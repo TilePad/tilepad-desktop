@@ -29,3 +29,10 @@ tokio = { version = "1.43.0", features = ["full"] }
 axum = { version = "0.8.1", features = ["ws"] }
 reqwest = "0.12.12"
 async_zip = { version = "0.0.17", features = ["full", "tokio"] }
+node-semver = "2.2.0"
+system-info = { version = "0.1.2", features = ["std"] }
+strum = { version = "0.26", features = ["derive"] }
+tempfile = "3.16.0"
+tokio-util = { version = "0.7.13", features = ["full"] }
+sanitize-filename = "0.6.0"
+zip = "2.2.2"
