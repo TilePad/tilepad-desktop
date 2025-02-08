@@ -4,6 +4,10 @@
 
 use serde::Serialize;
 
+use super::{
+    ActionId, Context, Controller, Coordinates, Device, DeviceInfo, Settings, TitleParameters,
+};
+
 #[derive(Debug, Serialize)]
 #[serde(tag = "event")]
 #[serde(rename_all = "camelCase")]
@@ -17,32 +21,32 @@ pub enum Events {
     },
 
     DeviceDidConnect {
-        device: DeviceId,
+        device: Device,
         device_info: DeviceInfo,
     },
 
     DeviceDidDisconnect {
-        device: DeviceId,
+        device: Device,
     },
 
     DialDown {
         action: ActionId,
-        context: ContextId,
-        device: DeviceId,
+        context: Context,
+        device: Device,
         payload: DialDownPayload,
     },
 
     DialRotate {
         action: ActionId,
-        context: ContextId,
-        device: DeviceId,
+        context: Context,
+        device: Device,
         payload: DialRotatePayload,
     },
 
     DialUp {
         action: ActionId,
-        context: ContextId,
-        device: DeviceId,
+        context: Context,
+        device: Device,
         payload: DialUpPayload,
     },
 
@@ -57,70 +61,70 @@ pub enum Events {
     #[serde(rename = "sendToPlugin")]
     DidReceivePropertyInspectorMessage {
         action: ActionId,
-        context: ContextId,
+        context: Context,
         payload: serde_json::Value,
     },
 
     DidReceiveSettings {
         action: ActionId,
-        context: ContextId,
-        device: DeviceId,
+        context: Context,
+        device: Device,
         payload: DidReceiveSettingsPayload,
     },
 
     KeyDown {
         action: ActionId,
-        context: ContextId,
-        device: DeviceId,
+        context: Context,
+        device: Device,
         payload: KeyUpDownPayload,
     },
 
     KeyUp {
         action: ActionId,
-        context: ContextId,
-        device: DeviceId,
+        context: Context,
+        device: Device,
         payload: KeyUpDownPayload,
     },
 
     PropertyInspectorDidAppear {
         action: ActionId,
-        context: ContextId,
-        device: DeviceId,
+        context: Context,
+        device: Device,
     },
 
     PropertyInspectorDidDisappear {
         action: ActionId,
-        context: ContextId,
-        device: DeviceId,
+        context: Context,
+        device: Device,
     },
 
     SystemDidWakeUp,
 
     TitleParametersDidChange {
         action: ActionId,
-        context: ContextId,
-        device: DeviceId,
+        context: Context,
+        device: Device,
         payload: TitleParametersDidChangePayload,
     },
 
     TouchTap {
         action: ActionId,
-        context: ContextId,
-        device: DeviceId,
+        context: Context,
+        device: Device,
         payload: TouchTapPayload,
     },
 
     WillAppear {
         action: ActionId,
-        context: ContextId,
-        device: DeviceId,
+        context: Context,
+        device: Device,
         payload: WillAppearPayload,
     },
 
     WillDisappear {
         action: ActionId,
-        context: ContextId,
-        device: DeviceId,
+        context: Context,
+        device: Device,
         payload: WillDisappearPayload,
     },
 }
@@ -168,38 +172,6 @@ pub struct TitleParametersDidChangePayload {
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct TitleParameters {
-    pub font_family: String,
-    pub font_size: f32,
-    pub font_style: FontStyle,
-    pub font_underline: bool,
-    pub show_title: bool,
-    pub title_alignment: TitleAlignment,
-    pub title_color: String,
-}
-
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "PascalCase")]
-pub enum FontStyle {
-    #[serde(rename = "")]
-    Unset,
-    #[serde(rename = "Bold Italic")]
-    BoldItalic,
-    Bold,
-    Italic,
-    Regular,
-}
-
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub enum TitleAlignment {
-    Bottom,
-    Middle,
-    Top,
-}
-
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct KeyUpDownPayload {
     pub controller: Controller,
     pub coordinates: Option<Coordinates>,
@@ -207,12 +179,6 @@ pub struct KeyUpDownPayload {
     pub settings: Settings,
     pub state: Option<u32>,
     pub user_desired_state: Option<u32>,
-}
-
-#[derive(Debug, Serialize)]
-pub enum Controller {
-    Keypad,
-    Encoder,
 }
 
 #[derive(Debug, Serialize)]
@@ -234,10 +200,6 @@ pub struct DidReceiveDeepLinkPayload {
 pub struct DidReceiveGlobalSettings {
     pub settings: Settings,
 }
-
-#[derive(Debug, Serialize)]
-#[serde(transparent)]
-pub struct Settings(pub serde_json::Value);
 
 #[derive(Debug, Serialize)]
 pub struct DialDownPayload {
@@ -266,13 +228,6 @@ pub struct DialRotatePayload {
     pub ticks: f32,
 }
 
-/// Coordinates that identify the location of the action.
-#[derive(Debug, Serialize)]
-pub struct Coordinates {
-    pub column: u32,
-    pub row: u32,
-}
-
 #[derive(Debug, Serialize)]
 pub struct ApplicationDidLaunchPayload {
     pub application: String,
@@ -281,25 +236,4 @@ pub struct ApplicationDidLaunchPayload {
 #[derive(Debug, Serialize)]
 pub struct ApplicationDidTerminatePayload {
     pub application: String,
-}
-
-pub type DeviceId = String;
-pub type ContextId = String;
-pub type ActionId = String;
-
-#[derive(Debug, Serialize)]
-pub struct DeviceInfo {
-    pub name: String,
-    pub size: Size,
-    #[serde(rename = "type")]
-    pub ty: DeviceType,
-}
-
-// TODO: Typing
-pub type DeviceType = String;
-
-#[derive(Debug, Serialize)]
-pub struct Size {
-    pub columns: u32,
-    pub rows: u32,
 }
