@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 pub mod commands;
 pub mod events;
@@ -18,7 +18,7 @@ pub struct DeviceInfo {
 }
 
 // TODO: Typing
-pub type DeviceType = String;
+pub type DeviceType = u32;
 
 #[derive(Debug, Serialize)]
 pub struct Size {
@@ -49,7 +49,7 @@ pub struct TitleParameters {
     pub title_color: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub enum FontStyle {
     #[serde(rename = "")]
@@ -61,7 +61,7 @@ pub enum FontStyle {
     Regular,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum TitleAlignment {
     Bottom,
@@ -69,8 +69,10 @@ pub enum TitleAlignment {
     Top,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum Controller {
     Keypad,
     Encoder,
+    #[serde(other)]
+    Unknown,
 }

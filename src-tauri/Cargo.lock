@@ -4640,6 +4640,7 @@ dependencies = [
  "sanitize-filename",
  "serde",
  "serde_json",
+ "serde_repr",
  "strum",
  "system-info",
  "tauri",
