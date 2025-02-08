@@ -105,7 +105,7 @@ mod test {
 
     use node_semver::Version;
 
-    use crate::plugin::runtime::{arch::PlatformArch, download::download_node, NodeVersion};
+    use crate::plugin::node::{arch::PlatformArch, download::download_node, NodeVersion};
 
     #[tokio::test]
     async fn test_download_latest() {
