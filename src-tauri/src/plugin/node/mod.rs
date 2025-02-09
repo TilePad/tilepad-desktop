@@ -4,6 +4,7 @@ pub mod download;
 use std::path::{Path, PathBuf};
 
 use anyhow::{bail, Context};
+use serde::{Deserialize, Serialize};
 
 /// Node runtime
 pub struct NodeRuntime {
@@ -14,6 +15,8 @@ pub struct NodeRuntime {
 }
 
 /// Version of a node runtime
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+#[serde(transparent)]
 pub struct NodeVersion(pub node_semver::Version);
 
 /// Searches within the provided directory for available runtimes

@@ -1,6 +1,7 @@
 pub mod plugin;
 pub mod server;
 pub mod services;
+pub mod tile;
 pub mod utils;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

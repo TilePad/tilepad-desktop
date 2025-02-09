@@ -4793,6 +4793,7 @@ dependencies = [
  "tokio",
  "tokio-util",
  "toml 0.8.20",
+ "uuid",
  "zip",
 ]
 

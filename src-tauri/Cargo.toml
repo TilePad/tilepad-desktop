@@ -39,3 +39,4 @@ zip = "2.2.2"
 serde_repr = "0.1.19"
 toml = "0.8.20"
 garde = { version = "0.22.0", features = ["full"] }
+uuid = { version = "1.13.1", features = ["v4"] }

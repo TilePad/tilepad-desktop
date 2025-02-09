@@ -6,6 +6,8 @@ use garde::{
 };
 use serde::Deserialize;
 
+use super::node::NodeVersion;
+
 #[derive(Debug, Deserialize, Validate)]
 pub struct Manifest {
     /// Details about the plugin itself
@@ -41,6 +43,8 @@ pub struct ManifestPlugin {
     pub authors: Vec<String>,
     #[garde(skip)]
     pub description: Option<String>,
+    #[garde(skip)]
+    pub icon: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize, Validate, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -59,6 +63,8 @@ impl PathComponentKind for ActionId {
     }
 }
 
+pub struct ActionPath(pub PluginId, pub ActionId);
+
 #[derive(Debug, Deserialize, Validate)]
 pub struct ManifestAction {
     #[garde(length(min = 1))]
@@ -67,6 +73,42 @@ pub struct ManifestAction {
     pub icon: Option<String>,
     #[garde(skip)]
     pub description: Option<String>,
+}
+
+#[derive(Debug, Deserialize, Validate)]
+pub enum ManifestBin {
+    /// Program uses the node runtime
+    Node {
+        #[garde(dive)]
+        node: ManifestBinNode,
+    },
+
+    /// Program uses a native binary
+    Native {
+        #[garde(dive)]
+        native: ManifestBinNative,
+    },
+}
+
+#[derive(Debug, Deserialize, Validate)]
+pub struct ManifestBinNode {
+    /// Entrypoint for the program
+    #[garde(length(min = 1))]
+    pub entrypoint: String,
+
+    /// Version of node the program should run using
+    #[garde(skip)]
+    pub version: NodeVersion,
+}
+
+#[derive(Debug, Deserialize, Validate)]
+pub struct ManifestBinNative {
+    // Binary path for 64bit windows
+    #[garde(inner(length(min = 1)))]
+    pub windows_x64: Option<String>,
+    // Binary path for 32bit windows
+    #[garde(inner(length(min = 1)))]
+    pub windows_x86: Option<String>,
 }
 
 /// Separators allowed within names
