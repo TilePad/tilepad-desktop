@@ -37,3 +37,5 @@ tokio-util = { version = "0.7.13", features = ["full"] }
 sanitize-filename = "0.6.0"
 zip = "2.2.2"
 serde_repr = "0.1.19"
+toml = "0.8.20"
+garde = { version = "0.22.0", features = ["full"] }
