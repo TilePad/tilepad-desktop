@@ -1,4 +1,3 @@
-pub mod models;
 pub mod plugin;
 pub mod server;
 pub mod services;
