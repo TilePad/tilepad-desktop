@@ -1,3 +1,4 @@
+pub mod database;
 pub mod plugin;
 pub mod server;
 pub mod services;

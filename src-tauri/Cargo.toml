@@ -18,25 +18,62 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
+
+# Tauri
 tauri = { version = "2", features = [] }
 tauri-plugin-opener = "2"
 
+# Serialization
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-
-anyhow = "1.0.95"
-tokio = { version = "1.43.0", features = ["full"] }
-axum = { version = "0.8.1", features = ["ws"] }
-reqwest = "0.12.12"
-async_zip = { version = "0.0.17", features = ["full", "tokio"] }
-node-semver = "2.2.0"
-system-info = { version = "0.1.2", features = ["std"] }
-strum = { version = "0.26", features = ["derive"] }
-tempfile = "3.16.0"
-tokio-util = { version = "0.7.13", features = ["full"] }
-sanitize-filename = "0.6.0"
-zip = "2.2.2"
-serde_repr = "0.1.19"
 toml = "0.8.20"
+
+# Validation
 garde = { version = "0.22.0", features = ["full"] }
+
+# Error handling
+anyhow = "1"
+
+# Async 
+tokio = { version = "1.43.0", features = ["full"] }
+tokio-util = { version = "0.7.13", features = ["full"] }
+futures = "0.3"
+
+# Mime type guessing for file serving
+mime_guess = "2"
+
+# HTTP
+axum = { version = "0.8.1", features = ["ws"] }
+tower-http = { version = "0.6.2", features = ["cors"] }
+reqwest = "0.12.12"
+
+# Files
+tempfile = "3.16.0"
+sanitize-filename = "0.6.0"
+async_zip = { version = "0.0.17", features = ["full", "tokio"] }
+
+node-semver = "2.2.0"
+strum = { version = "0.26", features = ["derive"] }
 uuid = { version = "1.13.1", features = ["v4"] }
+log = "0.4.25"
+
+
+# App database
+[dependencies.sea-orm]
+version = "1.1.0"
+features = ["sqlx-sqlite", "runtime-tokio-rustls", "macros"]
+
+# Database migration runner
+[dependencies.sea-orm-migration]
+version = "1.1.0"
+features = ["sqlx-sqlite", "runtime-tokio-rustls"]
+
+[profile.dev]
+incremental = true # Compile your binary in smaller steps.
+
+[profile.release]
+codegen-units = 1 # Allows LLVM to perform better optimization.
+lto = true        # Enables link-time-optimizations.
+opt-level = "s"   # Prioritizes small binary size. Use `3` if you prefer speed.
+panic = "abort"   # Higher performance by disabling panic handlers.
+strip = true      # Ensures debug symbols are removed.
