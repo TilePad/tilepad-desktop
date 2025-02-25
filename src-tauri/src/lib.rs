@@ -9,6 +9,7 @@ use tauri::{
 
 pub mod database;
 pub mod device;
+pub mod events;
 pub mod plugin;
 pub mod server;
 pub mod services;

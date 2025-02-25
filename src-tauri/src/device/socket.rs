@@ -9,6 +9,7 @@ use anyhow::anyhow;
 use axum::extract::ws::{Message, WebSocket};
 use futures::{SinkExt, StreamExt};
 use parking_lot::RwLock;
+use tauri::async_runtime::spawn;
 use tokio::sync::mpsc;
 use tracing::error;
 use uuid::Uuid;
@@ -29,9 +30,54 @@ pub struct DeviceSession {
     /// Session state
     state: RwLock<DeviceSessionState>,
 
+    tx: DeviceSessionSender,
+
     devices: Devices,
 }
 
+impl DeviceSession {
+    pub fn new(devices: Devices, socket: WebSocket) -> (DeviceSessionId, DeviceSessionRef) {
+        let id = Uuid::new_v4();
+
+        let (tx, rx) = mpsc::unbounded_channel();
+
+        let session = Arc::new(DeviceSession {
+            id,
+            state: Default::default(),
+            tx: DeviceSessionSender { tx },
+            devices,
+        });
+
+        // Spawn the future to handle the socket
+        spawn(DeviceSocketFuture {
+            rx,
+            session: session.clone(),
+            socket,
+            write_state: WriteState::Receive,
+        });
+
+        (id, session)
+    }
+
+    pub async fn handle_message(&self, message: ClientDeviceMessage) {
+        match message {
+            ClientDeviceMessage::RequestApproval { name } => {
+                self.devices.add_device_request(self.id, name);
+            }
+            ClientDeviceMessage::RequestProfile => {
+                // TODO: Request the device profile data, respond with new profile data
+            }
+            ClientDeviceMessage::Authenticate { access_token } => {
+                // TODO: Check db for authentication and authenticate device
+            }
+            ClientDeviceMessage::TileClicked { tile_id } => {
+                // TODO: Forward on click
+            }
+        }
+    }
+}
+
+#[derive(Default)]
 pub struct DeviceSessionState {
     /// Device ID if authenticated as a device
     device_id: Option<DeviceId>,
@@ -53,6 +99,12 @@ pub struct DeviceSocketFuture {
     write_state: WriteState,
 }
 
+impl Drop for DeviceSocketFuture {
+    fn drop(&mut self) {
+        self.session.devices.remove_session(self.session.id);
+    }
+}
+
 enum WriteState {
     /// Waiting for an outbound message
     Receive,
@@ -62,6 +114,11 @@ enum WriteState {
 
     /// Flush a message
     Flush,
+}
+
+enum ReadState {
+    /// Waiting for an incoming message
+    Receive,
 }
 
 /// Possible outcomes from polling the read state
@@ -195,8 +252,11 @@ impl Future for DeviceSocketFuture {
                     // Stop the socket since we are in an error state
                     return Poll::Ready(());
                 }
-                PollReadOutcome::Message(client_device_message) => {
-                    // TODO: Process device message
+                PollReadOutcome::Message(message) => {
+                    let session = this.session.clone();
+                    spawn(async move {
+                        session.handle_message(message).await;
+                    });
                 }
 
                 // Socket has closed, finish the future
