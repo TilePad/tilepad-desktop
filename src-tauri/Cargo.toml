@@ -55,10 +55,12 @@ async_zip = { version = "0.0.17", features = ["full", "tokio"] }
 node-semver = "2.2.0"
 strum = { version = "0.26", features = ["derive"] }
 uuid = { version = "1.13.1", features = ["v4"] }
-log = "0.4.25"
 chrono = { version = "0.4.39", features = ["serde"] }
 async-trait = "0.1.86"
 parking_lot = "0.12.3"
+
+tracing = { version = "0.1", features = ["log"] }
+tracing-subscriber = "0.3"
 
 [dependencies.sqlx]
 version = "0.8.2"
@@ -92,13 +94,3 @@ features = [
     "with-uuid",
     "runtime-tokio-rustls",
 ]
-
-[profile.dev]
-incremental = true # Compile your binary in smaller steps.
-
-[profile.release]
-codegen-units = 1 # Allows LLVM to perform better optimization.
-lto = true        # Enables link-time-optimizations.
-opt-level = "s"   # Prioritizes small binary size. Use `3` if you prefer speed.
-panic = "abort"   # Higher performance by disabling panic handlers.
-strip = true      # Ensures debug symbols are removed.

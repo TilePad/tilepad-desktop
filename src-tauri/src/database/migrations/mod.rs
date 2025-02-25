@@ -1,6 +1,5 @@
 use anyhow::Context;
 use chrono::{DateTime, Utc};
-use log::warn;
 use sea_query::{ColumnDef, IdenStatic, Query, SqliteQueryBuilder, Table};
 use sea_query_binder::SqlxBinder;
 use sqlx::prelude::FromRow;
@@ -84,9 +83,9 @@ pub async fn migrate(db: &DbPool) -> anyhow::Result<()> {
     // Check if a migration was applied but is not known locally (warning)
     for applied in applied {
         if !migration_names.contains(&applied.name) {
-            warn!(
-                "database has migration applied that is not known locally: \"{}\"",
-                &applied.name
+            tracing::warn!(
+                name = applied.name,
+                "database has migration applied that is not known locally",
             );
         }
     }
