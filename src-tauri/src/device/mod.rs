@@ -1,17 +1,10 @@
-use std::{
-    collections::{HashMap, VecDeque},
-    sync::Arc,
-};
+use std::{collections::HashMap, sync::Arc};
 
 use parking_lot::RwLock;
-use protocol::ClientDeviceMessage;
 use socket::{DeviceSessionId, DeviceSessionRef};
 use uuid::Uuid;
 
-use crate::{
-    database::entity::device::DeviceId,
-    events::{AppEvent, AppEventSender},
-};
+use crate::events::{AppEvent, AppEventSender};
 
 mod protocol;
 pub mod socket;
@@ -25,6 +18,16 @@ pub struct Devices {
 }
 
 impl Devices {
+    pub fn new(event_tx: AppEventSender) -> Self {
+        Self {
+            inner: Arc::new(DevicesInner {
+                event_tx,
+                sessions: Default::default(),
+                requests: Default::default(),
+            }),
+        }
+    }
+
     /// Insert a new session
     pub fn insert_session(&self, session_id: DeviceSessionId, session_ref: DeviceSessionRef) {
         self.inner.sessions.write().insert(session_id, session_ref);
@@ -41,7 +44,7 @@ impl Devices {
     pub fn remove_session_device_requests(&self, session_id: DeviceSessionId) {
         self.inner.requests.write().retain(|request| {
             if request.session_id == session_id {
-                self.inner.event_tx.send(AppEvent::DeviceRequestRemoved {
+                _ = self.inner.event_tx.send(AppEvent::DeviceRequestRemoved {
                     request_id: request.id,
                 });
                 false
@@ -64,7 +67,7 @@ impl Devices {
             device_name,
         });
 
-        inner
+        _ = inner
             .event_tx
             .send(AppEvent::DeviceRequestRemoved { request_id });
     }

@@ -6,6 +6,7 @@ use tauri::{
     async_runtime::{block_on, spawn},
     App, Manager,
 };
+use tokio::sync::mpsc;
 
 pub mod database;
 pub mod device;
@@ -27,19 +28,12 @@ pub fn run() {
 }
 
 fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
-    // Start configuring a `fmt` subscriber
     let subscriber = tracing_subscriber::fmt()
-        // Use a more compact, abbreviated log format
         .compact()
-        // Display source code file paths
         .with_file(true)
-        // Display source code line numbers
         .with_line_number(true)
-        // Display the thread ID an event was recorded on
         .with_thread_ids(true)
-        // Don't display the event's target (module path)
         .with_target(false)
-        // Build the subscriber
         .finish();
 
     // use that subscriber to process traces emitted after this point
@@ -54,11 +48,20 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
     let db = block_on(database::connect_database(app_data_path.join("app.db")))
         .context("failed to load database")?;
 
-    let devices = Devices::default();
+    let (app_event_tx, app_event_rx) = mpsc::unbounded_channel();
+    let devices = Devices::new(app_event_tx);
 
     app.manage(db.clone());
     app.manage(devices.clone());
 
+    // Spawn event processor
+    spawn(events::processing::process_events(
+        db.clone(),
+        app_handle.clone(),
+        app_event_rx,
+    ));
+
+    // Spawn HTTP server
     spawn(server::start_http_server(db, devices, app_handle.clone()));
 
     Ok(())

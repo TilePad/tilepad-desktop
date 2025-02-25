@@ -116,11 +116,6 @@ enum WriteState {
     Flush,
 }
 
-enum ReadState {
-    /// Waiting for an incoming message
-    Receive,
-}
-
 /// Possible outcomes from polling the read state
 enum PollReadOutcome {
     /// Encountered an error
@@ -216,7 +211,9 @@ impl DeviceSocketFuture {
                     .take()
                     .expect("unexpected write state without a packet");
 
-                self.socket.start_send_unpin(packet);
+                if let Err(err) = self.socket.start_send_unpin(packet) {
+                    return Poll::Ready(PollWriteOutcome::Error(anyhow::Error::new(err)));
+                }
 
                 self.write_state = WriteState::Flush;
 
