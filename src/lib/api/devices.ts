@@ -39,6 +39,10 @@ export function declineDeviceRequest(requestId: DeviceRequestId) {
   return invoke<void>("devices_decline_request", { requestId });
 }
 
+export function revokeDevice(deviceId: DeviceId) {
+  return invoke<void>("devices_revoke_device", { deviceId });
+}
+
 // [QUERIES] ------------------------------------------------------
 
 export function deviceRequestsQuery() {
@@ -50,14 +54,14 @@ export function deviceRequestsQuery() {
 
 export function devicesQuery() {
   return createQuery({
-    queryKey: devicesKeys.requests,
+    queryKey: devicesKeys.devices,
     queryFn: getDevices,
   });
 }
 
 export function connectedDevicesQuery() {
   return createQuery({
-    queryKey: devicesKeys.requests,
+    queryKey: devicesKeys.connectedDevices,
     queryFn: getConnectedDevices,
   });
 }
@@ -85,6 +89,13 @@ export function invalidateConnectedDevices() {
   });
 }
 
+export function invalidateDevicesAll() {
+  queryClient.invalidateQueries({
+    queryKey: devicesKeys.root,
+    exact: false,
+  });
+}
+
 // [LISTENERS] ------------------------------------------------------
 
 listen<DeviceRequestId>("device_requests:added", () => {
@@ -96,7 +107,7 @@ listen<DeviceRequestId>("device_requests:removed", () => {
 });
 
 listen<DeviceRequestId>("device_requests:accepted", () => {
-  invalidateDeviceRequests();
+  invalidateDevicesAll();
 });
 
 listen<DeviceRequestId>("device_requests:declined", () => {
@@ -104,5 +115,10 @@ listen<DeviceRequestId>("device_requests:declined", () => {
 });
 
 listen<DeviceId>("device:authenticated", () => {
+  invalidateConnectedDevices();
+});
+
+listen<DeviceId>("device:revoked", () => {
+  invalidateDevices();
   invalidateConnectedDevices();
 });

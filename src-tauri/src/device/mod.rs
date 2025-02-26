@@ -159,7 +159,6 @@ impl Devices {
         )
         .await?;
 
-        session.set_device_id(Some(device.id));
         session.send_approved(device.id, access_token)?;
 
         self.emit_app_event(AppEvent::DeviceRequest(DeviceRequestAppEvent::Accepted {
@@ -186,6 +185,28 @@ impl Devices {
         }));
 
         Ok(())
+    }
+
+    /// Find a session from its device ID
+    pub fn get_session_by_device(&self, device_id: DeviceId) -> Option<DeviceSessionRef> {
+        self.inner
+            .sessions
+            .read()
+            .values()
+            .find_map(|(session_ref)| {
+                // Skip closed sessions
+                if session_ref.is_closed() {
+                    return None;
+                }
+
+                let session_device_id = session_ref.get_device_id()?;
+
+                if session_device_id != device_id {
+                    return None;
+                }
+
+                Some(session_ref.clone())
+            })
     }
 
     /// Attempt to authenticate a session using a access token
@@ -215,6 +236,21 @@ impl Devices {
         self.emit_app_event(AppEvent::Device(DeviceAppEvent::Authenticated {
             device_id: device.id,
         }));
+
+        Ok(())
+    }
+
+    /// Revoke access for a device
+    pub async fn revoke_device(&self, device_id: DeviceId) -> anyhow::Result<()> {
+        DeviceModel::delete(&self.inner.db, device_id).await?;
+
+        self.emit_app_event(AppEvent::Device(DeviceAppEvent::Revoked { device_id }));
+
+        // Tell the session its been revoked
+        if let Some(session) = self.get_session_by_device(device_id) {
+            session.set_device_id(None);
+            session.send_revoked()?;
+        }
 
         Ok(())
     }

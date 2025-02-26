@@ -32,6 +32,7 @@ pub fn run() {
             devices::devices_get_connected_devices,
             devices::devices_approve_request,
             devices::devices_decline_request,
+            devices::devices_revoke_device,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -42,6 +42,9 @@ pub enum ServerDeviceMessage {
         access_token: String,
     },
 
+    /// Access was revoked
+    Revoked,
+
     /// Device is authenticated
     Authenticated,
 

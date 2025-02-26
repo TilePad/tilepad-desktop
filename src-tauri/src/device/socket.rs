@@ -88,6 +88,7 @@ impl DeviceSession {
         })?;
         Ok(())
     }
+
     pub fn send_authenticated(&self) -> anyhow::Result<()> {
         self.tx.tx.send(ServerDeviceMessage::Authenticated)?;
         Ok(())
@@ -100,6 +101,11 @@ impl DeviceSession {
 
     pub fn send_declined(&self) -> anyhow::Result<()> {
         self.tx.tx.send(ServerDeviceMessage::Declined)?;
+        Ok(())
+    }
+
+    pub fn send_revoked(&self) -> anyhow::Result<()> {
+        self.tx.tx.send(ServerDeviceMessage::Revoked)?;
         Ok(())
     }
 

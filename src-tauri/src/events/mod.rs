@@ -17,6 +17,7 @@ pub enum AppEvent {
 #[derive(Debug)]
 pub enum DeviceAppEvent {
     Authenticated { device_id: DeviceId },
+    Revoked { device_id: DeviceId },
 }
 
 #[derive(Debug)]

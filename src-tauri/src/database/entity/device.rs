@@ -137,6 +137,16 @@ impl DeviceModel {
         )
         .await
     }
+
+    pub async fn delete(db: &DbPool, device_id: DeviceId) -> DbResult<()> {
+        sql_exec(
+            db,
+            Query::delete()
+                .from_table(DevicesTable)
+                .and_where(Expr::col(DevicesColumn::Id).eq(device_id)),
+        )
+        .await
+    }
 }
 
 #[derive(IdenStatic, Copy, Clone)]

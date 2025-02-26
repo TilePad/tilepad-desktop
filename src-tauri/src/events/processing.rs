@@ -58,6 +58,9 @@ async fn process_event(app_handle: &AppHandle, event: AppEvent) -> anyhow::Resul
             DeviceAppEvent::Authenticated { device_id } => {
                 app_handle.emit("device:authenticated", device_id)?;
             }
+            DeviceAppEvent::Revoked { device_id } => {
+                app_handle.emit("device:revoked", device_id)?;
+            }
         },
     }
 
