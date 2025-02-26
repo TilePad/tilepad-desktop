@@ -10,7 +10,6 @@ use anyhow::anyhow;
 use axum::extract::ws::{Message, WebSocket};
 use futures::{SinkExt, StreamExt};
 use parking_lot::RwLock;
-use serde::de;
 use tauri::async_runtime::spawn;
 use tokio::sync::mpsc;
 use tracing::error;
@@ -70,6 +69,10 @@ impl DeviceSession {
         (id, session)
     }
 
+    pub fn is_closed(&self) -> bool {
+        self.tx.tx.is_closed()
+    }
+
     pub fn get_device_id(&self) -> Option<DeviceId> {
         self.state.read().device_id
     }
@@ -85,24 +88,46 @@ impl DeviceSession {
         })?;
         Ok(())
     }
+    pub fn send_authenticated(&self) -> anyhow::Result<()> {
+        self.tx.tx.send(ServerDeviceMessage::Authenticated)?;
+        Ok(())
+    }
+
+    pub fn send_invalid_access_token(&self) -> anyhow::Result<()> {
+        self.tx.tx.send(ServerDeviceMessage::InvalidAccessToken)?;
+        Ok(())
+    }
 
     pub fn send_declined(&self) -> anyhow::Result<()> {
         self.tx.tx.send(ServerDeviceMessage::Declined)?;
         Ok(())
     }
 
-    pub async fn handle_message(&self, message: ClientDeviceMessage) {
+    pub fn handle_message(&self, message: ClientDeviceMessage) {
         match message {
             ClientDeviceMessage::RequestApproval { name } => {
                 self.devices
                     .add_device_request(self.id, self.socket_addr, name);
             }
+
+            ClientDeviceMessage::Authenticate { access_token } => {
+                let session_id = self.id;
+                let devices = self.devices.clone();
+
+                _ = tokio::spawn(async move {
+                    if let Err(cause) = devices
+                        .attempt_authenticate_device(session_id, access_token)
+                        .await
+                    {
+                        tracing::error!(?cause, "failed to authenticate device");
+                    }
+                });
+            }
+
             ClientDeviceMessage::RequestProfile => {
                 // TODO: Request the device profile data, respond with new profile data
             }
-            ClientDeviceMessage::Authenticate { access_token } => {
-                // TODO: Check db for authentication and authenticate device
-            }
+
             ClientDeviceMessage::TileClicked { tile_id } => {
                 // TODO: Forward on click
             }
@@ -283,10 +308,7 @@ impl Future for DeviceSocketFuture {
                     return Poll::Ready(());
                 }
                 PollReadOutcome::Message(message) => {
-                    let session = this.session.clone();
-                    spawn(async move {
-                        session.handle_message(message).await;
-                    });
+                    this.session.handle_message(message);
                 }
 
                 // Socket has closed, finish the future

@@ -16,7 +16,8 @@
     "@tanstack/svelte-query": "^5.66.9",
     "@tanstack/svelte-query-devtools": "^5.66.9",
     "@tauri-apps/api": "^2",
-    "@tauri-apps/plugin-opener": "^2"
+    "@tauri-apps/plugin-opener": "^2",
+    "svelte-sonner": "^0.3.28"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.6",

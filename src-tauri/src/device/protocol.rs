@@ -46,7 +46,7 @@ pub enum ServerDeviceMessage {
     Authenticated,
 
     /// Provided access token was invalid
-    InvalidAccessToken {},
+    InvalidAccessToken,
 
     /// Update the current profile data and its tiles
     ProfileUpdate {},

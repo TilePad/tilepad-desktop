@@ -1,6 +1,6 @@
 use tokio::sync::mpsc;
 
-use crate::device::DeviceRequestId;
+use crate::{database::entity::device::DeviceId, device::DeviceRequestId};
 
 pub mod processing;
 
@@ -10,6 +10,13 @@ pub type AppEventReceiver = mpsc::UnboundedReceiver<AppEvent>;
 #[derive(Debug)]
 pub enum AppEvent {
     DeviceRequest(DeviceRequestAppEvent),
+
+    Device(DeviceAppEvent),
+}
+
+#[derive(Debug)]
+pub enum DeviceAppEvent {
+    Authenticated { device_id: DeviceId },
 }
 
 #[derive(Debug)]

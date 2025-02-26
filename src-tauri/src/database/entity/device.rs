@@ -1,10 +1,13 @@
 use chrono::{DateTime, Utc};
-use sea_query::{IdenStatic, Query};
+use sea_query::{Expr, IdenStatic, Query};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 use uuid::Uuid;
 
-use crate::database::{helpers::sql_exec, DbPool, DbResult};
+use crate::database::{
+    helpers::{sql_exec, sql_query_all, sql_query_maybe_one},
+    DbPool, DbResult,
+};
 
 use super::profile::ProfileId;
 
@@ -14,6 +17,8 @@ pub type DeviceId = Uuid;
 pub struct DeviceModel {
     pub id: DeviceId,
     pub name: String,
+    /// Access token should not be serialized
+    #[serde(skip)]
     pub access_token: String,
     #[sqlx(json)]
     pub config: DeviceConfig,
@@ -75,6 +80,62 @@ impl DeviceModel {
         .await?;
 
         Ok(model)
+    }
+
+    pub async fn set_connected_now(&mut self, db: &DbPool) -> DbResult<()> {
+        self.last_connected_at = Utc::now();
+        sql_exec(
+            db,
+            Query::update()
+                .table(DevicesTable)
+                .value(
+                    DevicesColumn::LastConnectedAt,
+                    Expr::value(self.last_connected_at),
+                )
+                .and_where(Expr::col(DevicesColumn::Id).eq(self.id)),
+        )
+        .await
+    }
+
+    /// Get a device using its access token
+    pub async fn get_by_access_token(
+        db: &DbPool,
+        access_token: &str,
+    ) -> DbResult<Option<DeviceModel>> {
+        sql_query_maybe_one(
+            db,
+            Query::select()
+                .from(DevicesTable)
+                .columns([
+                    DevicesColumn::Id,
+                    DevicesColumn::Name,
+                    DevicesColumn::AccessToken,
+                    DevicesColumn::Config,
+                    DevicesColumn::Order,
+                    DevicesColumn::ProfileId,
+                    DevicesColumn::CreatedAt,
+                    DevicesColumn::LastConnectedAt,
+                ])
+                .and_where(Expr::col(DevicesColumn::AccessToken).eq(access_token)),
+        )
+        .await
+    }
+
+    pub async fn all(db: &DbPool) -> DbResult<Vec<DeviceModel>> {
+        sql_query_all(
+            db,
+            Query::select().from(DevicesTable).columns([
+                DevicesColumn::Id,
+                DevicesColumn::Name,
+                DevicesColumn::AccessToken,
+                DevicesColumn::Config,
+                DevicesColumn::Order,
+                DevicesColumn::ProfileId,
+                DevicesColumn::CreatedAt,
+                DevicesColumn::LastConnectedAt,
+            ]),
+        )
+        .await
     }
 }
 

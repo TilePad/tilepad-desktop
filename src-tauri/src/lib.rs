@@ -28,6 +28,8 @@ pub fn run() {
         .setup(setup)
         .invoke_handler(tauri::generate_handler![
             devices::devices_get_requests,
+            devices::devices_get_devices,
+            devices::devices_get_connected_devices,
             devices::devices_approve_request,
             devices::devices_decline_request,
         ])

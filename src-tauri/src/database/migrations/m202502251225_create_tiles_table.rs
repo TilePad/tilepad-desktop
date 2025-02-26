@@ -21,7 +21,7 @@ impl Migration for TilesMigration {
                 .if_not_exists()
                 .col(pk_uuid(TilesColumn::Id))
                 .col(json(TilesColumn::Config))
-                .col(uuid(TilesColumn::ProfileId).null())
+                .col(uuid(TilesColumn::ProfileId))
                 .col(integer(TilesColumn::Position))
                 .col(date_time(TilesColumn::CreatedAt))
                 .foreign_key(

@@ -3,6 +3,7 @@
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
 
   import { queryClient } from "$lib/api/client";
+  import AppToaster from "$lib/components/AppToaster.svelte";
 
   let { children } = $props();
 </script>
@@ -11,5 +12,7 @@
   <main>
     {@render children()}
   </main>
+
+  <AppToaster />
   <SvelteQueryDevtools />
 </QueryClientProvider>

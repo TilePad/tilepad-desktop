@@ -18,6 +18,13 @@ where
     ColumnDef::new(name).uuid().not_null().to_owned()
 }
 
+pub fn uuid_null<T>(name: T) -> ColumnDef
+where
+    T: IntoIden,
+{
+    ColumnDef::new(name).uuid().null().to_owned()
+}
+
 pub fn string<T>(name: T) -> ColumnDef
 where
     T: IntoIden,

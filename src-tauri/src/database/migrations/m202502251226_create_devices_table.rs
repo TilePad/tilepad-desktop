@@ -23,7 +23,7 @@ impl Migration for DevicesMigration {
                 .col(string(DevicesColumn::AccessToken))
                 .col(json(DevicesColumn::Config))
                 .col(integer(DevicesColumn::Order).default(0))
-                .col(uuid(DevicesColumn::ProfileId).null())
+                .col(uuid_null(DevicesColumn::ProfileId))
                 .col(date_time(DevicesColumn::CreatedAt))
                 .col(date_time(DevicesColumn::LastConnectedAt))
                 .foreign_key(

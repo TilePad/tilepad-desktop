@@ -4,7 +4,7 @@ use futures::{stream::FuturesUnordered, Stream};
 use tauri::{AppHandle, Emitter};
 use tracing::{debug, error};
 
-use super::{AppEvent, AppEventReceiver, DeviceRequestAppEvent};
+use super::{AppEvent, AppEventReceiver, DeviceAppEvent, DeviceRequestAppEvent};
 
 pub async fn process_events(app_handle: AppHandle, mut event_rx: AppEventReceiver) {
     let mut futures = FuturesUnordered::new();
@@ -52,6 +52,11 @@ async fn process_event(app_handle: &AppHandle, event: AppEvent) -> anyhow::Resul
             }
             DeviceRequestAppEvent::Decline { request_id } => {
                 app_handle.emit("device_requests:declined", request_id)?;
+            }
+        },
+        AppEvent::Device(device_app_event) => match device_app_event {
+            DeviceAppEvent::Authenticated { device_id } => {
+                app_handle.emit("device:authenticated", device_id)?;
             }
         },
     }
