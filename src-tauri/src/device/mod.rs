@@ -189,24 +189,20 @@ impl Devices {
 
     /// Find a session from its device ID
     pub fn get_session_by_device(&self, device_id: DeviceId) -> Option<DeviceSessionRef> {
-        self.inner
-            .sessions
-            .read()
-            .values()
-            .find_map(|(session_ref)| {
-                // Skip closed sessions
-                if session_ref.is_closed() {
-                    return None;
-                }
+        self.inner.sessions.read().values().find_map(|session_ref| {
+            // Skip closed sessions
+            if session_ref.is_closed() {
+                return None;
+            }
 
-                let session_device_id = session_ref.get_device_id()?;
+            let session_device_id = session_ref.get_device_id()?;
 
-                if session_device_id != device_id {
-                    return None;
-                }
+            if session_device_id != device_id {
+                return None;
+            }
 
-                Some(session_ref.clone())
-            })
+            Some(session_ref.clone())
+        })
     }
 
     /// Attempt to authenticate a session using a access token
