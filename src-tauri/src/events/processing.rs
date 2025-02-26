@@ -1,7 +1,7 @@
 use std::{future::poll_fn, task::Poll};
 
 use futures::{stream::FuturesUnordered, Stream};
-use tauri::AppHandle;
+use tauri::{AppHandle, Emitter};
 use tracing::{debug, error};
 
 use crate::database::DbPool;
@@ -41,5 +41,14 @@ pub async fn process_events(db: DbPool, app_handle: AppHandle, mut event_rx: App
 }
 
 async fn process_event(db: &DbPool, app_handle: &AppHandle, event: AppEvent) -> anyhow::Result<()> {
+    match event {
+        AppEvent::DeviceRequestAdded { request_id } => {
+            app_handle.emit("device_requests:added", request_id)?;
+        }
+        AppEvent::DeviceRequestRemoved { request_id } => {
+            app_handle.emit("device_requests:removed", request_id)?;
+        }
+    }
+
     Ok(())
 }

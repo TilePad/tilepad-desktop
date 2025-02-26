@@ -31,6 +31,9 @@ pub enum ClientDeviceMessage {
 #[derive(Serialize)]
 #[serde(tag = "type")]
 pub enum ServerDeviceMessage {
+    /// Device access was denied
+    Denied {},
+
     /// Device access was approved
     Approved {
         /// Unique ID of the device
@@ -41,6 +44,9 @@ pub enum ServerDeviceMessage {
 
     /// Device is authenticated
     Authenticated {},
+
+    /// Provided access token was invalid
+    InvalidAccessToken {},
 
     /// Update the current profile data and its tiles
     ProfileUpdate {},

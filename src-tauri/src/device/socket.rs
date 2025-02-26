@@ -1,5 +1,6 @@
 use std::{
     future::Future,
+    net::SocketAddr,
     pin::Pin,
     sync::Arc,
     task::{ready, Context, Poll},
@@ -27,6 +28,10 @@ pub type DeviceSessionRef = Arc<DeviceSession>;
 pub struct DeviceSession {
     /// Unique ID of the session
     id: DeviceSessionId,
+
+    /// Address of the device session socket
+    socket_addr: SocketAddr,
+
     /// Session state
     state: RwLock<DeviceSessionState>,
 
@@ -36,13 +41,18 @@ pub struct DeviceSession {
 }
 
 impl DeviceSession {
-    pub fn new(devices: Devices, socket: WebSocket) -> (DeviceSessionId, DeviceSessionRef) {
+    pub fn new(
+        devices: Devices,
+        socket_addr: SocketAddr,
+        socket: WebSocket,
+    ) -> (DeviceSessionId, DeviceSessionRef) {
         let id = Uuid::new_v4();
 
         let (tx, rx) = mpsc::unbounded_channel();
 
         let session = Arc::new(DeviceSession {
             id,
+            socket_addr,
             state: Default::default(),
             tx: DeviceSessionSender { tx },
             devices,
@@ -62,7 +72,8 @@ impl DeviceSession {
     pub async fn handle_message(&self, message: ClientDeviceMessage) {
         match message {
             ClientDeviceMessage::RequestApproval { name } => {
-                self.devices.add_device_request(self.id, name);
+                self.devices
+                    .add_device_request(self.id, self.socket_addr, name);
             }
             ClientDeviceMessage::RequestProfile => {
                 // TODO: Request the device profile data, respond with new profile data

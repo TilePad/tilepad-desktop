@@ -7,30 +7,36 @@ use tauri::{
     App, Manager,
 };
 use tokio::sync::mpsc;
+use tracing_subscriber::EnvFilter;
 
-pub mod database;
-pub mod device;
-pub mod events;
-pub mod plugin;
-pub mod server;
-pub mod services;
-pub mod tile;
-pub mod utils;
+mod commands;
+mod database;
+mod device;
+mod events;
+mod plugin;
+mod server;
+mod services;
+mod tile;
+mod utils;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    use commands::devices;
+
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .setup(setup)
-        .invoke_handler(tauri::generate_handler![])
+        .invoke_handler(tauri::generate_handler![devices::devices_get_requests])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
 
 fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
+    let filter = EnvFilter::from_default_env();
     let subscriber = tracing_subscriber::fmt()
         .compact()
         .with_file(true)
+        .with_env_filter(filter)
         .with_line_number(true)
         .with_thread_ids(true)
         .with_target(false)
@@ -49,10 +55,12 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         .context("failed to load database")?;
 
     let (app_event_tx, app_event_rx) = mpsc::unbounded_channel();
-    let devices = Devices::new(app_event_tx);
+    let devices = Devices::new(app_event_tx, db.clone());
 
     app.manage(db.clone());
     app.manage(devices.clone());
+
+    tracing::debug!("starting event processor");
 
     // Spawn event processor
     spawn(events::processing::process_events(

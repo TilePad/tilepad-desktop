@@ -5,10 +5,10 @@ use super::{
 };
 use sea_query::{ForeignKey, ForeignKeyAction, IdenStatic, SqliteQueryBuilder, Table};
 
-pub struct ProfilesMigration;
+pub struct DevicesMigration;
 
 #[async_trait::async_trait]
-impl Migration for ProfilesMigration {
+impl Migration for DevicesMigration {
     fn name(&self) -> &str {
         "m202502251226_create_devices_table"
     }

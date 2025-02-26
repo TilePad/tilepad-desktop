@@ -1,10 +1,14 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::HashMap, net::SocketAddr, sync::Arc};
 
 use parking_lot::RwLock;
+use serde::Serialize;
 use socket::{DeviceSessionId, DeviceSessionRef};
 use uuid::Uuid;
 
-use crate::events::{AppEvent, AppEventSender};
+use crate::{
+    database::DbPool,
+    events::{AppEvent, AppEventSender},
+};
 
 mod protocol;
 pub mod socket;
@@ -18,10 +22,11 @@ pub struct Devices {
 }
 
 impl Devices {
-    pub fn new(event_tx: AppEventSender) -> Self {
+    pub fn new(event_tx: AppEventSender, db: DbPool) -> Self {
         Self {
             inner: Arc::new(DevicesInner {
                 event_tx,
+                db,
                 sessions: Default::default(),
                 requests: Default::default(),
             }),
@@ -55,7 +60,12 @@ impl Devices {
     }
 
     /// Add a new device request
-    pub fn add_device_request(&self, session_id: DeviceSessionId, device_name: String) {
+    pub fn add_device_request(
+        &self,
+        session_id: DeviceSessionId,
+        socket_addr: SocketAddr,
+        device_name: String,
+    ) {
         self.remove_session_device_requests(session_id);
 
         let inner = &*self.inner;
@@ -63,6 +73,7 @@ impl Devices {
         let request_id = Uuid::new_v4();
         inner.requests.write().push(DeviceRequest {
             id: request_id,
+            socket_addr,
             session_id,
             device_name,
         });
@@ -71,11 +82,18 @@ impl Devices {
             .event_tx
             .send(AppEvent::DeviceRequestRemoved { request_id });
     }
+
+    pub fn get_device_requests(&self) -> Vec<DeviceRequest> {
+        self.inner.requests.read().clone()
+    }
 }
 
 pub struct DevicesInner {
     /// Sender for app events
     event_tx: AppEventSender,
+
+    /// Access to the database
+    db: DbPool,
 
     /// Current device socket sessions
     sessions: RwLock<HashMap<DeviceSessionId, DeviceSessionRef>>,
@@ -84,9 +102,12 @@ pub struct DevicesInner {
     requests: RwLock<Vec<DeviceRequest>>,
 }
 
+#[derive(Clone, Serialize)]
 pub struct DeviceRequest {
     /// Unique ID for the request itself
     id: DeviceRequestId,
+    /// Address of the connecting device
+    socket_addr: SocketAddr,
     /// ID of the session the request is for
     session_id: DeviceSessionId,
     /// Name of the device requesting approval
