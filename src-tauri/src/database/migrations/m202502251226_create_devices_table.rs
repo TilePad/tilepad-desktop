@@ -20,7 +20,6 @@ impl Migration for DevicesMigration {
                 .if_not_exists()
                 .col(pk_uuid(DevicesColumn::Id))
                 .col(string(DevicesColumn::Name))
-                .col(boolean(DevicesColumn::Connected))
                 .col(string(DevicesColumn::AccessToken))
                 .col(json(DevicesColumn::Config))
                 .col(integer(DevicesColumn::Order).default(0))
@@ -54,8 +53,6 @@ pub enum DevicesColumn {
     Id,
     /// Name of the device
     Name,
-    /// Whether the device is connected
-    Connected,
     /// Access token for the device
     AccessToken,
     /// Additional device configuration

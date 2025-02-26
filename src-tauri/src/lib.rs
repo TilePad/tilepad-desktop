@@ -26,7 +26,11 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .setup(setup)
-        .invoke_handler(tauri::generate_handler![devices::devices_get_requests])
+        .invoke_handler(tauri::generate_handler![
+            devices::devices_get_requests,
+            devices::devices_approve_request,
+            devices::devices_decline_request,
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -64,7 +68,6 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
 
     // Spawn event processor
     spawn(events::processing::process_events(
-        db.clone(),
         app_handle.clone(),
         app_event_rx,
     ));

@@ -5404,6 +5404,7 @@ dependencies = [
  "mime_guess",
  "node-semver",
  "parking_lot",
+ "rand 0.9.0",
  "reqwest",
  "sanitize-filename",
  "sea-query",

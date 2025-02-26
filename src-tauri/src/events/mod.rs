@@ -9,6 +9,14 @@ pub type AppEventReceiver = mpsc::UnboundedReceiver<AppEvent>;
 
 #[derive(Debug)]
 pub enum AppEvent {
-    DeviceRequestAdded { request_id: DeviceRequestId },
-    DeviceRequestRemoved { request_id: DeviceRequestId },
+    DeviceRequest(DeviceRequestAppEvent),
+}
+
+#[derive(Debug)]
+pub enum DeviceRequestAppEvent {
+    Added { request_id: DeviceRequestId },
+    Removed { request_id: DeviceRequestId },
+
+    Accepted { request_id: DeviceRequestId },
+    Decline { request_id: DeviceRequestId },
 }

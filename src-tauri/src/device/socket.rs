@@ -10,6 +10,7 @@ use anyhow::anyhow;
 use axum::extract::ws::{Message, WebSocket};
 use futures::{SinkExt, StreamExt};
 use parking_lot::RwLock;
+use serde::de;
 use tauri::async_runtime::spawn;
 use tokio::sync::mpsc;
 use tracing::error;
@@ -67,6 +68,27 @@ impl DeviceSession {
         });
 
         (id, session)
+    }
+
+    pub fn get_device_id(&self) -> Option<DeviceId> {
+        self.state.read().device_id
+    }
+
+    pub fn set_device_id(&self, device_id: Option<DeviceId>) {
+        self.state.write().device_id = device_id;
+    }
+
+    pub fn send_approved(&self, device_id: DeviceId, access_token: String) -> anyhow::Result<()> {
+        self.tx.tx.send(ServerDeviceMessage::Approved {
+            device_id,
+            access_token,
+        })?;
+        Ok(())
+    }
+
+    pub fn send_declined(&self) -> anyhow::Result<()> {
+        self.tx.tx.send(ServerDeviceMessage::Declined)?;
+        Ok(())
     }
 
     pub async fn handle_message(&self, message: ClientDeviceMessage) {

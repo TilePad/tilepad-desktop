@@ -32,7 +32,7 @@ pub enum ClientDeviceMessage {
 #[serde(tag = "type")]
 pub enum ServerDeviceMessage {
     /// Device access was denied
-    Denied {},
+    Declined,
 
     /// Device access was approved
     Approved {
@@ -43,7 +43,7 @@ pub enum ServerDeviceMessage {
     },
 
     /// Device is authenticated
-    Authenticated {},
+    Authenticated,
 
     /// Provided access token was invalid
     InvalidAccessToken {},
