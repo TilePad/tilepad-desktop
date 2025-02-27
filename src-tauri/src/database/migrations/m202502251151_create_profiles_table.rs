@@ -16,11 +16,9 @@ impl Migration for ProfilesMigration {
                 .if_not_exists()
                 .col(pk_uuid(ProfilesColumn::Id))
                 .col(string(ProfilesColumn::Name))
-                .col(boolean(ProfilesColumn::Active))
                 .col(boolean(ProfilesColumn::Default))
                 .col(json(ProfilesColumn::Config))
                 .col(integer(ProfilesColumn::Order).default(0))
-                .col(date_time(ProfilesColumn::CreatedAt))
                 .build(SqliteQueryBuilder),
         )
         .execute(db)
@@ -40,14 +38,10 @@ pub enum ProfilesColumn {
     Id,
     /// Name of the profile
     Name,
-    /// Whether the profile is the active profile
-    Active,
     /// Whether the profile is the default profile
     Default,
     /// Profile configuration (JSON)
     Config,
     /// Order position of the profile
     Order,
-    /// When the profile was created
-    CreatedAt,
 }

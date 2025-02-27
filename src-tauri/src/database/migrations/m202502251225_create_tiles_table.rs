@@ -1,5 +1,4 @@
 use super::{
-    m202502251151_create_profiles_table::{ProfilesColumn, ProfilesTable},
     m202502251153_create_folders_table::{FoldersColumn, FoldersTable},
     m202502251226_create_devices_table::DevicesTable,
     schema::*,
@@ -25,7 +24,6 @@ impl Migration for TilesMigration {
                 .col(uuid_null(TilesColumn::FolderId))
                 .col(integer(TilesColumn::Row))
                 .col(integer(TilesColumn::Column))
-                .col(date_time(TilesColumn::CreatedAt))
                 // Connect to profiles table
                 .foreign_key(
                     ForeignKey::create()
@@ -60,6 +58,4 @@ pub enum TilesColumn {
     Row,
     /// Column the tile is on
     Column,
-    /// When the profile was created
-    CreatedAt,
 }

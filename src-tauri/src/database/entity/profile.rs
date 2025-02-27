@@ -1,4 +1,3 @@
-use chrono::{DateTime, Utc};
 use sea_query::{Expr, IdenStatic, Query};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
@@ -20,7 +19,6 @@ pub struct ProfileModel {
     #[sqlx(json)]
     pub config: ProfileConfig,
     pub order: u32,
-    pub created_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
@@ -43,7 +41,6 @@ impl ProfileModel {
             default: create.default,
             config: create.config,
             order: create.order,
-            created_at: Utc::now(),
         };
 
         let config = serde_json::to_value(&model.config)?;
@@ -55,11 +52,9 @@ impl ProfileModel {
                 .columns([
                     ProfilesColumn::Id,
                     ProfilesColumn::Name,
-                    ProfilesColumn::Active,
                     ProfilesColumn::Default,
                     ProfilesColumn::Config,
                     ProfilesColumn::Order,
-                    ProfilesColumn::CreatedAt,
                 ])
                 .values_panic([
                     model.id.into(),
@@ -68,28 +63,11 @@ impl ProfileModel {
                     model.default.into(),
                     config.into(),
                     model.order.into(),
-                    model.created_at.into(),
                 ]),
         )
         .await?;
 
         Ok(model)
-    }
-
-    /// Set this profile as the default profile
-    pub async fn set_active(&mut self, db: &DbPool) -> DbResult<()> {
-        sql_exec(
-            db,
-            Query::update().table(ProfilesTable).value(
-                ProfilesColumn::Active,
-                Expr::case(Expr::col(ProfilesColumn::Id).eq(self.id), true).finally(false),
-            ),
-        )
-        .await?;
-
-        self.active = true;
-
-        Ok(())
     }
 
     /// Set this profile as the default profile
@@ -117,11 +95,9 @@ impl ProfileModel {
                 .columns([
                     ProfilesColumn::Id,
                     ProfilesColumn::Name,
-                    ProfilesColumn::Active,
                     ProfilesColumn::Default,
                     ProfilesColumn::Config,
                     ProfilesColumn::Order,
-                    ProfilesColumn::CreatedAt,
                 ])
                 .and_where(Expr::col(ProfilesColumn::Default).eq(true)),
         )
@@ -139,14 +115,10 @@ pub enum ProfilesColumn {
     Id,
     /// Name of the profile
     Name,
-    /// Whether the profile is the active profile
-    Active,
     /// Whether the profile is the default profile
     Default,
     /// Profile configuration (JSON)
     Config,
     /// Order position of the profile
     Order,
-    /// When the profile was created
-    CreatedAt,
 }

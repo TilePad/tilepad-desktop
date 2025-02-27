@@ -22,8 +22,8 @@ impl Migration for ProfilesMigration {
                 .col(string(FoldersColumn::Name))
                 .col(json(FoldersColumn::Config))
                 .col(uuid(FoldersColumn::ProfileId))
-                .col(date_time(FoldersColumn::CreatedAt))
                 .col(boolean(FoldersColumn::Default))
+                .col(integer(FoldersColumn::Order))
                 // Connect to profiles table
                 .foreign_key(
                     ForeignKey::create()
@@ -54,10 +54,10 @@ pub enum FoldersColumn {
     Name,
     /// Folder config (JSON)
     Config,
+    /// Order in the list for this folder
+    Order,
     /// Profile the folder belongs to
     ProfileId,
     /// Whether the folder is the default for the profile
     Default,
-    /// When the profile was created
-    CreatedAt,
 }
