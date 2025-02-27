@@ -4,6 +4,7 @@
     deviceRequestsQuery,
     devicesQuery,
   } from "$lib/api/devices";
+  import ConnectInfo from "$lib/components/devices/ConnectInfo.svelte";
   import DeviceCard from "$lib/components/devices/DeviceCard.svelte";
   import DeviceRequestCard from "$lib/components/devices/DeviceRequestCard.svelte";
 
@@ -22,33 +23,75 @@
   }
 </script>
 
-<a href="/">Home</a>
-
-<h2>Requests</h2>
-
-{#if $requests.isLoading}
-  Loading requests...
-{:else if $requests.isError}
-  Failed to load device requests {$requests.error}
-{:else if $requests.isSuccess}
-  <div>
-    {#each $requests.data as request}
-      <DeviceRequestCard {request} />
-    {/each}
+<div class="layout">
+  <div class="layout__devices">
+    {#if $devices.isLoading}
+      Loading devices...
+    {:else if $devices.isError}
+      Failed to load devices {$requests.error}
+    {:else if $devices.isSuccess && $devices.data.length > 0}
+      <div class="section">
+        <h2>Devices</h2>
+        <div class="devices">
+          {#each $devices.data as device}
+            {@const connected = isDeviceConnected(device.id)}
+            <DeviceCard {device} {connected} />
+          {/each}
+        </div>
+      </div>
+    {/if}
+    {#if $requests.isLoading}
+      Loading requests...
+    {:else if $requests.isError}
+      Failed to load device requests {$requests.error}
+    {:else if $requests.isSuccess && $requests.data.length > 0}
+      <div class="section">
+        <h2>Requests</h2>
+        <div class="devices">
+          {#each $requests.data as request}
+            <DeviceRequestCard {request} />
+          {/each}
+        </div>
+      </div>
+    {/if}
   </div>
-{/if}
-
-<h2>Devices</h2>
-
-{#if $devices.isLoading}
-  Loading devices...
-{:else if $devices.isError}
-  Failed to load devices {$requests.error}
-{:else if $devices.isSuccess}
-  <div>
-    {#each $devices.data as device}
-      {@const connected = isDeviceConnected(device.id)}
-      <DeviceCard {device} {connected} />
-    {/each}
+  <div class="layout__connect">
+    <ConnectInfo />
   </div>
-{/if}
+</div>
+
+<style>
+  .layout {
+    display: flex;
+    height: 100%;
+  }
+
+  .layout__devices {
+    flex: auto;
+
+    display: flex;
+    flex-flow: column;
+    gap: 0.5rem;
+
+    padding: 1rem;
+  }
+
+  .section {
+    display: flex;
+    flex-flow: column;
+    gap: 0.5rem;
+  }
+
+  .layout__connect {
+    max-width: 16rem;
+    height: 100%;
+    background-color: #232029;
+    border-left: 2px solid #393444;
+  }
+
+  .devices {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+</style>

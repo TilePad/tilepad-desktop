@@ -1,6 +1,7 @@
 use serde::Serialize;
 
 pub mod devices;
+pub mod server;
 
 type CmdResult<T> = Result<T, CmdError>;
 

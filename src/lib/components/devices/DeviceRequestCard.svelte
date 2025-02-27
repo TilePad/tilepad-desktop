@@ -4,6 +4,7 @@
   import type { DeviceRequest } from "$lib/api/types/devices";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import { toast } from "svelte-sonner";
+  import Button from "../input/Button.svelte";
 
   type Props = {
     request: DeviceRequest;
@@ -33,11 +34,40 @@
 </script>
 
 <div class="device">
-  <b>Name</b>: {request.device_name}
-  <b>Address</b>: {request.socket_addr}
+  <h2 class="device__name">
+    {request.device_name}
+  </h2>
+  <span class="device__id">{request.socket_addr}</span>
 
-  <button onclick={handleApprove}>Approve</button>
-  <button onclick={handleDecline}>Decline</button>
+  <div class="actions">
+    <Button onclick={handleApprove}>Approve</Button>
+    <Button variant="error" onclick={handleDecline}>Decline</Button>
+  </div>
 </div>
 
-<style></style>
+<style>
+  .device {
+    display: flex;
+    flex-flow: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background-color: #2f2c36;
+  }
+
+  .actions {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .device__id {
+    color: #ccc;
+    font-size: 0.8rem;
+  }
+
+  .device__name {
+    font-size: 1.2rem;
+  }
+</style>

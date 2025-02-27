@@ -10,13 +10,13 @@ use crate::{database::DbPool, device::Devices};
 pub mod models;
 pub mod routes;
 
+pub const HTTP_PORT: u16 = 59371;
+
 pub async fn start_http_server(
     db: DbPool,
     devices: Devices,
     app_handle: AppHandle,
 ) -> anyhow::Result<()> {
-    let port = 59371;
-
     // build our application with a single route
     let app = routes::router()
         .layer(Extension(db))
@@ -25,7 +25,7 @@ pub async fn start_http_server(
         .layer(CorsLayer::very_permissive())
         .into_make_service_with_connect_info::<SocketAddr>();
 
-    let addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, port));
+    let addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, HTTP_PORT));
 
     let listener = tokio::net::TcpListener::bind(addr)
         .await

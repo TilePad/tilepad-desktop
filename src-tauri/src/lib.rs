@@ -21,7 +21,7 @@ mod utils;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    use commands::devices;
+    use commands::{devices, server};
 
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
@@ -33,6 +33,7 @@ pub fn run() {
             devices::devices_approve_request,
             devices::devices_decline_request,
             devices::devices_revoke_device,
+            server::server_get_connection_info,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
