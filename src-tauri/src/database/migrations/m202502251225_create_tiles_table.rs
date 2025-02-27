@@ -1,5 +1,6 @@
 use super::{
     m202502251151_create_profiles_table::{ProfilesColumn, ProfilesTable},
+    m202502251153_create_folders_table::{FoldersColumn, FoldersTable},
     m202502251226_create_devices_table::DevicesTable,
     schema::*,
     Migration,
@@ -21,14 +22,16 @@ impl Migration for TilesMigration {
                 .if_not_exists()
                 .col(pk_uuid(TilesColumn::Id))
                 .col(json(TilesColumn::Config))
-                .col(uuid(TilesColumn::ProfileId))
-                .col(integer(TilesColumn::Position))
+                .col(uuid_null(TilesColumn::FolderId))
+                .col(integer(TilesColumn::Row))
+                .col(integer(TilesColumn::Column))
                 .col(date_time(TilesColumn::CreatedAt))
+                // Connect to profiles table
                 .foreign_key(
                     ForeignKey::create()
-                        .name("fk_tiles_profile")
-                        .from(DevicesTable, TilesColumn::ProfileId)
-                        .to(ProfilesTable, ProfilesColumn::Id)
+                        .name("fk_tiles_folder")
+                        .from(DevicesTable, TilesColumn::FolderId)
+                        .to(FoldersTable, FoldersColumn::Id)
                         .on_delete(ForeignKeyAction::Cascade)
                         .on_update(ForeignKeyAction::Cascade),
                 )
@@ -51,10 +54,12 @@ pub enum TilesColumn {
     Id,
     /// Tile configuration (JSON)
     Config,
-    /// Profile this tile is apart of
-    ProfileId,
-    /// Position within the collection of tiles
-    Position,
+    /// ID of a folder this tile is within
+    FolderId,
+    /// Row the tile is on
+    Row,
+    /// Column the tile is on
+    Column,
     /// When the profile was created
     CreatedAt,
 }

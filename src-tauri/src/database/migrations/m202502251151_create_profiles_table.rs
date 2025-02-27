@@ -17,6 +17,7 @@ impl Migration for ProfilesMigration {
                 .col(pk_uuid(ProfilesColumn::Id))
                 .col(string(ProfilesColumn::Name))
                 .col(boolean(ProfilesColumn::Active))
+                .col(boolean(ProfilesColumn::Default))
                 .col(json(ProfilesColumn::Config))
                 .col(integer(ProfilesColumn::Order).default(0))
                 .col(date_time(ProfilesColumn::CreatedAt))
@@ -41,6 +42,8 @@ pub enum ProfilesColumn {
     Name,
     /// Whether the profile is the active profile
     Active,
+    /// Whether the profile is the default profile
+    Default,
     /// Profile configuration (JSON)
     Config,
     /// Order position of the profile

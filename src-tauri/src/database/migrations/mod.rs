@@ -7,6 +7,7 @@ use sqlx::prelude::FromRow;
 use super::{DbPool, DbResult};
 
 mod m202502251151_create_profiles_table;
+mod m202502251153_create_folders_table;
 mod m202502251225_create_tiles_table;
 mod m202502251226_create_devices_table;
 mod schema;
