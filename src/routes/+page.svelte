@@ -1,5 +1,6 @@
 <script lang="ts">
-  import ProfileEditor from "$lib/components/profiles/ProfileEditor.svelte";
+  import FolderEditor from "$lib/components/folders/FolderEditor.svelte";
+  import CurrentFolder from "$lib/components/profiles/CurrentFolder.svelte";
   import ProfileFolders from "$lib/components/profiles/ProfileFolders.svelte";
   import ProfileSelector from "$lib/components/profiles/ProfileSelector.svelte";
 </script>
@@ -7,10 +8,11 @@
 <div class="layout">
   <div>
     <ProfileSelector />
+    <CurrentFolder />
     <ProfileFolders />
   </div>
 
-  <ProfileEditor />
+  <FolderEditor />
 </div>
 
 <style>

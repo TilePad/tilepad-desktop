@@ -13,12 +13,13 @@
 
 <!-- Provider for profiles, loads the active default profile, creates one if missing -->
 <script lang="ts">
-  import type { FolderModel } from "$lib/api/types/folders";
+  import type { FolderId, FolderModel } from "$lib/api/types/folders";
 
   import { watch } from "runed";
   import { getErrorMessage } from "$lib/api/utils/error";
   import { getContext, setContext, type Snippet } from "svelte";
   import {
+    createFolderQuery,
     createFoldersQuery,
     createCreateFolderMutation,
   } from "$lib/api/folders";
@@ -37,18 +38,25 @@
   const foldersQuery = createFoldersQuery(() => currentProfile.id);
   const foldersQueryData = $derived($foldersQuery.data);
 
-  const createFolder = createCreateFolderMutation();
-
   // State for the actively selected folder
-  let folder: FolderModel | undefined = $state(undefined);
+  let folderId: FolderId | undefined = $state(undefined);
+
+  const folderQuery = createFolderQuery(
+    () => currentProfile.id,
+    () => folderId ?? null,
+  );
+
+  const folder = $derived($folderQuery.data);
+
+  const createFolder = createCreateFolderMutation();
 
   function getDefaultFolder(folders: FolderModel[]): FolderModel | undefined {
     return folders.find((profile) => profile.default);
   }
 
   setContext(FOLDER_STORE_KEY, {
-    folder: () => folder,
-    setFolder: (value: FolderModel) => (folder = value),
+    folder: () => folder!,
+    setFolderId: (value: FolderId) => (folderId = value),
   });
 
   watch(
@@ -59,11 +67,12 @@
 
       // Try and set the profile to the default
       if (folders.length > 0) {
-        folder = getDefaultFolder(folders);
+        const defaultFolder = getDefaultFolder(folders);
+        if (defaultFolder !== undefined) folderId = defaultFolder.id;
       }
 
       // Default profile is set
-      if (folder !== undefined) return;
+      if (folderId !== undefined) return;
 
       // Create a new default profile
       $createFolder.mutate(
@@ -79,7 +88,7 @@
         {
           // Use the newly create profile
           onSuccess: (data) => {
-            folder = data;
+            folderId = data.id;
           },
         },
       );
@@ -87,13 +96,20 @@
   );
 </script>
 
+<!-- Query create default -->
 {#if $createFolder.isIdle || $createFolder.isSuccess}
+  <!-- Query folders -->
   {#if $foldersQuery.isLoading}
-    Loading...
+    Loading folders...
   {:else if $foldersQuery.isError}
     Failed to load profiles {getErrorMessage($foldersQuery.error)}
   {:else if $foldersQuery.isSuccess}
-    {#if folder}
+    <!-- Query the current folder -->
+    {#if $folderQuery.isLoading}
+      Loading folder...
+    {:else if $folderQuery.isError}
+      Failed to load profile {getErrorMessage($folderQuery.error)}
+    {:else if $folderQuery.isSuccess}
       {@render children?.()}
     {/if}
   {/if}

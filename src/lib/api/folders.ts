@@ -2,16 +2,21 @@ import { invoke } from "@tauri-apps/api/core";
 import { createQuery, createMutation } from "@tanstack/svelte-query";
 
 import type { ProfileId, UpdateProfile } from "./types/profiles";
-import type { FolderId, FolderModel, CreateFolder } from "./types/folders";
+import type {
+  FolderId,
+  FolderModel,
+  CreateFolder,
+  UpdateFolder,
+} from "./types/folders";
 
 import { queryClient } from "./client";
 import { runeStore } from "./utils/svelte.svelte";
 
-const foldersKeys = {
+export const foldersKeys = {
   root: ["folders"],
   list: (profileId: ProfileId) => ["folders", "profile", profileId, "list"],
 
-  specific: (profileId: ProfileId, folderId: FolderId) => [
+  specific: (profileId: ProfileId, folderId: FolderId | null) => [
     "folders",
     "profile",
     profileId,
@@ -46,7 +51,7 @@ export async function createFolder(create: CreateFolder) {
   return folder;
 }
 
-export async function updateFolder(folderId: FolderId, update: UpdateProfile) {
+export async function updateFolder(folderId: FolderId, update: UpdateFolder) {
   const folder = await invoke<FolderModel>("folders_update_folder", {
     folderId,
     update,
@@ -83,7 +88,7 @@ export function createFoldersQuery(profileId: () => ProfileId) {
 
 export function createFolderQuery(
   profileId: () => ProfileId,
-  folderId: () => FolderId,
+  folderId: () => FolderId | null,
 ) {
   return createQuery(
     runeStore(() => {
@@ -91,8 +96,9 @@ export function createFolderQuery(
       const fid = folderId();
 
       return {
+        enabled: fid !== null,
         queryKey: foldersKeys.specific(pid, fid),
-        queryFn: () => getFolder(fid),
+        queryFn: () => getFolder(fid!),
       };
     }),
   );

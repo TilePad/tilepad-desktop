@@ -27,10 +27,8 @@ pub async fn folders_get_folders(
 pub async fn folders_get_folder(
     db: State<'_, DbPool>,
     folder_id: FolderId,
-) -> CmdResult<FolderModel> {
-    let folder = FolderModel::get_by_id(db.inner(), folder_id)
-        .await?
-        .context("unknown folder")?;
+) -> CmdResult<Option<FolderModel>> {
+    let folder = FolderModel::get_by_id(db.inner(), folder_id).await?;
     Ok(folder)
 }
 
@@ -50,13 +48,13 @@ pub async fn folders_update_folder(
     db: State<'_, DbPool>,
     folder_id: FolderId,
     update: UpdateFolder,
-) -> CmdResult<()> {
+) -> CmdResult<FolderModel> {
     let folder = FolderModel::get_by_id(db.inner(), folder_id)
         .await?
         .context("unknown folder")?;
-    folder.update(&db, update).await?;
+    let folder = folder.update(&db, update).await?;
 
-    Ok(())
+    Ok(folder)
 }
 
 /// Delete a folder

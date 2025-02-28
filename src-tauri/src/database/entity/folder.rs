@@ -22,8 +22,21 @@ pub struct FolderModel {
     pub default: bool,
     pub order: u32,
 }
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
-pub struct FolderConfig {}
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
+pub struct FolderConfig {
+    pub rows: u32,
+    pub columns: u32,
+}
+
+impl Default for FolderConfig {
+    fn default() -> Self {
+        Self {
+            rows: 4,
+            columns: 6,
+        }
+    }
+}
 
 #[derive(Deserialize)]
 pub struct CreateFolder {

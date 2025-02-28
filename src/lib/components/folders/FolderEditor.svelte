@@ -1,34 +1,33 @@
 <script lang="ts">
   import TileGrid from "$lib/components/tiles/TileGrid.svelte";
 
-  let rows = $state(4);
-  let columns = $state(6);
+  import { getFolderContext } from "../profiles/FolderProvider.svelte";
+
+  const { folder } = getFolderContext();
+  const currentFolder = $derived.by(folder);
 </script>
 
 <div class="layout">
-  <div class="grid-container">
-    <TileGrid {rows} {columns}>
-      {#snippet tile(row, column)}
-        <div class="tile"></div>
-      {/snippet}
-    </TileGrid>
-  </div>
+  <TileGrid
+    rows={currentFolder.config.rows}
+    columns={currentFolder.config.columns}
+  >
+    {#snippet tile(row, column)}
+      <div class="tile"></div>
+    {/snippet}
+  </TileGrid>
 </div>
 
 <style>
   .layout {
     display: flex;
+    flex: auto;
     flex-flow: column;
-    height: 100%;
-    overflow: hidden;
-    flex: auto;
-  }
 
-  .grid-container {
-    display: flex;
-    flex: auto;
-    overflow: hidden;
     padding: 1rem;
+    height: 100%;
+
+    overflow: hidden;
   }
 
   .tile {
