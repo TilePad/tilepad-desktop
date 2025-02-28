@@ -1,4 +1,5 @@
 use anyhow::Context;
+use entity::profile::{CreateProfile, ProfileConfig, ProfileModel};
 use sqlx::{sqlite::SqliteConnectOptions, SqlitePool};
 use std::{path::PathBuf, str::FromStr};
 use tokio::fs::{create_dir_all, File};
@@ -50,5 +51,29 @@ pub async fn setup_database(db: &DbPool) -> anyhow::Result<()> {
     migrations::migrate(db)
         .await
         .context("failed to migrate database")?;
+
+    try_create_default_profile(db).await?;
+
+    Ok(())
+}
+
+pub async fn try_create_default_profile(db: &DbPool) -> anyhow::Result<()> {
+    // Default profile already exists
+    if ProfileModel::get_default_profile(db).await?.is_some() {
+        return Ok(());
+    }
+
+    // Create default profile
+    let profile = ProfileModel::create(
+        db,
+        CreateProfile {
+            default: true,
+            name: "Default Profile".to_string(),
+            config: ProfileConfig::default(),
+            order: 0,
+        },
+    )
+    .await?;
+
     Ok(())
 }

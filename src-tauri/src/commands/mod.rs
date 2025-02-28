@@ -1,7 +1,10 @@
 use serde::Serialize;
 
 pub mod devices;
+pub mod folders;
+pub mod profiles;
 pub mod server;
+pub mod tiles;
 
 type CmdResult<T> = Result<T, CmdError>;
 

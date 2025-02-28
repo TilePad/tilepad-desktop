@@ -1,5 +1,6 @@
-use sea_query::SqliteQueryBuilder;
+use sea_query::{IntoIden, SimpleExpr, SqliteQueryBuilder, UpdateStatement};
 use sea_query_binder::SqlxBinder;
+use serde::Serialize;
 use sqlx::{
     sqlite::{SqliteQueryResult, SqliteRow},
     FromRow, Sqlite,
@@ -80,4 +81,43 @@ where
         .await?;
 
     Ok(result)
+}
+
+pub trait UpdateStatementExt {
+    fn cond_value<C, T>(&mut self, column: C, value: Option<T>) -> &mut Self
+    where
+        C: IntoIden,
+        T: Into<SimpleExpr>;
+
+    fn cond_value_json<C, T>(&mut self, column: C, value: Option<T>) -> anyhow::Result<&mut Self>
+    where
+        C: IntoIden,
+        T: Serialize;
+}
+
+impl UpdateStatementExt for UpdateStatement {
+    fn cond_value<C, T>(&mut self, column: C, value: Option<T>) -> &mut Self
+    where
+        C: IntoIden,
+        T: Into<SimpleExpr>,
+    {
+        if let Some(value) = value {
+            self.value(column, value);
+        }
+
+        self
+    }
+
+    fn cond_value_json<C, T>(&mut self, column: C, value: Option<T>) -> anyhow::Result<&mut Self>
+    where
+        C: IntoIden,
+        T: Serialize,
+    {
+        if let Some(value) = value {
+            let value = serde_json::to_value(&value)?;
+            self.value(column, value);
+        }
+
+        Ok(self)
+    }
 }

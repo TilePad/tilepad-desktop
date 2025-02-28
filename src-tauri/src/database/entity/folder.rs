@@ -1,10 +1,10 @@
-use sea_query::{Expr, IdenStatic, Query};
+use sea_query::{Expr, IdenStatic, Order, Query};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 use uuid::Uuid;
 
 use crate::database::{
-    helpers::{sql_exec, sql_query_maybe_one},
+    helpers::{sql_exec, sql_query_all, sql_query_maybe_one},
     DbPool, DbResult,
 };
 
@@ -32,6 +32,8 @@ pub struct CreateFolder {
     pub default: bool,
     pub order: u32,
 }
+
+pub struct UpdateFolder {}
 
 impl FolderModel {
     /// Create a new profile
@@ -73,6 +75,24 @@ impl FolderModel {
         Ok(model)
     }
 
+    pub async fn get_by_id(db: &DbPool, folder_id: FolderId) -> DbResult<Option<FolderModel>> {
+        sql_query_maybe_one(
+            db,
+            Query::select()
+                .from(FoldersTable)
+                .columns([
+                    FoldersColumn::Id,
+                    FoldersColumn::Name,
+                    FoldersColumn::Default,
+                    FoldersColumn::ProfileId,
+                    FoldersColumn::Config,
+                    FoldersColumn::Order,
+                ])
+                .and_where(Expr::col(FoldersColumn::Id).eq(folder_id)),
+        )
+        .await
+    }
+
     /// Set this profile as the default profile
     pub async fn set_default(&mut self, db: &DbPool) -> DbResult<()> {
         sql_exec(
@@ -108,6 +128,36 @@ impl FolderModel {
                 ])
                 .and_where(Expr::col(FoldersColumn::Default).eq(true))
                 .and_where(Expr::col(FoldersColumn::ProfileId).eq(profile_id)),
+        )
+        .await
+    }
+
+    pub async fn all(db: &DbPool, profile_id: ProfileId) -> DbResult<Vec<FolderModel>> {
+        sql_query_all(
+            db,
+            Query::select()
+                .from(FoldersTable)
+                .columns([
+                    FoldersColumn::Id,
+                    FoldersColumn::Name,
+                    FoldersColumn::Default,
+                    FoldersColumn::ProfileId,
+                    FoldersColumn::Config,
+                    FoldersColumn::Order,
+                ])
+                .and_where(Expr::col(FoldersColumn::ProfileId).eq(profile_id))
+                .order_by(FoldersColumn::Order, Order::Asc),
+        )
+        .await
+    }
+
+    pub async fn delete(db: &DbPool, folder_id: FolderId) -> DbResult<()> {
+        sql_exec(
+            db,
+            Query::delete()
+                .from_table(FoldersTable)
+                .and_where(Expr::col(FoldersColumn::Id).eq(folder_id))
+                .and_where(Expr::col(FoldersColumn::Default).eq(false)),
         )
         .await
     }

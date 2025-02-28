@@ -15,13 +15,11 @@ mod device;
 mod events;
 mod plugin;
 mod server;
-mod services;
-mod tile;
 mod utils;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    use commands::{devices, server};
+    use commands::{devices, profiles, server};
 
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
@@ -34,6 +32,10 @@ pub fn run() {
             devices::devices_decline_request,
             devices::devices_revoke_device,
             server::server_get_connection_info,
+            profiles::profiles_get_profiles,
+            profiles::profiles_get_profile,
+            profiles::profiles_delete_profile,
+            profiles::profiles_update_profile,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

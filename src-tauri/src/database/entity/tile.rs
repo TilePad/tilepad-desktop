@@ -81,8 +81,35 @@ impl TileModel {
         Ok(model)
     }
 
-    pub async fn update(&mut self, db: &DbPool, update: UpdateTile) -> DbResult<()> {
-        todo!()
+    pub async fn update(&mut self, db: &DbPool, update: UpdateTile) -> anyhow::Result<()> {
+        let mut query = Query::update();
+        query
+            .table(TilesTable)
+            .and_where(Expr::col(TilesColumn::Id).eq(self.id));
+
+        if let Some(config) = update.config {
+            let value = serde_json::to_value(&config)?;
+            self.config = config;
+            query.value(TilesColumn::Config, value);
+        }
+
+        if let Some(folder_id) = update.folder_id {
+            self.folder_id = folder_id;
+            query.value(TilesColumn::FolderId, folder_id);
+        }
+
+        if let Some(column) = update.column {
+            self.column = column;
+            query.value(TilesColumn::Column, column);
+        }
+
+        if let Some(row) = update.row {
+            self.row = row;
+            query.value(TilesColumn::Row, row);
+        }
+
+        sql_exec(db, &query).await?;
+        Ok(())
     }
 
     pub async fn get_by_folder(db: &DbPool, folder_id: FolderId) -> DbResult<Vec<TileModel>> {
