@@ -7,6 +7,7 @@
 </script>
 
 <header class="header">
+  <img class="logo" src="/tilepad-logo.svg" alt="Logo" />
   <nav class="nav">
     <NavButton
       icon={SolarLayersMinimalisticBoldDuotone}
@@ -29,9 +30,16 @@
 
 <style>
   .header {
+    display: flex;
+    gap: 1rem;
     width: 100%;
     background-color: #29262e;
     padding: 0.5rem;
+    align-items: center;
+  }
+
+  .logo {
+    max-height: 2rem;
   }
 
   .nav {
