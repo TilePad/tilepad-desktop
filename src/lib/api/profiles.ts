@@ -14,7 +14,7 @@ import { runeStore } from "./utils/svelte.svelte";
 const profilesKeys = {
   root: ["profiles"],
   list: ["profiles", "list"],
-  specific: (profileId: ProfileId) => ["profiles", "profile", profileId],
+  specific: (profileId: ProfileId | null) => ["profiles", "profile", profileId],
 };
 
 // [REQUESTS] ------------------------------------------------------
@@ -68,13 +68,13 @@ export function createProfilesQuery() {
   });
 }
 
-export function createProfileQuery(profileId: () => ProfileId) {
+export function createProfileQuery(profileId: () => ProfileId | null) {
   return createQuery(
     runeStore(() => {
       const id = profileId();
       return {
         queryKey: profilesKeys.specific(id),
-        queryFn: () => getProfile(id),
+        queryFn: () => getProfile(id!),
       };
     }),
   );

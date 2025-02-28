@@ -8,13 +8,13 @@
 
   import Button from "../input/Button.svelte";
   import { getProfileContext } from "./ProfilesProvider.svelte";
+  import CreateProfileDialog from "./CreateProfileDialog.svelte";
 
   const profilesQuery = createProfilesQuery();
   const profiles = $derived($profilesQuery.data ?? []);
 
-  const profileContext = getProfileContext();
-
-  const currentProfile = $derived(profileContext.profile());
+  const { profile, setProfileId } = getProfileContext();
+  const currentProfile = $derived.by(profile);
 
   let open = $state(false);
 </script>
@@ -28,7 +28,7 @@
   type="single"
   onOpenChange={(value) => (open = value)}
   value={currentProfile.id}
-  onValueChange={(value) => {}}
+  onValueChange={(value) => setProfileId(value)}
 >
   <Select.Trigger>
     {#snippet child({ props })}
@@ -64,7 +64,11 @@
                 </Select.Item>
               {/each}
 
-              <Button>Create Profile</Button>
+              <CreateProfileDialog order={profiles.length}>
+                {#snippet button({ props })}
+                  <Button {...props}>Create Profile</Button>
+                {/snippet}
+              </CreateProfileDialog>
             </div>
           {/if}
         </div>
@@ -76,9 +80,10 @@
 <style>
   .content {
     border-radius: 0.5rem;
-    background-color: #444;
+    background-color: #2a2631;
     padding: 0.25rem;
     max-height: 40vh;
+    min-width: 20rem;
     overflow: auto;
     box-shadow: 2px 10px 20px rgba(0, 0, 0, 0.1);
   }
@@ -97,11 +102,11 @@
   }
 
   .item:hover {
-    background-color: #777;
+    background-color: #706580;
   }
 
   .item--selected {
-    background-color: #888;
+    background-color: #675d75;
   }
 
   .item--highlighted {

@@ -7,6 +7,10 @@ body {
   height: 100%;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 .skeleton {
   border-radius: 1rem;
   background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);

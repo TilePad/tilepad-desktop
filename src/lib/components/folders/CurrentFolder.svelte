@@ -45,7 +45,7 @@
   }
 </script>
 
-<div>
+<div class="current">
   {currentFolder.name}
 
   <div>
@@ -69,3 +69,16 @@
     />
   </div>
 </div>
+
+<style>
+  .current {
+    padding: 1rem;
+    margin: 0.5rem;
+    border: 1px solid #333;
+    overflow: hidden;
+  }
+
+  input {
+    width: 100%;
+  }
+</style>

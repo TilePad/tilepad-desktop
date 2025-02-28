@@ -3,7 +3,7 @@
 
   interface FolderContext {
     folder(): FolderModel;
-    setFolder: (value: FolderModel) => void;
+    setFolderId: (value: FolderId) => void;
   }
 
   export function getFolderContext(): FolderContext {
@@ -24,7 +24,7 @@
     createCreateFolderMutation,
   } from "$lib/api/folders";
 
-  import { getProfileContext } from "./ProfilesProvider.svelte";
+  import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
 
   type Props = {
     children?: Snippet | undefined;
@@ -108,7 +108,7 @@
     {#if $folderQuery.isLoading}
       Loading folder...
     {:else if $folderQuery.isError}
-      Failed to load profile {getErrorMessage($folderQuery.error)}
+      Failed to load folder {getErrorMessage($folderQuery.error)}
     {:else if $folderQuery.isSuccess}
       {@render children?.()}
     {/if}

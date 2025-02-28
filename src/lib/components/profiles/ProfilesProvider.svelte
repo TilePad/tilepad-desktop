@@ -3,7 +3,7 @@
 
   interface ProfileContext {
     profile(): ProfileModel;
-    setProfile: (value: ProfileModel) => void;
+    setProfileId: (value: ProfileId) => void;
   }
 
   export function getProfileContext(): ProfileContext {
@@ -13,12 +13,13 @@
 
 <!-- Provider for profiles, loads the active default profile, creates one if missing -->
 <script lang="ts">
-  import type { ProfileModel } from "$lib/api/types/profiles";
+  import type { ProfileId, ProfileModel } from "$lib/api/types/profiles";
 
   import { watch } from "runed";
   import { getErrorMessage } from "$lib/api/utils/error";
   import { getContext, setContext, type Snippet } from "svelte";
   import {
+    createProfileQuery,
     createProfilesQuery,
     createCreateProfileMutation,
   } from "$lib/api/profiles";
@@ -35,7 +36,10 @@
   const createProfile = createCreateProfileMutation();
 
   // State for the actively selected profile
-  let profile: ProfileModel | undefined = $state(undefined);
+  let profileId: ProfileId | undefined = $state(undefined);
+
+  const profileQuery = createProfileQuery(() => profileId ?? null);
+  const profile = $derived($profileQuery.data);
 
   function getDefaultProfile(
     profiles: ProfileModel[],
@@ -44,8 +48,8 @@
   }
 
   setContext(PROFILE_STORE_KEY, {
-    profile: () => profile,
-    setProfile: (value: ProfileModel) => (profile = value),
+    profile: () => profile!,
+    setProfileId: (value: string) => (profileId = value),
   });
 
   watch(
@@ -56,11 +60,12 @@
 
       // Try and set the profile to the default
       if (profiles.length > 0) {
-        profile = getDefaultProfile(profiles);
+        const defaultProfile = getDefaultProfile(profiles);
+        if (defaultProfile !== undefined) profileId = defaultProfile.id;
       }
 
       // Default profile is set
-      if (profile !== undefined) return;
+      if (profileId !== undefined) return;
 
       // Create a new default profile
       $createProfile.mutate(
@@ -75,7 +80,7 @@
         {
           // Use the newly create profile
           onSuccess: (data) => {
-            profile = data;
+            profileId = data.id;
           },
         },
       );
@@ -89,7 +94,12 @@
   {:else if $profilesQuery.isError}
     Failed to load profiles {getErrorMessage($profilesQuery.error)}
   {:else if $profilesQuery.isSuccess}
-    {#if profile}
+    <!-- Query the current folder -->
+    {#if $profileQuery.isLoading}
+      Loading profile...
+    {:else if $profileQuery.isError}
+      Failed to load profile {getErrorMessage($profileQuery.error)}
+    {:else if $profileQuery.isSuccess}
       {@render children?.()}
     {/if}
   {/if}

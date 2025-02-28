@@ -1,7 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import { createQuery, createMutation } from "@tanstack/svelte-query";
 
-import type { ProfileId, UpdateProfile } from "./types/profiles";
+import type { ProfileId } from "./types/profiles";
 import type {
   FolderId,
   FolderModel,

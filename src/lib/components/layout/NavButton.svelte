@@ -76,10 +76,4 @@
     color: #fff;
     line-height: 1;
   }
-
-  .text {
-    color: #ccc;
-    font-size: 0.8rem;
-    line-height: 1;
-  }
 </style>

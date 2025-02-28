@@ -5,7 +5,7 @@
   import AppToaster from "$lib/components/AppToaster.svelte";
   import { QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
-  import FolderProvider from "$lib/components/profiles/FolderProvider.svelte";
+  import FolderProvider from "$lib/components/folders/FolderProvider.svelte";
   import ProfilesProvider from "$lib/components/profiles/ProfilesProvider.svelte";
 
   let { children } = $props();
