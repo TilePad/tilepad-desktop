@@ -15,6 +15,7 @@ mod schema;
 fn migrations() -> Vec<Box<dyn Migration>> {
     vec![
         Box::new(m202502251151_create_profiles_table::ProfilesMigration),
+        Box::new(m202502251153_create_folders_table::ProfilesMigration),
         Box::new(m202502251225_create_tiles_table::TilesMigration),
         Box::new(m202502251226_create_devices_table::DevicesMigration),
     ]

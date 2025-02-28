@@ -21,6 +21,7 @@
     flex-flow: column;
     height: 100%;
     overflow: hidden;
+    flex: auto;
   }
 
   .grid-container {
@@ -45,8 +46,8 @@
     height: 100%;
   }
 
-  .tile--filled {
+  /* .tile--filled {
     background-color: #393441;
     border: 2px solid #534c5e;
-  }
+  } */
 </style>

@@ -1,12 +1,11 @@
 <script lang="ts">
   import "$lib/styles/app.css";
-
+  import { queryClient } from "$lib/api/client";
+  import Header from "$lib/components/layout/Header.svelte";
+  import AppToaster from "$lib/components/AppToaster.svelte";
   import { QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
-
-  import { queryClient } from "$lib/api/client";
-  import AppToaster from "$lib/components/AppToaster.svelte";
-  import Header from "$lib/components/layout/Header.svelte";
+  import FolderProvider from "$lib/components/profiles/FolderProvider.svelte";
   import ProfilesProvider from "$lib/components/profiles/ProfilesProvider.svelte";
 
   let { children } = $props();
@@ -14,13 +13,15 @@
 
 <QueryClientProvider client={queryClient}>
   <ProfilesProvider>
-    <div class="layout">
-      <Header />
+    <FolderProvider>
+      <div class="layout">
+        <Header />
 
-      <main class="main">
-        {@render children()}
-      </main>
-    </div>
+        <main class="main">
+          {@render children()}
+        </main>
+      </div>
+    </FolderProvider>
   </ProfilesProvider>
 
   <AppToaster />

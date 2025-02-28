@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { range } from "$lib/api/utils/svelte";
   import type { Snippet } from "svelte";
+
+  import { range } from "$lib/api/utils/svelte.svelte";
 
   type Props = {
     rows: number;

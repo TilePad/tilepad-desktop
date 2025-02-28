@@ -12,6 +12,7 @@ use crate::{
     },
 };
 
+/// Get all folders for the specified profile
 #[tauri::command]
 pub async fn folders_get_folders(
     db: State<'_, DbPool>,
@@ -21,6 +22,7 @@ pub async fn folders_get_folders(
     Ok(profiles)
 }
 
+/// Get a specific folder
 #[tauri::command]
 pub async fn folders_get_folder(
     db: State<'_, DbPool>,
@@ -32,12 +34,17 @@ pub async fn folders_get_folder(
     Ok(folder)
 }
 
+/// Create a new folder
 #[tauri::command]
-pub async fn folders_delete_folder(db: State<'_, DbPool>, folder_id: FolderId) -> CmdResult<()> {
-    FolderModel::delete(db.inner(), folder_id).await?;
-    Ok(())
+pub async fn folders_create_folder(
+    db: State<'_, DbPool>,
+    create: CreateFolder,
+) -> CmdResult<FolderModel> {
+    let folder = FolderModel::create(&db, create).await?;
+    Ok(folder)
 }
 
+/// Update a specific folder
 #[tauri::command]
 pub async fn folders_update_folder(
     db: State<'_, DbPool>,
@@ -51,11 +58,10 @@ pub async fn folders_update_folder(
 
     Ok(())
 }
+
+/// Delete a folder
 #[tauri::command]
-pub async fn folders_create_folder(
-    db: State<'_, DbPool>,
-    create: CreateFolder,
-) -> CmdResult<FolderModel> {
-    let folder = FolderModel::create(&db, create).await?;
-    Ok(folder)
+pub async fn folders_delete_folder(db: State<'_, DbPool>, folder_id: FolderId) -> CmdResult<()> {
+    FolderModel::delete(db.inner(), folder_id).await?;
+    Ok(())
 }

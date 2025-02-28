@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Component } from "svelte";
+  import type { Snippet, Component } from "svelte";
   import type { SvelteHTMLElements } from "svelte/elements";
 
   import { page } from "$app/state";
@@ -8,6 +8,8 @@
     icon: Component<SvelteHTMLElements["svg"]>;
     href: string;
     title: string;
+
+    end?: Snippet;
   };
 
   const { icon: Icon, href, title }: Props = $props();

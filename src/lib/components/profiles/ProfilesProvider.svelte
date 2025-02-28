@@ -2,7 +2,7 @@
   const PROFILE_STORE_KEY = Symbol("ProfileStore");
 
   interface ProfileContext {
-    profile: ProfileModel;
+    profile(): ProfileModel;
     setProfile: (value: ProfileModel) => void;
   }
 
@@ -32,7 +32,7 @@
   const profilesQuery = createProfilesQuery();
   const profilesQueryData = $derived($profilesQuery.data);
 
-  const createDefaultProfile = createCreateProfileMutation();
+  const createProfile = createCreateProfileMutation();
 
   // State for the actively selected profile
   let profile: ProfileModel | undefined = $state(undefined);
@@ -63,10 +63,10 @@
       if (profile !== undefined) return;
 
       // Create a new default profile
-      $createDefaultProfile.mutate(
+      $createProfile.mutate(
         {
           create: {
-            name: "Default",
+            name: "Default Profile",
             default: true,
             config: {},
             order: 0,
@@ -83,7 +83,7 @@
   );
 </script>
 
-{#if $createDefaultProfile.isIdle || $createDefaultProfile.isSuccess}
+{#if $createProfile.isIdle || $createProfile.isSuccess}
   {#if $profilesQuery.isLoading}
     Loading...
   {:else if $profilesQuery.isError}
@@ -93,10 +93,8 @@
       {@render children?.()}
     {/if}
   {/if}
-{:else if $createDefaultProfile.isPending}
+{:else if $createProfile.isPending}
   Creating default profile...
-{:else if $createDefaultProfile.isError}
-  Failed to create default profile {getErrorMessage(
-    $createDefaultProfile.error,
-  )}
+{:else if $createProfile.isError}
+  Failed to create default profile {getErrorMessage($createProfile.error)}
 {/if}
