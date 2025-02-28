@@ -8,6 +8,7 @@ import eslintPluginSvelte from "eslint-plugin-svelte";
 import perfectionist from "eslint-plugin-perfectionist";
 import unusedImports from "eslint-plugin-unused-imports";
 import * as typescriptParser from "@typescript-eslint/parser";
+import tanstackQuery from "@tanstack/eslint-plugin-query";
 
 export default tseslint.config(
   { ignores: ["src-tauri/src/script/**/*", "script/**/*"] },
@@ -15,6 +16,7 @@ export default tseslint.config(
   tseslint.configs.recommended,
   ...eslintPluginSvelte.configs["flat/recommended"],
   ...eslintPluginSvelte.configs["flat/prettier"],
+  ...tanstackQuery.configs["flat/recommended"],
   {
     files: ["**/*.svelte"],
     languageOptions: {

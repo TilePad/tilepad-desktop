@@ -7,18 +7,21 @@
   import { queryClient } from "$lib/api/client";
   import AppToaster from "$lib/components/AppToaster.svelte";
   import Header from "$lib/components/layout/Header.svelte";
+  import ProfilesProvider from "$lib/components/profiles/ProfilesProvider.svelte";
 
   let { children } = $props();
 </script>
 
 <QueryClientProvider client={queryClient}>
-  <div class="layout">
-    <Header />
+  <ProfilesProvider>
+    <div class="layout">
+      <Header />
 
-    <main class="main">
-      {@render children()}
-    </main>
-  </div>
+      <main class="main">
+        {@render children()}
+      </main>
+    </div>
+  </ProfilesProvider>
 
   <AppToaster />
   <SvelteQueryDevtools />

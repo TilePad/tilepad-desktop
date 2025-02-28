@@ -1,4 +1,4 @@
-use sea_query::{Expr, IdenStatic, Query};
+use sea_query::{Expr, IdenStatic, Order, Query};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 use uuid::Uuid;
@@ -14,7 +14,6 @@ pub type ProfileId = Uuid;
 pub struct ProfileModel {
     pub id: ProfileId,
     pub name: String,
-    pub active: bool,
     pub default: bool,
     #[sqlx(json)]
     pub config: ProfileConfig,
@@ -24,6 +23,7 @@ pub struct ProfileModel {
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct ProfileConfig {}
 
+#[derive(Deserialize)]
 pub struct CreateProfile {
     pub name: String,
     pub default: bool,
@@ -42,11 +42,10 @@ pub struct UpdateProfile {
 impl ProfileModel {
     /// Create a new profile
     pub async fn create(db: &DbPool, create: CreateProfile) -> anyhow::Result<ProfileModel> {
-        let model = ProfileModel {
+        let mut model = ProfileModel {
             id: Uuid::new_v4(),
             name: create.name,
-            active: false,
-            default: create.default,
+            default: false,
             config: create.config,
             order: create.order,
         };
@@ -67,13 +66,16 @@ impl ProfileModel {
                 .values_panic([
                     model.id.into(),
                     model.name.clone().into(),
-                    model.active.into(),
                     model.default.into(),
                     config.into(),
                     model.order.into(),
                 ]),
         )
         .await?;
+
+        if create.default {
+            model = model.set_default(db).await?;
+        }
 
         Ok(model)
     }
@@ -116,14 +118,14 @@ impl ProfileModel {
         self.order = update.order.unwrap_or(self.order);
 
         if let Some(true) = update.default {
-            self.set_default(db).await?;
+            self = self.set_default(db).await?;
         }
 
         Ok(self)
     }
 
     /// Set this profile as the default profile
-    async fn set_default(&mut self, db: &DbPool) -> DbResult<()> {
+    async fn set_default(mut self, db: &DbPool) -> DbResult<ProfileModel> {
         sql_exec(
             db,
             Query::update().table(ProfilesTable).value(
@@ -135,7 +137,7 @@ impl ProfileModel {
 
         self.default = true;
 
-        Ok(())
+        Ok(self)
     }
 
     /// Get the first profile marked as default
@@ -159,13 +161,16 @@ impl ProfileModel {
     pub async fn all(db: &DbPool) -> DbResult<Vec<ProfileModel>> {
         sql_query_all(
             db,
-            Query::select().from(ProfilesTable).columns([
-                ProfilesColumn::Id,
-                ProfilesColumn::Name,
-                ProfilesColumn::Default,
-                ProfilesColumn::Config,
-                ProfilesColumn::Order,
-            ]),
+            Query::select()
+                .from(ProfilesTable)
+                .columns([
+                    ProfilesColumn::Id,
+                    ProfilesColumn::Name,
+                    ProfilesColumn::Default,
+                    ProfilesColumn::Config,
+                    ProfilesColumn::Order,
+                ])
+                .order_by(ProfilesColumn::Order, Order::Asc),
         )
         .await
     }

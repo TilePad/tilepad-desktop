@@ -18,6 +18,7 @@
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-opener": "^2",
     "bits-ui": "^1.3.4",
+    "runed": "^0.23.4",
     "svelte-dnd-action": "^0.9.57",
     "svelte-sonner": "^0.3.28"
   },
@@ -28,6 +29,7 @@
     "@sveltejs/adapter-static": "^3.0.6",
     "@sveltejs/kit": "^2.9.0",
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
+    "@tanstack/eslint-plugin-query": "^5.66.1",
     "@tauri-apps/cli": "^2",
     "eslint": "^9.21.0",
     "eslint-plugin-perfectionist": "^4.9.0",
@@ -38,7 +40,18 @@
     "svelte": "^5.0.0",
     "svelte-check": "^4.0.0",
     "typescript": "~5.6.2",
+    "typescript-eslint": "^8.18.0",
     "unplugin-icons": "^22.1.0",
     "vite": "^6.0.3"
+  },
+  "overrides": {
+    "@sveltejs/kit": {
+      "cookie": "^0.7.0"
+    }
+  },
+  "npm": {
+    "overrides": {
+      "cookie": "^0.7.0"
+    }
   }
 }

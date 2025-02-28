@@ -1,14 +1,16 @@
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
+import { createQuery } from "@tanstack/svelte-query";
+
 import type {
-  ConnectedDevice,
   DeviceId,
   DeviceModel,
   DeviceRequest,
+  ConnectedDevice,
   DeviceRequestId,
 } from "./types/devices";
-import { createMutation, createQuery } from "@tanstack/svelte-query";
+
 import { queryClient } from "./client";
-import { listen } from "@tauri-apps/api/event";
 
 const devicesKeys = {
   root: ["devices"],

@@ -4,7 +4,7 @@ use sqlx::prelude::FromRow;
 use uuid::Uuid;
 
 use crate::database::{
-    helpers::{sql_exec, sql_query_all, sql_query_maybe_one},
+    helpers::{sql_exec, sql_query_all, sql_query_maybe_one, UpdateStatementExt},
     DbPool, DbResult,
 };
 
@@ -25,6 +25,7 @@ pub struct FolderModel {
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct FolderConfig {}
 
+#[derive(Deserialize)]
 pub struct CreateFolder {
     pub name: String,
     pub config: FolderConfig,
@@ -33,7 +34,14 @@ pub struct CreateFolder {
     pub order: u32,
 }
 
-pub struct UpdateFolder {}
+#[derive(Deserialize)]
+pub struct UpdateFolder {
+    pub name: Option<String>,
+    pub config: Option<FolderConfig>,
+    pub profile_id: Option<ProfileId>,
+    pub default: Option<bool>,
+    pub order: Option<u32>,
+}
 
 impl FolderModel {
     /// Create a new profile
@@ -93,6 +101,35 @@ impl FolderModel {
         .await
     }
 
+    pub async fn update(
+        mut self,
+        db: &DbPool,
+        update: UpdateFolder,
+    ) -> anyhow::Result<FolderModel> {
+        sql_exec(
+            db,
+            Query::update()
+                .table(FoldersTable)
+                .and_where(Expr::col(FoldersColumn::Id).eq(self.id))
+                .cond_value(FoldersColumn::Name, update.name.as_ref())
+                .cond_value_json(FoldersColumn::Config, update.config.as_ref())?
+                .cond_value(FoldersColumn::Config, update.profile_id)
+                .cond_value(FoldersColumn::Order, update.order),
+        )
+        .await?;
+
+        self.name = update.name.unwrap_or(self.name);
+        self.config = update.config.unwrap_or(self.config);
+        self.profile_id = update.profile_id.unwrap_or(self.profile_id);
+        self.order = update.order.unwrap_or(self.order);
+
+        if let Some(true) = update.default {
+            self.set_default(db).await?;
+        }
+
+        Ok(self)
+    }
+
     /// Set this profile as the default profile
     pub async fn set_default(&mut self, db: &DbPool) -> DbResult<()> {
         sql_exec(
@@ -107,29 +144,6 @@ impl FolderModel {
         self.default = true;
 
         Ok(())
-    }
-
-    /// Get the default folder for a profile
-    pub async fn get_default_folder(
-        db: &DbPool,
-        profile_id: ProfileId,
-    ) -> DbResult<Option<FolderModel>> {
-        sql_query_maybe_one(
-            db,
-            Query::select()
-                .from(FoldersTable)
-                .columns([
-                    FoldersColumn::Id,
-                    FoldersColumn::Name,
-                    FoldersColumn::Default,
-                    FoldersColumn::ProfileId,
-                    FoldersColumn::Config,
-                    FoldersColumn::Order,
-                ])
-                .and_where(Expr::col(FoldersColumn::Default).eq(true))
-                .and_where(Expr::col(FoldersColumn::ProfileId).eq(profile_id)),
-        )
-        .await
     }
 
     pub async fn all(db: &DbPool, profile_id: ProfileId) -> DbResult<Vec<FolderModel>> {
