@@ -2,6 +2,7 @@ use std::{collections::HashMap, net::SocketAddr, sync::Arc};
 
 use anyhow::Context;
 use parking_lot::RwLock;
+use protocol::ServerDeviceMessage;
 use serde::{Deserialize, Serialize};
 use socket::{DeviceSessionId, DeviceSessionRef};
 use uuid::Uuid;
@@ -159,7 +160,10 @@ impl Devices {
         )
         .await?;
 
-        session.send_approved(device.id, access_token)?;
+        session.send_message(ServerDeviceMessage::Approved {
+            device_id: device.id,
+            access_token,
+        })?;
 
         self.emit_app_event(AppEvent::DeviceRequest(DeviceRequestAppEvent::Accepted {
             request_id,
@@ -178,7 +182,7 @@ impl Devices {
             .context("session not found")?;
 
         session.set_device_id(None);
-        session.send_declined()?;
+        session.send_message(ServerDeviceMessage::Declined)?;
 
         self.emit_app_event(AppEvent::DeviceRequest(DeviceRequestAppEvent::Decline {
             request_id,
@@ -216,7 +220,7 @@ impl Devices {
             match DeviceModel::get_by_access_token(&self.inner.db, &access_token).await? {
                 Some(device) => device,
                 None => {
-                    session.send_invalid_access_token()?;
+                    session.send_message(ServerDeviceMessage::InvalidAccessToken)?;
                     return Ok(());
                 }
             };
@@ -226,7 +230,7 @@ impl Devices {
 
         // Authenticate the device session
         session.set_device_id(Some(device.id));
-        session.send_authenticated()?;
+        session.send_message(ServerDeviceMessage::Authenticated)?;
 
         // Notify frontend
         self.emit_app_event(AppEvent::Device(DeviceAppEvent::Authenticated {
@@ -245,7 +249,7 @@ impl Devices {
         // Tell the session its been revoked
         if let Some(session) = self.get_session_by_device(device_id) {
             session.set_device_id(None);
-            session.send_revoked()?;
+            session.send_message(ServerDeviceMessage::Revoked)?;
         }
 
         Ok(())

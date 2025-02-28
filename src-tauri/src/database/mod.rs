@@ -52,7 +52,7 @@ pub async fn setup_database(db: &DbPool) -> anyhow::Result<()> {
         .await
         .context("failed to migrate database")?;
 
-    try_create_default_profile(db).await?;
+    // try_create_default_profile(db).await?;
 
     Ok(())
 }
