@@ -4,7 +4,7 @@ use garde::{
     error::{Kind, PathComponentKind},
     Validate,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use super::node::NodeVersion;
 
@@ -18,6 +18,14 @@ pub struct Manifest {
     pub actions: HashMap<ActionId, ManifestAction>,
 }
 
+#[derive(Debug, Deserialize, Validate)]
+pub struct ManifestCategory {
+    #[garde(length(min = 1))]
+    pub name: String,
+    #[garde(skip)]
+    pub icon: Option<String>,
+}
+
 impl Manifest {
     pub fn parse(value: &str) -> anyhow::Result<Manifest> {
         let manifest: Manifest = toml::from_str(value)?;
@@ -26,8 +34,9 @@ impl Manifest {
     }
 }
 
-#[derive(Debug, Deserialize, Validate)]
+#[derive(Debug, Clone, Serialize, Deserialize, Validate)]
 #[garde(transparent)]
+#[serde(transparent)]
 pub struct PluginId(#[garde(custom(is_valid_plugin_name))] pub String);
 
 #[derive(Debug, Deserialize, Validate)]
@@ -47,8 +56,9 @@ pub struct ManifestPlugin {
     pub icon: Option<String>,
 }
 
-#[derive(Debug, Clone, Deserialize, Validate, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Serialize, Deserialize, Validate, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[garde(transparent)]
+#[serde(transparent)]
 pub struct ActionId(#[garde(custom(is_valid_action_name))] pub String);
 
 impl Display for ActionId {
@@ -76,6 +86,7 @@ pub struct ManifestAction {
 }
 
 #[derive(Debug, Deserialize, Validate)]
+#[serde(untagged)]
 pub enum ManifestBin {
     /// Program uses the node runtime
     Node {
@@ -88,6 +99,9 @@ pub enum ManifestBin {
         #[garde(dive)]
         native: ManifestBinNative,
     },
+
+    /// No binary
+    None {},
 }
 
 #[derive(Debug, Deserialize, Validate)]

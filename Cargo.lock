@@ -5466,13 +5466,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tilepad-plugin-sdk"
-version = "0.0.0"
-dependencies = [
- "tracing",
-]
-
-[[package]]
 name = "time"
 version = "0.3.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"

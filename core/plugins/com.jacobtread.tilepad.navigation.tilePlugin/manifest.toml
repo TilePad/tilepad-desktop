@@ -1,0 +1,20 @@
+[plugin]
+id = "com.jacobtread.tilepad.navigation"
+name = "Navigation"
+version = "0.0.1"
+authors = ["Jacobtread"]
+description = "Tilepad navigation actions"
+
+[category]
+name = "Navigation"
+icon = "images/navigation.svg"
+
+[actions.switch_folder]
+label = "Switch Folder"
+icon = "images/switch-folder.svg"
+tooltip = "Switch to a specific folder"
+
+[actions.switch_profile]
+label = "Switch Profile"
+icon = "images/switch-folder.svg"
+tooltip = "Switch to a specific profile"
