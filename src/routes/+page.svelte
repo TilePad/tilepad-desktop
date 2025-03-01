@@ -1,6 +1,7 @@
 <script lang="ts">
   import FolderEditor from "$lib/components/folders/FolderEditor.svelte";
   import CurrentFolder from "$lib/components/folders/CurrentFolder.svelte";
+  import ActionsSidebar from "$lib/components/actions/ActionsSidebar.svelte";
   import ProfileFolders from "$lib/components/profiles/ProfileFolders.svelte";
   import ProfileSelector from "$lib/components/profiles/ProfileSelector.svelte";
 </script>
@@ -15,6 +16,8 @@
   <div class="tiles">
     <FolderEditor />
   </div>
+
+  <ActionsSidebar />
 </div>
 
 <style>

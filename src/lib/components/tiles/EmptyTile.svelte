@@ -1,19 +1,25 @@
 <!-- Empty tile that can be used to add a new tile -->
 <script lang="ts">
-  import type { Action } from "$lib/api/types/actions";
-
   import { toast } from "svelte-sonner";
   import { TileIconType } from "$lib/api/types/tiles";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import { createCreateTileMutation } from "$lib/api/tiles";
+  import {
+    dndzone,
+    type DndEvent,
+    SHADOW_ITEM_MARKER_PROPERTY_NAME,
+  } from "svelte-dnd-action";
 
-  import ActionChooser from "../actions/ActionChooser.svelte";
+  import type { MovableAction } from "../actions/ActionsSidebarList.svelte";
+
   import { getFolderContext } from "../folders/FolderProvider.svelte";
 
   type Props = {
     row: number;
     column: number;
   };
+
+  let item: MovableAction | undefined = $state(undefined);
 
   const { row, column }: Props = $props();
 
@@ -22,7 +28,14 @@
 
   const createTile = createCreateTileMutation();
 
-  function onSelectAction(action: Action) {
+  function handleDndConsider(e: CustomEvent<DndEvent<MovableAction>>) {
+    item = e.detail.items[0];
+  }
+
+  function handleDndFinalize(e: CustomEvent<DndEvent<MovableAction>>) {
+    if (e.detail.items.length < 1) return;
+
+    const action = e.detail.items[0];
     const createPromise = $createTile.mutateAsync({
       create: {
         row,
@@ -52,15 +65,21 @@
   }
 </script>
 
-{#if $createTile.isIdle || $createTile.isError}
-  <ActionChooser onSelect={onSelectAction}>
-    {#snippet button({ props })}
-      <button {...props} class="tile"> + </button>
-    {/snippet}
-  </ActionChooser>
-{:else if $createTile.isPending}
-  Creating...
-{/if}
+<div
+  class="tile"
+  class:tile--hovered={item && item[SHADOW_ITEM_MARKER_PROPERTY_NAME]}
+  use:dndzone={{
+    items: item ? [item] : [],
+    dropTargetStyle: {},
+    flipDurationMs: 0,
+    morphDisabled: true,
+    dragDisabled: true,
+  }}
+  onconsider={handleDndConsider}
+  onfinalize={handleDndFinalize}
+>
+  <div></div>
+</div>
 
 <style>
   .tile {
@@ -77,5 +96,10 @@
     height: 100%;
     color: #ccc;
     font-size: 1.5rem;
+  }
+
+  .tile--hovered {
+    background-color: #3a3542;
+    border-color: #36313d;
   }
 </style>
