@@ -2,6 +2,7 @@ use std::error::Error;
 
 use anyhow::Context;
 use device::Devices;
+use plugin::PluginRegistry;
 use tauri::{
     async_runtime::{block_on, spawn},
     App, Manager,
@@ -67,16 +68,32 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         .app_data_dir()
         .context("failed to get app data dir")?;
 
+    let resources = app
+        .path()
+        .resource_dir()
+        .context("failed to get resources directory")?;
+
+    let core_resources = resources.join("core");
+    let core_plugins = core_resources.join("plugins");
+
     let db = block_on(database::connect_database(app_data_path.join("app.db")))
         .context("failed to load database")?;
 
     let (app_event_tx, app_event_rx) = mpsc::unbounded_channel();
     let devices = Devices::new(app_event_tx, db.clone());
+    let registry = PluginRegistry::default();
 
     app.manage(db.clone());
     app.manage(devices.clone());
+    app.manage(registry.clone());
 
     tracing::debug!("starting event processor");
+
+    // Load the core plugins into the registry
+    spawn(plugin::load_plugins_into_registry(
+        registry.clone(),
+        core_plugins,
+    ));
 
     // Spawn event processor
     spawn(events::processing::process_events(

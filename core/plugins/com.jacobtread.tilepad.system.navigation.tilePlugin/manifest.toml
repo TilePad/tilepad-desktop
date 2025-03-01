@@ -1,5 +1,5 @@
 [plugin]
-id = "com.jacobtread.tilepad.navigation"
+id = "com.jacobtread.tilepad.sytem.navigation"
 name = "Navigation"
 version = "0.0.1"
 authors = ["Jacobtread"]
