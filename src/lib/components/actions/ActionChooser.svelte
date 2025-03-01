@@ -7,6 +7,7 @@
 
   import Dialog from "../dialog/Dialog.svelte";
   import DialogCloseButton from "../dialog/DialogCloseButton.svelte";
+  import PropertyInspector from "../property/PropertyInspector.svelte";
 
   type Props = DialogProps;
 
@@ -22,6 +23,8 @@
         <div class="list">
           <h2>Actions</h2>
           <input type="text" placeholder="Search..." />
+
+          <PropertyInspector />
 
           <div>
             {#if $actionsQuery.isLoading}
