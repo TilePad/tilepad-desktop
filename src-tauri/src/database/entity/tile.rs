@@ -1,10 +1,12 @@
-use crate::database::{
-    helpers::{sql_exec, sql_query_all},
-    DbPool, DbResult,
+use crate::{
+    database::{
+        helpers::{sql_exec, sql_query_all, sql_query_maybe_one, UpdateStatementExt},
+        DbPool, DbResult,
+    },
+    plugin::manifest::{ActionId, PluginId},
 };
 
 use super::folder::FolderId;
-use chrono::{DateTime, Utc};
 use sea_query::{Expr, IdenStatic, Query};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
@@ -22,14 +24,17 @@ pub struct TileModel {
     pub column: u32,
 }
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TileConfig {
+    /// ID of the plugin the action we are executing is withins
+    pub plugin_id: PluginId,
     /// ID of the action to execution
-    pub action_id: String,
+    pub action_id: ActionId,
     /// Configuration for the action
-    pub action_config: serde_json::Value,
+    pub properties: serde_json::Value,
 }
 
+#[derive(Deserialize)]
 pub struct CreateTile {
     pub config: TileConfig,
     pub folder_id: FolderId,
@@ -37,6 +42,7 @@ pub struct CreateTile {
     pub column: u32,
 }
 
+#[derive(Deserialize)]
 pub struct UpdateTile {
     pub config: Option<TileConfig>,
     pub folder_id: Option<FolderId>,
@@ -81,35 +87,25 @@ impl TileModel {
         Ok(model)
     }
 
-    pub async fn update(&mut self, db: &DbPool, update: UpdateTile) -> anyhow::Result<()> {
-        let mut query = Query::update();
-        query
-            .table(TilesTable)
-            .and_where(Expr::col(TilesColumn::Id).eq(self.id));
+    pub async fn update(mut self, db: &DbPool, update: UpdateTile) -> anyhow::Result<TileModel> {
+        sql_exec(
+            db,
+            Query::update()
+                .table(TilesTable)
+                .and_where(Expr::col(TilesColumn::Id).eq(self.id))
+                .cond_value_json(TilesColumn::Config, update.config.as_ref())?
+                .cond_value(TilesColumn::FolderId, update.folder_id)
+                .cond_value(TilesColumn::Column, update.column)
+                .cond_value(TilesColumn::Row, update.row),
+        )
+        .await?;
 
-        if let Some(config) = update.config {
-            let value = serde_json::to_value(&config)?;
-            self.config = config;
-            query.value(TilesColumn::Config, value);
-        }
+        self.config = update.config.unwrap_or(self.config);
+        self.folder_id = update.folder_id.unwrap_or(self.folder_id);
+        self.column = update.column.unwrap_or(self.column);
+        self.row = update.row.unwrap_or(self.row);
 
-        if let Some(folder_id) = update.folder_id {
-            self.folder_id = folder_id;
-            query.value(TilesColumn::FolderId, folder_id);
-        }
-
-        if let Some(column) = update.column {
-            self.column = column;
-            query.value(TilesColumn::Column, column);
-        }
-
-        if let Some(row) = update.row {
-            self.row = row;
-            query.value(TilesColumn::Row, row);
-        }
-
-        sql_exec(db, &query).await?;
-        Ok(())
+        Ok(self)
     }
 
     pub async fn get_by_folder(db: &DbPool, folder_id: FolderId) -> DbResult<Vec<TileModel>> {
@@ -125,6 +121,33 @@ impl TileModel {
                     TilesColumn::Column,
                 ])
                 .and_where(Expr::col(TilesColumn::FolderId).eq(folder_id)),
+        )
+        .await
+    }
+
+    pub async fn get_by_id(db: &DbPool, tile_id: TileId) -> DbResult<Option<TileModel>> {
+        sql_query_maybe_one(
+            db,
+            Query::select()
+                .from(TilesTable)
+                .columns([
+                    TilesColumn::Id,
+                    TilesColumn::Config,
+                    TilesColumn::FolderId,
+                    TilesColumn::Row,
+                    TilesColumn::Column,
+                ])
+                .and_where(Expr::col(TilesColumn::Id).eq(tile_id)),
+        )
+        .await
+    }
+
+    pub async fn delete(db: &DbPool, tile_id: TileId) -> DbResult<()> {
+        sql_exec(
+            db,
+            Query::delete()
+                .from_table(TilesTable)
+                .and_where(Expr::col(TilesColumn::Id).eq(tile_id)),
         )
         .await
     }

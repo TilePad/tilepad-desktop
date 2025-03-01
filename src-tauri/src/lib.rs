@@ -20,7 +20,7 @@ mod utils;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    use commands::{actions, devices, folders, profiles, server};
+    use commands::{actions, devices, folders, profiles, server, tiles};
 
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
@@ -44,6 +44,11 @@ pub fn run() {
             folders::folders_update_folder,
             folders::folders_create_folder,
             actions::actions_get_actions,
+            tiles::tiles_get_tiles,
+            tiles::tiles_get_tile,
+            tiles::tiles_create_tile,
+            tiles::tiles_update_tile,
+            tiles::tiles_delete_tile
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
