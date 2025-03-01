@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Action } from "$lib/api/types/actions";
+
   import { createActionsQuery } from "$lib/api/actions";
   import { getErrorMessage } from "$lib/api/utils/error";
   import { getPluginAssetPath } from "$lib/api/utils/url";
@@ -7,11 +9,14 @@
 
   import Dialog from "../dialog/Dialog.svelte";
   import DialogCloseButton from "../dialog/DialogCloseButton.svelte";
-  import PropertyInspector from "../property/PropertyInspector.svelte";
 
-  type Props = DialogProps;
+  type Props = DialogProps & {
+    onSelect: (action: Action) => void;
+  };
 
-  let { ...restProps }: Props = $props();
+  let { onSelect, ...restProps }: Props = $props();
+
+  let activeAction: Action | null = $state(null);
 
   const actionsQuery = createActionsQuery();
 </script>
@@ -23,8 +28,6 @@
         <div class="list">
           <h2>Actions</h2>
           <input type="text" placeholder="Search..." />
-
-          <PropertyInspector />
 
           <div>
             {#if $actionsQuery.isLoading}
@@ -47,7 +50,11 @@
                   <h3>{category.label}</h3>
 
                   {#each category.actions as action}
-                    <div>
+                    <button
+                      onclick={() => {
+                        activeAction = action;
+                      }}
+                    >
                       {#if action.icon !== null}
                         <img
                           src={getPluginAssetPath(
@@ -63,7 +70,7 @@
                       {#if action.description !== null}
                         <span>{action.description}</span>
                       {/if}
-                    </div>
+                    </button>
                   {/each}
                 </div>
               {/each}
@@ -74,7 +81,14 @@
 
       <div class="actions">
         <DialogCloseButton buttonLabel={{ text: "Cancel" }} />
-        <DialogCloseButton buttonLabel={{ text: "Select" }} />
+        <DialogCloseButton
+          disabled={activeAction === null}
+          buttonLabel={{ text: "Create" }}
+          onclick={() => {
+            if (activeAction === null) return;
+            onSelect(activeAction);
+          }}
+        />
       </div>
     </div>
   {/snippet}

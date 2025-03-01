@@ -30,8 +30,17 @@ pub struct TileConfig {
     pub plugin_id: PluginId,
     /// ID of the action to execution
     pub action_id: ActionId,
+    /// Icon to use
+    pub icon: TileIcon,
     /// Configuration for the action
     pub properties: serde_json::Value,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "type")]
+pub enum TileIcon {
+    None,
+    PluginIcon { plugin_id: PluginId, icon: String },
 }
 
 #[derive(Deserialize)]
