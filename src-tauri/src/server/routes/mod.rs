@@ -10,6 +10,12 @@ pub fn router() -> Router {
             "/server",
             Router::new().route_service("/details", get(server::details)),
         )
-        .nest("/plugins", Router::new().route("/ws", get(plugins::ws)))
+        .nest(
+            "/plugins",
+            Router::new().route("/ws", get(plugins::ws)).nest(
+                "/{plugin_id}",
+                Router::new().route("/assets/{*path}", get(plugins::get_plugin_file)),
+            ),
+        )
         .nest("/devices", Router::new().route("/ws", get(devices::ws)))
 }

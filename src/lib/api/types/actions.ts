@@ -1,6 +1,6 @@
 import type { Option } from "./shared";
+import type { PluginId } from "./plugin";
 
-export type PluginId = string;
 export type ActionId = string;
 
 export interface ActionCollection {
@@ -8,6 +8,8 @@ export interface ActionCollection {
 }
 
 export interface ActionCategory {
+  plugin_id: PluginId;
+
   label: string;
   icon: Option<string>;
   actions: Action[];

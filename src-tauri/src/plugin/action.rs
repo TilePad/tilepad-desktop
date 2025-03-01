@@ -7,6 +7,8 @@ use super::{
 
 #[derive(Debug, Serialize)]
 pub struct ActionCategory {
+    pub plugin_id: PluginId,
+
     pub label: String,
     pub icon: Option<String>,
     pub actions: Vec<Action>,
@@ -31,26 +33,11 @@ where
     for plugin in plugins {
         let manifest = &plugin.manifest;
         let manifest_category = &manifest.category;
-
-        let category = match categories
-            .iter_mut()
-            .find(|category: &&mut ActionCategory| {
-                category.label.eq(&manifest_category.label)
-                    && category.icon.eq(&manifest_category.icon)
-            }) {
-            Some(value) => value,
-            None => {
-                let category = ActionCategory {
-                    label: manifest_category.label.clone(),
-                    icon: manifest_category.icon.clone(),
-                    actions: Vec::new(),
-                };
-
-                let index = categories.len();
-                categories.push(category);
-
-                &mut categories[index]
-            }
+        let mut category = ActionCategory {
+            plugin_id: manifest.plugin.id.clone(),
+            label: manifest_category.label.clone(),
+            icon: manifest_category.icon.clone(),
+            actions: Vec::new(),
         };
 
         for (action_id, manifest_action) in &manifest.actions {
@@ -65,6 +52,8 @@ where
 
             category.actions.push(action);
         }
+
+        categories.push(category);
     }
 
     categories

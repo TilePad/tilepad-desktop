@@ -38,6 +38,14 @@ impl PluginRegistry {
     pub fn get_action_collection(&self) -> Vec<ActionCategory> {
         actions_from_plugins(self.inner.plugins.read().values())
     }
+
+    pub fn get_plugin_path(&self, plugin_id: &PluginId) -> Option<PathBuf> {
+        self.inner
+            .plugins
+            .read()
+            .get(plugin_id)
+            .map(|plugin| plugin.path.clone())
+    }
 }
 
 pub async fn load_plugins_into_registry(registry: PluginRegistry, path: PathBuf) {

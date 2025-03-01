@@ -103,7 +103,12 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
     ));
 
     // Spawn HTTP server
-    spawn(server::start_http_server(db, devices, app_handle.clone()));
+    spawn(server::start_http_server(
+        db,
+        devices,
+        app_handle.clone(),
+        registry.clone(),
+    ));
 
     Ok(())
 }

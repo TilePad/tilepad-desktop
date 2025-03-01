@@ -1,6 +1,8 @@
 <script lang="ts">
   import { createActionsQuery } from "$lib/api/actions";
   import { getErrorMessage } from "$lib/api/utils/error";
+  import { getPluginAssetPath } from "$lib/api/utils/url";
+
   import type { DialogProps } from "../dialog/Dialog.svelte";
 
   import Dialog from "../dialog/Dialog.svelte";
@@ -29,10 +31,30 @@
             {:else if $actionsQuery.isSuccess}
               {#each $actionsQuery.data as category}
                 <div>
+                  {#if category.icon !== null}
+                    <img
+                      src={getPluginAssetPath(
+                        category.plugin_id,
+                        category.icon,
+                      )}
+                      alt="Action Icon"
+                    />
+                  {/if}
+
                   <h3>{category.label}</h3>
 
                   {#each category.actions as action}
                     <div>
+                      {#if action.icon !== null}
+                        <img
+                          src={getPluginAssetPath(
+                            action.plugin_id,
+                            action.icon,
+                          )}
+                          alt="Action Icon"
+                        />
+                      {/if}
+
                       <span>{action.label}</span>
 
                       {#if action.description !== null}
