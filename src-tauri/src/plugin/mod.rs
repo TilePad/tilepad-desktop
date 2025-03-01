@@ -4,10 +4,12 @@ use std::{
     sync::Arc,
 };
 
+use action::{actions_from_plugins, ActionCategory};
 use garde::Validate;
 use manifest::{Manifest, PluginId};
 use parking_lot::RwLock;
 
+pub mod action;
 pub mod manifest;
 pub mod node;
 pub mod runner;
@@ -32,6 +34,10 @@ impl PluginRegistry {
                 .map(|plugin| (plugin.manifest.plugin.id.clone(), plugin)),
         );
     }
+
+    pub fn get_action_collection(&self) -> Vec<ActionCategory> {
+        actions_from_plugins(self.inner.plugins.read().values())
+    }
 }
 
 pub async fn load_plugins_into_registry(registry: PluginRegistry, path: PathBuf) {
@@ -50,8 +56,8 @@ pub async fn load_plugins_into_registry(registry: PluginRegistry, path: PathBuf)
 
 #[derive(Debug)]
 pub struct Plugin {
-    path: PathBuf,
-    manifest: Manifest,
+    pub path: PathBuf,
+    pub manifest: Manifest,
 }
 
 pub async fn load_plugins(path: &Path) -> anyhow::Result<Vec<Plugin>> {

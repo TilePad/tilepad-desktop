@@ -1,5 +1,6 @@
 use serde::Serialize;
 
+pub mod actions;
 pub mod devices;
 pub mod folders;
 pub mod profiles;

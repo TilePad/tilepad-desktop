@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { createActionsQuery } from "$lib/api/actions";
+  import { getErrorMessage } from "$lib/api/utils/error";
   import type { DialogProps } from "../dialog/Dialog.svelte";
 
   import Dialog from "../dialog/Dialog.svelte";
@@ -7,6 +9,8 @@
   type Props = DialogProps;
 
   let { ...restProps }: Props = $props();
+
+  const actionsQuery = createActionsQuery();
 </script>
 
 <Dialog {...restProps}>
@@ -16,6 +20,30 @@
         <div class="list">
           <h2>Actions</h2>
           <input type="text" placeholder="Search..." />
+
+          <div>
+            {#if $actionsQuery.isLoading}
+              Loading actions...
+            {:else if $actionsQuery.isError}
+              Failed to load actions: {getErrorMessage($actionsQuery.error)}
+            {:else if $actionsQuery.isSuccess}
+              {#each $actionsQuery.data as category}
+                <div>
+                  <h3>{category.label}</h3>
+
+                  {#each category.actions as action}
+                    <div>
+                      <span>{action.label}</span>
+
+                      {#if action.description !== null}
+                        <span>{action.description}</span>
+                      {/if}
+                    </div>
+                  {/each}
+                </div>
+              {/each}
+            {/if}
+          </div>
         </div>
       </div>
 

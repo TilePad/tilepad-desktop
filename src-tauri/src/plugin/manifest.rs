@@ -13,6 +13,11 @@ pub struct Manifest {
     /// Details about the plugin itself
     #[garde(dive)]
     pub plugin: ManifestPlugin,
+
+    /// Category for the manifest actions
+    #[garde(dive)]
+    pub category: ManifestCategory,
+
     /// Map of available plugin actions
     #[garde(dive)]
     pub actions: HashMap<ActionId, ManifestAction>,
@@ -21,7 +26,7 @@ pub struct Manifest {
 #[derive(Debug, Deserialize, Validate)]
 pub struct ManifestCategory {
     #[garde(length(min = 1))]
-    pub name: String,
+    pub label: String,
     #[garde(skip)]
     pub icon: Option<String>,
 }
@@ -54,6 +59,8 @@ pub struct ManifestPlugin {
     pub description: Option<String>,
     #[garde(skip)]
     pub icon: Option<String>,
+    #[garde(skip)]
+    pub internal: Option<bool>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Validate, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -72,8 +79,6 @@ impl PathComponentKind for ActionId {
         Kind::Key
     }
 }
-
-pub struct ActionPath(pub PluginId, pub ActionId);
 
 #[derive(Debug, Deserialize, Validate)]
 pub struct ManifestAction {
