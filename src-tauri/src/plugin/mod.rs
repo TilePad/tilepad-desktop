@@ -12,7 +12,8 @@ use parking_lot::RwLock;
 
 use crate::{
     database::{entity::tile::TileModel, DbPool},
-    events::{AppEventSender, PluginMessageContext},
+    device::Devices,
+    events::{AppEventSender, DeviceMessageContext, PluginMessageContext},
 };
 
 pub mod action;
@@ -103,16 +104,19 @@ impl PluginRegistry {
 
     pub async fn handle_action(
         &self,
+        devices: &Devices,
         db: &DbPool,
-        context: PluginMessageContext,
+        context: DeviceMessageContext,
         tile: TileModel,
     ) -> anyhow::Result<()> {
+        tracing::debug!(?context, "invoking action");
+
         let manifest = self
             .get_plugin_manifest(&context.plugin_id)
             .context("plugin not found")?;
 
         if manifest.plugin.internal.is_some_and(|value| value) {
-            internal::actions::handle_internal_action(self, db, context, tile).await?;
+            internal::actions::handle_internal_action(self, devices, db, context, tile).await?;
         } else {
             // Pass to plugin
         }

@@ -5,7 +5,7 @@ use sqlx::prelude::FromRow;
 use uuid::Uuid;
 
 use crate::database::{
-    helpers::{sql_exec, sql_query_all, sql_query_maybe_one},
+    helpers::{sql_exec, sql_query_all, sql_query_maybe_one, UpdateStatementExt},
     DbPool, DbResult,
 };
 
@@ -37,6 +37,13 @@ pub struct CreateDevice {
     pub name: String,
     pub access_token: String,
     pub config: DeviceConfig,
+}
+
+#[derive(Default, Deserialize)]
+pub struct UpdateDevice {
+    pub name: Option<String>,
+    pub config: Option<DeviceConfig>,
+    pub order: Option<u32>,
 }
 
 impl DeviceModel {
@@ -79,6 +86,29 @@ impl DeviceModel {
         .await?;
 
         Ok(model)
+    }
+
+    pub async fn update(
+        mut self,
+        db: &DbPool,
+        update: UpdateDevice,
+    ) -> anyhow::Result<DeviceModel> {
+        sql_exec(
+            db,
+            Query::update()
+                .table(DevicesTable)
+                .and_where(Expr::col(DevicesColumn::Id).eq(self.id))
+                .cond_value(DevicesColumn::Name, update.name.as_ref())
+                .cond_value_json(DevicesColumn::Config, update.config.as_ref())?
+                .cond_value(DevicesColumn::Order, update.order),
+        )
+        .await?;
+
+        self.name = update.name.unwrap_or(self.name);
+        self.config = update.config.unwrap_or(self.config);
+        self.order = update.order.unwrap_or(self.order);
+
+        Ok(self)
     }
 
     pub async fn set_connected_now(&mut self, db: &DbPool) -> DbResult<()> {

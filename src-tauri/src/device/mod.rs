@@ -18,13 +18,14 @@ use crate::{
         DbPool,
     },
     events::{
-        AppEvent, AppEventSender, DeviceAppEvent, DeviceRequestAppEvent, PluginMessageContext,
+        AppEvent, AppEventSender, DeviceAppEvent, DeviceMessageContext, DeviceRequestAppEvent,
+        PluginMessageContext,
     },
     plugin::PluginRegistry,
     utils::random::generate_access_token,
 };
 
-mod protocol;
+pub mod protocol;
 pub mod socket;
 
 pub type DeviceRequestId = Uuid;
@@ -298,22 +299,21 @@ impl Devices {
         tile_id: TileId,
     ) -> anyhow::Result<()> {
         let db = &self.inner.db;
-        let device = DeviceModel::get_by_id(db, device_id)
-            .await?
-            .context("device not found")?;
         let tile = TileModel::get_by_id(db, tile_id)
             .await?
             .context("tile instance not found")?;
 
-        let context = PluginMessageContext {
-            profile_id: device.config.profile_id,
-            folder_id: device.config.folder_id,
+        let context = DeviceMessageContext {
+            device_id,
             plugin_id: tile.config.plugin_id.clone(),
             action_id: tile.config.action_id.clone(),
             tile_id,
         };
 
-        self.inner.plugins.handle_action(db, context, tile).await?;
+        self.inner
+            .plugins
+            .handle_action(self, db, context, tile)
+            .await?;
 
         Ok(())
     }

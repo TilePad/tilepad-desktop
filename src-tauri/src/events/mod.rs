@@ -47,6 +47,16 @@ pub struct PluginMessageContext {
     pub tile_id: TileId,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DeviceMessageContext {
+    pub device_id: DeviceId,
+
+    pub plugin_id: PluginId,
+    pub action_id: ActionId,
+
+    pub tile_id: TileId,
+}
+
 #[derive(Debug)]
 pub enum PluginAppEvent {
     RecvPluginMessage {

@@ -126,7 +126,7 @@ impl FolderModel {
                 .and_where(Expr::col(FoldersColumn::Id).eq(self.id))
                 .cond_value(FoldersColumn::Name, update.name.as_ref())
                 .cond_value_json(FoldersColumn::Config, update.config.as_ref())?
-                .cond_value(FoldersColumn::Config, update.profile_id)
+                .cond_value(FoldersColumn::ProfileId, update.profile_id)
                 .cond_value(FoldersColumn::Order, update.order),
         )
         .await?;
