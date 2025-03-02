@@ -140,7 +140,7 @@ impl DeviceSession {
                 let devices = self.devices.clone();
 
                 _ = tokio::spawn(async move {
-                    let tiles = match devices.request_device_tiles(device_id).await {
+                    let (folder, tiles) = match devices.request_device_tiles(device_id).await {
                         Ok(value) => value,
                         Err(cause) => {
                             tracing::error!(?cause, "failed to request device tiles");
@@ -148,7 +148,9 @@ impl DeviceSession {
                         }
                     };
 
-                    if let Err(cause) = session.send_message(ServerDeviceMessage::Tiles { tiles }) {
+                    if let Err(cause) =
+                        session.send_message(ServerDeviceMessage::Tiles { tiles, folder })
+                    {
                         tracing::error!(?cause, "failed to send device tiles");
                     }
                 });

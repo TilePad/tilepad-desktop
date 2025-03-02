@@ -278,14 +278,18 @@ impl Devices {
     pub async fn request_device_tiles(
         &self,
         device_id: DeviceId,
-    ) -> anyhow::Result<Vec<TileModel>> {
+    ) -> anyhow::Result<(FolderModel, Vec<TileModel>)> {
         let db = &self.inner.db;
         let device = DeviceModel::get_by_id(db, device_id)
             .await?
             .context("device not found")?;
 
+        let folder = FolderModel::get_by_id(db, device.config.folder_id)
+            .await?
+            .context("folder not found")?;
+
         let tiles = TileModel::get_by_folder(db, device.config.folder_id).await?;
-        Ok(tiles)
+        Ok((folder, tiles))
     }
 
     pub async fn device_execute_tile(

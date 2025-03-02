@@ -1,9 +1,5 @@
-use super::{
-    m202502251151_create_profiles_table::{ProfilesColumn, ProfilesTable},
-    schema::*,
-    Migration,
-};
-use sea_query::{ForeignKey, ForeignKeyAction, IdenStatic, SqliteQueryBuilder, Table};
+use super::{schema::*, Migration};
+use sea_query::{IdenStatic, SqliteQueryBuilder, Table};
 
 pub struct DevicesMigration;
 
@@ -23,17 +19,8 @@ impl Migration for DevicesMigration {
                 .col(string(DevicesColumn::AccessToken))
                 .col(json(DevicesColumn::Config))
                 .col(integer(DevicesColumn::Order).default(0))
-                .col(uuid_null(DevicesColumn::ProfileId))
                 .col(date_time(DevicesColumn::CreatedAt))
                 .col(date_time(DevicesColumn::LastConnectedAt))
-                .foreign_key(
-                    ForeignKey::create()
-                        .name("fk_devices_profile")
-                        .from(DevicesTable, DevicesColumn::ProfileId)
-                        .to(ProfilesTable, ProfilesColumn::Id)
-                        .on_delete(ForeignKeyAction::Cascade)
-                        .on_update(ForeignKeyAction::Cascade),
-                )
                 .build(SqliteQueryBuilder),
         )
         .execute(db)
@@ -59,8 +46,6 @@ pub enum DevicesColumn {
     Config,
     /// Order of the device in the UI
     Order,
-    /// Current profile on the device
-    ProfileId,
     /// Timestamp of when the device was first approved
     CreatedAt,
     /// Timestamp of when the device last connected

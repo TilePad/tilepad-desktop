@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::database::entity::tile::TileModel;
+use crate::database::entity::{folder::FolderModel, tile::TileModel};
 
 /// Device message coming from the client side
 #[derive(Deserialize)]
@@ -54,5 +54,8 @@ pub enum ServerDeviceMessage {
     InvalidAccessToken,
 
     /// Update the current tiles list
-    Tiles { tiles: Vec<TileModel> },
+    Tiles {
+        tiles: Vec<TileModel>,
+        folder: FolderModel,
+    },
 }

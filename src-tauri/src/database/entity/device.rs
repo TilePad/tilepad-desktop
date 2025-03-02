@@ -63,7 +63,6 @@ impl DeviceModel {
                     DevicesColumn::AccessToken,
                     DevicesColumn::Config,
                     DevicesColumn::Order,
-                    DevicesColumn::ProfileId,
                     DevicesColumn::CreatedAt,
                     DevicesColumn::LastConnectedAt,
                 ])
@@ -112,7 +111,6 @@ impl DeviceModel {
                     DevicesColumn::AccessToken,
                     DevicesColumn::Config,
                     DevicesColumn::Order,
-                    DevicesColumn::ProfileId,
                     DevicesColumn::CreatedAt,
                     DevicesColumn::LastConnectedAt,
                 ])
@@ -132,7 +130,6 @@ impl DeviceModel {
                     DevicesColumn::AccessToken,
                     DevicesColumn::Config,
                     DevicesColumn::Order,
-                    DevicesColumn::ProfileId,
                     DevicesColumn::CreatedAt,
                     DevicesColumn::LastConnectedAt,
                 ])
@@ -150,7 +147,6 @@ impl DeviceModel {
                 DevicesColumn::AccessToken,
                 DevicesColumn::Config,
                 DevicesColumn::Order,
-                DevicesColumn::ProfileId,
                 DevicesColumn::CreatedAt,
                 DevicesColumn::LastConnectedAt,
             ]),
@@ -185,8 +181,6 @@ pub enum DevicesColumn {
     Config,
     /// Order of the device in the UI
     Order,
-    /// Current profile on the device
-    ProfileId,
     /// Timestamp of when the device was first approved
     CreatedAt,
     /// Timestamp of when the device last connected
