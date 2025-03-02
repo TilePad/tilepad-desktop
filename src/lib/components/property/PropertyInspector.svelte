@@ -76,7 +76,7 @@
     );
   }
 
-  let unlisten: (() => void) | undefined;
+  let removeEventListener: (() => void) | undefined;
 
   onMount(async () => {
     type Payload = {
@@ -84,22 +84,25 @@
       message: unknown;
     };
 
-    unlisten = await listen<Payload>("plugin:recv_plugin_message", (event) => {
-      const { context, message } = event.payload;
+    removeEventListener = await listen<Payload>(
+      "plugin:recv_plugin_message",
+      (event) => {
+        const { context, message } = event.payload;
 
-      if (context.plugin_id !== pluginId) return;
+        if (context.plugin_id !== pluginId) return;
 
-      sendFrameEvent({
-        type: "PLUGIN_MESSAGE",
-        context,
-        message,
-      });
-    });
+        sendFrameEvent({
+          type: "PLUGIN_MESSAGE",
+          context,
+          message,
+        });
+      },
+    );
   });
 
   onDestroy(() => {
-    if (unlisten) unlisten();
-    unlisten = undefined;
+    if (removeEventListener) removeEventListener();
+    removeEventListener = undefined;
   });
 </script>
 

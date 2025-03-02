@@ -9,19 +9,18 @@
 <body>
     <label for="folder">Folder</label>
     <select name="folder" id="folder">
+        <option disabled value="">Loading...</option>
     </select>
     <p>Which folder this will switch to</p>
 </body>
 
 <script>
-    /*** @type {HTMLSelectElement} */
     const folder = document.getElementById("folder");
 
     let properties;
 
     // Handle properties received
     window.tilepad.onProperties((newProperties) => {
-        console.debug("Got properties", newProperties);
         properties = newProperties;
 
         // Request the folder options
@@ -31,7 +30,7 @@
     });
 
 
-    // Handle messages rom plugin
+    // Handle messages from plugin
     window.tilepad.onPluginMessage((data) => {
         switch (data.type) {
             case "FOLDER_OPTIONS": {
@@ -44,23 +43,36 @@
     // Request the current properties
     window.tilepad.requestProperties();
 
-    folder.onchange = onChangeFolder;
+    folder.onchange = (event) => onChangeFolder(event.target.value);
 
-    function onChangeFolder(event) {
-        console.log("CHANGE FOLDER", event.target.value)
-        window.tilepad.setProperty("folder", event.target.value);
+    function onChangeFolder(value) {
+        if (value === "") {
+            window.tilepad.setProperty("folder", null);
+        } else {
+            window.tilepad.setProperty("folder", value);
+        }
     }
 
     function addFolderOptions(options) {
         folder.innerHTML = "";
 
+        // Add default option
+        {
+            const defaultOption = document.createElement("option");
+            defaultOption.disabled = true;
+            defaultOption.value = "";
+            defaultOption.textContent = "None";
+            defaultOption.selected = true;
+            folder.options.add(defaultOption);
+        }
+
+        // Add real options
         for (const folderOption of options) {
             const option = document.createElement("option");
             option.value = folderOption.value;
             option.textContent = folderOption.label;
             folder.options.add(option);
         }
-
 
         if (properties.folder) {
             const folderIndex = getFolderOptionIndex(properties.folder);

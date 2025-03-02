@@ -28,7 +28,7 @@ pub async fn handle_internal_send_message(
         }
 
         plugin_id => {
-            tracing::warn!(?plugin_id, ?context, "unknown inetnal action");
+            tracing::warn!(?plugin_id, ?context, "unknown internal action");
         }
     }
 
