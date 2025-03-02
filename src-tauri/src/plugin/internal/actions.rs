@@ -9,19 +9,13 @@ use crate::{
 
 pub async fn handle_internal_action(
     plugins: &PluginRegistry,
-    app_tx: &AppEventSender,
     db: &DbPool,
-
     context: PluginMessageContext,
-    message: serde_json::Value,
+    tile: TileModel,
 ) -> anyhow::Result<()> {
-    let tile = TileModel::get_by_id(db, context.tile_id)
-        .await?
-        .context("tile instance not found")?;
-
     match context.plugin_id.as_str() {
         "com.tilepad.system.navigation" => {
-            handle_internal_navigation(plugins, app_tx, db, &tile, context, message).await?;
+            handle_internal_navigation(plugins, db, context, tile).await?;
         }
 
         plugin_id => {
@@ -34,12 +28,15 @@ pub async fn handle_internal_action(
 
 async fn handle_internal_navigation(
     plugins: &PluginRegistry,
-    app_tx: &AppEventSender,
     db: &DbPool,
-    tile: &TileModel,
-
     context: PluginMessageContext,
-    message: serde_json::Value,
+    tile: TileModel,
 ) -> anyhow::Result<()> {
+    match context.action_id.as_str() {
+        "switch_folder" => {}
+        action_id => {
+            tracing::warn!(?action_id, ?context, "unknown internal action");
+        }
+    }
     Ok(())
 }

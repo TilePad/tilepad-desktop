@@ -11,7 +11,7 @@ use manifest::{ActionId, Manifest, PluginId};
 use parking_lot::RwLock;
 
 use crate::{
-    database::DbPool,
+    database::{entity::tile::TileModel, DbPool},
     events::{AppEventSender, PluginMessageContext},
 };
 
@@ -94,6 +94,25 @@ impl PluginRegistry {
         if manifest.plugin.internal.is_some_and(|value| value) {
             internal::messages::handle_internal_send_message(self, app_tx, db, context, message)
                 .await?;
+        } else {
+            // Pass to plugin
+        }
+
+        Ok(())
+    }
+
+    pub async fn handle_action(
+        &self,
+        db: &DbPool,
+        context: PluginMessageContext,
+        tile: TileModel,
+    ) -> anyhow::Result<()> {
+        let manifest = self
+            .get_plugin_manifest(&context.plugin_id)
+            .context("plugin not found")?;
+
+        if manifest.plugin.internal.is_some_and(|value| value) {
+            internal::actions::handle_internal_action(self, db, context, tile).await?;
         } else {
             // Pass to plugin
         }

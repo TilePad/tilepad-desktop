@@ -90,19 +90,19 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         .context("failed to load database")?;
 
     let (app_event_tx, app_event_rx) = mpsc::unbounded_channel();
-    let devices = Devices::new(app_event_tx.clone(), db.clone());
-    let registry = PluginRegistry::default();
+    let plugins = PluginRegistry::default();
+    let devices = Devices::new(app_event_tx.clone(), db.clone(), plugins.clone());
 
     app.manage(app_event_tx.clone());
     app.manage(db.clone());
     app.manage(devices.clone());
-    app.manage(registry.clone());
+    app.manage(plugins.clone());
 
     tracing::debug!("starting event processor");
 
     // Load the core plugins into the registry
     spawn(plugin::load_plugins_into_registry(
-        registry.clone(),
+        plugins.clone(),
         core_plugins,
     ));
 
@@ -118,7 +118,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         db,
         devices,
         app_handle.clone(),
-        registry.clone(),
+        plugins.clone(),
     ));
 
     Ok(())

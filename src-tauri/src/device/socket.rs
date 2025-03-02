@@ -107,7 +107,7 @@ impl DeviceSession {
         Ok(())
     }
 
-    pub fn handle_message(&self, message: ClientDeviceMessage) {
+    pub fn handle_message(self: &Arc<Self>, message: ClientDeviceMessage) {
         match message {
             ClientDeviceMessage::RequestApproval { name } => {
                 self.devices
@@ -128,12 +128,47 @@ impl DeviceSession {
                 });
             }
 
-            ClientDeviceMessage::RequestProfile => {
-                // TODO: Request the device profile data, respond with new profile data
+            ClientDeviceMessage::RequestTiles => {
+                let session = self.clone();
+                let device_id = match self.get_device_id() {
+                    Some(value) => value,
+                    None => {
+                        tracing::error!("unauthenticated device requested tiles");
+                        return;
+                    }
+                };
+                let devices = self.devices.clone();
+
+                _ = tokio::spawn(async move {
+                    let tiles = match devices.request_device_tiles(device_id).await {
+                        Ok(value) => value,
+                        Err(cause) => {
+                            tracing::error!(?cause, "failed to request device tiles");
+                            return;
+                        }
+                    };
+
+                    if let Err(cause) = session.send_message(ServerDeviceMessage::Tiles { tiles }) {
+                        tracing::error!(?cause, "failed to send device tiles");
+                    }
+                });
             }
 
             ClientDeviceMessage::TileClicked { tile_id } => {
-                // TODO: Forward on click
+                let device_id = match self.get_device_id() {
+                    Some(value) => value,
+                    None => {
+                        tracing::error!("unauthenticated device requested tiles");
+                        return;
+                    }
+                };
+                let devices = self.devices.clone();
+
+                _ = tokio::spawn(async move {
+                    if let Err(cause) = devices.device_execute_tile(device_id, tile_id).await {
+                        tracing::error!(?cause, "failed to execute tile");
+                    }
+                });
             }
         }
     }

@@ -188,6 +188,26 @@ impl FolderModel {
         )
         .await
     }
+
+    /// Get the first profile marked as default
+    pub async fn get_default(db: &DbPool, profile_id: ProfileId) -> DbResult<Option<FolderModel>> {
+        sql_query_maybe_one(
+            db,
+            Query::select()
+                .from(FoldersTable)
+                .columns([
+                    FoldersColumn::Id,
+                    FoldersColumn::Name,
+                    FoldersColumn::Default,
+                    FoldersColumn::ProfileId,
+                    FoldersColumn::Config,
+                    FoldersColumn::Order,
+                ])
+                .and_where(Expr::col(FoldersColumn::ProfileId).eq(profile_id))
+                .and_where(Expr::col(FoldersColumn::Default).eq(true)),
+        )
+        .await
+    }
 }
 
 #[derive(IdenStatic, Copy, Clone)]

@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use crate::database::entity::tile::TileModel;
+
 /// Device message coming from the client side
 #[derive(Deserialize)]
 #[serde(tag = "type")]
@@ -11,8 +13,8 @@ pub enum ClientDeviceMessage {
         name: String,
     },
 
-    /// Get the current profile and all its tiles
-    RequestProfile,
+    /// Request the current tiles
+    RequestTiles,
 
     /// Authenticate using a device access token
     Authenticate {
@@ -51,6 +53,6 @@ pub enum ServerDeviceMessage {
     /// Provided access token was invalid
     InvalidAccessToken,
 
-    /// Update the current profile data and its tiles
-    ProfileUpdate {},
+    /// Update the current tiles list
+    Tiles { tiles: Vec<TileModel> },
 }

@@ -9,10 +9,18 @@ use uuid::Uuid;
 
 use crate::{
     database::{
-        entity::device::{CreateDevice, DeviceConfig, DeviceId, DeviceModel},
+        entity::{
+            device::{CreateDevice, DeviceConfig, DeviceId, DeviceModel},
+            folder::FolderModel,
+            profile::ProfileModel,
+            tile::{TileId, TileModel},
+        },
         DbPool,
     },
-    events::{AppEvent, AppEventSender, DeviceAppEvent, DeviceRequestAppEvent},
+    events::{
+        AppEvent, AppEventSender, DeviceAppEvent, DeviceRequestAppEvent, PluginMessageContext,
+    },
+    plugin::PluginRegistry,
     utils::random::generate_access_token,
 };
 
@@ -36,11 +44,12 @@ pub struct ConnectedDevice {
 const DEVICES_TOKEN_LENGTH: usize = 32;
 
 impl Devices {
-    pub fn new(event_tx: AppEventSender, db: DbPool) -> Self {
+    pub fn new(event_tx: AppEventSender, db: DbPool, plugins: PluginRegistry) -> Self {
         Self {
             inner: Arc::new(DevicesInner {
                 event_tx,
                 db,
+                plugins,
                 sessions: Default::default(),
                 requests: Default::default(),
             }),
@@ -141,6 +150,14 @@ impl Devices {
 
     /// Approve a device request, creates a new device in the database
     pub async fn approve_device_request(&self, request_id: DeviceRequestId) -> anyhow::Result<()> {
+        let db = &self.inner.db;
+        let default_profile = ProfileModel::get_default_profile(db)
+            .await?
+            .context("no default profile")?;
+        let default_folder = FolderModel::get_default(db, default_profile.id)
+            .await?
+            .context("no default folder")?;
+
         let request = self
             .take_device_request(request_id)
             .context("request not found")?;
@@ -151,11 +168,14 @@ impl Devices {
         let access_token = generate_access_token(DEVICES_TOKEN_LENGTH);
 
         let device = DeviceModel::create(
-            &self.inner.db,
+            db,
             CreateDevice {
                 name: request.device_name,
                 access_token: access_token.to_string(),
-                config: DeviceConfig {},
+                config: DeviceConfig {
+                    profile_id: default_folder.profile_id,
+                    folder_id: default_folder.id,
+                },
             },
         )
         .await?;
@@ -255,6 +275,45 @@ impl Devices {
         Ok(())
     }
 
+    pub async fn request_device_tiles(
+        &self,
+        device_id: DeviceId,
+    ) -> anyhow::Result<Vec<TileModel>> {
+        let db = &self.inner.db;
+        let device = DeviceModel::get_by_id(db, device_id)
+            .await?
+            .context("device not found")?;
+
+        let tiles = TileModel::get_by_folder(db, device.config.folder_id).await?;
+        Ok(tiles)
+    }
+
+    pub async fn device_execute_tile(
+        &self,
+        device_id: DeviceId,
+        tile_id: TileId,
+    ) -> anyhow::Result<()> {
+        let db = &self.inner.db;
+        let device = DeviceModel::get_by_id(db, device_id)
+            .await?
+            .context("device not found")?;
+        let tile = TileModel::get_by_id(db, tile_id)
+            .await?
+            .context("tile instance not found")?;
+
+        let context = PluginMessageContext {
+            profile_id: device.config.profile_id,
+            folder_id: device.config.folder_id,
+            plugin_id: tile.config.plugin_id.clone(),
+            action_id: tile.config.action_id.clone(),
+            tile_id,
+        };
+
+        self.inner.plugins.handle_action(db, context, tile).await?;
+
+        Ok(())
+    }
+
     fn emit_app_event(&self, event: AppEvent) {
         // Notify frontend
         _ = self.inner.event_tx.send(event);
@@ -267,6 +326,9 @@ pub struct DevicesInner {
 
     /// Access to the database
     db: DbPool,
+
+    /// Access to the plugins registry
+    plugins: PluginRegistry,
 
     /// Current device socket sessions
     sessions: RwLock<HashMap<DeviceSessionId, DeviceSessionRef>>,

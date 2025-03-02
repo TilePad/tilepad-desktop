@@ -9,7 +9,7 @@ use crate::database::{
     DbPool, DbResult,
 };
 
-use super::profile::ProfileId;
+use super::{folder::FolderId, profile::ProfileId};
 
 pub type DeviceId = Uuid;
 
@@ -23,13 +23,15 @@ pub struct DeviceModel {
     #[sqlx(json)]
     pub config: DeviceConfig,
     pub order: u32,
-    pub profile_id: Option<ProfileId>,
     pub created_at: DateTime<Utc>,
     pub last_connected_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
-pub struct DeviceConfig {}
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DeviceConfig {
+    pub profile_id: ProfileId,
+    pub folder_id: FolderId,
+}
 
 pub struct CreateDevice {
     pub name: String,
@@ -45,7 +47,6 @@ impl DeviceModel {
             access_token: create.access_token,
             config: create.config,
             order: 0,
-            profile_id: None,
             created_at: Utc::now(),
             last_connected_at: Utc::now(),
         };
@@ -72,7 +73,6 @@ impl DeviceModel {
                     model.access_token.clone().into(),
                     config.into(),
                     model.order.into(),
-                    model.profile_id.into(),
                     model.created_at.into(),
                     model.last_connected_at.into(),
                 ]),
@@ -117,6 +117,26 @@ impl DeviceModel {
                     DevicesColumn::LastConnectedAt,
                 ])
                 .and_where(Expr::col(DevicesColumn::AccessToken).eq(access_token)),
+        )
+        .await
+    }
+
+    pub async fn get_by_id(db: &DbPool, id: DeviceId) -> DbResult<Option<DeviceModel>> {
+        sql_query_maybe_one(
+            db,
+            Query::select()
+                .from(DevicesTable)
+                .columns([
+                    DevicesColumn::Id,
+                    DevicesColumn::Name,
+                    DevicesColumn::AccessToken,
+                    DevicesColumn::Config,
+                    DevicesColumn::Order,
+                    DevicesColumn::ProfileId,
+                    DevicesColumn::CreatedAt,
+                    DevicesColumn::LastConnectedAt,
+                ])
+                .and_where(Expr::col(DevicesColumn::Id).eq(id)),
         )
         .await
     }
