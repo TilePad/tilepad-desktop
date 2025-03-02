@@ -44,6 +44,7 @@ pub fn run() {
             folders::folders_update_folder,
             folders::folders_create_folder,
             actions::actions_get_actions,
+            actions::actions_get_action,
             tiles::tiles_get_tiles,
             tiles::tiles_get_tile,
             tiles::tiles_create_tile,

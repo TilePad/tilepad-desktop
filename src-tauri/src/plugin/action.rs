@@ -22,6 +22,7 @@ pub struct Action {
     pub label: String,
     pub icon: Option<String>,
     pub description: Option<String>,
+    pub inspector: Option<String>,
 }
 
 pub fn actions_from_plugins<'a, I>(plugins: I) -> Vec<ActionCategory>
@@ -48,6 +49,7 @@ where
                 label: manifest_action.label.clone(),
                 icon: manifest_action.icon.clone(),
                 description: manifest_action.description.clone(),
+                inspector: manifest_action.inspector.clone(),
             };
 
             category.actions.push(action);

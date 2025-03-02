@@ -4,9 +4,9 @@ use std::{
     sync::Arc,
 };
 
-use action::{actions_from_plugins, ActionCategory};
+use action::{actions_from_plugins, Action, ActionCategory};
 use garde::Validate;
-use manifest::{Manifest, PluginId};
+use manifest::{ActionId, Manifest, PluginId};
 use parking_lot::RwLock;
 
 pub mod action;
@@ -37,6 +37,22 @@ impl PluginRegistry {
 
     pub fn get_action_collection(&self) -> Vec<ActionCategory> {
         actions_from_plugins(self.inner.plugins.read().values())
+    }
+
+    pub fn get_action(&self, plugin_id: &PluginId, action_id: &ActionId) -> Option<Action> {
+        let plugins = self.inner.plugins.read();
+        let plugin = plugins.get(plugin_id)?;
+        let manifest_action = plugin.manifest.actions.get(action_id)?;
+
+        Some(Action {
+            action_id: action_id.clone(),
+            plugin_id: plugin_id.clone(),
+
+            label: manifest_action.label.clone(),
+            icon: manifest_action.icon.clone(),
+            description: manifest_action.description.clone(),
+            inspector: manifest_action.inspector.clone(),
+        })
     }
 
     pub fn get_plugin_path(&self, plugin_id: &PluginId) -> Option<PathBuf> {

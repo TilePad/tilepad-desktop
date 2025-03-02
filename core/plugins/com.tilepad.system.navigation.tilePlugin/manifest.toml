@@ -14,6 +14,7 @@ icon = "images/navigation.svg"
 label = "Switch Folder"
 icon = "images/switch-folder.svg"
 description = "Switch to a specific folder"
+inspector = "ui/switch-folder.html"
 
 [actions.switch_profile]
 label = "Switch Profile"

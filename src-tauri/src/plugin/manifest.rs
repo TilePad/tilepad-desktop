@@ -88,6 +88,8 @@ pub struct ManifestAction {
     pub icon: Option<String>,
     #[garde(skip)]
     pub description: Option<String>,
+    #[garde(skip)]
+    pub inspector: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Validate)]

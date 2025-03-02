@@ -22,4 +22,5 @@ export interface Action {
   label: string;
   icon: Option<string>;
   description: Option<string>;
+  inspector: Option<string>;
 }

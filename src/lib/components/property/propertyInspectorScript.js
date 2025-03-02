@@ -1,13 +1,11 @@
 /* eslint-disable */
 // @ts-nocheck
 
-const channel = new BroadcastChannel("TILEPAD_INSPECTOR");
-
-channel.onmessage = (event) => {
+window.addEventListener("message", (event) => {
   document.body.innerHTML += "<p>Received from parent: " + event.data + "</p>";
-};
+});
 
-channel.postMessage("Hello from Iframe");
+window.parent.postMessage("Hello from Iframe");
 
 function debounce(fn, delay) {
   let timeoutId;

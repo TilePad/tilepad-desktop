@@ -1,27 +1,27 @@
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte";
-
+  import type { PluginId } from "$lib/api/types/plugin";
   import propertyInspectorScript from "./propertyInspectorScript?raw";
 
-  let message = "Nothing";
+  type Props = {
+    pluginId: PluginId;
+    inspector: string;
+  };
+  const { pluginId, inspector }: Props = $props();
 
-  const channel = new BroadcastChannel("TILEPAD_INSPECTOR");
+  let message = $state("Nothing");
+  let iframe: HTMLIFrameElement | undefined = $state(undefined);
 
   function onFrameEvent(event: MessageEvent) {
+    if (!iframe) return;
+    if (event.source !== iframe.contentWindow) return;
     message = `Received from iframe: ${event.data}`;
   }
 
   function sendFrameEvent(data: string) {
-    channel.postMessage(data);
+    if (!iframe) return;
+    if (!iframe.contentWindow) return;
+    iframe.contentWindow.postMessage(data);
   }
-
-  onMount(() => {
-    channel.onmessage = onFrameEvent;
-  });
-
-  onDestroy(() => {
-    channel.close();
-  });
 
   /**
    * Injects the property inspector into the provided HTML
@@ -52,10 +52,13 @@
   const iframeContent = injectPropertyInspector(testDocument);
 </script>
 
-<div>
-  <button on:click={() => sendFrameEvent("Test")}>Send Message to Iframe</button
-  >
-  <p>{message}</p>
+<svelte:window onmessage={onFrameEvent} />
 
-  <iframe title="Test" srcdoc={iframeContent}></iframe>
-</div>
+<iframe class="frame" bind:this={iframe} title="Test" srcdoc={iframeContent}
+></iframe>
+
+<style>
+  .frame {
+    border: none;
+  }
+</style>

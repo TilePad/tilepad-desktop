@@ -4,6 +4,8 @@
   import { watch } from "runed";
   import { getFolderContext } from "../folders/FolderProvider.svelte";
   import PropertyInspector from "../property/PropertyInspector.svelte";
+  import { createActionQuery } from "$lib/api/actions";
+  import { getErrorMessage } from "$lib/api/utils/error";
 
   type Props = {
     tileId: TileId;
@@ -20,6 +22,16 @@
     () => tileId,
   );
 
+  const tile = $derived($tileQuery.data);
+  const tileConfig = $derived(tile?.config);
+
+  const actionQuery = createActionQuery(
+    () => tileConfig?.plugin_id ?? null,
+    () => tileConfig?.action_id ?? null,
+  );
+
+  const action = $derived($actionQuery.data);
+
   watch(
     () => $tileQuery.data,
     (tile) => {
@@ -29,22 +41,32 @@
 </script>
 
 <div class="editor">
-  {#if $tileQuery.isLoading}{:else if $tileQuery.isError}{:else if $tileQuery.isSuccess}
-    {@const tile = $tileQuery.data}
-    {#if tile === null}
-      <div>Unknown tile</div>
-    {:else}
-      <div class="left">
-        <h2>Configure Tile</h2>
-        {tile.column}
-        {tile.row}
-        {JSON.stringify(tile.config)}
-        <button onclick={onClose}> Close</button>
-      </div>
+  {#if $tileQuery.isSuccess && $actionQuery.isSuccess && tile && action}
+    <div class="left">
+      <h2>Configure Tile</h2>
+      {tile.column}
+      {tile.row}
+      {JSON.stringify(tile.config)}
+      {JSON.stringify(action)}
+      <button onclick={onClose}> Close</button>
+    </div>
+
+    {#if action.inspector !== null}
       <div class="right">
-        <PropertyInspector />
+        <PropertyInspector
+          pluginId={action.plugin_id}
+          inspector={action.inspector}
+        />
       </div>
     {/if}
+  {:else if $tileQuery.isError}
+    Failed to load tile: {getErrorMessage($tileQuery.error)}
+  {:else if $actionQuery.isError}
+    Failed to load action: {getErrorMessage($actionQuery.error)}
+  {:else if $tileQuery.isLoading}
+    Loading tile...
+  {:else if $actionQuery.isLoading}
+    Loading action...
   {/if}
 </div>
 
@@ -67,7 +89,8 @@
   }
 
   .left {
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
   .right {
