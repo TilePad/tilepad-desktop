@@ -7,7 +7,79 @@
 </head>
 
 <body>
-
+    <label for="folder">Folder</label>
+    <select name="folder" id="folder">
+    </select>
+    <p>Which folder this will switch to</p>
 </body>
+
+<script>
+    /*** @type {HTMLSelectElement} */
+    const folder = document.getElementById("folder");
+
+    let properties;
+
+    // Handle properties received
+    window.tilepad.onProperties((newProperties) => {
+        console.debug("Got properties", newProperties);
+        properties = newProperties;
+
+        // Request the folder options
+        window.tilepad.sendPluginMessage({
+            type: "GET_FOLDER_OPTIONS"
+        })
+    });
+
+
+    // Handle messages rom plugin
+    window.tilepad.onPluginMessage((data) => {
+        switch (data.type) {
+            case "FOLDER_OPTIONS": {
+                addFolderOptions(data.options)
+                break;
+            }
+        }
+    });
+
+    // Request the current properties
+    window.tilepad.requestProperties();
+
+    folder.onchange = onChangeFolder;
+
+    function onChangeFolder(event) {
+        console.log("CHANGE FOLDER", event.target.value)
+        window.tilepad.setProperty("folder", event.target.value);
+    }
+
+    function addFolderOptions(options) {
+        folder.innerHTML = "";
+
+        for (const folderOption of options) {
+            const option = document.createElement("option");
+            option.value = folderOption.value;
+            option.textContent = folderOption.label;
+            folder.options.add(option);
+        }
+
+
+        if (properties.folder) {
+            const folderIndex = getFolderOptionIndex(properties.folder);
+            if (folderIndex !== -1) {
+                folder.selectedIndex = folderIndex;
+            }
+        }
+    }
+
+    function getFolderOptionIndex(value) {
+        for (let i = 0; i < folder.options.length; i++) {
+            let option = folder.options.item(i);
+            if (option === null) break;
+            if (option.value !== value) continue;
+            return i;
+        }
+
+        return -1
+    }
+</script>
 
 </html>

@@ -5,11 +5,18 @@ use std::{
 };
 
 use action::{actions_from_plugins, Action, ActionCategory};
+use anyhow::Context;
 use garde::Validate;
 use manifest::{ActionId, Manifest, PluginId};
 use parking_lot::RwLock;
 
+use crate::{
+    database::DbPool,
+    events::{AppEventSender, PluginMessageContext},
+};
+
 pub mod action;
+pub mod internal;
 pub mod manifest;
 pub mod node;
 pub mod runner;
@@ -61,6 +68,37 @@ impl PluginRegistry {
             .read()
             .get(plugin_id)
             .map(|plugin| plugin.path.clone())
+    }
+
+    pub fn get_plugin_manifest(&self, plugin_id: &PluginId) -> Option<Manifest> {
+        self.inner
+            .plugins
+            .read()
+            .get(plugin_id)
+            .map(|plugin| plugin.manifest.clone())
+    }
+
+    pub async fn handle_send_message(
+        &self,
+
+        app_tx: &AppEventSender,
+        db: &DbPool,
+
+        context: PluginMessageContext,
+        message: serde_json::Value,
+    ) -> anyhow::Result<()> {
+        let manifest = self
+            .get_plugin_manifest(&context.plugin_id)
+            .context("plugin not found")?;
+
+        if manifest.plugin.internal.is_some_and(|value| value) {
+            internal::messages::handle_internal_send_message(self, app_tx, db, context, message)
+                .await?;
+        } else {
+            // Pass to plugin
+        }
+
+        Ok(())
     }
 }
 

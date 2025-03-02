@@ -3,6 +3,7 @@ use serde::Serialize;
 pub mod actions;
 pub mod devices;
 pub mod folders;
+pub mod plugins;
 pub mod profiles;
 pub mod server;
 pub mod tiles;

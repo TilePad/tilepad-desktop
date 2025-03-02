@@ -55,6 +55,9 @@ export async function deleteTile(folderId: FolderId, tileId: TileId) {
   await invoke("tiles_delete_tile", { tileId });
 
   invalidateTilesList(folderId);
+  queryClient.removeQueries({
+    queryKey: tilesKeys.specific(folderId, tileId),
+  });
 }
 
 // [QUERIES] ------------------------------------------------------

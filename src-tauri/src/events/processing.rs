@@ -1,12 +1,15 @@
 use std::{future::poll_fn, task::Poll};
 
 use futures::{stream::FuturesUnordered, Stream};
+use serde::Serialize;
 use tauri::{AppHandle, Emitter};
 use tracing::{debug, error};
 
-use super::{AppEvent, AppEventReceiver, DeviceAppEvent, DeviceRequestAppEvent};
+use crate::{database::DbPool, events::PluginMessageContext};
 
-pub async fn process_events(app_handle: AppHandle, mut event_rx: AppEventReceiver) {
+use super::{AppEvent, AppEventReceiver, DeviceAppEvent, DeviceRequestAppEvent, PluginAppEvent};
+
+pub async fn process_events(app_handle: AppHandle, db: DbPool, mut event_rx: AppEventReceiver) {
     let mut futures = FuturesUnordered::new();
     let mut futures = std::pin::pin!(futures);
 
@@ -23,7 +26,7 @@ pub async fn process_events(app_handle: AppHandle, mut event_rx: AppEventReceive
 
             debug!(?event, "app event received");
 
-            futures.push(process_event(&app_handle, event));
+            futures.push(process_event(&app_handle, &db, event));
         }
 
         // Poll completions until no more ready
@@ -38,7 +41,7 @@ pub async fn process_events(app_handle: AppHandle, mut event_rx: AppEventReceive
     .await;
 }
 
-async fn process_event(app_handle: &AppHandle, event: AppEvent) -> anyhow::Result<()> {
+async fn process_event(app_handle: &AppHandle, db: &DbPool, event: AppEvent) -> anyhow::Result<()> {
     match event {
         AppEvent::DeviceRequest(request) => match request {
             DeviceRequestAppEvent::Added { request_id } => {
@@ -61,6 +64,19 @@ async fn process_event(app_handle: &AppHandle, event: AppEvent) -> anyhow::Resul
             DeviceAppEvent::Revoked { device_id } => {
                 app_handle.emit("device:revoked", device_id)?;
             }
+        },
+        AppEvent::Plugin(plugin_app_event) => match plugin_app_event {
+            PluginAppEvent::RecvPluginMessage { context, message } => {
+                #[derive(Serialize)]
+                struct Payload {
+                    context: PluginMessageContext,
+                    message: serde_json::Value,
+                }
+
+                app_handle.emit("plugin:recv_plugin_message", &Payload { context, message })?;
+            }
+            PluginAppEvent::OpenInspector { context } => {}
+            PluginAppEvent::CloseInspector { context } => {}
         },
     }
 

@@ -1,6 +1,11 @@
+use serde::{Deserialize, Serialize};
 use tokio::sync::mpsc;
 
-use crate::{database::entity::device::DeviceId, device::DeviceRequestId};
+use crate::{
+    database::entity::{device::DeviceId, folder::FolderId, profile::ProfileId, tile::TileId},
+    device::DeviceRequestId,
+    plugin::manifest::{ActionId, PluginId},
+};
 
 pub mod processing;
 
@@ -12,6 +17,8 @@ pub enum AppEvent {
     DeviceRequest(DeviceRequestAppEvent),
 
     Device(DeviceAppEvent),
+
+    Plugin(PluginAppEvent),
 }
 
 #[derive(Debug)]
@@ -27,4 +34,31 @@ pub enum DeviceRequestAppEvent {
 
     Accepted { request_id: DeviceRequestId },
     Decline { request_id: DeviceRequestId },
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PluginMessageContext {
+    pub profile_id: ProfileId,
+    pub folder_id: FolderId,
+
+    pub plugin_id: PluginId,
+    pub action_id: ActionId,
+
+    pub tile_id: TileId,
+}
+
+#[derive(Debug)]
+pub enum PluginAppEvent {
+    RecvPluginMessage {
+        context: PluginMessageContext,
+        message: serde_json::Value,
+    },
+
+    OpenInspector {
+        context: PluginMessageContext,
+    },
+
+    CloseInspector {
+        context: PluginMessageContext,
+    },
 }

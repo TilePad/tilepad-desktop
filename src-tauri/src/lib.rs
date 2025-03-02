@@ -20,7 +20,7 @@ mod utils;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    use commands::{actions, devices, folders, profiles, server, tiles};
+    use commands::{actions, devices, folders, plugins, profiles, server, tiles};
 
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
@@ -49,7 +49,10 @@ pub fn run() {
             tiles::tiles_get_tile,
             tiles::tiles_create_tile,
             tiles::tiles_update_tile,
-            tiles::tiles_delete_tile
+            tiles::tiles_delete_tile,
+            plugins::plugins_send_plugin_message,
+            plugins::plugins_open_inspector,
+            plugins::plugins_close_inspector,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -87,9 +90,10 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         .context("failed to load database")?;
 
     let (app_event_tx, app_event_rx) = mpsc::unbounded_channel();
-    let devices = Devices::new(app_event_tx, db.clone());
+    let devices = Devices::new(app_event_tx.clone(), db.clone());
     let registry = PluginRegistry::default();
 
+    app.manage(app_event_tx.clone());
     app.manage(db.clone());
     app.manage(devices.clone());
     app.manage(registry.clone());
@@ -105,6 +109,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
     // Spawn event processor
     spawn(events::processing::process_events(
         app_handle.clone(),
+        db.clone(),
         app_event_rx,
     ));
 

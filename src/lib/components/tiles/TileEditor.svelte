@@ -1,11 +1,15 @@
 <script lang="ts">
-  import { createTileQuery } from "$lib/api/tiles";
   import type { TileId } from "$lib/api/types/tiles";
+
   import { watch } from "runed";
+  import { createActionQuery } from "$lib/api/actions";
+  import { sendPluginMessage } from "$lib/api/plugins";
+  import { getErrorMessage } from "$lib/api/utils/error";
+  import { updateTile, createTileQuery } from "$lib/api/tiles";
+
   import { getFolderContext } from "../folders/FolderProvider.svelte";
   import PropertyInspector from "../property/PropertyInspector.svelte";
-  import { createActionQuery } from "$lib/api/actions";
-  import { getErrorMessage } from "$lib/api/utils/error";
+  import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
 
   type Props = {
     tileId: TileId;
@@ -14,8 +18,11 @@
 
   const { tileId, onClose }: Props = $props();
 
+  const { profile } = getProfileContext();
   const { folder } = getFolderContext();
+
   const currentFolder = $derived.by(folder);
+  const currentProfile = $derived.by(profile);
 
   const tileQuery = createTileQuery(
     () => currentFolder.id,
@@ -56,6 +63,30 @@
         <PropertyInspector
           pluginId={action.plugin_id}
           inspector={action.inspector}
+          properties={tile.config.properties}
+          onSetProperty={(name, value) => {
+            updateTile(tile.id, {
+              config: {
+                ...tile.config,
+                properties: {
+                  ...tile.config.properties,
+                  [name]: value,
+                },
+              },
+            });
+          }}
+          onSendPluginMessage={(message) => {
+            sendPluginMessage(
+              {
+                profile_id: currentProfile.id,
+                folder_id: currentFolder.id,
+                plugin_id: action.plugin_id,
+                action_id: action.action_id,
+                tile_id: tile.id,
+              },
+              message,
+            );
+          }}
         />
       </div>
     {/if}

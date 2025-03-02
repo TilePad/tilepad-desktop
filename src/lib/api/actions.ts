@@ -6,6 +6,7 @@ import type { Action, ActionId, ActionCategory } from "./types/actions";
 
 import { queryClient } from "./client";
 import { runeStore } from "./utils/svelte.svelte";
+import { getPluginAssetPath } from "./utils/url";
 
 export const actionsKeys = {
   root: ["actions"],

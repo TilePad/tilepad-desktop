@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 
 use super::node::NodeVersion;
 
-#[derive(Debug, Deserialize, Validate)]
+#[derive(Debug, Clone, Deserialize, Validate)]
 pub struct Manifest {
     /// Details about the plugin itself
     #[garde(dive)]
@@ -23,7 +23,7 @@ pub struct Manifest {
     pub actions: HashMap<ActionId, ManifestAction>,
 }
 
-#[derive(Debug, Deserialize, Validate)]
+#[derive(Debug, Clone, Deserialize, Validate)]
 pub struct ManifestCategory {
     #[garde(length(min = 1))]
     pub label: String,
@@ -44,7 +44,19 @@ impl Manifest {
 #[serde(transparent)]
 pub struct PluginId(#[garde(custom(is_valid_plugin_name))] pub String);
 
-#[derive(Debug, Deserialize, Validate)]
+impl PluginId {
+    pub fn as_str(&self) -> &str {
+        self.0.as_str()
+    }
+}
+
+impl AsRef<str> for PluginId {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+#[derive(Debug, Clone, Deserialize, Validate)]
 pub struct ManifestPlugin {
     /// Unique ID of the plugin (e.g com.jacobtread.tilepad.obs)
     #[garde(dive)]
@@ -68,6 +80,18 @@ pub struct ManifestPlugin {
 #[serde(transparent)]
 pub struct ActionId(#[garde(custom(is_valid_action_name))] pub String);
 
+impl ActionId {
+    pub fn as_str(&self) -> &str {
+        self.0.as_str()
+    }
+}
+
+impl AsRef<str> for ActionId {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
 impl Display for ActionId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.0.fmt(f)
@@ -80,7 +104,7 @@ impl PathComponentKind for ActionId {
     }
 }
 
-#[derive(Debug, Deserialize, Validate)]
+#[derive(Debug, Clone, Deserialize, Validate)]
 pub struct ManifestAction {
     #[garde(length(min = 1))]
     pub label: String,
