@@ -10,9 +10,11 @@
 
   type Props = {
     tile: TileModel;
+
+    onClick: VoidFunction;
   };
 
-  const { tile }: Props = $props();
+  const { tile, onClick }: Props = $props();
 
   const config = $derived(tile.config);
 
@@ -30,8 +32,24 @@
   }
 </script>
 
-<div class="tile">
-  <button onclick={onRemove} class="remove"> R </button>
+<div
+  class="tile"
+  onclick={onClick}
+  tabindex="0"
+  role="button"
+  aria-roledescription="button"
+  onkeydown={() => {}}
+>
+  <button
+    onclick={(event) => {
+      event.preventDefault();
+      onRemove();
+    }}
+    class="remove"
+    type="button"
+    aria-label="Remove"
+  >
+  </button>
 
   {#if config.icon.type === "PluginIcon"}
     <img
@@ -47,7 +65,8 @@
     position: absolute;
     top: 0;
     right: 0;
-    width: 32px;
+    width: 16px;
+    height: 16px;
   }
 
   .tile {
