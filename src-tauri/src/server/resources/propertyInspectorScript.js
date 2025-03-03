@@ -40,6 +40,8 @@ window.addEventListener("message", (event) => {
     events.emit("properties", data.properties);
   } else if (type === "PLUGIN_MESSAGE") {
     events.emit("plugin_message", data.message);
+  } else if (type === "REFRESH") {
+    window.location.reload();
   }
 });
 

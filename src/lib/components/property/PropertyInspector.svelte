@@ -94,7 +94,9 @@
   watch(
     () => tileId,
     () => {
-      iframe?.contentWindow?.location?.reload();
+      sendFrameEvent({
+        type: "REFRESH",
+      });
     },
   );
 </script>
