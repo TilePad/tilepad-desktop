@@ -1,14 +1,11 @@
 <script lang="ts">
+  import type { TileId } from "$lib/api/types/tiles";
   import type { PluginId, PluginMessageContext } from "$lib/api/types/plugin";
 
+  import { watch } from "runed";
   import { onMount, onDestroy } from "svelte";
   import { listen } from "@tauri-apps/api/event";
-  import { getErrorMessage } from "$lib/api/utils/error";
-  import { createPluginAssetTextQuery } from "$lib/api/plugins";
-
-  import propertyInspectorScript from "./propertyInspectorScript?raw";
-  import { watch } from "runed";
-  import type { TileId } from "$lib/api/types/tiles";
+  import { getPluginAssetPath } from "$lib/api/utils/url";
 
   type Props = {
     pluginId: PluginId;
@@ -28,11 +25,6 @@
     onSendPluginMessage,
     onSetProperty,
   }: Props = $props();
-
-  const assetQuery = createPluginAssetTextQuery(
-    () => pluginId,
-    () => inspector,
-  );
 
   let iframe: HTMLIFrameElement | undefined = $state(undefined);
 
@@ -67,18 +59,7 @@
   function sendFrameEvent(data: object) {
     if (!iframe) return;
     if (!iframe.contentWindow) return;
-    iframe.contentWindow.postMessage(data);
-  }
-
-  /**
-   * Injects the property inspector into the provided HTML
-   */
-  function injectPropertyInspector(html: string) {
-    return html.replace(
-      "<head>",
-      // eslint-disable-next-line no-useless-escape
-      `<head><script>${propertyInspectorScript}<\/script>`,
-    );
+    iframe.contentWindow.postMessage(data, "*");
   }
 
   let removeEventListener: (() => void) | undefined;
@@ -120,18 +101,12 @@
 
 <svelte:window onmessage={onFrameEvent} />
 
-{#if $assetQuery.isLoading}
-  Loading...
-{:else if $assetQuery.isError}
-  Failed to load inspector: {getErrorMessage($assetQuery.error)}
-{:else if $assetQuery.isSuccess}
-  <iframe
-    class="frame"
-    bind:this={iframe}
-    title="Inspector"
-    srcdoc={injectPropertyInspector($assetQuery.data)}
-  ></iframe>
-{/if}
+<iframe
+  class="frame"
+  bind:this={iframe}
+  title="Inspector"
+  src={getPluginAssetPath(pluginId, inspector)}
+></iframe>
 
 <style>
   .frame {
