@@ -73,5 +73,6 @@
   .grid-wrapper {
     flex: auto;
     padding: 1rem;
+    overflow: hidden;
   }
 </style>

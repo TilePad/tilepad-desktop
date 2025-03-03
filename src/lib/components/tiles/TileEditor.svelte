@@ -62,6 +62,7 @@
       <div class="right">
         <PropertyInspector
           pluginId={action.plugin_id}
+          tileId={tile.id}
           inspector={action.inspector}
           properties={tile.config.properties}
           onSetProperty={(name, value) => {
@@ -112,11 +113,11 @@
     border-top: 2px solid #302d36;
     flex-grow: 0;
     flex-shrink: 0;
+    flex: auto;
 
     display: flex;
     flex-flow: row;
     gap: 0.5rem;
-    margin-top: 1rem;
   }
 
   .left {

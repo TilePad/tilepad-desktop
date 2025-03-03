@@ -7,9 +7,13 @@
   import { createPluginAssetTextQuery } from "$lib/api/plugins";
 
   import propertyInspectorScript from "./propertyInspectorScript?raw";
+  import { watch } from "runed";
+  import type { TileId } from "$lib/api/types/tiles";
 
   type Props = {
     pluginId: PluginId;
+    tileId: TileId;
+
     inspector: string;
     properties: object;
 
@@ -18,6 +22,7 @@
   };
   const {
     pluginId,
+    tileId,
     inspector,
     properties,
     onSendPluginMessage,
@@ -70,9 +75,9 @@
    */
   function injectPropertyInspector(html: string) {
     return html.replace(
-      "</head>",
+      "<head>",
       // eslint-disable-next-line no-useless-escape
-      `<script>${propertyInspectorScript}<\/script></head>`,
+      `<head><script>${propertyInspectorScript}<\/script>`,
     );
   }
 
@@ -104,6 +109,13 @@
     if (removeEventListener) removeEventListener();
     removeEventListener = undefined;
   });
+
+  watch(
+    () => tileId,
+    () => {
+      iframe?.contentWindow?.location?.reload();
+    },
+  );
 </script>
 
 <svelte:window onmessage={onFrameEvent} />
