@@ -31,16 +31,63 @@ pub struct TileConfig {
     /// ID of the action to execution
     pub action_id: ActionId,
     /// Icon to use
+    #[serde(default)]
     pub icon: TileIcon,
     /// Configuration for the action
     pub properties: serde_json::Value,
+
+    #[serde(default)]
+    pub label: TileLabel,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
+pub struct TileLabel {
+    pub enabled: bool,
+    pub label: String,
+    pub align: LabelAlign,
+
+    pub font_size: u32,
+
+    pub bold: bool,
+    pub italic: bool,
+    pub underline: bool,
+
+    pub color: String,
+}
+
+impl Default for TileLabel {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            label: Default::default(),
+            align: Default::default(),
+            font_size: 10,
+            bold: false,
+            italic: false,
+            underline: false,
+            color: "#ffffff".to_string(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub enum LabelAlign {
+    #[default]
+    Bottom,
+    Middle,
+    Top,
+}
+
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
 pub enum TileIcon {
+    #[default]
     None,
-    PluginIcon { plugin_id: PluginId, icon: String },
+    PluginIcon {
+        plugin_id: PluginId,
+        icon: String,
+    },
 }
 
 #[derive(Deserialize)]

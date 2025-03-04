@@ -18,6 +18,7 @@ export interface TileConfig {
   action_id: ActionId;
   icon: TileIcon;
   properties: object;
+  label: TileLabel;
 }
 
 export type TileIconNone = object;
@@ -38,3 +39,20 @@ export type TileIcon =
 export type CreateTile = Omit<TileModel, "id">;
 
 export type UpdateTile = Partial<Omit<TileModel, "id">>;
+
+export interface TileLabel {
+  enabled: boolean;
+  label: string;
+  align: LabelAlign;
+  font_size: number;
+  bold: boolean;
+  italic: boolean;
+  underline: boolean;
+  color: string;
+}
+
+export enum LabelAlign {
+  Bottom = "Bottom",
+  Middle = "Middle",
+  Top = "Top",
+}

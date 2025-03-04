@@ -7,6 +7,7 @@
   import { toastErrorMessage } from "$lib/api/utils/error";
 
   import { getFolderContext } from "../folders/FolderProvider.svelte";
+  import TileLabelElm from "./TileLabelElm.svelte";
 
   type Props = {
     tile: TileModel;
@@ -58,6 +59,8 @@
       alt="Tile Icon"
     />
   {/if}
+
+  <TileLabelElm label={config.label} />
 </div>
 
 <style>

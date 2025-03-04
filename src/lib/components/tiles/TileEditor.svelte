@@ -10,6 +10,7 @@
   import { getFolderContext } from "../folders/FolderProvider.svelte";
   import PropertyInspector from "../property/PropertyInspector.svelte";
   import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
+  import TileNameEditor from "./TileNameEditor.svelte";
 
   type Props = {
     tileId: TileId;
@@ -51,6 +52,9 @@
   {#if $tileQuery.isSuccess && $actionQuery.isSuccess && tile && action}
     <div class="left">
       <h2>Configure Tile</h2>
+
+      <TileNameEditor config={tile.config} tileId={tile.id} />
+
       {tile.column}
       {tile.row}
       {JSON.stringify(tile.config)}
