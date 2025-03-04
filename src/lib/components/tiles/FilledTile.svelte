@@ -1,13 +1,9 @@
 <script lang="ts">
   import type { TileModel } from "$lib/api/types/tiles";
 
-  import { toast } from "svelte-sonner";
-  import { deleteTile } from "$lib/api/tiles";
   import { getPluginAssetPath } from "$lib/api/utils/url";
-  import { toastErrorMessage } from "$lib/api/utils/error";
 
   import TileLabelElm from "./TileLabelElm.svelte";
-  import { getFolderContext } from "../folders/FolderProvider.svelte";
 
   type Props = {
     tile: TileModel;
@@ -18,19 +14,6 @@
   const { tile, onClick }: Props = $props();
 
   const config = $derived(tile.config);
-
-  const { folder } = getFolderContext();
-  const currentFolder = $derived.by(folder);
-
-  function onRemove() {
-    const deletePromise = deleteTile(currentFolder.id, tile.id);
-
-    toast.promise(deletePromise, {
-      loading: "Deleting tile",
-      success: "Deleted tile",
-      error: toastErrorMessage("Failed to delete tile"),
-    });
-  }
 </script>
 
 <div
@@ -41,17 +24,6 @@
   aria-roledescription="button"
   onkeydown={() => {}}
 >
-  <button
-    onclick={(event) => {
-      event.preventDefault();
-      onRemove();
-    }}
-    class="remove"
-    type="button"
-    aria-label="Remove"
-  >
-  </button>
-
   {#if config.icon.type === "PluginIcon"}
     <img
       class="tile__icon"
@@ -64,14 +36,6 @@
 </div>
 
 <style>
-  .remove {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 16px;
-    height: 16px;
-  }
-
   .tile {
     position: relative;
     background-color: #242129;

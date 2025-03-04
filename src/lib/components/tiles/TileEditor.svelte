@@ -2,16 +2,17 @@
   import type { TileId } from "$lib/api/types/tiles";
 
   import { watch } from "runed";
+  import { toast } from "svelte-sonner";
   import { createActionQuery } from "$lib/api/actions";
   import { sendPluginMessage } from "$lib/api/plugins";
-  import { getErrorMessage } from "$lib/api/utils/error";
-  import { updateTile, createTileQuery } from "$lib/api/tiles";
+  import { updateTile, deleteTile, createTileQuery } from "$lib/api/tiles";
+  import { getErrorMessage, toastErrorMessage } from "$lib/api/utils/error";
 
+  import Button from "../input/Button.svelte";
   import TileNameEditor from "./TileNameEditor.svelte";
   import { getFolderContext } from "../folders/FolderProvider.svelte";
   import PropertyInspector from "../property/PropertyInspector.svelte";
   import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
-  import Button from "../input/Button.svelte";
 
   type Props = {
     tileId: TileId;
@@ -47,13 +48,23 @@
       if (tile === null) onClose();
     },
   );
+
+  function onRemove() {
+    const deletePromise = deleteTile(currentFolder.id, tileId);
+
+    toast.promise(deletePromise, {
+      loading: "Deleting tile",
+      success: "Deleted tile",
+      error: toastErrorMessage("Failed to delete tile"),
+    });
+  }
 </script>
 
 <div class="editor">
   {#if $tileQuery.isSuccess && $actionQuery.isSuccess && tile && action}
     <div class="left">
       <Button onclick={onClose}>Close</Button>
-
+      <Button onclick={onRemove}>Remove</Button>
       <TileNameEditor config={tile.config} tileId={tile.id} />
     </div>
 
@@ -128,5 +139,6 @@
     flex: auto;
     flex-shrink: 0;
     overflow: hidden;
+    position: relative;
   }
 </style>
