@@ -1,13 +1,14 @@
 <script lang="ts">
   import { watch, useDebounce } from "runed";
   import { updateTile } from "$lib/api/tiles";
+  import ColorPicker from "svelte-awesome-color-picker";
+  import SolarTextBoldDuotone from "~icons/solar/text-bold-duotone";
   import SolarAlignTopBoldDuotone from "~icons/solar/align-top-bold-duotone";
   import SolarTextBoldBoldDuotone from "~icons/solar/text-bold-bold-duotone";
   import SolarTextItalicBoldDuotone from "~icons/solar/text-italic-bold-duotone";
   import SolarAlignBottomBoldDuotone from "~icons/solar/align-bottom-bold-duotone";
   import SolarTextUnderlineBoldDuotone from "~icons/solar/text-underline-bold-duotone";
   import SolarAlignVerticalSpacingBoldDuotone from "~icons/solar/align-vertical-spacing-bold-duotone";
-  import SolarTextBoldDuotone from "~icons/solar/text-bold-duotone";
   import {
     LabelAlign,
     type TileId,
@@ -19,6 +20,7 @@
   import NumberInput from "../input/NumberInput.svelte";
   import ToggleButton from "../input/ToggleButton.svelte";
   import PopoverButton from "../popover/PopoverButton.svelte";
+
   type Props = {
     tileId: TileId;
     config: TileConfig;
@@ -52,8 +54,7 @@
     updateLabel(label);
   };
 
-  const onChangeColor = (event: Event) => {
-    const value = (event.target as HTMLInputElement).value;
+  const onChangeColor = (value: string) => {
     dirty = true;
     label = { ...label, color: value };
     updateLabel(label);
@@ -150,8 +151,14 @@
         <NumberInput value={label.font_size} oninput={onChangeFontSize} /> pt
       </div>
 
-      <div>
-        <TextInput value={label.color} oninput={onChangeColor} />
+      <div class="color-picker">
+        <ColorPicker
+          hex={label.color}
+          on:input={(event) => {
+            if (event.detail.hex) onChangeColor(event.detail.hex);
+          }}
+          position="responsive"
+        />
       </div>
     {/snippet}
   </PopoverButton>
@@ -162,6 +169,14 @@
     display: flex;
     flex-flow: row;
     gap: 0.5rem;
+  }
+
+  .color-picker {
+    --cp-bg-color: #2f2b35;
+    --cp-border-color: #544e5e;
+    --cp-text-color: white;
+    --cp-input-color: #524b5c;
+    --cp-button-hover-color: #777;
   }
 
   .toggles {
