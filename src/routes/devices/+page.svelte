@@ -1,12 +1,12 @@
 <script lang="ts">
-  import {
-    connectedDevicesQuery,
-    deviceRequestsQuery,
-    devicesQuery,
-  } from "$lib/api/devices";
-  import ConnectInfo from "$lib/components/devices/ConnectInfo.svelte";
   import DeviceCard from "$lib/components/devices/DeviceCard.svelte";
+  import ConnectInfo from "$lib/components/devices/DeviceConnectQR.svelte";
   import DeviceRequestCard from "$lib/components/devices/DeviceRequestCard.svelte";
+  import {
+    devicesQuery,
+    deviceRequestsQuery,
+    connectedDevicesQuery,
+  } from "$lib/api/devices";
 
   const devices = devicesQuery();
   const connectedDevices = connectedDevicesQuery();

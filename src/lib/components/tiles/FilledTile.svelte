@@ -6,8 +6,8 @@
   import { getPluginAssetPath } from "$lib/api/utils/url";
   import { toastErrorMessage } from "$lib/api/utils/error";
 
-  import { getFolderContext } from "../folders/FolderProvider.svelte";
   import TileLabelElm from "./TileLabelElm.svelte";
+  import { getFolderContext } from "../folders/FolderProvider.svelte";
 
   type Props = {
     tile: TileModel;
