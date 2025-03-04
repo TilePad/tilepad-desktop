@@ -7,10 +7,11 @@
   import { getErrorMessage } from "$lib/api/utils/error";
   import { updateTile, createTileQuery } from "$lib/api/tiles";
 
+  import TileNameEditor from "./TileNameEditor.svelte";
   import { getFolderContext } from "../folders/FolderProvider.svelte";
   import PropertyInspector from "../property/PropertyInspector.svelte";
   import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
-  import TileNameEditor from "./TileNameEditor.svelte";
+  import Button from "../input/Button.svelte";
 
   type Props = {
     tileId: TileId;
@@ -51,15 +52,9 @@
 <div class="editor">
   {#if $tileQuery.isSuccess && $actionQuery.isSuccess && tile && action}
     <div class="left">
-      <h2>Configure Tile</h2>
+      <Button onclick={onClose}>Close</Button>
 
       <TileNameEditor config={tile.config} tileId={tile.id} />
-
-      {tile.column}
-      {tile.row}
-      {JSON.stringify(tile.config)}
-      {JSON.stringify(action)}
-      <button onclick={onClose}> Close</button>
     </div>
 
     {#if action.inspector !== null}
@@ -113,7 +108,6 @@
     background-color: #28252c;
     flex: auto;
     width: 100%;
-    padding: 2rem;
     border-top: 2px solid #302d36;
     flex-grow: 0;
     flex-shrink: 0;

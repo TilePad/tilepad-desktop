@@ -29,7 +29,7 @@
   const { tileId, config }: Props = $props();
 
   let label = $state(config.label);
-  let dirty = $state(false);
+  let dirty: TileId | null = $state(null);
 
   const updateLabel = useDebounce((label: TileLabel) => {
     updateTile(tileId, {
@@ -42,50 +42,50 @@
 
   const onChangeTileName = (event: Event) => {
     const value = (event.target as HTMLInputElement).value;
-    dirty = true;
+    dirty = tileId;
     label = { ...label, label: value };
     updateLabel(label);
   };
 
   const onChangeFontSize = (event: Event) => {
     const value = (event.target as HTMLInputElement).value;
-    dirty = true;
+    dirty = tileId;
     label = { ...label, font_size: Number(value) };
     updateLabel(label);
   };
 
   const onChangeColor = (value: string) => {
-    dirty = true;
+    dirty = tileId;
     label = { ...label, color: value };
     updateLabel(label);
   };
 
   const onToggleEnabled = () => {
-    dirty = true;
+    dirty = tileId;
     label = { ...label, enabled: !label.enabled };
     updateLabel(label);
   };
 
   const onToggleBold = () => {
-    dirty = true;
+    dirty = tileId;
     label = { ...label, bold: !label.bold };
     updateLabel(label);
   };
 
   const onToggleItalic = () => {
-    dirty = true;
+    dirty = tileId;
     label = { ...label, italic: !label.italic };
     updateLabel(label);
   };
 
   const onToggleUnderline = () => {
-    dirty = true;
+    dirty = tileId;
     label = { ...label, underline: !label.underline };
     updateLabel(label);
   };
 
   const onChangeAlign = (align: LabelAlign) => {
-    dirty = true;
+    dirty = tileId;
     label = { ...label, align };
     updateLabel(label);
   };
@@ -95,9 +95,10 @@
     () => ({
       config,
       dirty,
+      tileId,
     }),
-    ({ config, dirty }) => {
-      if (dirty) return;
+    ({ config, dirty, tileId }) => {
+      if (dirty === tileId) return;
       label = config.label;
     },
   );
