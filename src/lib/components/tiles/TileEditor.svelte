@@ -10,6 +10,7 @@
 
   import Button from "../input/Button.svelte";
   import TileNameEditor from "./TileNameEditor.svelte";
+  import TileIconEditor from "./TileIconEditor.svelte";
   import { getFolderContext } from "../folders/FolderProvider.svelte";
   import PropertyInspector from "../property/PropertyInspector.svelte";
   import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
@@ -65,6 +66,7 @@
     <div class="left">
       <Button onclick={onClose}>Close</Button>
       <Button onclick={onRemove}>Remove</Button>
+      <TileIconEditor icon={tile.config.icon} tileId={tile.id} />
       <TileNameEditor config={tile.config} tileId={tile.id} />
     </div>
 
