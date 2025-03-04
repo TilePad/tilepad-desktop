@@ -55,8 +55,13 @@ where
             category.actions.push(action);
         }
 
+        category
+            .actions
+            .sort_by(|a, b| a.action_id.cmp(&b.action_id));
+
         categories.push(category);
     }
 
+    categories.sort_by(|a, b| a.plugin_id.cmp(&b.plugin_id));
     categories
 }
