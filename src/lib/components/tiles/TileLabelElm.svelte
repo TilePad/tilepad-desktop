@@ -33,7 +33,7 @@
   }
 
   .label[data-align="Bottom"] {
-    bottom: 15px;
+    bottom: 5%;
   }
 
   .label[data-align="Middle"] {
@@ -43,7 +43,7 @@
   }
 
   .label[data-align="Top"] {
-    top: 15px;
+    top: 5%;
   }
 
   .label--bold {
