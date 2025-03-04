@@ -63,23 +63,7 @@
                   preserveAspectRatio="none"
                   data-arrow=""
                 >
-                  <polygon points="0,0 30,0 15,10" fill="currentColor" />
-                  <line
-                    x1="0"
-                    y1="0"
-                    x2="15"
-                    y2="10"
-                    stroke="#333"
-                    stroke-width={1}
-                  />
-                  <line
-                    x1="30"
-                    y1="0"
-                    x2="15"
-                    y2="10"
-                    stroke="#333"
-                    stroke-width={1}
-                  />
+                  <polygon points="0,0 30,0 15,10" fill="#453f4d" />
                 </svg>
               </span>
             {/snippet}
@@ -95,9 +79,8 @@
     z-index: 30;
     min-width: 12rem;
     border-radius: 8px;
-    border: 1px solid #333;
     padding: 0.5rem;
-    background-color: #222;
+    background-color: #453f4d;
     box-shadow: 4px 0 10px #000;
 
     display: flex;

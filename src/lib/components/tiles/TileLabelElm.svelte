@@ -30,6 +30,7 @@
       1px -1px 0 #000,
       -1px 1px 0 #000,
       1px 1px 0 #000;
+    font-weight: normal;
   }
 
   .label[data-align="Bottom"] {

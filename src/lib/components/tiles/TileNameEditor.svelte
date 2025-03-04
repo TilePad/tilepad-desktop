@@ -1,12 +1,24 @@
 <script lang="ts">
-  import type { TileId, TileLabel, TileConfig } from "$lib/api/types/tiles";
-
   import { watch, useDebounce } from "runed";
   import { updateTile } from "$lib/api/tiles";
+  import SolarAlignTopBoldDuotone from "~icons/solar/align-top-bold-duotone";
+  import SolarTextBoldBoldDuotone from "~icons/solar/text-bold-bold-duotone";
+  import SolarTextItalicBoldDuotone from "~icons/solar/text-italic-bold-duotone";
+  import SolarAlignBottomBoldDuotone from "~icons/solar/align-bottom-bold-duotone";
+  import SolarTextUnderlineBoldDuotone from "~icons/solar/text-underline-bold-duotone";
+  import SolarAlignVerticalSpacingBoldDuotone from "~icons/solar/align-vertical-spacing-bold-duotone";
+  import SolarTextBoldDuotone from "~icons/solar/text-bold-duotone";
+  import {
+    LabelAlign,
+    type TileId,
+    type TileLabel,
+    type TileConfig,
+  } from "$lib/api/types/tiles";
 
   import TextInput from "../input/TextInput.svelte";
+  import NumberInput from "../input/NumberInput.svelte";
+  import ToggleButton from "../input/ToggleButton.svelte";
   import PopoverButton from "../popover/PopoverButton.svelte";
-
   type Props = {
     tileId: TileId;
     config: TileConfig;
@@ -33,6 +45,50 @@
     updateLabel(label);
   };
 
+  const onChangeFontSize = (event: Event) => {
+    const value = (event.target as HTMLInputElement).value;
+    dirty = true;
+    label = { ...label, font_size: Number(value) };
+    updateLabel(label);
+  };
+
+  const onChangeColor = (event: Event) => {
+    const value = (event.target as HTMLInputElement).value;
+    dirty = true;
+    label = { ...label, color: value };
+    updateLabel(label);
+  };
+
+  const onToggleEnabled = () => {
+    dirty = true;
+    label = { ...label, enabled: !label.enabled };
+    updateLabel(label);
+  };
+
+  const onToggleBold = () => {
+    dirty = true;
+    label = { ...label, bold: !label.bold };
+    updateLabel(label);
+  };
+
+  const onToggleItalic = () => {
+    dirty = true;
+    label = { ...label, italic: !label.italic };
+    updateLabel(label);
+  };
+
+  const onToggleUnderline = () => {
+    dirty = true;
+    label = { ...label, underline: !label.underline };
+    updateLabel(label);
+  };
+
+  const onChangeAlign = (align: LabelAlign) => {
+    dirty = true;
+    label = { ...label, align };
+    updateLabel(label);
+  };
+
   // Only set initial site when not dirty (Prevent UI flickering from changes)
   watch(
     () => ({
@@ -46,9 +102,76 @@
   );
 </script>
 
-<TextInput value={label.label} oninput={onChangeTileName} />
+<div class="layout">
+  <TextInput value={label.label} oninput={onChangeTileName} />
 
-<PopoverButton>
-  {#snippet children()}T{/snippet}
-  {#snippet content()}{/snippet}
-</PopoverButton>
+  <PopoverButton>
+    {#snippet children()}
+      <SolarTextBoldDuotone />
+    {/snippet}
+    {#snippet content()}
+      <button onclick={onToggleEnabled}>Enabled {label.enabled}</button>
+      <div class="toggles">
+        <div class="toggle-button-list">
+          <ToggleButton active={label.bold} onclick={onToggleBold}>
+            <SolarTextBoldBoldDuotone />
+          </ToggleButton>
+          <ToggleButton active={label.italic} onclick={onToggleItalic}>
+            <SolarTextItalicBoldDuotone />
+          </ToggleButton>
+          <ToggleButton active={label.underline} onclick={onToggleUnderline}>
+            <SolarTextUnderlineBoldDuotone />
+          </ToggleButton>
+        </div>
+
+        <div class="toggle-button-list">
+          <ToggleButton
+            active={label.align === LabelAlign.Bottom}
+            onclick={() => onChangeAlign(LabelAlign.Bottom)}
+          >
+            <SolarAlignBottomBoldDuotone />
+          </ToggleButton>
+          <ToggleButton
+            active={label.align === LabelAlign.Middle}
+            onclick={() => onChangeAlign(LabelAlign.Middle)}
+          >
+            <SolarAlignVerticalSpacingBoldDuotone />
+          </ToggleButton>
+          <ToggleButton
+            active={label.align === LabelAlign.Top}
+            onclick={() => onChangeAlign(LabelAlign.Top)}
+          >
+            <SolarAlignTopBoldDuotone />
+          </ToggleButton>
+        </div>
+      </div>
+
+      <div>
+        <NumberInput value={label.font_size} oninput={onChangeFontSize} /> pt
+      </div>
+
+      <div>
+        <TextInput value={label.color} oninput={onChangeColor} />
+      </div>
+    {/snippet}
+  </PopoverButton>
+</div>
+
+<style>
+  .toggle-button-list {
+    display: flex;
+    flex-flow: row;
+    gap: 0.5rem;
+  }
+
+  .toggles {
+    display: flex;
+    flex-flow: column;
+    gap: 0.5rem;
+  }
+
+  .layout {
+    display: flex;
+    gap: 0.5rem;
+  }
+</style>
