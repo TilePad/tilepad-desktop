@@ -23,6 +23,7 @@ pub async fn ws(ws: WebSocketUpgrade) -> Response {
 pub async fn handle_plugin_socket(_socket: WebSocket) {}
 
 static INSPECTOR_SCRIPT: &str = include_str!("../resources/propertyInspectorScript.js");
+static INSPECTOR_STYLES: &str = include_str!("../resources/propertyInspectorStyles.css");
 
 /// GET /plugins/{plugin_id}/assets/{file_path*}
 pub async fn get_plugin_file(
@@ -77,6 +78,9 @@ pub async fn get_plugin_file(
 fn inject_property_inspector_script(value: &str) -> String {
     value.replace(
         "<head>",
-        &format!("<head><script>{}</script>", INSPECTOR_SCRIPT),
+        &format!(
+            "<head><script>{}</script><style>{}</style>",
+            INSPECTOR_SCRIPT, INSPECTOR_STYLES
+        ),
     )
 }
