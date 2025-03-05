@@ -1,5 +1,10 @@
-use super::{schema::*, Migration};
-use sea_query::{IdenStatic, SqliteQueryBuilder, Table};
+use super::{
+    m202502251151_create_profiles_table::{ProfilesColumn, ProfilesTable},
+    m202502251153_create_folders_table::{FoldersColumn, FoldersTable},
+    schema::*,
+    Migration,
+};
+use sea_query::{ForeignKey, ForeignKeyAction, IdenStatic, SqliteQueryBuilder, Table};
 
 pub struct DevicesMigration;
 
@@ -19,8 +24,28 @@ impl Migration for DevicesMigration {
                 .col(string(DevicesColumn::AccessToken))
                 .col(json(DevicesColumn::Config))
                 .col(integer(DevicesColumn::Order).default(0))
+                .col(integer(DevicesColumn::ProfileId))
+                .col(integer(DevicesColumn::FolderId))
                 .col(date_time(DevicesColumn::CreatedAt))
                 .col(date_time(DevicesColumn::LastConnectedAt))
+                // Connect to folders table
+                .foreign_key(
+                    ForeignKey::create()
+                        .name("fk_device_folder")
+                        .from(DevicesTable, DevicesColumn::FolderId)
+                        .to(FoldersTable, FoldersColumn::Id)
+                        .on_delete(ForeignKeyAction::Restrict)
+                        .on_update(ForeignKeyAction::Cascade),
+                )
+                // Connect to profiles table
+                .foreign_key(
+                    ForeignKey::create()
+                        .name("fk_device_profile")
+                        .from(DevicesTable, DevicesColumn::ProfileId)
+                        .to(ProfilesTable, ProfilesColumn::Id)
+                        .on_delete(ForeignKeyAction::Restrict)
+                        .on_update(ForeignKeyAction::Cascade),
+                )
                 .build(SqliteQueryBuilder),
         )
         .execute(db)
@@ -46,6 +71,10 @@ pub enum DevicesColumn {
     Config,
     /// Order of the device in the UI
     Order,
+    /// Current profile the device is using
+    ProfileId,
+    /// Current folder the device is using
+    FolderId,
     /// Timestamp of when the device was first approved
     CreatedAt,
     /// Timestamp of when the device last connected

@@ -11,7 +11,7 @@ use crate::{
     database::{
         entity::{
             device::{CreateDevice, DeviceConfig, DeviceId, DeviceModel},
-            folder::FolderModel,
+            folder::{FolderId, FolderModel},
             profile::ProfileModel,
             tile::{TileId, TileModel},
         },
@@ -19,7 +19,6 @@ use crate::{
     },
     events::{
         AppEvent, AppEventSender, DeviceAppEvent, DeviceMessageContext, DeviceRequestAppEvent,
-        PluginMessageContext,
     },
     plugin::PluginRegistry,
     utils::random::generate_access_token,
@@ -173,10 +172,9 @@ impl Devices {
             CreateDevice {
                 name: request.device_name,
                 access_token: access_token.to_string(),
-                config: DeviceConfig {
-                    profile_id: default_folder.profile_id,
-                    folder_id: default_folder.id,
-                },
+                config: DeviceConfig {},
+                profile_id: default_folder.profile_id,
+                folder_id: default_folder.id,
             },
         )
         .await?;
@@ -285,13 +283,15 @@ impl Devices {
             .await?
             .context("device not found")?;
 
-        let folder = FolderModel::get_by_id(db, device.config.folder_id)
+        let folder = FolderModel::get_by_id(db, device.folder_id)
             .await?
             .context("folder not found")?;
 
-        let tiles = TileModel::get_by_folder(db, device.config.folder_id).await?;
+        let tiles = TileModel::get_by_folder(db, device.folder_id).await?;
         Ok((folder, tiles))
     }
+
+    pub async fn update_devices_tiles(&self, folder_id: FolderId) {}
 
     pub async fn device_execute_tile(
         &self,

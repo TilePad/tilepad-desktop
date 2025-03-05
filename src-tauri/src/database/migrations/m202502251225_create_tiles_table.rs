@@ -28,7 +28,7 @@ impl Migration for TilesMigration {
                 .foreign_key(
                     ForeignKey::create()
                         .name("fk_tiles_folder")
-                        .from(DevicesTable, TilesColumn::FolderId)
+                        .from(TilesTable, TilesColumn::FolderId)
                         .to(FoldersTable, FoldersColumn::Id)
                         .on_delete(ForeignKeyAction::Cascade)
                         .on_update(ForeignKeyAction::Cascade),

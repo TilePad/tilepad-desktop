@@ -5,6 +5,7 @@ use crate::{
     commands::CmdResult,
     database::{
         entity::{
+            device::DeviceModel,
             folder::{CreateFolder, FolderId, FolderModel, UpdateFolder},
             profile::ProfileId,
         },
@@ -61,5 +62,6 @@ pub async fn folders_update_folder(
 #[tauri::command]
 pub async fn folders_delete_folder(db: State<'_, DbPool>, folder_id: FolderId) -> CmdResult<()> {
     FolderModel::delete(db.inner(), folder_id).await?;
+
     Ok(())
 }

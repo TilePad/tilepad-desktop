@@ -1,17 +1,17 @@
 use anyhow::Context;
-use serde::{de, Deserialize, Serialize};
+use serde::Deserialize;
 
 use crate::{
     database::{
         entity::{
-            device::{DeviceConfig, DeviceModel, UpdateDevice},
+            device::{DeviceModel, UpdateDevice},
             folder::{FolderId, FolderModel},
             tile::TileModel,
         },
         DbPool,
     },
     device::{protocol::ServerDeviceMessage, Devices},
-    events::{AppEventSender, DeviceMessageContext, PluginMessageContext},
+    events::DeviceMessageContext,
     plugin::PluginRegistry,
 };
 
@@ -60,14 +60,11 @@ async fn handle_internal_navigation(
                 .context("unknown folder")?;
             let tiles = TileModel::get_by_folder(db, folder_id).await?;
 
-            let mut config = device.config.clone();
-            config.folder_id = folder_id;
-
             device
                 .update(
                     db,
                     UpdateDevice {
-                        config: Some(config),
+                        folder_id: Some(folder_id),
                         ..Default::default()
                     },
                 )
