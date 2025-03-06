@@ -5,12 +5,12 @@ use crate::{
     commands::CmdResult,
     database::{
         entity::{
-            device::DeviceModel,
             folder::{CreateFolder, FolderId, FolderModel, UpdateFolder},
             profile::ProfileId,
         },
         DbPool,
     },
+    device::Devices,
 };
 
 /// Get all folders for the specified profile
@@ -47,6 +47,7 @@ pub async fn folders_create_folder(
 #[tauri::command]
 pub async fn folders_update_folder(
     db: State<'_, DbPool>,
+    devices: State<'_, Devices>,
     folder_id: FolderId,
     update: UpdateFolder,
 ) -> CmdResult<FolderModel> {
@@ -54,6 +55,16 @@ pub async fn folders_update_folder(
         .await?
         .context("unknown folder")?;
     let folder = folder.update(&db, update).await?;
+
+    tokio::spawn({
+        let folder_id = folder.id;
+        let devices = devices.inner().clone();
+
+        async move {
+            let devices = devices;
+            _ = devices.update_devices_tiles(folder_id).await;
+        }
+    });
 
     Ok(folder)
 }

@@ -10,6 +10,7 @@ use crate::{
         },
         DbPool,
     },
+    device::Devices,
 };
 
 /// Get a list of all tiles for a folder
@@ -34,8 +35,23 @@ pub async fn tiles_get_tile(
 
 /// Create a new tile
 #[tauri::command]
-pub async fn tiles_create_tile(db: State<'_, DbPool>, create: CreateTile) -> CmdResult<TileModel> {
+pub async fn tiles_create_tile(
+    db: State<'_, DbPool>,
+    devices: State<'_, Devices>,
+    create: CreateTile,
+) -> CmdResult<TileModel> {
     let tile = TileModel::create(db.inner(), create).await?;
+
+    tokio::spawn({
+        let folder_id = tile.folder_id;
+        let devices = devices.inner().clone();
+
+        async move {
+            let devices = devices;
+            _ = devices.update_devices_tiles(folder_id).await;
+        }
+    });
+
     Ok(tile)
 }
 
@@ -43,6 +59,8 @@ pub async fn tiles_create_tile(db: State<'_, DbPool>, create: CreateTile) -> Cmd
 #[tauri::command]
 pub async fn tiles_update_tile(
     db: State<'_, DbPool>,
+    devices: State<'_, Devices>,
+
     tile_id: TileId,
     update: UpdateTile,
 ) -> CmdResult<TileModel> {
@@ -52,12 +70,43 @@ pub async fn tiles_update_tile(
         .context("tile not found")?;
 
     let tile = tile.update(db, update).await?;
+
+    tokio::spawn({
+        let folder_id = tile.folder_id;
+        let devices = devices.inner().clone();
+
+        async move {
+            let devices = devices;
+            _ = devices.update_devices_tiles(folder_id).await;
+        }
+    });
+
     Ok(tile)
 }
 
 /// Delete a specific tile
 #[tauri::command]
-pub async fn tiles_delete_tile(db: State<'_, DbPool>, tile_id: TileId) -> CmdResult<()> {
-    TileModel::delete(db.inner(), tile_id).await?;
+pub async fn tiles_delete_tile(
+    db: State<'_, DbPool>,
+    devices: State<'_, Devices>,
+    tile_id: TileId,
+) -> CmdResult<()> {
+    let db = db.inner();
+    let tile = TileModel::get_by_id(db, tile_id)
+        .await?
+        .context("tile not found")?;
+
+    TileModel::delete(db, tile_id).await?;
+
+    tokio::spawn({
+        let folder_id = tile.folder_id;
+        let devices = devices.inner().clone();
+
+        async move {
+            let devices = devices;
+            _ = devices.update_devices_tiles(folder_id).await;
+        }
+    });
+
     Ok(())
 }
