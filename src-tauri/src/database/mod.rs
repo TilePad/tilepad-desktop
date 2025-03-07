@@ -1,10 +1,10 @@
 use anyhow::Context;
-use entity::profile::{CreateProfile, ProfileConfig, ProfileModel};
 use sqlx::{sqlite::SqliteConnectOptions, SqlitePool};
 use std::{path::PathBuf, str::FromStr};
 use tokio::fs::{create_dir_all, File};
 
 pub mod entity;
+#[allow(unused)]
 pub mod helpers;
 mod migrations;
 

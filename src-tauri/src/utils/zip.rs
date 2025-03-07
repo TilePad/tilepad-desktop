@@ -9,6 +9,7 @@ use tokio::{
 use tokio_util::compat::FuturesAsyncReadCompatExt;
 
 /// Extracts the provided zip file reader to the provided `out_dir`
+#[allow(unused)]
 pub async fn extract_zip(
     mut zip: ZipFileReader<BufReader<File>>,
     out_dir: &Path,
@@ -67,6 +68,7 @@ pub async fn extract_zip(
 }
 
 /// Returns a relative path without reserved names, redundant separators, ".", or "..".
+#[allow(unused)]
 fn sanitize_file_path(path: &str) -> PathBuf {
     // Replaces backwards slashes
     path.replace('\\', "/")

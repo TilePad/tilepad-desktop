@@ -41,7 +41,11 @@ pub async fn process_events(app_handle: AppHandle, db: DbPool, mut event_rx: App
     .await;
 }
 
-async fn process_event(app_handle: &AppHandle, db: &DbPool, event: AppEvent) -> anyhow::Result<()> {
+async fn process_event(
+    app_handle: &AppHandle,
+    _db: &DbPool,
+    event: AppEvent,
+) -> anyhow::Result<()> {
     match event {
         AppEvent::DeviceRequest(request) => match request {
             DeviceRequestAppEvent::Added { request_id } => {
@@ -75,8 +79,8 @@ async fn process_event(app_handle: &AppHandle, db: &DbPool, event: AppEvent) -> 
 
                 app_handle.emit("plugin:recv_plugin_message", &Payload { context, message })?;
             }
-            PluginAppEvent::OpenInspector { context } => {}
-            PluginAppEvent::CloseInspector { context } => {}
+            PluginAppEvent::OpenInspector { .. } => {}
+            PluginAppEvent::CloseInspector { .. } => {}
         },
     }
 

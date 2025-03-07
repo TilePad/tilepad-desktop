@@ -3,13 +3,15 @@ use std::path::Path;
 use tokio::process::{Child, Command};
 
 /// Plugin task that is handling running the plugin itself
-enum PluginTask {
+#[allow(unused)]
+pub enum PluginTask {
     /// Node child process is running the task
     Node(Child),
     /// Native child process is running the task
     Native(Child),
 }
 
+#[allow(unused)]
 pub async fn spawn_node_plugin_task(
     node_path: &Path,
     script_path: &Path,
@@ -41,6 +43,7 @@ pub async fn spawn_node_plugin_task(
     Ok(PluginTask::Node(child))
 }
 
+#[allow(unused)]
 pub async fn spawn_native_plugin_task() -> anyhow::Result<PluginTask> {
     todo!()
 }

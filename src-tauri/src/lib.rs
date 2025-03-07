@@ -14,6 +14,7 @@ mod commands;
 mod database;
 mod device;
 mod events;
+#[allow(unused)]
 mod plugin;
 mod server;
 mod utils;

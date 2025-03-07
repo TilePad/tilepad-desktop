@@ -3,6 +3,7 @@ use std::{collections::VecDeque, path::Path};
 /// Moves a directory from one path to another
 ///
 /// This is safe for cross volume moving unlike [std::fs::rename]
+#[allow(unused)]
 pub async fn move_directory<Src: AsRef<Path>, Dst: AsRef<Path>>(
     src: Src,
     dest: Dst,
@@ -20,6 +21,7 @@ pub async fn move_directory<Src: AsRef<Path>, Dst: AsRef<Path>>(
 }
 
 /// Copies all files and directories from one path to another
+#[allow(unused)]
 pub async fn copy_dir_all(src: &Path, dst: &Path) -> anyhow::Result<()> {
     // Create destination path
     tokio::fs::create_dir_all(dst).await?;

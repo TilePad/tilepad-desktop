@@ -16,6 +16,7 @@ use axum::{
 use serde::Serialize;
 
 /// Type alias for dynamic error handling and JSON responses
+#[allow(unused)]
 pub type HttpResult<T> = Result<Json<T>, DynHttpError>;
 
 /// Wrapper for dynamic error handling using [HttpError] types

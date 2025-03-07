@@ -65,10 +65,12 @@ pub enum PluginAppEvent {
     },
 
     OpenInspector {
+        #[allow(unused)]
         context: PluginMessageContext,
     },
 
     CloseInspector {
+        #[allow(unused)]
         context: PluginMessageContext,
     },
 }

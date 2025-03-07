@@ -1,6 +1,5 @@
 use super::{
     m202502251153_create_folders_table::{FoldersColumn, FoldersTable},
-    m202502251226_create_devices_table::DevicesTable,
     schema::*,
     Migration,
 };
