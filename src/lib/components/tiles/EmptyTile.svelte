@@ -1,16 +1,16 @@
 <!-- Empty tile that can be used to add a new tile -->
 <script lang="ts">
   import { toast } from "svelte-sonner";
-  import { TileIconType } from "$lib/api/types/tiles";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import { createCreateTileMutation } from "$lib/api/tiles";
+  import { LabelAlign, TileIconType } from "$lib/api/types/tiles";
   import {
     dndzone,
     type DndEvent,
     SHADOW_ITEM_MARKER_PROPERTY_NAME,
   } from "svelte-dnd-action";
 
-  import type { MovableAction } from "../actions/ActionsSidebarList.svelte";
+  import type { MovableAction } from "../actions/ActionList.svelte";
 
   import { getFolderContext } from "../folders/FolderProvider.svelte";
 
@@ -42,6 +42,16 @@
         column,
         folder_id: currentFolder.id,
         config: {
+          label: {
+            enabled: true,
+            label: "",
+            align: LabelAlign.Bottom,
+            font_size: 12,
+            bold: false,
+            italic: false,
+            underline: false,
+            color: "#ffffff",
+          },
           action_id: action.action_id,
           plugin_id: action.plugin_id,
           icon:

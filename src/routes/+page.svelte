@@ -1,15 +1,19 @@
 <script lang="ts">
   import FolderEditor from "$lib/components/folders/FolderEditor.svelte";
-  import CurrentFolder from "$lib/components/folders/CurrentFolder.svelte";
   import ActionsSidebar from "$lib/components/actions/ActionsSidebar.svelte";
   import ProfileFolders from "$lib/components/profiles/ProfileFolders.svelte";
   import ProfileSelector from "$lib/components/profiles/ProfileSelector.svelte";
+  import { getFolderContext } from "$lib/components/folders/FolderProvider.svelte";
+  import FolderConfigEditor from "$lib/components/folders/FolderConfigEditor.svelte";
+
+  const { folder } = getFolderContext();
+  const currentFolder = $derived.by(folder);
 </script>
 
 <div class="layout">
-  <div class="left">
+  <div class="sidebar">
     <ProfileSelector />
-    <CurrentFolder />
+    <FolderConfigEditor folder={currentFolder} />
     <ProfileFolders />
   </div>
 
@@ -28,9 +32,12 @@
     height: 100%;
   }
 
-  .left {
+  .sidebar {
     width: 200px;
     flex-shrink: 0;
+    background-color: #29262e;
+
+    height: 100%;
   }
 
   .tiles {

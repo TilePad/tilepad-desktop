@@ -9,13 +9,14 @@
   import type { Action } from "$lib/api/types/actions";
 
   import { watch } from "runed";
-  import { getPluginAssetPath } from "$lib/api/utils/url";
   import {
     dndzone,
     TRIGGERS,
     type DndEvent,
     SHADOW_ITEM_MARKER_PROPERTY_NAME,
   } from "svelte-dnd-action";
+
+  import ActionItem from "./ActionItem.svelte";
 
   type Props = {
     actions: Action[];
@@ -74,22 +75,7 @@
   onfinalize={handleDndFinalize}
 >
   {#each items as action (action.id)}
-    <div class="action">
-      {#if action.icon !== null}
-        <img
-          src={getPluginAssetPath(action.plugin_id, action.icon)}
-          alt="Action Icon"
-        />
-      {/if}
-
-      <div class="action__text">
-        <span class="label">{action.label}</span>
-
-        {#if action.description !== null}
-          <span class="description">{action.description}</span>
-        {/if}
-      </div>
-    </div>
+    <ActionItem {action} />
   {/each}
 </section>
 
@@ -97,23 +83,5 @@
   .list {
     width: 100%;
     height: 100%;
-  }
-
-  .action {
-    padding: 0.5rem;
-    display: flex;
-    flex-flow: row;
-    gap: 0.5rem;
-    width: 20rem;
-    background-color: #35303b;
-  }
-
-  .action__text {
-    display: flex;
-    flex-flow: column;
-  }
-
-  .label {
-    font-weight: bold;
   }
 </style>

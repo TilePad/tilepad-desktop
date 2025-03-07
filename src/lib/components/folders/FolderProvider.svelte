@@ -3,6 +3,7 @@
 
   interface FolderContext {
     folder(): FolderModel;
+    folderId(): FolderId;
     setFolderId: (value: FolderId) => void;
   }
 
@@ -56,6 +57,7 @@
 
   setContext(FOLDER_STORE_KEY, {
     folder: () => folder!,
+    folderId: () => folderId!,
     setFolderId: (value: FolderId) => (folderId = value),
   });
 

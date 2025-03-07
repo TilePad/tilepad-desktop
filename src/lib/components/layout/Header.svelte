@@ -1,8 +1,9 @@
 <script lang="ts">
   import SolarDevicesBoldDuotone from "~icons/solar/devices-bold-duotone";
   import SolarSettingsBoldDuotone from "~icons/solar/settings-bold-duotone";
-  import SolarLayersMinimalisticBoldDuotone from "~icons/solar/layers-minimalistic-bold-duotone";
   import SolarPlugCircleBoldDuotone from "~icons/solar/plug-circle-bold-duotone";
+  import SolarLayersMinimalisticBoldDuotone from "~icons/solar/layers-minimalistic-bold-duotone";
+
   import NavButton from "./NavButton.svelte";
 </script>
 
@@ -33,7 +34,7 @@
     display: flex;
     gap: 1rem;
     width: 100%;
-    background-color: #29262e;
+    background-color: #322e38;
     padding: 0.5rem;
     align-items: center;
   }

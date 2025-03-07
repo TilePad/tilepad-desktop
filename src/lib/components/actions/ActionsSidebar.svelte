@@ -1,16 +1,23 @@
 <script lang="ts">
   import { createActionsQuery } from "$lib/api/actions";
   import { getErrorMessage } from "$lib/api/utils/error";
-  import { getPluginAssetPath } from "$lib/api/utils/url";
 
-  import ActionsSidebarList from "./ActionsSidebarList.svelte";
+  import ActionsSidebarCategory from "./ActionCategory.svelte";
 
   const actionsQuery = createActionsQuery();
+
+  let search = $state("");
 </script>
 
 <div class="list">
-  <h2>Actions</h2>
-  <input type="text" placeholder="Search..." />
+  <div class="search-wrapper">
+    <input
+      bind:value={search}
+      class="search"
+      type="text"
+      placeholder="Search..."
+    />
+  </div>
 
   <div>
     {#if $actionsQuery.isLoading}
@@ -19,18 +26,7 @@
       Failed to load actions: {getErrorMessage($actionsQuery.error)}
     {:else if $actionsQuery.isSuccess}
       {#each $actionsQuery.data as category}
-        <div>
-          {#if category.icon !== null}
-            <img
-              src={getPluginAssetPath(category.plugin_id, category.icon)}
-              alt="Action Icon"
-            />
-          {/if}
-
-          <h3>{category.label}</h3>
-
-          <ActionsSidebarList actions={category.actions} />
-        </div>
+        <ActionsSidebarCategory {category} />
       {/each}
     {/if}
   </div>
@@ -39,6 +35,24 @@
 <style>
   .list {
     flex-shrink: 0;
-    max-width: 15rem;
+    width: 15rem;
+    background-color: #29262e;
+    height: 100%;
+  }
+
+  .search {
+    padding: 0.5rem;
+    background-color: #000;
+    border: 1px solid #666;
+    color: #fff;
+    border-radius: 0.25rem;
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .search-wrapper {
+    padding: 0.5rem;
   }
 </style>
