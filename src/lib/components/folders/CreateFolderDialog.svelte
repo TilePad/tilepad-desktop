@@ -50,16 +50,16 @@
   }
 </script>
 
-<Dialog {open} onOpenChange={(value) => (open = value)} {buttonLabel}>
+<Dialog bind:open {buttonLabel}>
   {#snippet children()}
     <form onsubmit={onCreate}>
       <div class="content">
         <h2>Create Folder</h2>
         <input
+          bind:value={name}
           required
           minlength="1"
           class="input"
-          bind:value={name}
           placeholder="Name"
         />
       </div>

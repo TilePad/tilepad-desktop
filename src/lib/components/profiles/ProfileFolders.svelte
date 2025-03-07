@@ -42,7 +42,6 @@
       </button>
     {/each}
   </div>
-
   <CreateFolderDialog
     order={folders.length}
     buttonLabel={{ text: "Create Folder" }}
