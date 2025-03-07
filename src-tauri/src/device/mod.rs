@@ -296,6 +296,11 @@ impl Devices {
         let db = &self.inner.db;
         let devices = DeviceModel::all_by_folder(db, folder_id).await?;
 
+        // No devices to update
+        if devices.is_empty() {
+            return Ok(());
+        }
+
         let folder = FolderModel::get_by_id(db, folder_id)
             .await?
             .context("folder not found")?;
@@ -303,18 +308,25 @@ impl Devices {
         let tiles = TileModel::get_by_folder(db, folder_id).await?;
 
         for device in devices {
-            let session = match self.get_session_by_device(device.id) {
-                Some(value) => value,
-                None => continue,
-            };
-
-            _ = session.send_message(ServerDeviceMessage::Tiles {
-                tiles: tiles.clone(),
-                folder: folder.clone(),
-            });
+            self.send_to_device(
+                device.id,
+                ServerDeviceMessage::Tiles {
+                    tiles: tiles.clone(),
+                    folder: folder.clone(),
+                },
+            )
         }
 
         Ok(())
+    }
+
+    pub fn send_to_device(&self, device_id: DeviceId, message: ServerDeviceMessage) {
+        let session = match self.get_session_by_device(device_id) {
+            Some(value) => value,
+            None => return,
+        };
+
+        _ = session.send_message(message);
     }
 
     pub async fn device_execute_tile(

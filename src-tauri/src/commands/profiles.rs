@@ -1,9 +1,14 @@
 use crate::{
     commands::CmdResult,
     database::{
-        entity::profile::{CreateProfile, ProfileId, ProfileModel, UpdateProfile},
+        entity::{
+            device::{DeviceModel, UpdateDevice},
+            folder::FolderModel,
+            profile::{CreateProfile, ProfileId, ProfileModel, UpdateProfile},
+        },
         DbPool,
     },
+    device::Devices,
 };
 use anyhow::Context;
 use tauri::State;
@@ -56,8 +61,40 @@ pub async fn profiles_update_profile(
 #[tauri::command]
 pub async fn profiles_delete_profile(
     db: State<'_, DbPool>,
+    devices: State<'_, Devices>,
     profile_id: ProfileId,
 ) -> CmdResult<()> {
-    ProfileModel::delete(db.inner(), profile_id).await?;
+    let db = db.inner();
+
+    // Obtain the default profile and folder
+    let default_profile = ProfileModel::get_default_profile(db)
+        .await?
+        .context("default profile is missing")?;
+
+    let default_folder = FolderModel::get_default(db, default_profile.id)
+        .await?
+        .context("default folder is missing")?;
+
+    // First all devices using the profile must be updated to use the default profile
+    let profile_devices = DeviceModel::all_by_profile(db, profile_id).await?;
+    for device in profile_devices {
+        device
+            .update(
+                db,
+                UpdateDevice {
+                    profile_id: Some(default_profile.id),
+                    folder_id: Some(default_folder.id),
+                    ..Default::default()
+                },
+            )
+            .await?;
+    }
+
+    // Update the actual device sessions
+    devices.update_devices_tiles(default_folder.id).await?;
+
+    // Delete the profile itself
+    ProfileModel::delete(db, profile_id).await?;
+
     Ok(())
 }
