@@ -11,6 +11,7 @@
   import FilledTile from "../tiles/FilledTile.svelte";
   import TileEditor from "../tiles/TileEditor.svelte";
   import { getFolderContext } from "./FolderProvider.svelte";
+  import FolderConfigEditor from "./FolderConfigEditor.svelte";
   import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
 
   const { profile } = getProfileContext();
@@ -45,6 +46,10 @@
   Failed to load tiles {getErrorMessage($tilesQuery.error)}
 {:else if $tilesQuery.isSuccess}
   <div class="layout">
+    <div class="header">
+      <FolderConfigEditor folder={currentFolder} />
+    </div>
+
     <div class="grid-wrapper">
       <TileGrid
         rows={currentFolder.config.rows}

@@ -42,7 +42,7 @@ export async function createFolder(create: CreateFolder) {
     create,
   });
 
-  invalidateFoldersList();
+  invalidateFoldersList(folder.profile_id);
   queryClient.setQueryData(
     foldersKeys.specific(folder.profile_id, folder.id),
     folder,
@@ -57,7 +57,7 @@ export async function updateFolder(folderId: FolderId, update: UpdateFolder) {
     update,
   });
 
-  invalidateFoldersList();
+  invalidateFoldersList(folder.profile_id);
   queryClient.setQueryData(
     foldersKeys.specific(folder.profile_id, folder.id),
     folder,
@@ -69,7 +69,7 @@ export async function updateFolder(folderId: FolderId, update: UpdateFolder) {
 export async function deleteFolder(profileId: ProfileId) {
   await invoke("folders_delete_folder", { profileId });
 
-  invalidateFoldersList();
+  invalidateFoldersList(profileId);
 }
 
 // [QUERIES] ------------------------------------------------------
@@ -114,9 +114,9 @@ export function createCreateFolderMutation() {
 
 // [MUTATORS] ------------------------------------------------------
 
-function invalidateFoldersList() {
+function invalidateFoldersList(profileId: ProfileId) {
   queryClient.invalidateQueries({
-    queryKey: foldersKeys.list,
+    queryKey: foldersKeys.list(profileId),
     exact: false,
   });
 }

@@ -25,13 +25,15 @@
 {:else if $foldersQuery.isSuccess}
   <div class="folders">
     {#each folders as folder}
+      {@const isCurrent = currentFolder.id === folder.id}
       <button
         class="folder"
+        class:folder--current={isCurrent}
         onclick={() => {
           setFolderId(folder.id);
         }}
       >
-        {#if currentFolder.id === folder.id}
+        {#if isCurrent}
           <SolarFolderOpenBoldDuotone />
         {:else}
           <SolarFolder2BoldDuotone />
@@ -39,32 +41,36 @@
         {folder.name}
       </button>
     {/each}
-
-    <CreateFolderDialog
-      order={folders.length}
-      buttonLabel={{ text: "Create Folder" }}
-    />
   </div>
+
+  <CreateFolderDialog
+    order={folders.length}
+    buttonLabel={{ text: "Create Folder" }}
+  />
 {/if}
 
 <style>
   .folders {
     display: flex;
     flex-flow: column;
-    gap: 0.5rem;
-    padding: 0.5rem;
+    margin-bottom: 1rem;
   }
 
   .folder {
     display: flex;
     gap: 0.5rem;
     background-color: #413c49;
-    border-radius: 0.5rem;
     color: #fff;
     border: none;
     width: 100%;
     text-align: left;
     padding: 0.5rem;
     cursor: pointer;
+    background-color: #1a181d;
+    font-size: 0.9rem;
+  }
+
+  .folder--current {
+    background-color: #604a85;
   }
 </style>

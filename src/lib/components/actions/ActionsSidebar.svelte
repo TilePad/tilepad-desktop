@@ -9,7 +9,7 @@
   let search = $state("");
 </script>
 
-<div class="list">
+<div class="sidebar">
   <div class="search-wrapper">
     <input
       bind:value={search}
@@ -33,16 +33,17 @@
 </div>
 
 <style>
-  .list {
+  .sidebar {
     flex-shrink: 0;
     width: 15rem;
     background-color: #29262e;
     height: 100%;
+    border-left: 1px solid #333;
   }
 
   .search {
     padding: 0.5rem;
-    background-color: #000;
+    background-color: #1f1d22;
     border: 1px solid #666;
     color: #fff;
     border-radius: 0.25rem;

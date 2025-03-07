@@ -47,15 +47,17 @@
   .header {
     display: flex;
     align-items: center;
-    background-color: #322e38;
+    background-color: #3d3844;
     border: none;
     width: 100%;
     padding: 0.5rem;
     color: #fff;
     gap: 0.5rem;
+    cursor: pointer;
   }
 
   .content {
+    flex: auto;
   }
 
   .section {

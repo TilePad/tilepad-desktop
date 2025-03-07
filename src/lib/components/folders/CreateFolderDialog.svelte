@@ -14,7 +14,7 @@
     order: number;
   };
 
-  let { order, ...restProps }: Props = $props();
+  let { order, buttonLabel }: Props = $props();
 
   const { profile } = getProfileContext();
   const { folder } = getFolderContext();
@@ -22,6 +22,7 @@
   const currentProfile = $derived.by(profile);
   const currentFolder = $derived.by(folder);
 
+  let open = $state(false);
   let name = $state("");
 
   async function onCreate(event: Event) {
@@ -44,10 +45,12 @@
       success: "Created folder",
       error: toastErrorMessage("Failed to create folder"),
     });
+
+    open = false;
   }
 </script>
 
-<Dialog {...restProps}>
+<Dialog {open} onOpenChange={(value) => (open = value)} {buttonLabel}>
   {#snippet children()}
     <form onsubmit={onCreate}>
       <div class="content">

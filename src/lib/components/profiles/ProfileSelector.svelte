@@ -114,9 +114,9 @@
   }
 
   .trigger {
-    padding: 0.5rem;
-    background-color: transparent;
+    padding: 0.9rem;
     border: none;
+    background-color: #1f1d22;
     color: #fff;
     border-radius: 0.25rem;
     align-items: center;
@@ -125,5 +125,7 @@
     cursor: pointer;
     font-size: 1em;
     text-decoration: none;
+    width: 100%;
+    justify-content: space-between;
   }
 </style>

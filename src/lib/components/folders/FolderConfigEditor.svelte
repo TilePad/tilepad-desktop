@@ -85,8 +85,9 @@
 <style>
   .current {
     padding: 0.5rem;
-    border: 1px solid #333;
+    border-bottom: 1px solid #333;
     overflow: hidden;
+    background-color: #29262e;
 
     display: flex;
     gap: 0.5rem;

@@ -33,7 +33,7 @@
     flex-flow: row;
     gap: 0.5rem;
     width: 20rem;
-    background-color: #35303b;
+    background-color: #1a181d;
   }
 
   .action__text {
@@ -43,5 +43,11 @@
 
   .label {
     font-weight: bold;
+    font-size: 0.9rem;
+  }
+
+  .description {
+    font-size: 0.8rem;
+    color: #ccc;
   }
 </style>
