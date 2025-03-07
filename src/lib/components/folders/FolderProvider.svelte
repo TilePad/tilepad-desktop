@@ -33,7 +33,7 @@
   const { children }: Props = $props();
 
   const profileContext = getProfileContext();
-  const currentProfile = $derived(profileContext.profile());
+  const currentProfile = $derived.by(profileContext.profile);
 
   const foldersQuery = createFoldersQuery(() => currentProfile.id);
   const foldersQueryData = $derived($foldersQuery.data);
