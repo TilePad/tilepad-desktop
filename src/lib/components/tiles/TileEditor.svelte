@@ -51,6 +51,8 @@
   );
 
   function onRemove() {
+    onClose();
+
     const deletePromise = deleteTile(currentFolder.id, tileId);
 
     toast.promise(deletePromise, {
