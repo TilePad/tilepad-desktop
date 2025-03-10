@@ -56,6 +56,7 @@
       <div class="content">
         <h2>Create Folder</h2>
         <input
+          autocomplete="off"
           bind:value={name}
           required
           minlength="1"
