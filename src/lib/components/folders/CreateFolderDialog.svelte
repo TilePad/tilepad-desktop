@@ -5,6 +5,7 @@
 
   import type { DialogProps } from "../dialog/Dialog.svelte";
 
+  import Button from "../input/Button.svelte";
   import Dialog from "../dialog/Dialog.svelte";
   import { getFolderContext } from "./FolderProvider.svelte";
   import DialogCloseButton from "../dialog/DialogCloseButton.svelte";
@@ -47,6 +48,12 @@
     });
 
     open = false;
+
+    reset();
+  }
+
+  function reset() {
+    name = "";
   }
 </script>
 
@@ -67,11 +74,7 @@
 
       <div class="actions">
         <DialogCloseButton buttonLabel={{ text: "Close" }} />
-        <DialogCloseButton
-          buttonLabel={{ text: "Create" }}
-          onclick={onCreate}
-          type="submit"
-        />
+        <Button type="submit">Create</Button>
       </div>
     </form>
   {/snippet}

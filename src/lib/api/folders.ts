@@ -66,8 +66,8 @@ export async function updateFolder(folderId: FolderId, update: UpdateFolder) {
   return folder;
 }
 
-export async function deleteFolder(profileId: ProfileId) {
-  await invoke("folders_delete_folder", { profileId });
+export async function deleteFolder(profileId: ProfileId, folderId: FolderId) {
+  await invoke("folders_delete_folder", { folderId });
 
   invalidateFoldersList(profileId);
 }

@@ -1,15 +1,21 @@
+<script module lang="ts">
+  export type DialogCloseButtonProps = {
+    buttonLabel?: { text?: string; icon?: Component };
+    button?: Snippet<[{ props: Record<string, unknown> }]>;
+  } & DialogCloseProps &
+    ButtonProps;
+</script>
+
 <script lang="ts">
   import type { Snippet, Component } from "svelte";
 
   import { Dialog, type DialogCloseProps } from "bits-ui";
-  import Button from "$lib/components/input/Button.svelte";
+  import Button, {
+    type ButtonProps,
+  } from "$lib/components/input/Button.svelte";
 
-  type Props = {
-    buttonLabel?: { text?: string; icon?: Component };
-    button?: Snippet<[{ props: Record<string, unknown> }]>;
-  } & DialogCloseProps;
-
-  const { button, buttonLabel, ...buttonProps }: Props = $props();
+  const { button, buttonLabel, ...buttonProps }: DialogCloseButtonProps =
+    $props();
 </script>
 
 <Dialog.Close {...buttonProps}>

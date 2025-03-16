@@ -1,13 +1,15 @@
+<script module lang="ts">
+  export type ButtonProps = {
+    variant?: "default" | "warning" | "error";
+    children?: Snippet;
+  } & HTMLButtonAttributes;
+</script>
+
 <script lang="ts">
   import type { Snippet } from "svelte";
   import type { HTMLButtonAttributes } from "svelte/elements";
 
-  type Props = {
-    variant?: "default" | "warning" | "error";
-    children?: Snippet;
-  } & HTMLButtonAttributes;
-
-  const { variant = "default", children, ...props }: Props = $props();
+  const { variant = "default", children, ...props }: ButtonProps = $props();
 </script>
 
 <button

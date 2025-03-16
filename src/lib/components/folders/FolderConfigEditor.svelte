@@ -54,6 +54,7 @@
 
 <div class="current">
   {folder.name}
+
   <PopoverButton>
     {#snippet children()}<SolarSettingsBoldDuotone />{/snippet}
 

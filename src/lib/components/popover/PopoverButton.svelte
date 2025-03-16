@@ -15,6 +15,7 @@
   type Props = {
     children?: Snippet;
     content?: Snippet;
+    transparent?: boolean;
 
     rootProps?: PopoverRootProps;
     triggerProps?: Omit<PopoverTriggerProps, "asChild">;
@@ -24,6 +25,7 @@
   const {
     content,
     children,
+    transparent,
     rootProps,
     triggerProps,
     contentProps,
@@ -34,9 +36,34 @@
 <Popover.Root {...rootProps}>
   <Popover.Trigger {...triggerProps}>
     {#snippet child({ props })}
-      <Button {...props} {...buttonProps} type="button">
-        {@render children?.()}
-      </Button>
+      {#if transparent}
+        <button
+          class="transparent"
+          {...props}
+          {...buttonProps}
+          onclick={(event) => {
+            const p = props as HTMLButtonAttributes;
+            if (buttonProps.onclick) buttonProps.onclick(event);
+            if (p.onclick) p.onclick(event);
+          }}
+          type="button"
+        >
+          {@render children?.()}
+        </button>
+      {:else}
+        <Button
+          {...props}
+          {...buttonProps}
+          onclick={(event) => {
+            const p = props as HTMLButtonAttributes;
+            if (buttonProps.onclick) buttonProps.onclick(event);
+            if (p.onclick) p.onclick(event);
+          }}
+          type="button"
+        >
+          {@render children?.()}
+        </Button>
+      {/if}
     {/snippet}
   </Popover.Trigger>
   <Popover.Portal>
@@ -90,5 +117,12 @@
 
   .arrow {
     color: #222;
+  }
+
+  .transparent {
+    border: none;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
   }
 </style>

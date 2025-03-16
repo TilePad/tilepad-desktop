@@ -1,13 +1,16 @@
 <script>
   import { createFoldersQuery } from "$lib/api/folders";
   import { getErrorMessage } from "$lib/api/utils/error";
+  import SolarMenuDotsBold from "~icons/solar/menu-dots-bold";
   import SolarFolder2BoldDuotone from "~icons/solar/folder-2-bold-duotone";
   import SolarFolderOpenBoldDuotone from "~icons/solar/folder-open-bold-duotone";
 
+  import Button from "../input/Button.svelte";
+  import PopoverButton from "../popover/PopoverButton.svelte";
   import { getProfileContext } from "./ProfilesProvider.svelte";
   import { getFolderContext } from "../folders/FolderProvider.svelte";
   import CreateFolderDialog from "../folders/CreateFolderDialog.svelte";
-
+  import DeleteFolderDialog from "../folders/DeleteFolderDialog.svelte";
   const { profile } = getProfileContext();
   const currentProfile = $derived.by(profile);
 
@@ -33,12 +36,30 @@
           setFolderId(folder.id);
         }}
       >
-        {#if isCurrent}
-          <SolarFolderOpenBoldDuotone />
-        {:else}
-          <SolarFolder2BoldDuotone />
-        {/if}
-        {folder.name}
+        <span class="folder__icon">
+          {#if isCurrent}
+            <SolarFolderOpenBoldDuotone />
+          {:else}
+            <SolarFolder2BoldDuotone />
+          {/if}</span
+        >
+
+        <span class="folder__name">
+          {folder.name}
+        </span>
+
+        <PopoverButton
+          transparent
+          onclick={(event) => event.stopPropagation()}
+          style="flex-shrink: 0;"
+        >
+          {#snippet children()}<SolarMenuDotsBold />{/snippet}
+
+          {#snippet content()}
+            <Button>Edit</Button>
+            <DeleteFolderDialog {folder} />
+          {/snippet}
+        </PopoverButton>
       </button>
     {/each}
   </div>
@@ -71,5 +92,16 @@
 
   .folder--current {
     background-color: #604a85;
+  }
+
+  .folder__icon {
+    flex-shrink: 0;
+  }
+
+  .folder__name {
+    flex: auto;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 </style>
