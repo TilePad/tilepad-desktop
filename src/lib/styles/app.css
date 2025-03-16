@@ -13,7 +13,7 @@ body {
 
 .skeleton {
   border-radius: 1rem;
-  background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+  background: linear-gradient(90deg, #544d5e 25%, #8d79a8 50%, #544d5e 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }

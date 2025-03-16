@@ -7,6 +7,7 @@
   import { getErrorMessage } from "$lib/api/utils/error";
   import TileGrid from "$lib/components/tiles/TileGrid.svelte";
 
+  import Aside from "../Aside.svelte";
   import EmptyTile from "../tiles/EmptyTile.svelte";
   import FilledTile from "../tiles/FilledTile.svelte";
   import TileEditor from "../tiles/TileEditor.svelte";
@@ -40,17 +41,25 @@
   );
 </script>
 
-{#if $tilesQuery.isLoading}
-  Loading tiles...
-{:else if $tilesQuery.isError}
-  Failed to load tiles {getErrorMessage($tilesQuery.error)}
-{:else if $tilesQuery.isSuccess}
-  <div class="layout">
-    <div class="header">
-      <FolderConfigEditor folder={currentFolder} />
+<div class="layout">
+  {#if $tilesQuery.isLoading}
+    <div class="content">
+      <div class="skeleton-list">
+        <div class="skeleton" style="width: 80%; height: 1rem"></div>
+        <div class="skeleton" style="width: 70%; height: 1rem"></div>
+        <div class="skeleton" style="width: 30%; height: 1rem"></div>
+      </div>
     </div>
+  {:else if $tilesQuery.isError}
+    <div class="content">
+      <Aside severity="error" style="width: 100%">
+        Failed to load tiles: {getErrorMessage($tilesQuery.error)}
+      </Aside>
+    </div>
+  {:else if $tilesQuery.isSuccess}
+    <FolderConfigEditor folder={currentFolder} />
 
-    <div class="grid-wrapper">
+    <div class="content">
       <TileGrid
         rows={currentFolder.config.rows}
         columns={currentFolder.config.columns}
@@ -79,8 +88,8 @@
     {#if activeTileId !== null}
       <TileEditor tileId={activeTileId} onClose={() => (activeTileId = null)} />
     {/if}
-  </div>
-{/if}
+  {/if}
+</div>
 
 <style>
   .layout {
@@ -93,7 +102,7 @@
     overflow: hidden;
   }
 
-  .grid-wrapper {
+  .content {
     flex: auto;
     padding: 1rem;
     overflow: hidden;
