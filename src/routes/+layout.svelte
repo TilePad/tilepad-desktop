@@ -12,17 +12,17 @@
 </script>
 
 <QueryClientProvider client={queryClient}>
-  <ProfilesProvider>
-    <FolderProvider>
-      <div class="layout">
-        <Header />
+  <div class="layout">
+    <Header />
 
-        <main class="main">
+    <main class="main">
+      <ProfilesProvider>
+        <FolderProvider>
           {@render children()}
-        </main>
-      </div>
-    </FolderProvider>
-  </ProfilesProvider>
+        </FolderProvider>
+      </ProfilesProvider>
+    </main>
+  </div>
 
   <AppToaster />
   <SvelteQueryDevtools />
