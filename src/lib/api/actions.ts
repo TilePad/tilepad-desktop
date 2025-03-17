@@ -2,7 +2,12 @@ import { invoke } from "@tauri-apps/api/core";
 import { createQuery } from "@tanstack/svelte-query";
 
 import type { PluginId } from "./types/plugin";
-import type { Action, ActionId, ActionCategory } from "./types/actions";
+import type {
+  Action,
+  ActionId,
+  ActionCategory,
+  ActionWithCategory,
+} from "./types/actions";
 
 import { queryClient } from "./client";
 import { runeStore } from "./utils/svelte.svelte";
@@ -26,7 +31,10 @@ function getActions() {
 }
 
 function getAction(pluginId: PluginId, actionId: ActionId) {
-  return invoke<Action>("actions_get_action", { pluginId, actionId });
+  return invoke<ActionWithCategory>("actions_get_action", {
+    pluginId,
+    actionId,
+  });
 }
 
 // [QUERIES] ------------------------------------------------------

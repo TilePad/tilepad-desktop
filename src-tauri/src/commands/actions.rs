@@ -1,7 +1,7 @@
 use tauri::State;
 
 use crate::plugin::{
-    action::{Action, ActionCategory},
+    action::{Action, ActionCategory, ActionWithCategory},
     manifest::{ActionId, PluginId},
     PluginRegistry,
 };
@@ -18,6 +18,6 @@ pub fn actions_get_action(
     plugins: State<'_, PluginRegistry>,
     plugin_id: PluginId,
     action_id: ActionId,
-) -> Option<Action> {
+) -> Option<ActionWithCategory> {
     plugins.get_action(&plugin_id, &action_id)
 }

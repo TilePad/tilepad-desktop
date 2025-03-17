@@ -25,6 +25,13 @@ pub struct Action {
     pub inspector: Option<String>,
 }
 
+#[derive(Debug, Serialize)]
+pub struct ActionWithCategory {
+    #[serde(flatten)]
+    pub action: Action,
+    pub category_label: String,
+}
+
 pub fn actions_from_plugins<'a, I>(plugins: I) -> Vec<ActionCategory>
 where
     I: IntoIterator<Item = &'a Plugin>,

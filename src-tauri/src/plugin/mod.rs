@@ -4,7 +4,7 @@ use std::{
     sync::Arc,
 };
 
-use action::{actions_from_plugins, Action, ActionCategory};
+use action::{actions_from_plugins, Action, ActionCategory, ActionWithCategory};
 use anyhow::Context;
 use garde::Validate;
 use manifest::{ActionId, Manifest, PluginId};
@@ -47,19 +47,26 @@ impl PluginRegistry {
         actions_from_plugins(self.inner.plugins.read().values())
     }
 
-    pub fn get_action(&self, plugin_id: &PluginId, action_id: &ActionId) -> Option<Action> {
+    pub fn get_action(
+        &self,
+        plugin_id: &PluginId,
+        action_id: &ActionId,
+    ) -> Option<ActionWithCategory> {
         let plugins = self.inner.plugins.read();
         let plugin = plugins.get(plugin_id)?;
         let manifest_action = plugin.manifest.actions.get(action_id)?;
 
-        Some(Action {
-            action_id: action_id.clone(),
-            plugin_id: plugin_id.clone(),
+        Some(ActionWithCategory {
+            action: Action {
+                action_id: action_id.clone(),
+                plugin_id: plugin_id.clone(),
 
-            label: manifest_action.label.clone(),
-            icon: manifest_action.icon.clone(),
-            description: manifest_action.description.clone(),
-            inspector: manifest_action.inspector.clone(),
+                label: manifest_action.label.clone(),
+                icon: manifest_action.icon.clone(),
+                description: manifest_action.description.clone(),
+                inspector: manifest_action.inspector.clone(),
+            },
+            category_label: plugin.manifest.category.label.clone(),
         })
     }
 

@@ -35,3 +35,16 @@ body {
   cursor: not-allowed;
   color: #777;
 }
+
+*::-webkit-scrollbar {
+  width: 0.65rem;
+  height: 0.65rem;
+  background-color: #444;
+}
+
+/* Add a thumb */
+*::-webkit-scrollbar-thumb {
+  background: #999;
+  border-radius: 0.1rem;
+  cursor: grab;
+}

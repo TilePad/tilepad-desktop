@@ -24,3 +24,7 @@ export interface Action {
   description: Option<string>;
   inspector: Option<string>;
 }
+
+export type ActionWithCategory = Action & {
+  category_label: string;
+};

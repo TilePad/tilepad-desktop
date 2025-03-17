@@ -7,6 +7,7 @@
   import { sendPluginMessage } from "$lib/api/plugins";
   import { updateTile, deleteTile, createTileQuery } from "$lib/api/tiles";
   import { getErrorMessage, toastErrorMessage } from "$lib/api/utils/error";
+  import SolarTrashBinTrashBoldDuotone from "~icons/solar/trash-bin-trash-bold-duotone";
 
   import Button from "../input/Button.svelte";
   import TileNameEditor from "./TileNameEditor.svelte";
@@ -65,46 +66,56 @@
 
 <div class="editor">
   {#if $tileQuery.isSuccess && $actionQuery.isSuccess && tile && action}
-    <div class="left">
-      <Button onclick={onClose}>Close</Button>
-      <Button onclick={onRemove}>Remove</Button>
-      <TileIconEditor icon={tile.config.icon} tileId={tile.id} />
-      <TileNameEditor config={tile.config} tileId={tile.id} />
+    <div class="titlebar">
+      <p class="titlebar__name">
+        <b>{action.category_label}</b>: {action.label}
+      </p>
+
+      <Button transparent variant="error" onclick={onRemove}>
+        <SolarTrashBinTrashBoldDuotone width={24} height={24} />
+      </Button>
     </div>
 
-    {#if action.inspector !== null}
-      <div class="right">
-        <PropertyInspector
-          pluginId={action.plugin_id}
-          tileId={tile.id}
-          inspector={action.inspector}
-          properties={tile.config.properties}
-          onSetProperty={(name, value) => {
-            updateTile(tile.id, {
-              config: {
-                ...tile.config,
-                properties: {
-                  ...tile.config.properties,
-                  [name]: value,
-                },
-              },
-            });
-          }}
-          onSendPluginMessage={(message) => {
-            sendPluginMessage(
-              {
-                profile_id: currentProfile.id,
-                folder_id: currentFolder.id,
-                plugin_id: action.plugin_id,
-                action_id: action.action_id,
-                tile_id: tile.id,
-              },
-              message,
-            );
-          }}
-        />
+    <div class="content">
+      <div class="left">
+        <TileIconEditor icon={tile.config.icon} tileId={tile.id} />
+        <TileNameEditor config={tile.config} tileId={tile.id} />
       </div>
-    {/if}
+
+      {#if action.inspector !== null}
+        <div class="right">
+          <PropertyInspector
+            pluginId={action.plugin_id}
+            tileId={tile.id}
+            inspector={action.inspector}
+            properties={tile.config.properties}
+            onSetProperty={(name, value) => {
+              updateTile(tile.id, {
+                config: {
+                  ...tile.config,
+                  properties: {
+                    ...tile.config.properties,
+                    [name]: value,
+                  },
+                },
+              });
+            }}
+            onSendPluginMessage={(message) => {
+              sendPluginMessage(
+                {
+                  profile_id: currentProfile.id,
+                  folder_id: currentFolder.id,
+                  plugin_id: action.plugin_id,
+                  action_id: action.action_id,
+                  tile_id: tile.id,
+                },
+                message,
+              );
+            }}
+          />
+        </div>
+      {/if}
+    </div>
   {:else if $tileQuery.isError}
     Failed to load tile: {getErrorMessage($tileQuery.error)}
   {:else if $actionQuery.isError}
@@ -119,7 +130,8 @@
 <style>
   .editor {
     position: relative;
-    height: 250px;
+    height: 35%;
+    max-height: 250px;
     background-color: #28252c;
     flex: auto;
     width: 100%;
@@ -129,13 +141,39 @@
     flex: auto;
 
     display: flex;
+    flex-flow: column;
+  }
+
+  .content {
+    display: flex;
     flex-flow: row;
     gap: 0.5rem;
+    flex: auto;
+    overflow: hidden;
+  }
+
+  .titlebar {
+    display: flex;
+    align-items: center;
+    padding: 0.15rem 0.15rem;
+    padding-left: 0.75rem;
+    background-color: #151318;
+    border-bottom: 2px solid #302d36;
+  }
+
+  .titlebar__name {
+    flex: auto;
   }
 
   .left {
+    background-color: #211e24;
+    border-right: 2px solid #302d36;
     overflow-x: hidden;
     overflow-y: auto;
+    padding: 0.5rem;
+    display: flex;
+    flex-flow: column;
+    gap: 0.65rem;
   }
 
   .right {

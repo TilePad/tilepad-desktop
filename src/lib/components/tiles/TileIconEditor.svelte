@@ -23,7 +23,8 @@
 <style>
   .tile {
     position: relative;
-    background-color: #000000;
+    background-color: #242129;
+    border: 2px solid #715c8f;
     border-radius: 5px;
     display: flex;
     justify-content: center;

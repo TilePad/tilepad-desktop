@@ -1,6 +1,7 @@
 <script module lang="ts">
   export type ButtonProps = {
     variant?: "default" | "warning" | "error";
+    transparent?: boolean;
     children?: Snippet;
   } & HTMLButtonAttributes;
 </script>
@@ -9,13 +10,19 @@
   import type { Snippet } from "svelte";
   import type { HTMLButtonAttributes } from "svelte/elements";
 
-  const { variant = "default", children, ...props }: ButtonProps = $props();
+  const {
+    variant = "default",
+    transparent,
+    children,
+    ...props
+  }: ButtonProps = $props();
 </script>
 
 <button
   type="button"
   {...props}
   class="btn {props.class}"
+  class:btn--transparent={transparent}
   data-variant={variant}
 >
   {@render children?.()}
@@ -66,5 +73,11 @@
     border: 1px solid #333;
     cursor: not-allowed;
     color: #777;
+  }
+
+  .btn--transparent {
+    background-color: transparent !important;
+    color: #ffffff;
+    border-color: transparent !important;
   }
 </style>
