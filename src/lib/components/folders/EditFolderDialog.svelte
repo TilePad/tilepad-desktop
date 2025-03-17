@@ -97,4 +97,16 @@
     padding: 1rem;
     justify-content: flex-end;
   }
+
+  .input {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    background-color: #000;
+    border: 1px solid #666;
+    color: #fff;
+    border-radius: 0.25rem;
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+  }
 </style>

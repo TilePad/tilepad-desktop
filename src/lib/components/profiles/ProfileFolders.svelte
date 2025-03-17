@@ -62,11 +62,9 @@
         </PopoverButton>
       </button>
     {/each}
+
+    <CreateFolderDialog order={folders.length} />
   </div>
-  <CreateFolderDialog
-    order={folders.length}
-    buttonLabel={{ text: "Create Folder" }}
-  />
 {/if}
 
 <style>

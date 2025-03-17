@@ -2,6 +2,7 @@
   import { toast } from "svelte-sonner";
   import { createFolder } from "$lib/api/folders";
   import { toastErrorMessage } from "$lib/api/utils/error";
+  import SolarAddSquareBold from "~icons/solar/add-square-bold";
 
   import type { DialogProps } from "../dialog/Dialog.svelte";
 
@@ -15,7 +16,7 @@
     order: number;
   };
 
-  let { order, buttonLabel }: Props = $props();
+  let { order }: Props = $props();
 
   const { profile } = getProfileContext();
   const { folder } = getFolderContext();
@@ -57,7 +58,13 @@
   }
 </script>
 
-<Dialog bind:open {buttonLabel}>
+<Dialog bind:open>
+  {#snippet button({ props })}
+    <button type="button" {...props} class="btn">
+      <SolarAddSquareBold />
+      Create Folder
+    </button>
+  {/snippet}
   {#snippet children()}
     <form onsubmit={onCreate}>
       <div class="content">
@@ -109,5 +116,30 @@
     align-items: center;
     display: flex;
     gap: 0.5rem;
+  }
+
+  .btn {
+    padding: 0.5rem;
+    background-color: #544d5e;
+    border: none;
+    color: #fff;
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 1em;
+    text-decoration: none;
+  }
+
+  .btn:hover {
+    background-color: #675d75;
+  }
+
+  .btn:disabled,
+  .btn:disabled:hover {
+    background-color: #222;
+    border: 1px solid #333;
+    cursor: not-allowed;
+    color: #777;
   }
 </style>
