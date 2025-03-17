@@ -5,9 +5,9 @@
   import SolarFolder2BoldDuotone from "~icons/solar/folder-2-bold-duotone";
   import SolarFolderOpenBoldDuotone from "~icons/solar/folder-open-bold-duotone";
 
-  import Button from "../input/Button.svelte";
   import PopoverButton from "../popover/PopoverButton.svelte";
   import { getProfileContext } from "./ProfilesProvider.svelte";
+  import EditFolderDialog from "../folders/EditFolderDialog.svelte";
   import { getFolderContext } from "../folders/FolderProvider.svelte";
   import CreateFolderDialog from "../folders/CreateFolderDialog.svelte";
   import DeleteFolderDialog from "../folders/DeleteFolderDialog.svelte";
@@ -56,7 +56,7 @@
           {#snippet children()}<SolarMenuDotsBold />{/snippet}
 
           {#snippet content()}
-            <Button>Edit</Button>
+            <EditFolderDialog {folder} />
             <DeleteFolderDialog {folder} />
           {/snippet}
         </PopoverButton>
