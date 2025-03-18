@@ -20,6 +20,7 @@ pub mod action;
 pub mod internal;
 pub mod manifest;
 pub mod node;
+pub mod protocol;
 pub mod runner;
 pub mod socket;
 
