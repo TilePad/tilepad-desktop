@@ -1,14 +1,54 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::database::entity::{folder::FolderModel, tile::TileModel};
+use crate::{
+    database::entity::{folder::FolderModel, tile::TileModel},
+    events::{DeviceMessageContext, PluginMessageContext},
+};
+
+use super::manifest::{ActionId, PluginId};
 
 /// Plugin message coming from the client side
 #[derive(Deserialize)]
 #[serde(tag = "type")]
-pub enum ClientPluginMessage {}
+pub enum ClientPluginMessage {
+    /// Register the current plugin with the server
+    RegisterPlugin { plugin_id: PluginId },
+
+    /// Request the current plugin settings
+    RequestSettings,
+
+    /// Request setting the settings value
+    SetSettings { settings: serde_json::Value },
+
+    /// Send data to the current inspector window
+    SendToInspector {
+        /// Inspector context
+        ctx: PluginMessageContext,
+        /// Message to send the inspector
+        message: serde_json::Value,
+    },
+}
 
 /// Plugin message coming from the server side
 #[derive(Serialize)]
 #[serde(tag = "type")]
-pub enum ServerPluginMessage {}
+pub enum ServerPluginMessage {
+    /// Plugin has registered with the server
+    Registered { plugin_id: PluginId },
+
+    /// Settings received from the server
+    Settings { settings: serde_json::Value },
+
+    /// Tile was clicked on a remote device
+    TileClicked {
+        ctx: DeviceMessageContext,
+        properties: serde_json::Value,
+    },
+
+    /// Got a message from the inspector
+    RecvFromInspector {
+        ctx: PluginMessageContext,
+        message: serde_json::Value,
+    },
+}

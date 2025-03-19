@@ -24,7 +24,7 @@ pub enum ClientDeviceMessage {
 
     /// User has clicked a tile
     TileClicked {
-        /// ID of the tile that was touches
+        /// ID of the tile that was touched
         tile_id: Uuid,
     },
 }

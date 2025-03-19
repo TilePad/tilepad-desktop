@@ -9,6 +9,7 @@ use anyhow::Context;
 use garde::Validate;
 use manifest::{ActionId, Manifest, PluginId};
 use parking_lot::RwLock;
+use socket::{PluginSessionId, PluginSessionRef};
 
 use crate::{
     database::{entity::tile::TileModel, DbPool},
@@ -24,15 +25,35 @@ pub mod protocol;
 pub mod runner;
 pub mod socket;
 
-#[derive(Default, Clone)]
+#[derive(Clone)]
 pub struct PluginRegistry {
     inner: Arc<PluginRegistryInner>,
 }
 
-#[derive(Default)]
+impl PluginRegistry {
+    pub fn new(event_tx: AppEventSender) -> Self {
+        Self {
+            inner: Arc::new(PluginRegistryInner {
+                event_tx,
+                plugins: Default::default(),
+                sessions: Default::default(),
+                plugin_to_session: Default::default(),
+            }),
+        }
+    }
+}
+
 struct PluginRegistryInner {
+    /// Sender for app events
+    event_tx: AppEventSender,
+
     /// Collection of currently loaded plugins
     plugins: RwLock<HashMap<PluginId, Plugin>>,
+
+    /// Current plugin socket sessions
+    sessions: RwLock<HashMap<PluginSessionId, PluginSessionRef>>,
+
+    plugin_to_session: RwLock<HashMap<PluginId, PluginSessionId>>,
 }
 
 impl PluginRegistry {
@@ -104,7 +125,15 @@ impl PluginRegistry {
             internal::messages::handle_internal_send_message(self, app_tx, db, context, message)
                 .await?;
         } else {
-            // Pass to plugin
+            let session = match self.get_plugin_session(&context.plugin_id) {
+                Some(value) => value,
+                None => return Ok(()),
+            };
+
+            session.send_message(protocol::ServerPluginMessage::RecvFromInspector {
+                ctx: context,
+                message,
+            })?;
         }
 
         Ok(())
@@ -126,10 +155,56 @@ impl PluginRegistry {
         if manifest.plugin.internal.is_some_and(|value| value) {
             internal::actions::handle_internal_action(self, devices, db, context, tile).await?;
         } else {
-            // Pass to plugin
+            let session = match self.get_plugin_session(&context.plugin_id) {
+                Some(value) => value,
+                None => return Ok(()),
+            };
+
+            session.send_message(protocol::ServerPluginMessage::TileClicked {
+                ctx: context,
+                properties: tile.config.properties,
+            })?;
         }
 
         Ok(())
+    }
+
+    /// Insert a new session
+    pub fn insert_session(&self, session_id: PluginSessionId, session_ref: PluginSessionRef) {
+        self.inner.sessions.write().insert(session_id, session_ref);
+    }
+
+    /// Insert a new session
+    pub fn get_session(&self, session_id: &PluginSessionId) -> Option<PluginSessionRef> {
+        self.inner.sessions.write().get(session_id).cloned()
+    }
+
+    /// Remove a session
+    pub fn remove_session(&self, session_id: PluginSessionId) {
+        self.inner.sessions.write().remove(&session_id);
+    }
+
+    pub fn set_plugin_session(&self, plugin_id: PluginId, session_id: Option<PluginSessionId>) {
+        if let Some(session_id) = session_id {
+            self.inner
+                .plugin_to_session
+                .write()
+                .insert(plugin_id, session_id);
+        } else {
+            self.inner.plugin_to_session.write().remove(&plugin_id);
+        }
+    }
+
+    pub fn get_plugin_session(&self, plugin_id: &PluginId) -> Option<PluginSessionRef> {
+        let session_id = {
+            let plugin_to_session = self.inner.plugin_to_session.read();
+            plugin_to_session.get(plugin_id).cloned()
+        }?;
+        let session = {
+            let sessions = self.inner.sessions.read();
+            sessions.get(&session_id).cloned()
+        }?;
+        Some(session.clone())
     }
 }
 

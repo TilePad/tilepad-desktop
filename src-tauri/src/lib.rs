@@ -86,12 +86,13 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
 
     let core_resources = resources.join("core");
     let core_plugins = core_resources.join("plugins");
+    let user_plugins = app_data_path.join("plugins");
 
     let db = block_on(database::connect_database(app_data_path.join("app.db")))
         .context("failed to load database")?;
 
     let (app_event_tx, app_event_rx) = mpsc::unbounded_channel();
-    let plugins = PluginRegistry::default();
+    let plugins = PluginRegistry::new(app_event_tx.clone());
     let devices = Devices::new(app_event_tx.clone(), db.clone(), plugins.clone());
 
     app.manage(app_event_tx.clone());
@@ -105,6 +106,12 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
     spawn(plugin::load_plugins_into_registry(
         plugins.clone(),
         core_plugins,
+    ));
+
+    // Load the user plugins into the registry
+    spawn(plugin::load_plugins_into_registry(
+        plugins.clone(),
+        user_plugins,
     ));
 
     // Spawn event processor

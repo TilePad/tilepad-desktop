@@ -9,18 +9,22 @@ use mime_guess::mime::TEXT_HTML;
 use reqwest::{header::CONTENT_TYPE, StatusCode};
 
 use crate::{
-    plugin::{manifest::PluginId, PluginRegistry},
+    plugin::{manifest::PluginId, socket::PluginSession, PluginRegistry},
     server::models::error::DynHttpError,
 };
 
 /// GET /plugins/ws
 ///
-/// Accept a websocket connection
-pub async fn ws(ws: WebSocketUpgrade) -> Response {
-    ws.on_upgrade(handle_plugin_socket)
+/// Accept a new plugin websocket connection upgrade
+pub async fn ws(Extension(plugins): Extension<PluginRegistry>, ws: WebSocketUpgrade) -> Response {
+    ws.on_upgrade(move |socket| handle_plugin_socket(plugins, socket))
 }
 
-pub async fn handle_plugin_socket(_socket: WebSocket) {}
+/// Handle the connection of a new plugin socket
+pub async fn handle_plugin_socket(plugins: PluginRegistry, socket: WebSocket) {
+    let (session_id, session_ref) = PluginSession::new(plugins.clone(), socket);
+    plugins.insert_session(session_id, session_ref);
+}
 
 static INSPECTOR_SCRIPT: &str = include_str!("../resources/propertyInspectorScript.js");
 static INSPECTOR_STYLES: &str = include_str!("../resources/propertyInspectorStyles.css");
