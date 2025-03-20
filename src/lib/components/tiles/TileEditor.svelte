@@ -87,6 +87,7 @@
           <PropertyInspector
             pluginId={action.plugin_id}
             tileId={tile.id}
+            actionId={action.action_id}
             inspector={action.inspector}
             properties={tile.config.properties}
             onSetProperty={(name, value) => {

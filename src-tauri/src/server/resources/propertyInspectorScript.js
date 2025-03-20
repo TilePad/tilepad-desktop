@@ -37,7 +37,10 @@ window.addEventListener("message", (event) => {
   const type = data.type;
 
   if (type === "PROPERTIES") {
-    events.emit("properties", data.properties);
+    events.emit("properties", data.properties, {
+      tileId: data.tileId,
+      actionId: data.actionId,
+    });
   } else if (type === "PLUGIN_MESSAGE") {
     events.emit("plugin_message", data.message);
   } else if (type === "REFRESH") {

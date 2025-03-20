@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { TileId } from "$lib/api/types/tiles";
+  import type { ActionId } from "$lib/api/types/actions";
   import type { PluginId, PluginMessageContext } from "$lib/api/types/plugin";
 
-  import { watch } from "runed";
   import { onMount, onDestroy } from "svelte";
   import { listen } from "@tauri-apps/api/event";
   import { getPluginAssetPath } from "$lib/api/utils/url";
@@ -10,6 +10,7 @@
   type Props = {
     pluginId: PluginId;
     tileId: TileId;
+    actionId: ActionId;
 
     inspector: string;
     properties: object;
@@ -20,6 +21,7 @@
   const {
     pluginId,
     tileId,
+    actionId,
     inspector,
     properties,
     onSendPluginMessage,
@@ -44,6 +46,8 @@
       case "GET_PROPERTIES": {
         sendFrameEvent({
           type: "PROPERTIES",
+          tileId,
+          actionId,
           properties,
         });
         break;
@@ -75,7 +79,8 @@
       (event) => {
         const { context, message } = event.payload;
 
-        if (context.plugin_id !== pluginId) return;
+        if (context.plugin_id !== pluginId || context.tile_id !== tileId)
+          return;
 
         sendFrameEvent({
           type: "PLUGIN_MESSAGE",
@@ -94,7 +99,7 @@
 
 <svelte:window onmessage={onFrameEvent} />
 
-{#key pluginId + "-" + tileId}
+{#key pluginId + "-" + tileId + "-" + actionId}
   <iframe
     class="frame"
     bind:this={iframe}
