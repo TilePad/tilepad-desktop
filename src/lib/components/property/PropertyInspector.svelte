@@ -90,25 +90,18 @@
     if (removeEventListener) removeEventListener();
     removeEventListener = undefined;
   });
-
-  watch(
-    () => tileId,
-    () => {
-      sendFrameEvent({
-        type: "REFRESH",
-      });
-    },
-  );
 </script>
 
 <svelte:window onmessage={onFrameEvent} />
 
-<iframe
-  class="frame"
-  bind:this={iframe}
-  title="Inspector"
-  src={getPluginAssetPath(pluginId, inspector)}
-></iframe>
+{#key pluginId + "-" + tileId}
+  <iframe
+    class="frame"
+    bind:this={iframe}
+    title="Inspector"
+    src={getPluginAssetPath(pluginId, inspector)}
+  ></iframe>
+{/key}
 
 <style>
   .frame {
