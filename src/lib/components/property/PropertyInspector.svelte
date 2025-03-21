@@ -16,7 +16,7 @@
     properties: object;
 
     onSendPluginMessage: (message: string) => void;
-    onSetProperty: (name: string, value: unknown) => void;
+    onSetProperties: (properties: Record<string, unknown>) => void;
   };
   const {
     pluginId,
@@ -25,7 +25,7 @@
     inspector,
     properties,
     onSendPluginMessage,
-    onSetProperty,
+    onSetProperties,
   }: Props = $props();
 
   let iframe: HTMLIFrameElement | undefined = $state(undefined);
@@ -53,8 +53,8 @@
         break;
       }
 
-      case "SET_PROPERTY": {
-        onSetProperty(data.name, data.value);
+      case "SET_PROPERTIES": {
+        onSetProperties(data.properties);
         break;
       }
     }

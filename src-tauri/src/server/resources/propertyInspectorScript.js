@@ -75,10 +75,13 @@ function requestProperties() {
 }
 
 function setProperty(name, value) {
+  setProperties({ [name]: value });
+}
+
+function setProperties(properties) {
   postInspectorMessage({
-    type: "SET_PROPERTY",
-    name,
-    value,
+    type: "SET_PROPERTIES",
+    properties,
   });
 }
 

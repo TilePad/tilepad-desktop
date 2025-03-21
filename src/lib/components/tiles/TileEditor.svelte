@@ -90,13 +90,13 @@
             actionId={action.action_id}
             inspector={action.inspector}
             properties={tile.config.properties}
-            onSetProperty={(name, value) => {
+            onSetProperties={(properties) => {
               updateTile(tile.id, {
                 config: {
                   ...tile.config,
                   properties: {
                     ...tile.config.properties,
-                    [name]: value,
+                    ...properties,
                   },
                 },
               });
