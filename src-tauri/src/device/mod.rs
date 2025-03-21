@@ -18,7 +18,7 @@ use crate::{
         DbPool,
     },
     events::{
-        AppEvent, AppEventSender, DeviceAppEvent, DeviceMessageContext, DeviceRequestAppEvent,
+        AppEvent, AppEventSender, DeviceAppEvent, DeviceRequestAppEvent, TileInteractionContext,
     },
     plugin::PluginRegistry,
     utils::random::generate_access_token,
@@ -339,7 +339,7 @@ impl Devices {
             .await?
             .context("tile instance not found")?;
 
-        let context = DeviceMessageContext {
+        let context = TileInteractionContext {
             device_id,
             plugin_id: tile.config.plugin_id.clone(),
             action_id: tile.config.action_id.clone(),

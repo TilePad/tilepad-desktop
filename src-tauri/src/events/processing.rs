@@ -5,7 +5,7 @@ use serde::Serialize;
 use tauri::{AppHandle, Emitter};
 use tracing::{debug, error};
 
-use crate::{database::DbPool, events::PluginMessageContext};
+use crate::{database::DbPool, events::InspectorContext};
 
 use super::{AppEvent, AppEventReceiver, DeviceAppEvent, DeviceRequestAppEvent, PluginAppEvent};
 
@@ -73,7 +73,7 @@ async fn process_event(
             PluginAppEvent::RecvPluginMessage { context, message } => {
                 #[derive(Serialize)]
                 struct Payload {
-                    context: PluginMessageContext,
+                    context: InspectorContext,
                     message: serde_json::Value,
                 }
 

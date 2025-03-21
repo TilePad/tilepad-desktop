@@ -37,7 +37,7 @@ pub enum DeviceRequestAppEvent {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PluginMessageContext {
+pub struct InspectorContext {
     pub profile_id: ProfileId,
     pub folder_id: FolderId,
 
@@ -48,7 +48,7 @@ pub struct PluginMessageContext {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DeviceMessageContext {
+pub struct TileInteractionContext {
     pub device_id: DeviceId,
 
     pub plugin_id: PluginId,
@@ -60,17 +60,17 @@ pub struct DeviceMessageContext {
 #[derive(Debug)]
 pub enum PluginAppEvent {
     RecvPluginMessage {
-        context: PluginMessageContext,
+        context: InspectorContext,
         message: serde_json::Value,
     },
 
     OpenInspector {
         #[allow(unused)]
-        context: PluginMessageContext,
+        context: InspectorContext,
     },
 
     CloseInspector {
         #[allow(unused)]
-        context: PluginMessageContext,
+        context: InspectorContext,
     },
 }

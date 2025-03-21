@@ -1,7 +1,7 @@
 use crate::{
     commands::CmdResult,
     database::DbPool,
-    events::{AppEvent, AppEventSender, PluginAppEvent, PluginMessageContext},
+    events::{AppEvent, AppEventSender, InspectorContext, PluginAppEvent},
     plugin::{manifest::PluginId, PluginRegistry},
 };
 use tauri::State;
@@ -11,7 +11,7 @@ pub async fn plugins_send_plugin_message(
     app_tx: State<'_, AppEventSender>,
     plugins: State<'_, PluginRegistry>,
     db: State<'_, DbPool>,
-    context: PluginMessageContext,
+    context: InspectorContext,
     message: serde_json::Value,
 ) -> CmdResult<()> {
     plugins
@@ -24,7 +24,7 @@ pub async fn plugins_send_plugin_message(
 #[tauri::command]
 pub async fn plugins_open_inspector(
     app_tx: State<'_, AppEventSender>,
-    context: PluginMessageContext,
+    context: InspectorContext,
 ) -> CmdResult<()> {
     app_tx.send(AppEvent::Plugin(PluginAppEvent::OpenInspector { context }))?;
     Ok(())
@@ -33,7 +33,7 @@ pub async fn plugins_open_inspector(
 #[tauri::command]
 pub async fn plugins_close_inspector(
     app_tx: State<'_, AppEventSender>,
-    context: PluginMessageContext,
+    context: InspectorContext,
 ) -> CmdResult<()> {
     app_tx.send(AppEvent::Plugin(PluginAppEvent::CloseInspector { context }))?;
     Ok(())

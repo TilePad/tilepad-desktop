@@ -6,7 +6,7 @@ use crate::{
         entity::{folder::FolderModel, tile::TileModel},
         DbPool,
     },
-    events::{AppEvent, AppEventSender, PluginAppEvent, PluginMessageContext},
+    events::{AppEvent, AppEventSender, PluginAppEvent, InspectorContext},
     plugin::PluginRegistry,
 };
 
@@ -15,7 +15,7 @@ pub async fn handle_internal_send_message(
     app_tx: &AppEventSender,
     db: &DbPool,
 
-    context: PluginMessageContext,
+    context: InspectorContext,
     message: serde_json::Value,
 ) -> anyhow::Result<()> {
     let tile = TileModel::get_by_id(db, context.tile_id)
@@ -59,7 +59,7 @@ async fn handle_internal_navigation(
     db: &DbPool,
     _tile: &TileModel,
 
-    context: PluginMessageContext,
+    context: InspectorContext,
     message: serde_json::Value,
 ) -> anyhow::Result<()> {
     let message: NavigationInspectorMessage = serde_json::from_value(message)?;

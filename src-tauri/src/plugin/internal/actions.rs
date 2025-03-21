@@ -11,7 +11,7 @@ use crate::{
         DbPool,
     },
     device::{protocol::ServerDeviceMessage, Devices},
-    events::DeviceMessageContext,
+    events::TileInteractionContext,
     plugin::PluginRegistry,
 };
 
@@ -19,7 +19,7 @@ pub async fn handle_internal_action(
     plugins: &PluginRegistry,
     devices: &Devices,
     db: &DbPool,
-    context: DeviceMessageContext,
+    context: TileInteractionContext,
     tile: TileModel,
 ) -> anyhow::Result<()> {
     match context.plugin_id.as_str() {
@@ -44,7 +44,7 @@ async fn handle_internal_navigation(
     devices: &Devices,
     plugins: &PluginRegistry,
     db: &DbPool,
-    context: DeviceMessageContext,
+    context: TileInteractionContext,
     tile: TileModel,
 ) -> anyhow::Result<()> {
     match context.action_id.as_str() {

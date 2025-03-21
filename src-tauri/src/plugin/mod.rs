@@ -18,7 +18,7 @@ use crate::{
         DbPool,
     },
     device::Devices,
-    events::{AppEventSender, DeviceMessageContext, PluginMessageContext},
+    events::{AppEventSender, TileInteractionContext, InspectorContext},
 };
 
 pub mod action;
@@ -123,7 +123,7 @@ impl PluginRegistry {
         app_tx: &AppEventSender,
         db: &DbPool,
 
-        context: PluginMessageContext,
+        context: InspectorContext,
         message: serde_json::Value,
     ) -> anyhow::Result<()> {
         let manifest = self
@@ -152,7 +152,7 @@ impl PluginRegistry {
         &self,
         devices: &Devices,
         db: &DbPool,
-        context: DeviceMessageContext,
+        context: TileInteractionContext,
         tile: TileModel,
     ) -> anyhow::Result<()> {
         tracing::debug!(?context, "invoking action");

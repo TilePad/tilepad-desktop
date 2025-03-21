@@ -3,7 +3,7 @@ use uuid::Uuid;
 
 use crate::{
     database::entity::{folder::FolderModel, tile::TileModel},
-    events::{DeviceMessageContext, PluginMessageContext},
+    events::{InspectorContext, TileInteractionContext},
 };
 
 use super::manifest::{ActionId, PluginId};
@@ -24,7 +24,7 @@ pub enum ClientPluginMessage {
     /// Send data to the current inspector window
     SendToInspector {
         /// Inspector context
-        ctx: PluginMessageContext,
+        ctx: InspectorContext,
         /// Message to send the inspector
         message: serde_json::Value,
     },
@@ -42,13 +42,13 @@ pub enum ServerPluginMessage {
 
     /// Tile was clicked on a remote device
     TileClicked {
-        ctx: DeviceMessageContext,
+        ctx: TileInteractionContext,
         properties: serde_json::Value,
     },
 
     /// Got a message from the inspector
     RecvFromInspector {
-        ctx: PluginMessageContext,
+        ctx: InspectorContext,
         message: serde_json::Value,
     },
 }
