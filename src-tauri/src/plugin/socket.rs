@@ -15,7 +15,7 @@ use axum::extract::ws::{Message, WebSocket};
 use parking_lot::RwLock;
 use serde_json::{Map, Value};
 use tauri::async_runtime::spawn;
-use tracing::error;
+use tracing::{debug, error};
 use uuid::Uuid;
 
 use super::{
@@ -108,20 +108,43 @@ impl PluginSession {
     pub fn handle_message(self: &Arc<Self>, message: ClientPluginMessage) {
         match message {
             ClientPluginMessage::RegisterPlugin { plugin_id } => {
+                // Handle unknown plugin
+                if self.plugins.get_plugin_path(&plugin_id).is_none() {
+                    debug!(?plugin_id, "plugin registered with unknown id");
+                    return;
+                }
+
                 self.plugins
                     .set_plugin_session(plugin_id.clone(), Some(self.id));
-                self.set_plugin_id(Some(plugin_id));
-                self.send_message(ServerPluginMessage::Settings {
-                    settings: Value::Object(Map::new()),
-                })
-                .unwrap();
+                self.set_plugin_id(Some(plugin_id.clone()));
+
+                _ = self.send_message(ServerPluginMessage::Registered { plugin_id });
             }
-            ClientPluginMessage::RequestSettings => {
-                // TODO: Load settings from database
-                self.send_message(ServerPluginMessage::Settings {
-                    settings: Value::Object(Map::new()),
-                })
-                .unwrap();
+            ClientPluginMessage::GetProperties => {
+                let plugin_id = match self.get_plugin_id() {
+                    Some(value) => value,
+                    None => {
+                        debug!("plugin requested properties before registering");
+                        return;
+                    }
+                };
+
+                let session = self.clone();
+                tokio::spawn(async move {
+                    let properties = match session.plugins.get_plugin_properties(plugin_id).await {
+                        Ok(value) => value,
+                        Err(cause) => {
+                            error!(?cause, "failed to load plugin properties");
+                            return;
+                        }
+                    };
+
+                    if let Err(cause) =
+                        session.send_message(ServerPluginMessage::Properties { properties })
+                    {
+                        error!(?cause, "failed to send plugin properties")
+                    }
+                });
             }
             ClientPluginMessage::SendToInspector { ctx, message } => {
                 _ = self.plugins.inner.event_tx.send(AppEvent::Plugin(
@@ -131,8 +154,22 @@ impl PluginSession {
                     },
                 ));
             }
-            ClientPluginMessage::SetSettings { settings } => {
-                //TODO: Store settings
+            ClientPluginMessage::SetProperties { properties } => {
+                let plugin_id = match self.get_plugin_id() {
+                    Some(value) => value,
+                    None => return,
+                };
+
+                let session = self.clone();
+                tokio::spawn(async move {
+                    if let Err(cause) = session
+                        .plugins
+                        .set_plugin_properties(plugin_id, properties)
+                        .await
+                    {
+                        error!(?cause, "failed to save plugin properties");
+                    }
+                });
             }
         }
     }

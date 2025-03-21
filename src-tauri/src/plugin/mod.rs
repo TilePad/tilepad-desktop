@@ -9,10 +9,14 @@ use anyhow::Context;
 use garde::Validate;
 use manifest::{ActionId, Manifest, PluginId};
 use parking_lot::RwLock;
+use serde_json::Map;
 use socket::{PluginSessionId, PluginSessionRef};
 
 use crate::{
-    database::{entity::tile::TileModel, DbPool},
+    database::{
+        entity::{plugin_properties::PluginPropertiesModel, tile::TileModel},
+        DbPool,
+    },
     device::Devices,
     events::{AppEventSender, DeviceMessageContext, PluginMessageContext},
 };
@@ -31,10 +35,11 @@ pub struct PluginRegistry {
 }
 
 impl PluginRegistry {
-    pub fn new(event_tx: AppEventSender) -> Self {
+    pub fn new(event_tx: AppEventSender, db: DbPool) -> Self {
         Self {
             inner: Arc::new(PluginRegistryInner {
                 event_tx,
+                db,
                 plugins: Default::default(),
                 sessions: Default::default(),
                 plugin_to_session: Default::default(),
@@ -47,12 +52,16 @@ struct PluginRegistryInner {
     /// Sender for app events
     event_tx: AppEventSender,
 
+    /// Access to the database
+    db: DbPool,
+
     /// Collection of currently loaded plugins
     plugins: RwLock<HashMap<PluginId, Plugin>>,
 
     /// Current plugin socket sessions
     sessions: RwLock<HashMap<PluginSessionId, PluginSessionRef>>,
 
+    /// Mapping from plugin ID to session for that plugin
     plugin_to_session: RwLock<HashMap<PluginId, PluginSessionId>>,
 }
 
@@ -205,6 +214,26 @@ impl PluginRegistry {
             sessions.get(&session_id).cloned()
         }?;
         Some(session.clone())
+    }
+
+    pub async fn get_plugin_properties(
+        &self,
+        plugin_id: PluginId,
+    ) -> anyhow::Result<serde_json::Value> {
+        let result = PluginPropertiesModel::get_by_plugin(&self.inner.db, plugin_id).await?;
+
+        Ok(result
+            .map(|value| value.properties)
+            .unwrap_or_else(|| serde_json::Value::Object(Map::new())))
+    }
+
+    pub async fn set_plugin_properties(
+        &self,
+        plugin_id: PluginId,
+        properties: serde_json::Value,
+    ) -> anyhow::Result<()> {
+        PluginPropertiesModel::set(&self.inner.db, plugin_id, properties).await?;
+        Ok(())
     }
 }
 

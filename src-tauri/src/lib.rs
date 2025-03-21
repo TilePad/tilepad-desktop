@@ -54,6 +54,8 @@ pub fn run() {
             plugins::plugins_send_plugin_message,
             plugins::plugins_open_inspector,
             plugins::plugins_close_inspector,
+            plugins::plugins_get_plugin_properties,
+            plugins::plugins_set_plugin_properties,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -92,7 +94,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         .context("failed to load database")?;
 
     let (app_event_tx, app_event_rx) = mpsc::unbounded_channel();
-    let plugins = PluginRegistry::new(app_event_tx.clone());
+    let plugins = PluginRegistry::new(app_event_tx.clone(), db.clone());
     let devices = Devices::new(app_event_tx.clone(), db.clone(), plugins.clone());
 
     app.manage(app_event_tx.clone());

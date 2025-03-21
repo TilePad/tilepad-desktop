@@ -15,11 +15,11 @@ pub enum ClientPluginMessage {
     /// Register the current plugin with the server
     RegisterPlugin { plugin_id: PluginId },
 
-    /// Request the current plugin settings
-    RequestSettings,
+    /// Request the current plugin properties
+    GetProperties,
 
-    /// Request setting the settings value
-    SetSettings { settings: serde_json::Value },
+    /// Set the properties for the plugin (Partial update)
+    SetProperties { properties: serde_json::Value },
 
     /// Send data to the current inspector window
     SendToInspector {
@@ -37,8 +37,8 @@ pub enum ServerPluginMessage {
     /// Plugin has registered with the server
     Registered { plugin_id: PluginId },
 
-    /// Settings received from the server
-    Settings { settings: serde_json::Value },
+    /// Properties received from the server
+    Properties { properties: serde_json::Value },
 
     /// Tile was clicked on a remote device
     TileClicked {

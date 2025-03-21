@@ -1,11 +1,10 @@
-use tauri::State;
-
 use crate::{
     commands::CmdResult,
     database::DbPool,
     events::{AppEvent, AppEventSender, PluginAppEvent, PluginMessageContext},
-    plugin::PluginRegistry,
+    plugin::{manifest::PluginId, PluginRegistry},
 };
+use tauri::State;
 
 #[tauri::command]
 pub async fn plugins_send_plugin_message(
@@ -37,5 +36,24 @@ pub async fn plugins_close_inspector(
     context: PluginMessageContext,
 ) -> CmdResult<()> {
     app_tx.send(AppEvent::Plugin(PluginAppEvent::CloseInspector { context }))?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn plugins_get_plugin_properties(
+    plugins: State<'_, PluginRegistry>,
+    plugin_id: PluginId,
+) -> CmdResult<serde_json::Value> {
+    let result = plugins.get_plugin_properties(plugin_id).await?;
+    Ok(result)
+}
+
+#[tauri::command]
+pub async fn plugins_set_plugin_properties(
+    plugins: State<'_, PluginRegistry>,
+    plugin_id: PluginId,
+    properties: serde_json::Value,
+) -> CmdResult<()> {
+    plugins.set_plugin_properties(plugin_id, properties).await?;
     Ok(())
 }

@@ -1,7 +1,7 @@
 use tauri::State;
 
 use crate::plugin::{
-    action::{Action, ActionCategory, ActionWithCategory},
+    action::{ActionCategory, ActionWithCategory},
     manifest::{ActionId, PluginId},
     PluginRegistry,
 };
