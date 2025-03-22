@@ -1,27 +1,27 @@
 <script lang="ts">
-  import type { TileId } from "$lib/api/types/tiles";
-  import type { ActionId } from "$lib/api/types/actions";
-  import type { PluginId, PluginMessageContext } from "$lib/api/types/plugin";
-
+  import { watch } from "runed";
   import { onMount, onDestroy } from "svelte";
   import { listen } from "@tauri-apps/api/event";
   import { getPluginAssetPath } from "$lib/api/utils/url";
+  import { openPluginInspector, closePluginInspector } from "$lib/api/plugins";
+  import {
+    type InspectorContext,
+    encodeInspectorContext,
+    isInspectorContextEqual,
+  } from "$lib/api/types/plugin";
 
   type Props = {
-    pluginId: PluginId;
-    tileId: TileId;
-    actionId: ActionId;
+    ctx: InspectorContext;
 
     inspector: string;
     properties: object;
 
-    onSendPluginMessage: (message: string) => void;
+    onSendPluginMessage: (ctx: InspectorContext, message: string) => void;
     onSetProperties: (properties: Record<string, unknown>) => void;
   };
+
   const {
-    pluginId,
-    tileId,
-    actionId,
+    ctx,
     inspector,
     properties,
     onSendPluginMessage,
@@ -29,6 +29,7 @@
   }: Props = $props();
 
   let iframe: HTMLIFrameElement | undefined = $state(undefined);
+  let currentCtx: InspectorContext | null = null;
 
   function onFrameEvent(event: MessageEvent) {
     if (!iframe) return;
@@ -39,15 +40,15 @@
 
     switch (type) {
       case "SEND_TO_PLUGIN": {
-        onSendPluginMessage(data.message);
+        onSendPluginMessage(ctx, data.message);
         break;
       }
 
       case "GET_PROPERTIES": {
         sendFrameEvent({
           type: "PROPERTIES",
-          tileId,
-          actionId,
+          tileId: ctx.tile_id,
+          actionId: ctx.action_id,
           properties,
         });
         break;
@@ -70,7 +71,7 @@
 
   onMount(async () => {
     type Payload = {
-      context: PluginMessageContext;
+      context: InspectorContext;
       message: unknown;
     };
 
@@ -79,8 +80,7 @@
       (event) => {
         const { context, message } = event.payload;
 
-        if (context.plugin_id !== pluginId || context.tile_id !== tileId)
-          return;
+        if (!isInspectorContextEqual(context, ctx)) return;
 
         sendFrameEvent({
           type: "PLUGIN_MESSAGE",
@@ -94,17 +94,44 @@
   onDestroy(() => {
     if (removeEventListener) removeEventListener();
     removeEventListener = undefined;
+
+    if (currentCtx !== null) {
+      console.debug("closed plugin inspector (destroy)");
+      closePluginInspector(currentCtx);
+      currentCtx = null;
+    }
   });
+
+  watch(
+    () => ctx,
+    (ctx) => {
+      // Context has not changed
+      if (currentCtx !== null && isInspectorContextEqual(ctx, currentCtx)) {
+        return;
+      }
+
+      // Notify the previous inspector of closing
+      if (currentCtx !== null) {
+        console.debug("closed plugin inspector");
+        closePluginInspector(currentCtx);
+        currentCtx = null;
+      }
+
+      console.debug("opened plugin inspector");
+      openPluginInspector(ctx);
+      currentCtx = ctx;
+    },
+  );
 </script>
 
 <svelte:window onmessage={onFrameEvent} />
 
-{#key pluginId + "-" + tileId + "-" + actionId}
+{#key encodeInspectorContext(ctx)}
   <iframe
     class="frame"
     bind:this={iframe}
     title="Inspector"
-    src={getPluginAssetPath(pluginId, inspector)}
+    src={getPluginAssetPath(ctx.plugin_id, inspector)}
   ></iframe>
 {/key}
 

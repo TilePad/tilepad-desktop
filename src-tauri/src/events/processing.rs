@@ -79,8 +79,6 @@ async fn process_event(
 
                 app_handle.emit("plugin:recv_plugin_message", &Payload { context, message })?;
             }
-            PluginAppEvent::OpenInspector { .. } => {}
-            PluginAppEvent::CloseInspector { .. } => {}
         },
     }
 

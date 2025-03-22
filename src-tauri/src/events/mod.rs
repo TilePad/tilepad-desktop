@@ -63,14 +63,4 @@ pub enum PluginAppEvent {
         context: InspectorContext,
         message: serde_json::Value,
     },
-
-    OpenInspector {
-        #[allow(unused)]
-        context: InspectorContext,
-    },
-
-    CloseInspector {
-        #[allow(unused)]
-        context: InspectorContext,
-    },
 }

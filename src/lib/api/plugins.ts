@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 
-import type { PluginId, PluginMessageContext } from "./types/plugin";
+import type { PluginId, InspectorContext } from "./types/plugin";
 
 import { queryClient } from "./client";
 
@@ -18,23 +18,20 @@ export const pluginsKey = {
 
 // [REQUESTS] ------------------------------------------------------
 
-export function sendPluginMessage(
-  context: PluginMessageContext,
-  message: unknown,
-) {
+export function sendPluginMessage(context: InspectorContext, message: unknown) {
   return invoke<void>("plugins_send_plugin_message", {
     context,
     message,
   });
 }
 
-export function openPluginInspector(context: PluginMessageContext) {
+export function openPluginInspector(context: InspectorContext) {
   return invoke<void>("plugins_open_inspector", {
     context,
   });
 }
 
-export function closePluginInspector(context: PluginMessageContext) {
+export function closePluginInspector(context: InspectorContext) {
   return invoke<void>("plugins_close_inspector", {
     context,
   });

@@ -85,9 +85,13 @@
       {#if action.inspector !== null}
         <div class="right">
           <PropertyInspector
-            pluginId={action.plugin_id}
-            tileId={tile.id}
-            actionId={action.action_id}
+            ctx={{
+              profile_id: currentProfile.id,
+              folder_id: currentFolder.id,
+              plugin_id: action.plugin_id,
+              action_id: action.action_id,
+              tile_id: tile.id,
+            }}
             inspector={action.inspector}
             properties={tile.config.properties}
             onSetProperties={(properties) => {
@@ -101,18 +105,7 @@
                 },
               });
             }}
-            onSendPluginMessage={(message) => {
-              sendPluginMessage(
-                {
-                  profile_id: currentProfile.id,
-                  folder_id: currentFolder.id,
-                  plugin_id: action.plugin_id,
-                  action_id: action.action_id,
-                  tile_id: tile.id,
-                },
-                message,
-              );
-            }}
+            onSendPluginMessage={sendPluginMessage}
           />
         </div>
       {/if}

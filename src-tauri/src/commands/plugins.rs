@@ -23,19 +23,19 @@ pub async fn plugins_send_plugin_message(
 
 #[tauri::command]
 pub async fn plugins_open_inspector(
-    app_tx: State<'_, AppEventSender>,
+    plugins: State<'_, PluginRegistry>,
     context: InspectorContext,
 ) -> CmdResult<()> {
-    app_tx.send(AppEvent::Plugin(PluginAppEvent::OpenInspector { context }))?;
+    plugins.open_inspector(context).await?;
     Ok(())
 }
 
 #[tauri::command]
 pub async fn plugins_close_inspector(
-    app_tx: State<'_, AppEventSender>,
+    plugins: State<'_, PluginRegistry>,
     context: InspectorContext,
 ) -> CmdResult<()> {
-    app_tx.send(AppEvent::Plugin(PluginAppEvent::CloseInspector { context }))?;
+    plugins.close_inspector(context).await?;
     Ok(())
 }
 

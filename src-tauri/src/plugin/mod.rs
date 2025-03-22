@@ -9,6 +9,7 @@ use anyhow::Context;
 use garde::Validate;
 use manifest::{ActionId, Manifest, PluginId};
 use parking_lot::RwLock;
+use protocol::ServerPluginMessage;
 use serde_json::Map;
 use socket::{PluginSessionId, PluginSessionRef};
 
@@ -18,7 +19,7 @@ use crate::{
         DbPool,
     },
     device::Devices,
-    events::{AppEventSender, TileInteractionContext, InspectorContext},
+    events::{AppEventSender, InspectorContext, TileInteractionContext},
 };
 
 pub mod action;
@@ -139,7 +140,7 @@ impl PluginRegistry {
                 None => return Ok(()),
             };
 
-            session.send_message(protocol::ServerPluginMessage::RecvFromInspector {
+            session.send_message(ServerPluginMessage::RecvFromInspector {
                 ctx: context,
                 message,
             })?;
@@ -169,7 +170,7 @@ impl PluginRegistry {
                 None => return Ok(()),
             };
 
-            session.send_message(protocol::ServerPluginMessage::TileClicked {
+            session.send_message(ServerPluginMessage::TileClicked {
                 ctx: context,
                 properties: tile.config.properties,
             })?;
@@ -233,6 +234,22 @@ impl PluginRegistry {
         properties: serde_json::Value,
     ) -> anyhow::Result<()> {
         PluginPropertiesModel::set(&self.inner.db, plugin_id, properties).await?;
+        Ok(())
+    }
+
+    pub async fn open_inspector(&self, inspector: InspectorContext) -> anyhow::Result<()> {
+        if let Some(session) = self.get_plugin_session(&inspector.plugin_id) {
+            _ = session.send_message(ServerPluginMessage::InspectorOpen { ctx: inspector });
+        }
+
+        Ok(())
+    }
+
+    pub async fn close_inspector(&self, inspector: InspectorContext) -> anyhow::Result<()> {
+        if let Some(session) = self.get_plugin_session(&inspector.plugin_id) {
+            _ = session.send_message(ServerPluginMessage::InspectorClose { ctx: inspector });
+        }
+
         Ok(())
     }
 }
