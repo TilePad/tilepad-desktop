@@ -18,16 +18,24 @@
 
   const gap = 10;
 
+  const desiredWidth = 120;
+
   const tileWidth = $derived(
     Math.min(
       (containerWidth - gap * (columns - 1)) / columns,
       (containerHeight - gap * (rows - 1)) / rows,
     ),
   );
+
+  const sizeAdjust = $derived.by(() => {
+    const ratio = (tileWidth - desiredWidth) / desiredWidth;
+    return 1 - Math.max(0.0, -ratio);
+  });
 </script>
 
 <div
   class="grid"
+  style="--font-size-adjustment: {sizeAdjust};"
   bind:this={container}
   bind:clientWidth={containerWidth}
   bind:clientHeight={containerHeight}
