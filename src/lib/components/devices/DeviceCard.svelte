@@ -1,11 +1,13 @@
 <!-- Card for a known device -->
 <script lang="ts">
-  import { revokeDevice } from "$lib/api/devices";
   import type { DeviceModel } from "$lib/api/types/devices";
-  import { toastErrorMessage } from "$lib/api/utils/error";
+
   import { toast } from "svelte-sonner";
-  import SolarTranslationBoldDuotone from "~icons/solar/translation-bold-duotone";
+  import { revokeDevice } from "$lib/api/devices";
+  import { toastErrorMessage } from "$lib/api/utils/error";
   import SolarTrashBin2BoldDuotone from "~icons/solar/trash-bin-2-bold-duotone";
+  import SolarTranslationBoldDuotone from "~icons/solar/translation-bold-duotone";
+
   import Button from "../input/Button.svelte";
   type Props = {
     device: DeviceModel;
