@@ -28,6 +28,7 @@
 
     {#if category.icon !== null}
       <img
+        class="icon"
         src={getPluginAssetPath(category.plugin_id, category.icon)}
         alt="Action Icon"
       />
@@ -61,5 +62,9 @@
   }
 
   .section {
+  }
+
+  .icon {
+    max-width: 1rem;
   }
 </style>

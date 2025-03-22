@@ -12,6 +12,7 @@
 <div class="action">
   {#if action.icon !== null}
     <img
+      class="icon"
       src={getPluginAssetPath(action.plugin_id, action.icon)}
       alt="Action Icon"
     />
@@ -34,6 +35,10 @@
     gap: 0.5rem;
     width: 20rem;
     background-color: #1a181d;
+  }
+
+  .icon {
+    max-width: 1.5rem;
   }
 
   .action__text {

@@ -38,7 +38,7 @@
 <style>
   .tile {
     position: relative;
-    background-color: #242129;
+    background-color: #151318;
     border: 2px solid #715c8f;
     border-radius: 5px;
     display: flex;
@@ -54,6 +54,6 @@
   }
 
   .tile__icon {
-    width: 3.5rem;
+    width: 100%;
   }
 </style>
