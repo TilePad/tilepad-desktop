@@ -1,5 +1,6 @@
 use std::{
     collections::HashMap,
+    os::windows::fs::FileTypeExt,
     path::{Path, PathBuf},
     sync::Arc,
 };
@@ -377,7 +378,7 @@ pub async fn load_plugins(path: &Path) -> anyhow::Result<Vec<Plugin>> {
     while let Some(entry) = dir.next_entry().await? {
         let path = entry.path();
         let file_type = entry.file_type().await?;
-        if !file_type.is_dir() {
+        if !file_type.is_dir() && !file_type.is_symlink_dir() {
             continue;
         }
 
