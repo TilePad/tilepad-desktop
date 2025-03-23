@@ -234,6 +234,22 @@ pub enum OperatingSystem {
     Linux,
 }
 
+impl Default for OperatingSystem {
+    fn default() -> Self {
+        platform_os()
+    }
+}
+
+#[cfg(target_os = "windows")]
+pub fn platform_os() -> OperatingSystem {
+    OperatingSystem::Windows
+}
+
+#[cfg(target_os = "linux")]
+pub fn platform_os() -> OperatingSystem {
+    OperatingSystem::Linux
+}
+
 /// CPU architecture the binary is compiled as
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumString, Display, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]

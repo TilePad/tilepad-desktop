@@ -1,49 +1,116 @@
-use std::path::Path;
+use std::{
+    path::{Path, PathBuf},
+    process::Stdio,
+};
 
-use tokio::process::{Child, Command};
+use tokio::{
+    process::{Child, Command},
+    sync::mpsc,
+    task::AbortHandle,
+};
 
-/// Plugin task that is handling running the plugin itself
-#[allow(unused)]
-pub enum PluginTask {
-    /// Node child process is running the task
-    Node(Child),
-    /// Native child process is running the task
-    Native(Child),
+use super::{
+    manifest::{
+        platform_arch, platform_os, Arch, ManifestBin, ManifestBinNative, OperatingSystem, PluginId,
+    },
+    Plugin, Plugins,
+};
+
+pub enum PluginTaskState {
+    // Process is starting
+    Starting,
+
+    // Task not available for the current os/arch/binary
+    Unavailable,
+
+    /// Process is running
+    Running {
+        abort: AbortHandle,
+    },
+
+    /// Plugin task ended with an error itself
+    Error,
+
+    /// Plugin task ended without an error
+    Stopped,
 }
 
-#[allow(unused)]
-pub async fn spawn_node_plugin_task(
-    node_path: &Path,
-    script_path: &Path,
-    plugin_path: &Path,
+pub enum PluginTaskType {
+    Node,
+    Native,
+}
 
-    server_port: u16,
-    plugin_uuid: String,
-) -> anyhow::Result<PluginTask> {
-    let node_exe = node_path.join("node.exe");
+pub fn spawn_native_task(
+    plugins: Plugins,
 
-    let child = Command::new(node_exe)
+    plugin_path: PathBuf,
+    exe: String,
+
+    connect_url: String,
+    plugin_id: PluginId,
+) {
+    let exe_path = plugin_path.join(&exe);
+
+    // Exe does not exist
+    if !exe_path.exists() {
+        plugins.set_plugin_task(&plugin_id, PluginTaskState::Unavailable);
+        return;
+    }
+
+    // Starting the exe
+    plugins.set_plugin_task(&plugin_id, PluginTaskState::Starting);
+
+    tracing::debug!(?plugin_id, ?exe, ?plugin_path, "starting native plugin");
+
+    let child = Command::new(exe_path)
         .current_dir(plugin_path)
-        // Specify script to run
-        .arg(script_path)
-        // Specify port
-        .arg("-port")
-        .arg(server_port.to_string())
-        // Specify plugin UUID
-        .arg("-pluginUUID")
-        .arg(plugin_uuid)
-        // Specify register event
-        .arg("-registerEvent")
-        .arg("registerPlugin")
-        // TODO: Specify info
-        .arg("-info")
-        .arg("{}")
-        .spawn()?;
+        .args([
+            "--connect-url",
+            connect_url.as_str(),
+            "--plugin-id",
+            plugin_id.0.as_str(),
+        ])
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .kill_on_drop(true)
+        .spawn();
 
-    Ok(PluginTask::Node(child))
-}
+    let child = match child {
+        Ok(child) => child,
+        Err(cause) => {
+            tracing::error!(?cause, "failed to start plugin executable");
+            plugins.set_plugin_task(&plugin_id, PluginTaskState::Error);
+            return;
+        }
+    };
 
-#[allow(unused)]
-pub async fn spawn_native_plugin_task() -> anyhow::Result<PluginTask> {
-    todo!()
+    let abort_handle = tokio::spawn({
+        let plugins = plugins.clone();
+        let plugin_id = plugin_id.clone();
+
+        async move {
+            let output = match child.wait_with_output().await {
+                Ok(child) => child,
+                Err(cause) => {
+                    tracing::error!(?cause, "failed to get plugin output");
+                    plugins.set_plugin_task(&plugin_id, PluginTaskState::Error);
+                    return;
+                }
+            };
+
+            if output.status.success() {
+                plugins.set_plugin_task(&plugin_id, PluginTaskState::Stopped);
+            } else {
+                plugins.set_plugin_task(&plugin_id, PluginTaskState::Error);
+            }
+        }
+    })
+    .abort_handle();
+
+    plugins.set_plugin_task(
+        &plugin_id,
+        PluginTaskState::Running {
+            abort: abort_handle,
+        },
+    );
 }

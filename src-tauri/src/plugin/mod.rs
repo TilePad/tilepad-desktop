@@ -7,9 +7,10 @@ use std::{
 use action::{actions_from_plugins, Action, ActionCategory, ActionWithCategory};
 use anyhow::Context;
 use garde::Validate;
-use manifest::{ActionId, Manifest, PluginId};
+use manifest::{platform_arch, platform_os, ActionId, Manifest, PluginId};
 use parking_lot::RwLock;
 use protocol::ServerPluginMessage;
+use runner::{spawn_native_task, PluginTaskState};
 use serde_json::Map;
 use socket::{PluginSessionId, PluginSessionRef};
 
@@ -44,6 +45,7 @@ impl Plugins {
                 plugins: Default::default(),
                 sessions: Default::default(),
                 plugin_to_session: Default::default(),
+                plugin_tasks: Default::default(),
             }),
         }
     }
@@ -59,6 +61,9 @@ struct PluginsInner {
     /// Collection of currently loaded plugins
     plugins: RwLock<HashMap<PluginId, Plugin>>,
 
+    /// Mapping for the current plugin tasks
+    plugin_tasks: RwLock<HashMap<PluginId, PluginTaskState>>,
+
     /// Current plugin socket sessions
     sessions: RwLock<HashMap<PluginSessionId, PluginSessionRef>>,
 
@@ -68,11 +73,15 @@ struct PluginsInner {
 
 impl Plugins {
     pub fn insert_plugins(&self, plugins: Vec<Plugin>) {
-        self.inner.plugins.write().extend(
-            plugins
-                .into_iter()
-                .map(|plugin| (plugin.manifest.plugin.id.clone(), plugin)),
-        );
+        let mut plugins_map = &mut *self.inner.plugins.write();
+
+        for plugin in plugins {
+            // Spawn task for the plugin
+            self.create_plugin_task(&plugin);
+
+            // Insert the plugin into the manifest
+            plugins_map.insert(plugin.manifest.plugin.id.clone(), plugin);
+        }
     }
 
     pub fn get_action_collection(&self) -> Vec<ActionCategory> {
@@ -252,6 +261,63 @@ impl Plugins {
 
         Ok(())
     }
+
+    pub fn set_plugin_task(&self, plugin_id: &PluginId, plugin_task: PluginTaskState) {
+        self.inner
+            .plugin_tasks
+            .write()
+            .insert(plugin_id.clone(), plugin_task);
+    }
+
+    pub fn create_plugin_task(&self, plugin: &Plugin) {
+        let plugin_id = plugin.manifest.plugin.id.clone();
+
+        tracing::debug!(?plugin_id, "starting background task for plugin");
+
+        let binary = match plugin.manifest.bin.as_ref() {
+            Some(value) => value,
+            None => {
+                // No binary available for the plugin
+                tracing::debug!(?plugin_id, "skipping starting plugin without binary");
+                self.set_plugin_task(&plugin_id, PluginTaskState::Unavailable);
+                return;
+            }
+        };
+
+        match binary {
+            manifest::ManifestBin::Node { node } => todo!("node task support"),
+            manifest::ManifestBin::Native { native } => {
+                let os = platform_os();
+                let arch = platform_arch();
+
+                let binary = native.iter().find(|bin| os == bin.os && arch == bin.arch);
+                let binary = match binary {
+                    Some(value) => value,
+                    None => {
+                        // No binary available for the plugin
+                        tracing::debug!(
+                            ?plugin_id,
+                            ?os,
+                            ?arch,
+                            "skipping starting plugin without binary for current platform"
+                        );
+                        self.set_plugin_task(&plugin_id, PluginTaskState::Unavailable);
+                        return;
+                    }
+                };
+
+                // No binary available for the plugin
+                tracing::debug!(?plugin_id, ?os, ?arch, "starting native plugin binary");
+
+                let plugin_path = plugin.path.clone();
+                let exe = binary.path.clone();
+
+                let connect_url = "ws://localhost:59371/plugins/ws".to_string();
+
+                spawn_native_task(self.clone(), plugin_path, exe, connect_url, plugin_id);
+            }
+        }
+    }
 }
 
 pub async fn load_plugins_into_registry(registry: Plugins, path: PathBuf) {
@@ -268,7 +334,7 @@ pub async fn load_plugins_into_registry(registry: Plugins, path: PathBuf) {
     registry.insert_plugins(plugins);
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Plugin {
     pub path: PathBuf,
     pub manifest: Manifest,
