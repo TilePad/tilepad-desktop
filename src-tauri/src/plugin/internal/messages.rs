@@ -6,12 +6,12 @@ use crate::{
         entity::{folder::FolderModel, tile::TileModel},
         DbPool,
     },
-    events::{AppEvent, AppEventSender, PluginAppEvent, InspectorContext},
-    plugin::PluginRegistry,
+    events::{AppEvent, AppEventSender, InspectorContext, PluginAppEvent},
+    plugin::Plugins,
 };
 
 pub async fn handle_internal_send_message(
-    plugins: &PluginRegistry,
+    plugins: &Plugins,
     app_tx: &AppEventSender,
     db: &DbPool,
 
@@ -54,7 +54,7 @@ pub struct FolderOption {
 }
 
 async fn handle_internal_navigation(
-    _plugins: &PluginRegistry,
+    _plugins: &Plugins,
     app_tx: &AppEventSender,
     db: &DbPool,
     _tile: &TileModel,

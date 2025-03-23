@@ -2,14 +2,14 @@ use crate::{
     commands::CmdResult,
     database::DbPool,
     events::{AppEvent, AppEventSender, InspectorContext, PluginAppEvent},
-    plugin::{manifest::PluginId, PluginRegistry},
+    plugin::{manifest::PluginId, Plugins},
 };
 use tauri::State;
 
 #[tauri::command]
 pub async fn plugins_send_plugin_message(
     app_tx: State<'_, AppEventSender>,
-    plugins: State<'_, PluginRegistry>,
+    plugins: State<'_, Plugins>,
     db: State<'_, DbPool>,
     context: InspectorContext,
     message: serde_json::Value,
@@ -23,7 +23,7 @@ pub async fn plugins_send_plugin_message(
 
 #[tauri::command]
 pub async fn plugins_open_inspector(
-    plugins: State<'_, PluginRegistry>,
+    plugins: State<'_, Plugins>,
     context: InspectorContext,
 ) -> CmdResult<()> {
     plugins.open_inspector(context).await?;
@@ -32,7 +32,7 @@ pub async fn plugins_open_inspector(
 
 #[tauri::command]
 pub async fn plugins_close_inspector(
-    plugins: State<'_, PluginRegistry>,
+    plugins: State<'_, Plugins>,
     context: InspectorContext,
 ) -> CmdResult<()> {
     plugins.close_inspector(context).await?;
@@ -41,7 +41,7 @@ pub async fn plugins_close_inspector(
 
 #[tauri::command]
 pub async fn plugins_get_plugin_properties(
-    plugins: State<'_, PluginRegistry>,
+    plugins: State<'_, Plugins>,
     plugin_id: PluginId,
 ) -> CmdResult<serde_json::Value> {
     let result = plugins.get_plugin_properties(plugin_id).await?;
@@ -50,7 +50,7 @@ pub async fn plugins_get_plugin_properties(
 
 #[tauri::command]
 pub async fn plugins_set_plugin_properties(
-    plugins: State<'_, PluginRegistry>,
+    plugins: State<'_, Plugins>,
     plugin_id: PluginId,
     properties: serde_json::Value,
 ) -> CmdResult<()> {

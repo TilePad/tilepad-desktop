@@ -2,7 +2,7 @@ use std::error::Error;
 
 use anyhow::Context;
 use device::Devices;
-use plugin::PluginRegistry;
+use plugin::Plugins;
 use tauri::{
     async_runtime::{block_on, spawn},
     App, Manager,
@@ -94,7 +94,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         .context("failed to load database")?;
 
     let (app_event_tx, app_event_rx) = mpsc::unbounded_channel();
-    let plugins = PluginRegistry::new(app_event_tx.clone(), db.clone());
+    let plugins = Plugins::new(app_event_tx.clone(), db.clone());
     let devices = Devices::new(app_event_tx.clone(), db.clone(), plugins.clone());
 
     app.manage(app_event_tx.clone());

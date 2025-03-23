@@ -9,19 +9,19 @@ use mime_guess::mime::TEXT_HTML;
 use reqwest::{header::CONTENT_TYPE, StatusCode};
 
 use crate::{
-    plugin::{manifest::PluginId, socket::PluginSession, PluginRegistry},
+    plugin::{manifest::PluginId, socket::PluginSession, Plugins},
     server::models::error::DynHttpError,
 };
 
 /// GET /plugins/ws
 ///
 /// Accept a new plugin websocket connection upgrade
-pub async fn ws(Extension(plugins): Extension<PluginRegistry>, ws: WebSocketUpgrade) -> Response {
+pub async fn ws(Extension(plugins): Extension<Plugins>, ws: WebSocketUpgrade) -> Response {
     ws.on_upgrade(move |socket| handle_plugin_socket(plugins, socket))
 }
 
 /// Handle the connection of a new plugin socket
-pub async fn handle_plugin_socket(plugins: PluginRegistry, socket: WebSocket) {
+pub async fn handle_plugin_socket(plugins: Plugins, socket: WebSocket) {
     let (session_id, session_ref) = PluginSession::new(plugins.clone(), socket);
     plugins.insert_session(session_id, session_ref);
 }
@@ -32,7 +32,7 @@ static INSPECTOR_STYLES: &str = include_str!("../resources/propertyInspectorStyl
 /// GET /plugins/{plugin_id}/assets/{file_path*}
 pub async fn get_plugin_file(
     Path((plugin_id, path)): Path<(PluginId, String)>,
-    Extension(plugins): Extension<PluginRegistry>,
+    Extension(plugins): Extension<Plugins>,
 ) -> Result<Response<Body>, DynHttpError> {
     let plugin_path = plugins
         .get_plugin_path(&plugin_id)

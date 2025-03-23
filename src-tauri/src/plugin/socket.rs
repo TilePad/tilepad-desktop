@@ -21,7 +21,7 @@ use uuid::Uuid;
 use super::{
     manifest::PluginId,
     protocol::{ClientPluginMessage, ServerPluginMessage},
-    PluginRegistry,
+    Plugins,
 };
 
 pub type PluginSessionId = Uuid;
@@ -34,14 +34,14 @@ pub struct PluginSession {
     state: RwLock<PluginSessionState>,
 
     /// Access to the plugins registry
-    plugins: PluginRegistry,
+    plugins: Plugins,
 
     /// Sender to send messages to the session socket
     tx: WsTx,
 }
 
 impl PluginSession {
-    pub fn new(plugins: PluginRegistry, socket: WebSocket) -> (PluginSessionId, PluginSessionRef) {
+    pub fn new(plugins: Plugins, socket: WebSocket) -> (PluginSessionId, PluginSessionRef) {
         let id = Uuid::new_v4();
 
         // Create and spawn a future for the websocket

@@ -20,7 +20,7 @@ use crate::{
     events::{
         AppEvent, AppEventSender, DeviceAppEvent, DeviceRequestAppEvent, TileInteractionContext,
     },
-    plugin::PluginRegistry,
+    plugin::Plugins,
     utils::random::generate_access_token,
 };
 
@@ -44,7 +44,7 @@ pub struct ConnectedDevice {
 const DEVICES_TOKEN_LENGTH: usize = 32;
 
 impl Devices {
-    pub fn new(event_tx: AppEventSender, db: DbPool, plugins: PluginRegistry) -> Self {
+    pub fn new(event_tx: AppEventSender, db: DbPool, plugins: Plugins) -> Self {
         Self {
             inner: Arc::new(DevicesInner {
                 event_tx,
@@ -368,7 +368,7 @@ pub struct DevicesInner {
     db: DbPool,
 
     /// Access to the plugins registry
-    plugins: PluginRegistry,
+    plugins: Plugins,
 
     /// Current device socket sessions
     sessions: RwLock<HashMap<DeviceSessionId, DeviceSessionRef>>,

@@ -5,7 +5,7 @@ use axum::Extension;
 use tauri::AppHandle;
 use tower_http::cors::CorsLayer;
 
-use crate::{database::DbPool, device::Devices, plugin::PluginRegistry};
+use crate::{database::DbPool, device::Devices, plugin::Plugins};
 
 pub mod models;
 pub mod routes;
@@ -16,7 +16,7 @@ pub async fn start_http_server(
     db: DbPool,
     devices: Devices,
     app_handle: AppHandle,
-    plugins: PluginRegistry,
+    plugins: Plugins,
 ) -> anyhow::Result<()> {
     // build our application with a single route
     let app = routes::router()

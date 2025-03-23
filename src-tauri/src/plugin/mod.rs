@@ -31,14 +31,14 @@ pub mod runner;
 pub mod socket;
 
 #[derive(Clone)]
-pub struct PluginRegistry {
-    inner: Arc<PluginRegistryInner>,
+pub struct Plugins {
+    inner: Arc<PluginsInner>,
 }
 
-impl PluginRegistry {
+impl Plugins {
     pub fn new(event_tx: AppEventSender, db: DbPool) -> Self {
         Self {
-            inner: Arc::new(PluginRegistryInner {
+            inner: Arc::new(PluginsInner {
                 event_tx,
                 db,
                 plugins: Default::default(),
@@ -49,7 +49,7 @@ impl PluginRegistry {
     }
 }
 
-struct PluginRegistryInner {
+struct PluginsInner {
     /// Sender for app events
     event_tx: AppEventSender,
 
@@ -66,7 +66,7 @@ struct PluginRegistryInner {
     plugin_to_session: RwLock<HashMap<PluginId, PluginSessionId>>,
 }
 
-impl PluginRegistry {
+impl Plugins {
     pub fn insert_plugins(&self, plugins: Vec<Plugin>) {
         self.inner.plugins.write().extend(
             plugins
@@ -254,7 +254,7 @@ impl PluginRegistry {
     }
 }
 
-pub async fn load_plugins_into_registry(registry: PluginRegistry, path: PathBuf) {
+pub async fn load_plugins_into_registry(registry: Plugins, path: PathBuf) {
     let plugins = match load_plugins(&path).await {
         Ok(value) => value,
         Err(cause) => {

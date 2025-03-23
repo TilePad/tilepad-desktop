@@ -12,11 +12,11 @@ use crate::{
     },
     device::{protocol::ServerDeviceMessage, Devices},
     events::TileInteractionContext,
-    plugin::PluginRegistry,
+    plugin::Plugins,
 };
 
 pub async fn handle_internal_action(
-    plugins: &PluginRegistry,
+    plugins: &Plugins,
     devices: &Devices,
     db: &DbPool,
     context: TileInteractionContext,
@@ -42,7 +42,7 @@ pub struct SwitchFolderProperties {
 
 async fn handle_internal_navigation(
     devices: &Devices,
-    plugins: &PluginRegistry,
+    plugins: &Plugins,
     db: &DbPool,
     context: TileInteractionContext,
     tile: TileModel,
