@@ -3,7 +3,7 @@ use std::{
     process::Stdio,
 };
 
-use serde::Serialize;
+use serde::{Serialize, Serializer};
 use tokio::{
     process::{Child, Command},
     sync::mpsc,
@@ -17,7 +17,7 @@ use super::{
     Plugin, Plugins,
 };
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone)]
 pub enum PluginTaskState {
     // Not started yet
     NotStarted,
@@ -30,7 +30,6 @@ pub enum PluginTaskState {
 
     /// Process is running
     Running {
-        #[serde(skip)]
         abort: AbortHandle,
     },
 
@@ -39,6 +38,22 @@ pub enum PluginTaskState {
 
     /// Plugin task ended without an error
     Stopped,
+}
+
+impl Serialize for PluginTaskState {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            PluginTaskState::NotStarted => serializer.serialize_str("NotStarted"),
+            PluginTaskState::Starting => serializer.serialize_str("Starting"),
+            PluginTaskState::Unavailable => serializer.serialize_str("Unavailable"),
+            PluginTaskState::Running { .. } => serializer.serialize_str("Running"),
+            PluginTaskState::Error => serializer.serialize_str("Error"),
+            PluginTaskState::Stopped => serializer.serialize_str("Stopped"),
+        }
+    }
 }
 
 pub enum PluginTaskType {

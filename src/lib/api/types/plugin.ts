@@ -41,3 +41,52 @@ export function isInspectorContextEqual(
     a.tile_id === b.tile_id
   );
 }
+
+export type PluginWithState = Plugin & {
+  state: PluginTaskState;
+};
+
+export type Plugin = {
+  path: string;
+  manifest: PluginManifest;
+};
+
+export type PluginManifest = {
+  plugin: ManifestPlugin;
+  bin: ManifestBin | null;
+  category: ManifestCategory;
+  actions: Record<ActionId, ManifestAction>;
+};
+
+export interface ManifestPlugin {
+  id: string;
+  name: string;
+  version: string;
+  authors: string[];
+  description: string | null;
+  icon: string | null;
+  internal: boolean | null;
+}
+export interface ManifestCategory {
+  label: string;
+  icon: string | null;
+}
+export interface ManifestAction {
+  label: string;
+  icon: string | null;
+  description: string | null;
+  inspector: string | null;
+}
+
+export type ManifestBin =
+  | { node: { entrypoint: string; version: string } }
+  | { native: { os: string; arch: string; path: string }[] };
+
+export enum PluginTaskState {
+  NotStarted = "NotStarted",
+  Starting = "Starting",
+  Unavailable = "Unavailable",
+  Running = "Running",
+  Error = "Error",
+  Stopped = "Stopped",
+}

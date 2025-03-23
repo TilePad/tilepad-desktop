@@ -1,14 +1,21 @@
 import { invoke } from "@tauri-apps/api/core";
 
-import type { PluginId, InspectorContext } from "./types/plugin";
+import type {
+  PluginId,
+  InspectorContext,
+  PluginWithState,
+} from "./types/plugin";
 
 import { queryClient } from "./client";
+import { createQuery } from "@tanstack/svelte-query";
 
 export const pluginsKey = {
   root: ["plugins"],
+  list: ["plugins", "list"],
   specific: {
     asset: (pluginId: PluginId | null, asset: string | null) => [
       "plugins",
+      "specific",
       pluginId,
       "asset",
       asset,
@@ -17,6 +24,10 @@ export const pluginsKey = {
 };
 
 // [REQUESTS] ------------------------------------------------------
+
+export function getPluginsWithState() {
+  return invoke<PluginWithState[]>("plugins_get_plugins");
+}
 
 export function sendPluginMessage(context: InspectorContext, message: unknown) {
   return invoke<void>("plugins_send_plugin_message", {
@@ -39,9 +50,16 @@ export function closePluginInspector(context: InspectorContext) {
 
 // [QUERIES] ------------------------------------------------------
 
+export function createPluginsQuery() {
+  return createQuery({
+    queryKey: pluginsKey.list,
+    queryFn: getPluginsWithState,
+  });
+}
+
 // [MUTATORS] ------------------------------------------------------
 
-function invalidatePluginQueries() {
+function invalidatePluginsQuery() {
   queryClient.invalidateQueries({
     queryKey: pluginsKey.root,
     exact: false,
