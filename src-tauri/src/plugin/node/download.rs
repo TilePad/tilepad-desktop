@@ -1,6 +1,6 @@
 use crate::utils::{file::move_directory, zip::extract_zip};
 
-use super::{arch::PlatformArch, NodeVersion};
+use crate::plugin::manifest::{Arch, NodeVersion};
 use anyhow::{bail, Context};
 use async_zip::tokio::read::seek::ZipFileReader;
 use std::path::Path;
@@ -18,7 +18,7 @@ const NODE_DIST_BASE_URL: &str = "https://nodejs.org/dist";
 /// https://nodejs.org/dist/v22.13.1/node-v22.13.1-linux-x64.tar.xz
 /// https://nodejs.org/dist/v22.13.1/node-v22.13.1-darwin-x64.tar.gz
 #[cfg(windows)]
-fn node_download_url(version: &str, arch: PlatformArch) -> String {
+fn node_download_url(version: &str, arch: Arch) -> String {
     format!(
         "{base_url}/v{version}/node-v{version}-win-{arch}.zip",
         base_url = NODE_DIST_BASE_URL,
@@ -32,7 +32,7 @@ pub async fn download_node<P: AsRef<Path>>(
     client: &reqwest::Client,
     path: P,
     version: NodeVersion,
-    arch: PlatformArch,
+    arch: Arch,
 ) -> anyhow::Result<()> {
     let path = path.as_ref();
     if path.exists() && !path.is_dir() {
@@ -105,7 +105,10 @@ mod test {
 
     use node_semver::Version;
 
-    use crate::plugin::node::{arch::PlatformArch, download::download_node, NodeVersion};
+    use crate::plugin::{
+        manifest::Arch,
+        node::{download::download_node, NodeVersion},
+    };
 
     #[tokio::test]
     async fn test_download_latest() {
@@ -115,7 +118,7 @@ mod test {
             &client,
             path,
             NodeVersion(Version::new(22, 13, 1)),
-            PlatformArch::default(),
+            Arch::default(),
         )
         .await
         .unwrap();

@@ -5,6 +5,7 @@ use garde::{
     Validate,
 };
 use serde::{Deserialize, Serialize};
+use strum::{Display, EnumString};
 
 /// Version of a node runtime
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
@@ -136,7 +137,7 @@ pub enum ManifestBin {
     /// Program uses a native binary
     Native {
         #[garde(dive)]
-        native: ManifestBinNative,
+        native: Vec<ManifestBinNative>,
     },
 }
 
@@ -153,12 +154,12 @@ pub struct ManifestBinNode {
 
 #[derive(Debug, Clone, Deserialize, Validate)]
 pub struct ManifestBinNative {
-    // Binary path for 64bit windows
-    #[garde(inner(length(min = 1)))]
-    pub windows_x64: Option<String>,
-    // Binary path for 32bit windows
-    #[garde(inner(length(min = 1)))]
-    pub windows_x86: Option<String>,
+    #[garde(skip)]
+    pub os: OperatingSystem,
+    #[garde(skip)]
+    pub arch: Arch,
+    #[garde(length(min = 1))]
+    pub path: String,
 }
 
 /// Separators allowed within names
@@ -222,4 +223,45 @@ fn is_valid_action_name(value: &str, _context: &()) -> garde::Result {
     }
 
     Ok(())
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumString, Display, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum OperatingSystem {
+    #[strum(serialize = "windows")]
+    Windows,
+    #[strum(serialize = "linux")]
+    Linux,
+}
+
+/// CPU architecture the binary is compiled as
+#[derive(Debug, Clone, Copy, PartialEq, Eq, EnumString, Display, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Arch {
+    #[strum(serialize = "x86")]
+    X86,
+    #[strum(serialize = "x64")]
+    X64,
+}
+
+impl Default for Arch {
+    fn default() -> Self {
+        platform_arch()
+    }
+}
+
+#[cfg(all(
+    target_pointer_width = "64",
+    not(any(target_arch = "arm", target_arch = "aarch64"))
+))]
+pub fn platform_arch() -> Arch {
+    Arch::X64
+}
+
+#[cfg(all(
+    target_pointer_width = "32",
+    not(any(target_arch = "arm", target_arch = "aarch64"))
+))]
+pub fn platform_arch() -> Arch {
+    Arch::X86
 }
