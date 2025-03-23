@@ -12,7 +12,7 @@ use strum::{Display, EnumString};
 #[serde(transparent)]
 pub struct NodeVersion(pub node_semver::Version);
 
-#[derive(Debug, Clone, Deserialize, Validate)]
+#[derive(Debug, Clone, Deserialize, Serialize, Validate)]
 pub struct Manifest {
     /// Details about the plugin itself
     #[garde(dive)]
@@ -32,7 +32,7 @@ pub struct Manifest {
     pub actions: HashMap<ActionId, ManifestAction>,
 }
 
-#[derive(Debug, Clone, Deserialize, Validate)]
+#[derive(Debug, Clone, Deserialize, Serialize, Validate)]
 pub struct ManifestCategory {
     #[garde(length(min = 1))]
     pub label: String,
@@ -65,7 +65,7 @@ impl AsRef<str> for PluginId {
     }
 }
 
-#[derive(Debug, Clone, Deserialize, Validate)]
+#[derive(Debug, Clone, Deserialize, Serialize, Validate)]
 pub struct ManifestPlugin {
     /// Unique ID of the plugin (e.g com.jacobtread.tilepad.obs)
     #[garde(dive)]
@@ -113,7 +113,7 @@ impl PathComponentKind for ActionId {
     }
 }
 
-#[derive(Debug, Clone, Deserialize, Validate)]
+#[derive(Debug, Clone, Deserialize, Serialize, Validate)]
 pub struct ManifestAction {
     #[garde(length(min = 1))]
     pub label: String,
@@ -125,7 +125,7 @@ pub struct ManifestAction {
     pub inspector: Option<String>,
 }
 
-#[derive(Debug, Clone, Deserialize, Validate)]
+#[derive(Debug, Clone, Deserialize, Serialize, Validate)]
 #[serde(untagged)]
 pub enum ManifestBin {
     /// Program uses the node runtime
@@ -141,7 +141,7 @@ pub enum ManifestBin {
     },
 }
 
-#[derive(Debug, Clone, Deserialize, Validate)]
+#[derive(Debug, Clone, Deserialize, Serialize, Validate)]
 pub struct ManifestBinNode {
     /// Entrypoint for the program
     #[garde(length(min = 1))]
@@ -152,7 +152,7 @@ pub struct ManifestBinNode {
     pub version: NodeVersion,
 }
 
-#[derive(Debug, Clone, Deserialize, Validate)]
+#[derive(Debug, Clone, Deserialize, Serialize, Validate)]
 pub struct ManifestBinNative {
     #[garde(skip)]
     pub os: OperatingSystem,

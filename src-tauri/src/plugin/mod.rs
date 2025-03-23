@@ -11,8 +11,10 @@ use manifest::{platform_arch, platform_os, ActionId, Manifest, PluginId};
 use parking_lot::RwLock;
 use protocol::ServerPluginMessage;
 use runner::{spawn_native_task, PluginTaskState};
+use serde::Serialize;
 use serde_json::Map;
 use socket::{PluginSessionId, PluginSessionRef};
+use tauri::plugin;
 
 use crate::{
     database::{
@@ -71,6 +73,13 @@ struct PluginsInner {
     plugin_to_session: RwLock<HashMap<PluginId, PluginSessionId>>,
 }
 
+#[derive(Serialize)]
+pub struct PluginWithState {
+    #[serde(flatten)]
+    pub plugin: Plugin,
+    pub state: PluginTaskState,
+}
+
 impl Plugins {
     pub fn insert_plugins(&self, plugins: Vec<Plugin>) {
         let mut plugins_map = &mut *self.inner.plugins.write();
@@ -82,6 +91,27 @@ impl Plugins {
             // Insert the plugin into the manifest
             plugins_map.insert(plugin.manifest.plugin.id.clone(), plugin);
         }
+    }
+
+    pub fn get_plugins_with_state(&self) -> Vec<PluginWithState> {
+        let plugins: Vec<Plugin> = {
+            let plugins = self.inner.plugins.read();
+            plugins.values().cloned().collect()
+        };
+
+        let states = self.inner.plugin_tasks.read();
+
+        plugins
+            .into_iter()
+            .map(|plugin| {
+                let state = states.get(&plugin.manifest.plugin.id).cloned();
+
+                PluginWithState {
+                    plugin,
+                    state: state.unwrap_or(PluginTaskState::NotStarted),
+                }
+            })
+            .collect()
     }
 
     pub fn get_action_collection(&self) -> Vec<ActionCategory> {
@@ -334,7 +364,7 @@ pub async fn load_plugins_into_registry(registry: Plugins, path: PathBuf) {
     registry.insert_plugins(plugins);
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Serialize, Clone)]
 pub struct Plugin {
     pub path: PathBuf,
     pub manifest: Manifest,

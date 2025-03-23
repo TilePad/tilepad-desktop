@@ -1,8 +1,8 @@
 use crate::{
     commands::CmdResult,
     database::DbPool,
-    events::{AppEvent, AppEventSender, InspectorContext, PluginAppEvent},
-    plugin::{manifest::PluginId, Plugins},
+    events::{AppEventSender, InspectorContext},
+    plugin::{manifest::PluginId, PluginWithState, Plugins},
 };
 use tauri::State;
 
@@ -56,4 +56,9 @@ pub async fn plugins_set_plugin_properties(
 ) -> CmdResult<()> {
     plugins.set_plugin_properties(plugin_id, properties).await?;
     Ok(())
+}
+
+#[tauri::command]
+pub fn plugins_get_plugins(plugins: State<'_, Plugins>) -> Vec<PluginWithState> {
+    plugins.get_plugins_with_state()
 }

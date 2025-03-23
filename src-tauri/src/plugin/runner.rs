@@ -3,6 +3,7 @@ use std::{
     process::Stdio,
 };
 
+use serde::Serialize;
 use tokio::{
     process::{Child, Command},
     sync::mpsc,
@@ -16,7 +17,11 @@ use super::{
     Plugin, Plugins,
 };
 
+#[derive(Debug, Clone, Serialize)]
 pub enum PluginTaskState {
+    // Not started yet
+    NotStarted,
+
     // Process is starting
     Starting,
 
@@ -25,6 +30,7 @@ pub enum PluginTaskState {
 
     /// Process is running
     Running {
+        #[serde(skip)]
         abort: AbortHandle,
     },
 
