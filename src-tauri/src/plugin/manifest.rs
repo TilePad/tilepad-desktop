@@ -6,13 +6,21 @@ use garde::{
 };
 use serde::{Deserialize, Serialize};
 
-use super::node::NodeVersion;
+/// Version of a node runtime
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+#[serde(transparent)]
+pub struct NodeVersion(pub node_semver::Version);
 
 #[derive(Debug, Clone, Deserialize, Validate)]
 pub struct Manifest {
     /// Details about the plugin itself
     #[garde(dive)]
     pub plugin: ManifestPlugin,
+
+    /// Details for running the plugin
+    /// (Option not specified for internal plugins)
+    #[garde(dive)]
+    pub bin: Option<ManifestBin>,
 
     /// Category for the manifest actions
     #[garde(dive)]
@@ -116,7 +124,7 @@ pub struct ManifestAction {
     pub inspector: Option<String>,
 }
 
-#[derive(Debug, Deserialize, Validate)]
+#[derive(Debug, Clone, Deserialize, Validate)]
 #[serde(untagged)]
 pub enum ManifestBin {
     /// Program uses the node runtime
@@ -130,12 +138,9 @@ pub enum ManifestBin {
         #[garde(dive)]
         native: ManifestBinNative,
     },
-
-    /// No binary
-    None {},
 }
 
-#[derive(Debug, Deserialize, Validate)]
+#[derive(Debug, Clone, Deserialize, Validate)]
 pub struct ManifestBinNode {
     /// Entrypoint for the program
     #[garde(length(min = 1))]
@@ -146,7 +151,7 @@ pub struct ManifestBinNode {
     pub version: NodeVersion,
 }
 
-#[derive(Debug, Deserialize, Validate)]
+#[derive(Debug, Clone, Deserialize, Validate)]
 pub struct ManifestBinNative {
     // Binary path for 64bit windows
     #[garde(inner(length(min = 1)))]

@@ -6,6 +6,8 @@ use std::path::{Path, PathBuf};
 use anyhow::{bail, Context};
 use serde::{Deserialize, Serialize};
 
+use super::manifest::NodeVersion;
+
 /// Node runtime
 pub struct NodeRuntime {
     /// Version of the runtime
@@ -13,11 +15,6 @@ pub struct NodeRuntime {
     /// Path to the runtime directory
     path: PathBuf,
 }
-
-/// Version of a node runtime
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
-#[serde(transparent)]
-pub struct NodeVersion(pub node_semver::Version);
 
 /// Searches within the provided directory for available runtimes
 pub async fn discover_runtimes<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<NodeRuntime>> {
