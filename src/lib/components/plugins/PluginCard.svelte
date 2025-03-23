@@ -1,12 +1,28 @@
 <!-- Card for a known device -->
 <script lang="ts">
   import type { PluginWithState } from "$lib/api/types/plugin";
+
+  import { toast } from "svelte-sonner";
+  import { reloadPlugin } from "$lib/api/plugins";
+  import { toastErrorMessage } from "$lib/api/utils/error";
+
+  import Button from "../input/Button.svelte";
   type Props = {
     plugin: PluginWithState;
   };
 
   const { plugin }: Props = $props();
   const { manifest, state } = plugin;
+
+  function handleReload() {
+    const revokePromise = reloadPlugin(manifest.plugin.id);
+
+    toast.promise(revokePromise, {
+      loading: "Reloading plugin",
+      success: "Reloaded plugin",
+      error: toastErrorMessage("Failed to reload plugin"),
+    });
+  }
 </script>
 
 <div class="plugin">
@@ -19,6 +35,8 @@
   <p class="plugin__description">{manifest.plugin.description}</p>
 
   <span class="state">{state}</span>
+
+  <Button onclick={handleReload}>Reload</Button>
 </div>
 
 <style>

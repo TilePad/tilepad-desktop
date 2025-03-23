@@ -62,3 +62,36 @@ pub async fn plugins_set_plugin_properties(
 pub fn plugins_get_plugins(plugins: State<'_, Plugins>) -> Vec<PluginWithState> {
     plugins.get_plugins_with_state()
 }
+
+#[tauri::command]
+pub fn plugins_stop_plugin_task(plugins: State<'_, Plugins>, plugin_id: PluginId) -> CmdResult<()> {
+    plugins.stop_plugin_task(&plugin_id);
+    Ok(())
+}
+
+#[tauri::command]
+pub fn plugins_start_plugin_task(
+    plugins: State<'_, Plugins>,
+    plugin_id: PluginId,
+) -> CmdResult<()> {
+    plugins.start_plugin_task(&plugin_id);
+    Ok(())
+}
+
+#[tauri::command]
+pub fn plugins_restart_plugin_task(
+    plugins: State<'_, Plugins>,
+    plugin_id: PluginId,
+) -> CmdResult<()> {
+    plugins.restart_plugin_task(&plugin_id);
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn plugins_reload_plugin(
+    plugins: State<'_, Plugins>,
+    plugin_id: PluginId,
+) -> CmdResult<()> {
+    plugins.reload_plugin(&plugin_id).await?;
+    Ok(())
+}

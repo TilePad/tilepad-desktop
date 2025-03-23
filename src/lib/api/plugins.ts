@@ -1,13 +1,13 @@
 import { invoke } from "@tauri-apps/api/core";
+import { createQuery } from "@tanstack/svelte-query";
 
 import type {
   PluginId,
-  InspectorContext,
   PluginWithState,
+  InspectorContext,
 } from "./types/plugin";
 
 import { queryClient } from "./client";
-import { createQuery } from "@tanstack/svelte-query";
 
 export const pluginsKey = {
   root: ["plugins"],
@@ -46,6 +46,38 @@ export function closePluginInspector(context: InspectorContext) {
   return invoke<void>("plugins_close_inspector", {
     context,
   });
+}
+
+export async function stopPluginTask(pluginId: PluginId) {
+  await invoke<void>("plugins_stop_plugin_task", {
+    pluginId,
+  });
+
+  invalidatePluginsQuery();
+}
+
+export async function startPluginTask(pluginId: PluginId) {
+  await invoke<void>("plugins_start_plugin_task", {
+    pluginId,
+  });
+
+  invalidatePluginsQuery();
+}
+
+export async function restartPluginTask(pluginId: PluginId) {
+  await invoke<void>("plugins_restart_plugin_task", {
+    pluginId,
+  });
+
+  invalidatePluginsQuery();
+}
+
+export async function reloadPlugin(pluginId: PluginId) {
+  await invoke<void>("plugins_reload_plugin", {
+    pluginId,
+  });
+
+  invalidatePluginsQuery();
 }
 
 // [QUERIES] ------------------------------------------------------

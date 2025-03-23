@@ -6,7 +6,7 @@ use std::{
 };
 
 use action::{actions_from_plugins, Action, ActionCategory, ActionWithCategory};
-use anyhow::Context;
+use anyhow::{anyhow, Context};
 use garde::Validate;
 use manifest::{platform_arch, platform_os, ActionId, Manifest, PluginId};
 use parking_lot::RwLock;
@@ -300,6 +300,52 @@ impl Plugins {
             .insert(plugin_id.clone(), plugin_task);
     }
 
+    pub fn stop_plugin_task(&self, plugin_id: &PluginId) {
+        let mut tasks = self.inner.plugin_tasks.write();
+        let state = match tasks.get_mut(plugin_id) {
+            Some(value) => value,
+            None => return,
+        };
+
+        if let PluginTaskState::Running { abort } = state {
+            abort.abort();
+        }
+
+        *state = PluginTaskState::NotStarted;
+    }
+
+    pub fn start_plugin_task(&self, plugin_id: &PluginId) {
+        let plugins_map = &*self.inner.plugins.read();
+        let plugin = match plugins_map.get(plugin_id) {
+            Some(value) => value,
+            None => return,
+        };
+        self.create_plugin_task(plugin);
+    }
+
+    pub fn restart_plugin_task(&self, plugin_id: &PluginId) {
+        self.stop_plugin_task(plugin_id);
+        self.start_plugin_task(plugin_id);
+    }
+
+    pub async fn reload_plugin(&self, plugin_id: &PluginId) -> anyhow::Result<()> {
+        self.stop_plugin_task(plugin_id);
+
+        let plugin_path = self
+            .get_plugin_path(plugin_id)
+            .context("plugin not loaded")?;
+
+        let new_plugin = load_plugin(&plugin_path).await?;
+        self.create_plugin_task(&new_plugin);
+
+        {
+            let plugins_map = &mut *self.inner.plugins.write();
+            plugins_map.insert(plugin_id.clone(), new_plugin);
+        }
+
+        Ok(())
+    }
+
     pub fn create_plugin_task(&self, plugin: &Plugin) {
         let plugin_id = plugin.manifest.plugin.id.clone();
 
@@ -382,19 +428,27 @@ pub async fn load_plugins(path: &Path) -> anyhow::Result<Vec<Plugin>> {
             continue;
         }
 
-        let manifest_path = path.join("manifest.toml");
-        let manifest = match load_manifest(&manifest_path).await {
-            Ok(value) => value,
-            Err(cause) => {
-                tracing::error!(?cause, ?manifest_path, "failed to load manifest file");
-                continue;
-            }
-        };
-
-        plugins.push(Plugin { path, manifest });
+        if let Ok(plugin) = load_plugin(&path).await {
+            plugins.push(plugin);
+        }
     }
 
     Ok(plugins)
+}
+
+pub async fn load_plugin(path: &Path) -> anyhow::Result<Plugin> {
+    let manifest_path = path.join("manifest.toml");
+    let manifest = match load_manifest(&manifest_path).await {
+        Ok(value) => value,
+        Err(cause) => {
+            tracing::error!(?cause, ?manifest_path, "failed to load manifest file");
+            return Err(cause);
+        }
+    };
+    Ok(Plugin {
+        path: path.to_path_buf(),
+        manifest,
+    })
 }
 
 pub async fn load_manifest(path: &Path) -> anyhow::Result<Manifest> {
