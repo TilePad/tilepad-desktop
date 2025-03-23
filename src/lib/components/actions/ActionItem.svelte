@@ -28,6 +28,11 @@
 </div>
 
 <style>
+  /* 	This is the css way of styling the dragged element */
+  :global(#dnd-action-dragged-el .action) {
+    transform: rotate(7deg);
+  }
+
   .action {
     padding: 0.5rem;
     display: flex;

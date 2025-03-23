@@ -83,6 +83,7 @@
     dropTargetStyle: {},
     flipDurationMs: 0,
     morphDisabled: true,
+    centreDraggedOnCursor: true,
     dragDisabled: true,
   }}
   onconsider={handleDndConsider}

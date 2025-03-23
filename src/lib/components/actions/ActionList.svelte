@@ -70,6 +70,7 @@
     flipDurationMs: 0,
     dropTargetStyle: {},
     morphDisabled: true,
+    centreDraggedOnCursor: true,
   }}
   onconsider={handleDndConsider}
   onfinalize={handleDndFinalize}
