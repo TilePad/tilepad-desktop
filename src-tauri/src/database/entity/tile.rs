@@ -10,6 +10,7 @@ use super::folder::FolderId;
 use sea_query::{Expr, IdenStatic, Query};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
+use tilepad_manifest::icons::IconPackId;
 use uuid::Uuid;
 
 pub type TileId = Uuid;
@@ -35,7 +36,7 @@ pub struct TileConfig {
     pub icon: TileIcon,
     /// Configuration for the action
     pub properties: serde_json::Value,
-
+    /// Label to display on top of the tile
     #[serde(default)]
     pub label: TileLabel,
 }
@@ -82,11 +83,24 @@ pub enum LabelAlign {
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
 pub enum TileIcon {
+    /// No icon
     #[default]
     None,
+
+    /// Icon from a specific plugin path
     PluginIcon {
+        /// ID of the plugin the icon is from
         plugin_id: PluginId,
+        /// Path to the icon file
         icon: String,
+    },
+
+    /// Use an icon from an icon pack
+    IconPack {
+        /// ID of the icon pack
+        pack_id: IconPackId,
+        /// Path to the icon file
+        path: String,
     },
 }
 

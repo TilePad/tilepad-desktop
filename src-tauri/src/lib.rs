@@ -2,6 +2,7 @@ use std::error::Error;
 
 use anyhow::Context;
 use device::Devices;
+use icons::Icons;
 use plugin::Plugins;
 use tauri::{
     async_runtime::{block_on, spawn},
@@ -14,6 +15,7 @@ mod commands;
 mod database;
 mod device;
 mod events;
+mod icons;
 #[allow(unused)]
 mod plugin;
 mod server;
@@ -21,7 +23,7 @@ mod utils;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    use commands::{actions, devices, folders, plugins, profiles, server, tiles};
+    use commands::{actions, devices, folders, icons, plugins, profiles, server, tiles};
 
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
@@ -61,6 +63,7 @@ pub fn run() {
             plugins::plugins_start_plugin_task,
             plugins::plugins_restart_plugin_task,
             plugins::plugins_reload_plugin,
+            icons::icons_get_icon_packs,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -92,8 +95,11 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         .context("failed to get resources directory")?;
 
     let core_resources = resources.join("core");
+
     let core_plugins = core_resources.join("plugins");
     let user_plugins = app_data_path.join("plugins");
+
+    let user_icons = app_data_path.join("icons");
 
     let db = block_on(database::connect_database(app_data_path.join("app.db")))
         .context("failed to load database")?;
@@ -101,11 +107,13 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
     let (app_event_tx, app_event_rx) = mpsc::unbounded_channel();
     let plugins = Plugins::new(app_event_tx.clone(), db.clone());
     let devices = Devices::new(app_event_tx.clone(), db.clone(), plugins.clone());
+    let icons = Icons::new();
 
     app.manage(app_event_tx.clone());
     app.manage(db.clone());
     app.manage(devices.clone());
     app.manage(plugins.clone());
+    app.manage(icons.clone());
 
     tracing::debug!("starting event processor");
 
@@ -121,6 +129,12 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         user_plugins,
     ));
 
+    // Load the user icon packs into the registry
+    spawn(icons::load_icon_packs_into_registry(
+        icons.clone(),
+        user_icons,
+    ));
+
     // Spawn event processor
     spawn(events::processing::process_events(
         app_handle.clone(),
@@ -134,6 +148,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         devices,
         app_handle.clone(),
         plugins.clone(),
+        icons.clone(),
     ));
 
     Ok(())
