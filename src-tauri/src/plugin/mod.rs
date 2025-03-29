@@ -16,6 +16,7 @@ use serde::Serialize;
 use serde_json::Map;
 use socket::{PluginSessionId, PluginSessionRef};
 use tauri::plugin;
+pub use tilepad_manifest::plugin as manifest;
 
 use crate::{
     database::{
@@ -28,7 +29,6 @@ use crate::{
 
 pub mod action;
 pub mod internal;
-pub mod manifest;
 pub mod node;
 pub mod protocol;
 pub mod runner;
