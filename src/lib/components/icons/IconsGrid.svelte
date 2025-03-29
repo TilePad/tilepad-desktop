@@ -30,10 +30,6 @@
     createVirtualItems(containerHeight, offset, rowCount, itemHeight),
   );
 
-  $effect(() => {
-    console.log(virtualItems.startIndex, "Virtual items updated");
-  });
-
   type VirtualItems = {
     startIndex: number;
     stopIndex: number;
