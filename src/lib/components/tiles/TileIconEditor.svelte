@@ -1,24 +1,38 @@
 <script lang="ts">
-  import { getPluginAssetPath } from "$lib/api/utils/url";
-  import { type TileId, type TileIcon } from "$lib/api/types/tiles";
+  import type { Icon, IconPackId } from "$lib/api/types/icons";
+
+  import { updateTile } from "$lib/api/tiles";
+  import {
+    type TileId,
+    TileIconType,
+    type TileConfig,
+  } from "$lib/api/types/tiles";
+
+  import TileIcon from "./TileIcon.svelte";
+  import IconSelector from "../icons/IconSelector.svelte";
 
   type Props = {
     tileId: TileId;
-    icon: TileIcon;
+    config: TileConfig;
   };
 
-  const { tileId, icon }: Props = $props();
+  const { tileId, config }: Props = $props();
+
+  const onClickIconPackIcon = (packId: IconPackId, icon: Icon) => {
+    updateTile(tileId, {
+      config: {
+        ...config,
+        icon: { type: TileIconType.IconPack, pack_id: packId, path: icon.path },
+      },
+    });
+  };
 </script>
 
 <div class="tile">
-  {#if icon.type === "PluginIcon"}
-    <img
-      class="tile__icon"
-      src={getPluginAssetPath(icon.plugin_id, icon.icon)}
-      alt="Tile Icon"
-    />
-  {/if}
+  <TileIcon icon={config.icon} />
 </div>
+
+<IconSelector onClickIcon={onClickIconPackIcon} />
 
 <style>
   .tile {
@@ -36,9 +50,5 @@
     height: 80px;
     color: #ccc;
     font-size: 1.5rem;
-  }
-
-  .tile__icon {
-    width: 3.5rem;
   }
 </style>

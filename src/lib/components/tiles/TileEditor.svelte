@@ -78,7 +78,7 @@
 
     <div class="content">
       <div class="left">
-        <TileIconEditor icon={tile.config.icon} tileId={tile.id} />
+        <TileIconEditor config={tile.config} tileId={tile.id} />
         <TileNameEditor config={tile.config} tileId={tile.id} />
       </div>
 

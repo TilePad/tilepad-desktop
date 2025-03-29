@@ -13,3 +13,7 @@ export function getPluginAssetPath(pluginId: PluginId, path: string) {
     getBackendURL(),
   ).toString();
 }
+
+export function getIconAssetPath(packId: PluginId, path: string) {
+  return new URL(`/icons/${packId}/assets/${path}`, getBackendURL()).toString();
+}

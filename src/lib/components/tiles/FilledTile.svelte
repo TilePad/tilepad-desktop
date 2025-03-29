@@ -1,8 +1,7 @@
 <script lang="ts">
   import type { TileModel } from "$lib/api/types/tiles";
 
-  import { getPluginAssetPath } from "$lib/api/utils/url";
-
+  import TileIcon from "./TileIcon.svelte";
   import TileLabelElm from "./TileLabelElm.svelte";
 
   type Props = {
@@ -24,14 +23,7 @@
   aria-roledescription="button"
   onkeydown={() => {}}
 >
-  {#if config.icon.type === "PluginIcon"}
-    <img
-      class="tile__icon"
-      src={getPluginAssetPath(config.icon.plugin_id, config.icon.icon)}
-      alt="Tile Icon"
-    />
-  {/if}
-
+  <TileIcon icon={config.icon} />
   <TileLabelElm label={config.label} />
 </div>
 
@@ -53,9 +45,5 @@
     font-size: 1.5rem;
     user-select: none;
     overflow: hidden;
-  }
-
-  .tile__icon {
-    width: 100%;
   }
 </style>

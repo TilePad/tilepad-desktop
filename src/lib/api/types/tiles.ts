@@ -2,6 +2,7 @@ import type { Uuid } from "./shared";
 import type { PluginId } from "./plugin";
 import type { ActionId } from "./actions";
 import type { FolderId } from "./folders";
+import type { IconPackId } from "./icons";
 
 export type TileId = Uuid;
 
@@ -26,15 +27,21 @@ export type TileIconPluginIcon = {
   plugin_id: PluginId;
   icon: string;
 };
+export type TileIconIconPack = {
+  pack_id: IconPackId;
+  path: string;
+};
 
 export enum TileIconType {
   None = "None",
   PluginIcon = "PluginIcon",
+  IconPack = "IconPack",
 }
 
 export type TileIcon =
   | ({ type: TileIconType.None } & TileIconNone)
-  | ({ type: TileIconType.PluginIcon } & TileIconPluginIcon);
+  | ({ type: TileIconType.PluginIcon } & TileIconPluginIcon)
+  | ({ type: TileIconType.IconPack } & TileIconIconPack);
 
 export type CreateTile = Omit<TileModel, "id">;
 
