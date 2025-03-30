@@ -34,11 +34,11 @@
 
 <div bind:this={wrapper} class="scroll-container">
   <div style={`height:${totalHeight}px;`}>
-    {#each range(startRow, stopRow + 1) as row (row)}
+    {#each range(startRow, stopRow + 1) as row}
       <!-- Compute row offset -->
       {@const rowOffset = row * itemHeight}
 
-      {#each range(0, columns) as col (col)}
+      {#each range(0, columns) as col}
         <!-- Get the item at the position -->
         {@const icon = items[row * columns + col]}
 
