@@ -1,18 +1,29 @@
-use std::{
-    collections::HashMap,
-    os::windows::fs::FileTypeExt,
-    path::{Path, PathBuf},
-    sync::Arc,
-};
+use std::{collections::HashMap, path::PathBuf, sync::Arc};
 
-use garde::Validate;
+use loader::load_icon_packs_from_path;
 use parking_lot::RwLock;
 use serde::Serialize;
 use tilepad_manifest::icons::{Icon, IconPackId, Manifest as IconPackManifest};
 
+pub mod install;
+pub mod loader;
+
 #[derive(Clone)]
 pub struct Icons {
     inner: Arc<IconsInner>,
+}
+
+#[derive(Default)]
+struct IconsInner {
+    /// Collection of currently loaded plugins
+    packs: RwLock<HashMap<IconPackId, Arc<IconPack>>>,
+}
+
+#[derive(Debug, Serialize, Clone)]
+pub struct IconPack {
+    pub path: PathBuf,
+    pub manifest: IconPackManifest,
+    pub icons: Vec<Icon>,
 }
 
 impl Icons {
@@ -22,15 +33,29 @@ impl Icons {
         }
     }
 
-    pub fn insert_packs(&self, plugins: Vec<IconPack>) {
-        self.inner.packs.write().extend(
-            plugins
-                .into_iter()
-                .map(|plugin| (plugin.manifest.icons.id.clone(), plugin)),
-        );
+    /// Load a single plugin
+    pub fn load_pack(&self, pack: IconPack) {
+        let packs = &mut *self.inner.packs.write();
+        self.load_pack_inner(packs, pack);
     }
 
-    pub fn get_icon_packs(&self) -> Vec<IconPack> {
+    /// Load in bulk many plugins from `plugins`
+    pub fn load_packs(&self, packs: Vec<IconPack>) {
+        let plugins_map = &mut *self.inner.packs.write();
+        for pack in packs {
+            self.load_pack_inner(plugins_map, pack);
+        }
+    }
+
+    /// Performs the actual plugin loading process for a specific plugin
+    fn load_pack_inner(&self, packs: &mut HashMap<IconPackId, Arc<IconPack>>, pack: IconPack) {
+        let pack_id = pack.manifest.icons.id.clone();
+
+        // Store the plugin
+        packs.insert(pack_id, Arc::new(pack));
+    }
+
+    pub fn get_icon_packs(&self) -> Vec<Arc<IconPack>> {
         self.inner.packs.read().values().cloned().collect()
     }
 
@@ -41,82 +66,14 @@ impl Icons {
             .get(pack_id)
             .map(|pack| pack.path.clone())
     }
-}
 
-#[derive(Default)]
-struct IconsInner {
-    /// Collection of currently loaded plugins
-    packs: RwLock<HashMap<IconPackId, IconPack>>,
-}
-
-#[derive(Debug, Serialize, Clone)]
-pub struct IconPack {
-    pub path: PathBuf,
-    pub manifest: IconPackManifest,
-    pub icons: Vec<Icon>,
-}
-
-pub async fn load_icon_packs(path: &Path) -> anyhow::Result<Vec<IconPack>> {
-    let mut packs = Vec::new();
-    let mut dir = tokio::fs::read_dir(path).await?;
-
-    while let Some(entry) = dir.next_entry().await? {
-        let path = entry.path();
-        let file_type = entry.file_type().await?;
-        if !file_type.is_dir() && !file_type.is_symlink_dir() {
-            continue;
-        }
-
-        if let Ok(pack) = load_icon_pack(&path).await {
-            packs.push(pack);
-        }
+    pub fn unload_pack(&self, pack_id: &IconPackId) {
+        self.inner.packs.write().remove(pack_id);
     }
-
-    Ok(packs)
-}
-
-pub async fn load_icon_pack(path: &Path) -> anyhow::Result<IconPack> {
-    let manifest_path = path.join("manifest.toml");
-    let manifest = match load_manifest(&manifest_path).await {
-        Ok(value) => value,
-        Err(cause) => {
-            tracing::error!(?cause, ?manifest_path, "failed to load manifest file");
-            return Err(cause);
-        }
-    };
-
-    let icons_path = path.join("icons.json");
-    let icons = match load_icons(&icons_path).await {
-        Ok(value) => value,
-        Err(cause) => {
-            tracing::error!(?cause, ?icons_path, "failed to load icons file");
-            return Err(cause);
-        }
-    };
-
-    Ok(IconPack {
-        path: path.to_path_buf(),
-        manifest,
-        icons,
-    })
-}
-
-pub async fn load_manifest(path: &Path) -> anyhow::Result<IconPackManifest> {
-    let data = tokio::fs::read_to_string(path).await?;
-    let manifest: IconPackManifest = toml::from_str(&data)?;
-    manifest.validate()?;
-    Ok(manifest)
-}
-
-pub async fn load_icons(path: &Path) -> anyhow::Result<Vec<Icon>> {
-    let data = tokio::fs::read_to_string(path).await?;
-    let icons: Vec<Icon> = serde_json::from_str(&data)?;
-    icons.validate()?;
-    Ok(icons)
 }
 
 pub async fn load_icon_packs_into_registry(registry: Icons, path: PathBuf) {
-    let packs = match load_icon_packs(&path).await {
+    let packs = match load_icon_packs_from_path(&path).await {
         Ok(value) => value,
         Err(cause) => {
             tracing::error!(?cause, ?path, "failed to load icon packs for registry");
@@ -131,5 +88,5 @@ pub async fn load_icon_packs_into_registry(registry: Icons, path: PathBuf) {
 
     tracing::debug!(?pack_ids, "loaded icon packs");
 
-    registry.insert_packs(packs);
+    registry.load_packs(packs);
 }

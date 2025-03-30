@@ -2,6 +2,7 @@
   import SolarDevicesBoldDuotone from "~icons/solar/devices-bold-duotone";
   import SolarSettingsBoldDuotone from "~icons/solar/settings-bold-duotone";
   import SolarPlugCircleBoldDuotone from "~icons/solar/plug-circle-bold-duotone";
+  import SolarGalleryWideBoldDuotone from "~icons/solar/gallery-wide-bold-duotone";
   import SolarLayersMinimalisticBoldDuotone from "~icons/solar/layers-minimalistic-bold-duotone";
 
   import NavButton from "./NavButton.svelte";
@@ -21,6 +22,7 @@
       href="/plugins"
       title="Plugins"
     />
+    <NavButton icon={SolarGalleryWideBoldDuotone} href="/icons" title="Icons" />
     <NavButton
       icon={SolarSettingsBoldDuotone}
       href="/settings"

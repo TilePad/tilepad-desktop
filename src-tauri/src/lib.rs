@@ -66,6 +66,8 @@ pub fn run() {
             plugins::plugins_install_plugin_manual,
             plugins::plugins_uninstall_plugin,
             icons::icons_get_icon_packs,
+            icons::icons_install_icon_pack,
+            icons::icons_uninstall_icon_pack,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
