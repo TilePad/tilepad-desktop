@@ -1,7 +1,12 @@
 use crate::{
     commands::CmdResult,
     events::InspectorContext,
-    plugin::{loader::load_plugin_from_path, manifest::PluginId, PluginWithState, Plugins},
+    plugin::{
+        install::{install_plugin_zip, remove_existing_plugin},
+        loader::{load_plugin_from_path, read_plugin_manifest_zip},
+        manifest::PluginId,
+        PluginWithState, Plugins,
+    },
 };
 use anyhow::Context;
 use tauri::{AppHandle, Manager, State};
@@ -10,6 +15,7 @@ use tauri::{AppHandle, Manager, State};
 pub async fn plugins_install_plugin_manual(
     app: AppHandle,
     plugins: State<'_, Plugins>,
+    data: Vec<u8>,
 ) -> CmdResult<()> {
     let app_data_path = app
         .path()
@@ -17,11 +23,29 @@ pub async fn plugins_install_plugin_manual(
         .context("failed to get app data dir")?;
     let user_plugins = app_data_path.join("plugins");
 
-    // // Load the user plugins into the registry
-    // spawn(plugin::load_plugins_into_registry(
-    //     plugins.clone(),
-    //     user_plugins,
-    // ));
+    // Read the plugin manifest from within the zip file
+    let manifest = read_plugin_manifest_zip(&data).await?;
+
+    // Determine plugin install directory
+    let plugin_id = manifest.plugin.id;
+    let directory_name = format!("{plugin_id}.tilepadPlugin");
+    let path = user_plugins.join(directory_name);
+
+    // Unload the plugin
+    plugins.unload_plugin(&plugin_id);
+
+    // Cleanup old files
+    remove_existing_plugin(&path).await?;
+
+    // Install the plugin zip file
+    install_plugin_zip(&data, &path).await?;
+
+    // Load the plugin
+    let plugin = load_plugin_from_path(&path)
+        .await
+        .context("failed to load plugin")?;
+
+    plugins.load_plugin(plugin);
 
     Ok(())
 }

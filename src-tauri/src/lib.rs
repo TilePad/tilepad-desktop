@@ -63,6 +63,7 @@ pub fn run() {
             plugins::plugins_start_plugin_task,
             plugins::plugins_restart_plugin_task,
             plugins::plugins_reload_plugin,
+            plugins::plugins_install_plugin_manual,
             icons::icons_get_icon_packs,
         ])
         .run(tauri::generate_context!())

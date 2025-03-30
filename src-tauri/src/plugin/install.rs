@@ -13,26 +13,6 @@ use crate::utils::zip::{create_zip_reader, extract_zip};
 
 use super::loader::read_plugin_manifest_zip;
 
-/// Installs the plugin zip from `data` saving the plugin data to its directory
-/// within `out_path`
-pub async fn install_plugin(data: Vec<u8>, out_path: PathBuf) -> anyhow::Result<()> {
-    // Read the plugin manifest from within the zip file
-    let manifest = read_plugin_manifest_zip(&data).await?;
-
-    // Determine plugin install directory
-    let plugin_id = manifest.plugin.id;
-    let directory_name = format!("{plugin_id}.tilepadPlugin");
-    let path = out_path.join(directory_name);
-
-    // Cleanup old files
-    remove_existing_plugin(&path).await?;
-
-    // Install the plugin zip file
-    install_plugin_zip(&data, &path).await?;
-
-    Ok(())
-}
-
 /// Removes any existing plugin data from the provided `path`
 pub async fn remove_existing_plugin(path: &Path) -> anyhow::Result<()> {
     // Remove old directory if present

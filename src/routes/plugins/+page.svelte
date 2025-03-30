@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createPluginsQuery } from "$lib/api/plugins";
   import PluginCard from "$lib/components/plugins/PluginCard.svelte";
+  import ManualImportPlugin from "$lib/components/plugins/ManualImportPlugin.svelte";
 
   const pluginsQuery = createPluginsQuery();
 </script>
@@ -12,7 +13,11 @@
     Failed to load plugins {$pluginsQuery.error}
   {:else if $pluginsQuery.isSuccess && $pluginsQuery.data.length > 0}
     <div class="section">
-      <h2>Plugins</h2>
+      <div class="header">
+        <h2>Plugins</h2>
+        <ManualImportPlugin />
+      </div>
+
       <div class="plugins">
         {#each $pluginsQuery.data as plugin}
           {#if !plugin.manifest.plugin.internal}
@@ -33,6 +38,13 @@
     gap: 0.5rem;
 
     padding: 1rem;
+  }
+
+  .header {
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .section {

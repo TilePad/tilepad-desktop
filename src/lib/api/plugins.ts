@@ -80,6 +80,16 @@ export async function reloadPlugin(pluginId: PluginId) {
   invalidatePluginsQuery();
 }
 
+export async function installPlugin(file: File) {
+  const data = await file.arrayBuffer();
+
+  await invoke<void>("plugins_install_plugin_manual", {
+    data,
+  });
+
+  invalidatePluginsQuery();
+}
+
 // [QUERIES] ------------------------------------------------------
 
 export function createPluginsQuery() {
