@@ -1,22 +1,38 @@
 use crate::{
     commands::CmdResult,
-    database::DbPool,
-    events::{AppEventSender, InspectorContext},
-    plugin::{manifest::PluginId, PluginWithState, Plugins},
+    events::InspectorContext,
+    plugin::{loader::load_plugin_from_path, manifest::PluginId, PluginWithState, Plugins},
 };
-use tauri::State;
+use anyhow::Context;
+use tauri::{AppHandle, Manager, State};
+
+#[tauri::command]
+pub async fn plugins_install_plugin_manual(
+    app: AppHandle,
+    plugins: State<'_, Plugins>,
+) -> CmdResult<()> {
+    let app_data_path = app
+        .path()
+        .app_data_dir()
+        .context("failed to get app data dir")?;
+    let user_plugins = app_data_path.join("plugins");
+
+    // // Load the user plugins into the registry
+    // spawn(plugin::load_plugins_into_registry(
+    //     plugins.clone(),
+    //     user_plugins,
+    // ));
+
+    Ok(())
+}
 
 #[tauri::command]
 pub async fn plugins_send_plugin_message(
-    app_tx: State<'_, AppEventSender>,
     plugins: State<'_, Plugins>,
-    db: State<'_, DbPool>,
     context: InspectorContext,
     message: serde_json::Value,
 ) -> CmdResult<()> {
-    plugins
-        .handle_send_message(app_tx.inner(), db.inner(), context, message)
-        .await?;
+    plugins.handle_send_message(context, message).await?;
 
     Ok(())
 }
@@ -26,7 +42,7 @@ pub async fn plugins_open_inspector(
     plugins: State<'_, Plugins>,
     context: InspectorContext,
 ) -> CmdResult<()> {
-    plugins.open_inspector(context).await?;
+    plugins.open_inspector(context);
     Ok(())
 }
 
@@ -35,7 +51,7 @@ pub async fn plugins_close_inspector(
     plugins: State<'_, Plugins>,
     context: InspectorContext,
 ) -> CmdResult<()> {
-    plugins.close_inspector(context).await?;
+    plugins.close_inspector(context);
     Ok(())
 }
 
@@ -65,7 +81,7 @@ pub fn plugins_get_plugins(plugins: State<'_, Plugins>) -> Vec<PluginWithState> 
 
 #[tauri::command]
 pub fn plugins_stop_plugin_task(plugins: State<'_, Plugins>, plugin_id: PluginId) -> CmdResult<()> {
-    plugins.stop_plugin_task(&plugin_id);
+    plugins.tasks().stop(&plugin_id);
     Ok(())
 }
 
@@ -74,7 +90,12 @@ pub fn plugins_start_plugin_task(
     plugins: State<'_, Plugins>,
     plugin_id: PluginId,
 ) -> CmdResult<()> {
-    plugins.start_plugin_task(&plugin_id);
+    let plugin = plugins.get_plugin(&plugin_id).context("plugin not found")?;
+
+    plugins
+        .tasks()
+        .start(plugin_id, plugin.path.clone(), &plugin.manifest);
+
     Ok(())
 }
 
@@ -83,7 +104,12 @@ pub fn plugins_restart_plugin_task(
     plugins: State<'_, Plugins>,
     plugin_id: PluginId,
 ) -> CmdResult<()> {
-    plugins.restart_plugin_task(&plugin_id);
+    let plugin = plugins.get_plugin(&plugin_id).context("plugin not found")?;
+
+    plugins
+        .tasks()
+        .restart(plugin_id, plugin.path.clone(), &plugin.manifest);
+
     Ok(())
 }
 
@@ -92,6 +118,15 @@ pub async fn plugins_reload_plugin(
     plugins: State<'_, Plugins>,
     plugin_id: PluginId,
 ) -> CmdResult<()> {
-    plugins.reload_plugin(&plugin_id).await?;
+    // Unload the plugin
+    let plugin = plugins
+        .unload_plugin(&plugin_id)
+        .context("plugin was never loaded")?;
+
+    // Load the new plugin from the same path
+    let new_plugin = load_plugin_from_path(&plugin.path).await?;
+
+    // Load the new plugin into the plugins registry
+    plugins.load_plugin(new_plugin);
     Ok(())
 }

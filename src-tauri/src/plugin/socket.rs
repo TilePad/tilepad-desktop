@@ -29,7 +29,7 @@ pub type PluginSessionRef = Arc<PluginSession>;
 
 pub struct PluginSession {
     /// Unique ID of the session
-    id: PluginSessionId,
+    pub id: PluginSessionId,
     /// Session state
     state: RwLock<PluginSessionState>,
 
@@ -78,7 +78,7 @@ impl PluginSession {
                 session.plugins.remove_session(session.id);
 
                 if let Some(plugin_id) = session.get_plugin_id() {
-                    session.plugins.set_plugin_session(plugin_id, None);
+                    session.plugins.remove_plugin_session(plugin_id);
                 }
             }
         });
@@ -102,6 +102,7 @@ impl PluginSession {
         let msg = serde_json::to_string(&msg)?;
         let message = Message::text(msg);
         self.tx.send(message)?;
+
         Ok(())
     }
 
@@ -109,13 +110,12 @@ impl PluginSession {
         match message {
             ClientPluginMessage::RegisterPlugin { plugin_id } => {
                 // Handle unknown plugin
-                if self.plugins.get_plugin_path(&plugin_id).is_none() {
+                if self.plugins.get_plugin(&plugin_id).is_none() {
                     debug!(?plugin_id, "plugin registered with unknown id");
                     return;
                 }
 
-                self.plugins
-                    .set_plugin_session(plugin_id.clone(), Some(self.id));
+                self.plugins.set_plugin_session(plugin_id.clone(), self.id);
                 self.set_plugin_id(Some(plugin_id.clone()));
 
                 _ = self.send_message(ServerPluginMessage::Registered { plugin_id });
@@ -147,12 +147,7 @@ impl PluginSession {
                 });
             }
             ClientPluginMessage::SendToInspector { ctx, message } => {
-                _ = self.plugins.inner.event_tx.send(AppEvent::Plugin(
-                    PluginAppEvent::RecvPluginMessage {
-                        context: ctx,
-                        message,
-                    },
-                ));
+                self.plugins.send_to_inspector(ctx, message);
             }
             ClientPluginMessage::SetProperties { properties } => {
                 let plugin_id = match self.get_plugin_id() {

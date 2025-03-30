@@ -1,4 +1,7 @@
+use std::sync::Arc;
+
 use serde::Serialize;
+use tilepad_manifest::plugin::Manifest;
 
 use super::{
     manifest::{ActionId, PluginId},
@@ -32,14 +35,13 @@ pub struct ActionWithCategory {
     pub category_label: String,
 }
 
-pub fn actions_from_plugins<'a, I>(plugins: I) -> Vec<ActionCategory>
+pub fn actions_from_manifests<'a, I>(manifests: I) -> Vec<ActionCategory>
 where
-    I: IntoIterator<Item = &'a Plugin>,
+    I: IntoIterator<Item = &'a Manifest>,
 {
     let mut categories = Vec::new();
 
-    for plugin in plugins {
-        let manifest = &plugin.manifest;
+    for manifest in manifests {
         let manifest_category = &manifest.category;
         let mut category = ActionCategory {
             plugin_id: manifest.plugin.id.clone(),

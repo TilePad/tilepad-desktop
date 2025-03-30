@@ -348,7 +348,7 @@ impl Devices {
 
         self.inner
             .plugins
-            .handle_action(self, db, context, tile)
+            .handle_action(self, context, tile)
             .await?;
 
         Ok(())

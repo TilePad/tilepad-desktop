@@ -1,22 +1,28 @@
 use std::{
     collections::HashMap,
+    io::Cursor,
     os::windows::fs::FileTypeExt,
     path::{Path, PathBuf},
     sync::Arc,
 };
 
-use action::{actions_from_plugins, Action, ActionCategory, ActionWithCategory};
+use action::{actions_from_manifests, Action, ActionCategory, ActionWithCategory};
 use anyhow::{anyhow, Context};
+use async_zip::base::read::seek::ZipFileReader;
 use garde::Validate;
-use manifest::{platform_arch, platform_os, ActionId, Manifest, PluginId};
+use loader::{load_plugin_from_path, load_plugins_from_path, read_plugin_manifest};
+use manifest::{platform_arch, platform_os, ActionId, Manifest as PluginManifest, PluginId};
 use parking_lot::RwLock;
 use protocol::ServerPluginMessage;
 use runner::{spawn_native_task, PluginTaskState};
 use serde::Serialize;
 use serde_json::Map;
 use socket::{PluginSessionId, PluginSessionRef};
+use tasks::PluginTasks;
 use tauri::plugin;
 pub use tilepad_manifest::plugin as manifest;
+use tokio::io::{BufReader, BufWriter};
+use tokio_util::compat::FuturesAsyncReadCompatExt;
 
 use crate::{
     database::{
@@ -24,34 +30,22 @@ use crate::{
         DbPool,
     },
     device::Devices,
-    events::{AppEventSender, InspectorContext, TileInteractionContext},
+    events::{AppEvent, AppEventSender, InspectorContext, PluginAppEvent, TileInteractionContext},
 };
 
 pub mod action;
+pub mod install;
 pub mod internal;
+pub mod loader;
 pub mod node;
 pub mod protocol;
 pub mod runner;
 pub mod socket;
+pub mod tasks;
 
 #[derive(Clone)]
 pub struct Plugins {
     inner: Arc<PluginsInner>,
-}
-
-impl Plugins {
-    pub fn new(event_tx: AppEventSender, db: DbPool) -> Self {
-        Self {
-            inner: Arc::new(PluginsInner {
-                event_tx,
-                db,
-                plugins: Default::default(),
-                sessions: Default::default(),
-                plugin_to_session: Default::default(),
-                plugin_tasks: Default::default(),
-            }),
-        }
-    }
 }
 
 struct PluginsInner {
@@ -62,10 +56,10 @@ struct PluginsInner {
     db: DbPool,
 
     /// Collection of currently loaded plugins
-    plugins: RwLock<HashMap<PluginId, Plugin>>,
+    plugins: RwLock<HashMap<PluginId, Arc<Plugin>>>,
 
-    /// Mapping for the current plugin tasks
-    plugin_tasks: RwLock<HashMap<PluginId, PluginTaskState>>,
+    /// Tasks running for plugins
+    tasks: PluginTasks,
 
     /// Current plugin socket sessions
     sessions: RwLock<HashMap<PluginSessionId, PluginSessionRef>>,
@@ -77,46 +71,115 @@ struct PluginsInner {
 #[derive(Serialize)]
 pub struct PluginWithState {
     #[serde(flatten)]
-    pub plugin: Plugin,
+    pub plugin: Arc<Plugin>,
     pub state: PluginTaskState,
 }
 
+#[derive(Debug, Serialize, Clone)]
+pub struct Plugin {
+    pub path: PathBuf,
+    pub manifest: PluginManifest,
+}
+
 impl Plugins {
-    pub fn insert_plugins(&self, plugins: Vec<Plugin>) {
-        let mut plugins_map = &mut *self.inner.plugins.write();
-
-        for plugin in plugins {
-            // Spawn task for the plugin
-            self.create_plugin_task(&plugin);
-
-            // Insert the plugin into the manifest
-            plugins_map.insert(plugin.manifest.plugin.id.clone(), plugin);
+    pub fn new(event_tx: AppEventSender, db: DbPool) -> Self {
+        Self {
+            inner: Arc::new(PluginsInner {
+                event_tx,
+                db,
+                plugins: Default::default(),
+                sessions: Default::default(),
+                plugin_to_session: Default::default(),
+                tasks: Default::default(),
+            }),
         }
     }
 
-    pub fn get_plugins_with_state(&self) -> Vec<PluginWithState> {
-        let plugins: Vec<Plugin> = {
-            let plugins = self.inner.plugins.read();
-            plugins.values().cloned().collect()
-        };
+    pub fn tasks(&self) -> &PluginTasks {
+        &self.inner.tasks
+    }
 
-        let states = self.inner.plugin_tasks.read();
+    /// Load a single plugin
+    pub fn load_plugin(&self, plugin: Plugin) {
+        let mut plugins = &mut *self.inner.plugins.write();
+        self.load_plugin_inner(plugins, plugin);
+    }
+
+    /// Load in bulk many plugins from `plugins`
+    pub fn load_plugins(&self, plugins: Vec<Plugin>) {
+        let mut plugins_map = &mut *self.inner.plugins.write();
+        for plugin in plugins {
+            self.load_plugin_inner(plugins_map, plugin);
+        }
+    }
+
+    /// Performs the actual plugin loading process for a specific plugin
+    fn load_plugin_inner(&self, plugins: &mut HashMap<PluginId, Arc<Plugin>>, plugin: Plugin) {
+        let plugin_id = plugin.manifest.plugin.id.clone();
+        let plugin_path = plugin.path.clone();
+
+        let tasks = self.tasks();
+
+        // Stop any existing plugin tasks for the matching plugin ID
+        tasks.stop(&plugin_id);
+
+        // Start a new task for the plugin
+        tasks.start(plugin_id.clone(), plugin_path, &plugin.manifest);
+
+        // Store the plugin
+        plugins.insert(plugin_id, Arc::new(plugin));
+    }
+
+    /// Unloads the plugin with the provided `plugin_id`
+    pub fn unload_plugin(&self, plugin_id: &PluginId) -> Option<Arc<Plugin>> {
+        // Stop any running plugin tasks
+        self.tasks().stop(plugin_id);
+
+        // Remove the plugin from the plugins list
+        let mut plugins = &mut *self.inner.plugins.write();
+        plugins.remove(plugin_id)
+    }
+
+    /// Get a specific plugin
+    pub fn get_plugin(&self, plugin_id: &PluginId) -> Option<Arc<Plugin>> {
+        self.inner.plugins.read().get(plugin_id).cloned()
+    }
+
+    /// Get a list of all plugins and the state of the plugins task
+    pub fn get_plugins_with_state(&self) -> Vec<PluginWithState> {
+        let plugins = self.inner.plugins.read();
+        let states = self.inner.tasks.get_states();
 
         plugins
-            .into_iter()
-            .map(|plugin| {
-                let state = states.get(&plugin.manifest.plugin.id).cloned();
+            .iter()
+            .map(|(plugin_id, plugin)| {
+                let state = states
+                    .iter()
+                    .find_map(|(state_plugin_id, state)| {
+                        if state_plugin_id == plugin_id {
+                            Some(state.clone())
+                        } else {
+                            None
+                        }
+                    })
+                    .unwrap_or_default();
 
                 PluginWithState {
-                    plugin,
-                    state: state.unwrap_or(PluginTaskState::NotStarted),
+                    plugin: plugin.clone(),
+                    state,
                 }
             })
             .collect()
     }
 
     pub fn get_action_collection(&self) -> Vec<ActionCategory> {
-        actions_from_plugins(self.inner.plugins.read().values())
+        actions_from_manifests(
+            self.inner
+                .plugins
+                .read()
+                .values()
+                .map(|value| &value.manifest),
+        )
     }
 
     pub fn get_action(
@@ -142,38 +205,59 @@ impl Plugins {
         })
     }
 
-    pub fn get_plugin_path(&self, plugin_id: &PluginId) -> Option<PathBuf> {
-        self.inner
-            .plugins
-            .read()
-            .get(plugin_id)
-            .map(|plugin| plugin.path.clone())
+    /// Insert a new session
+    pub fn insert_session(&self, session_id: PluginSessionId, session_ref: PluginSessionRef) {
+        self.inner.sessions.write().insert(session_id, session_ref);
     }
 
-    pub fn get_plugin_manifest(&self, plugin_id: &PluginId) -> Option<Manifest> {
+    /// Insert a new session
+    pub fn get_session(&self, session_id: &PluginSessionId) -> Option<PluginSessionRef> {
+        self.inner.sessions.write().get(session_id).cloned()
+    }
+
+    /// Remove a session
+    pub fn remove_session(&self, session_id: PluginSessionId) {
+        self.inner.sessions.write().remove(&session_id);
+    }
+
+    pub fn set_plugin_session(&self, plugin_id: PluginId, session_id: PluginSessionId) {
         self.inner
-            .plugins
-            .read()
-            .get(plugin_id)
-            .map(|plugin| plugin.manifest.clone())
+            .plugin_to_session
+            .write()
+            .insert(plugin_id, session_id);
+    }
+
+    pub fn remove_plugin_session(&self, plugin_id: PluginId) {
+        self.inner.plugin_to_session.write().remove(&plugin_id);
+    }
+
+    pub fn get_plugin_session(&self, plugin_id: &PluginId) -> Option<PluginSessionRef> {
+        let session_id = {
+            let plugin_to_session = self.inner.plugin_to_session.read();
+            plugin_to_session.get(plugin_id).cloned()
+        }?;
+
+        self.get_session(&session_id)
     }
 
     pub async fn handle_send_message(
         &self,
-
-        app_tx: &AppEventSender,
-        db: &DbPool,
-
         context: InspectorContext,
         message: serde_json::Value,
     ) -> anyhow::Result<()> {
-        let manifest = self
-            .get_plugin_manifest(&context.plugin_id)
+        let plugin = self
+            .get_plugin(&context.plugin_id)
             .context("plugin not found")?;
 
-        if manifest.plugin.internal.is_some_and(|value| value) {
-            internal::messages::handle_internal_send_message(self, app_tx, db, context, message)
-                .await?;
+        if plugin.manifest.plugin.internal.is_some_and(|value| value) {
+            internal::messages::handle_internal_send_message(
+                self,
+                &self.inner.event_tx,
+                &self.inner.db,
+                context,
+                message,
+            )
+            .await?;
         } else {
             let session = match self.get_plugin_session(&context.plugin_id) {
                 Some(value) => value,
@@ -192,18 +276,18 @@ impl Plugins {
     pub async fn handle_action(
         &self,
         devices: &Devices,
-        db: &DbPool,
         context: TileInteractionContext,
         tile: TileModel,
     ) -> anyhow::Result<()> {
         tracing::debug!(?context, "invoking action");
 
-        let manifest = self
-            .get_plugin_manifest(&context.plugin_id)
+        let plugin = self
+            .get_plugin(&context.plugin_id)
             .context("plugin not found")?;
 
-        if manifest.plugin.internal.is_some_and(|value| value) {
-            internal::actions::handle_internal_action(self, devices, db, context, tile).await?;
+        if plugin.manifest.plugin.internal.is_some_and(|value| value) {
+            internal::actions::handle_internal_action(self, devices, &self.inner.db, context, tile)
+                .await?;
         } else {
             let session = match self.get_plugin_session(&context.plugin_id) {
                 Some(value) => value,
@@ -219,44 +303,7 @@ impl Plugins {
         Ok(())
     }
 
-    /// Insert a new session
-    pub fn insert_session(&self, session_id: PluginSessionId, session_ref: PluginSessionRef) {
-        self.inner.sessions.write().insert(session_id, session_ref);
-    }
-
-    /// Insert a new session
-    pub fn get_session(&self, session_id: &PluginSessionId) -> Option<PluginSessionRef> {
-        self.inner.sessions.write().get(session_id).cloned()
-    }
-
-    /// Remove a session
-    pub fn remove_session(&self, session_id: PluginSessionId) {
-        self.inner.sessions.write().remove(&session_id);
-    }
-
-    pub fn set_plugin_session(&self, plugin_id: PluginId, session_id: Option<PluginSessionId>) {
-        if let Some(session_id) = session_id {
-            self.inner
-                .plugin_to_session
-                .write()
-                .insert(plugin_id, session_id);
-        } else {
-            self.inner.plugin_to_session.write().remove(&plugin_id);
-        }
-    }
-
-    pub fn get_plugin_session(&self, plugin_id: &PluginId) -> Option<PluginSessionRef> {
-        let session_id = {
-            let plugin_to_session = self.inner.plugin_to_session.read();
-            plugin_to_session.get(plugin_id).cloned()
-        }?;
-        let session = {
-            let sessions = self.inner.sessions.read();
-            sessions.get(&session_id).cloned()
-        }?;
-        Some(session.clone())
-    }
-
+    /// Retrieve the plugin properties from a specific plugin
     pub async fn get_plugin_properties(
         &self,
         plugin_id: PluginId,
@@ -268,6 +315,19 @@ impl Plugins {
             .unwrap_or_else(|| serde_json::Value::Object(Map::new())))
     }
 
+    /// Handle sending a message to the provided inspector context from
+    /// a plugin session
+    pub fn send_to_inspector(&self, ctx: InspectorContext, message: serde_json::Value) {
+        _ = self
+            .inner
+            .event_tx
+            .send(AppEvent::Plugin(PluginAppEvent::RecvPluginMessage {
+                context: ctx,
+                message,
+            }));
+    }
+
+    /// Handle setting the plugin properties
     pub async fn set_plugin_properties(
         &self,
         plugin_id: PluginId,
@@ -277,128 +337,25 @@ impl Plugins {
         Ok(())
     }
 
-    pub async fn open_inspector(&self, inspector: InspectorContext) -> anyhow::Result<()> {
+    /// Handle the inspector being opened, notify attached sessions for the
+    /// inspector plugin
+    pub fn open_inspector(&self, inspector: InspectorContext) {
         if let Some(session) = self.get_plugin_session(&inspector.plugin_id) {
             _ = session.send_message(ServerPluginMessage::InspectorOpen { ctx: inspector });
         }
-
-        Ok(())
     }
 
-    pub async fn close_inspector(&self, inspector: InspectorContext) -> anyhow::Result<()> {
+    /// Handle the inspector being closed, notify attached sessions for the
+    /// inspector plugin
+    pub fn close_inspector(&self, inspector: InspectorContext) {
         if let Some(session) = self.get_plugin_session(&inspector.plugin_id) {
             _ = session.send_message(ServerPluginMessage::InspectorClose { ctx: inspector });
-        }
-
-        Ok(())
-    }
-
-    pub fn set_plugin_task(&self, plugin_id: &PluginId, plugin_task: PluginTaskState) {
-        self.inner
-            .plugin_tasks
-            .write()
-            .insert(plugin_id.clone(), plugin_task);
-    }
-
-    pub fn stop_plugin_task(&self, plugin_id: &PluginId) {
-        let mut tasks = self.inner.plugin_tasks.write();
-        let state = match tasks.get_mut(plugin_id) {
-            Some(value) => value,
-            None => return,
-        };
-
-        if let PluginTaskState::Running { abort } = state {
-            abort.abort();
-        }
-
-        *state = PluginTaskState::NotStarted;
-    }
-
-    pub fn start_plugin_task(&self, plugin_id: &PluginId) {
-        let plugins_map = &*self.inner.plugins.read();
-        let plugin = match plugins_map.get(plugin_id) {
-            Some(value) => value,
-            None => return,
-        };
-        self.create_plugin_task(plugin);
-    }
-
-    pub fn restart_plugin_task(&self, plugin_id: &PluginId) {
-        self.stop_plugin_task(plugin_id);
-        self.start_plugin_task(plugin_id);
-    }
-
-    pub async fn reload_plugin(&self, plugin_id: &PluginId) -> anyhow::Result<()> {
-        self.stop_plugin_task(plugin_id);
-
-        let plugin_path = self
-            .get_plugin_path(plugin_id)
-            .context("plugin not loaded")?;
-
-        let new_plugin = load_plugin(&plugin_path).await?;
-        self.create_plugin_task(&new_plugin);
-
-        {
-            let plugins_map = &mut *self.inner.plugins.write();
-            plugins_map.insert(plugin_id.clone(), new_plugin);
-        }
-
-        Ok(())
-    }
-
-    pub fn create_plugin_task(&self, plugin: &Plugin) {
-        let plugin_id = plugin.manifest.plugin.id.clone();
-
-        tracing::debug!(?plugin_id, "starting background task for plugin");
-
-        let binary = match plugin.manifest.bin.as_ref() {
-            Some(value) => value,
-            None => {
-                // No binary available for the plugin
-                tracing::debug!(?plugin_id, "skipping starting plugin without binary");
-                self.set_plugin_task(&plugin_id, PluginTaskState::Unavailable);
-                return;
-            }
-        };
-
-        match binary {
-            manifest::ManifestBin::Node { node } => todo!("node task support"),
-            manifest::ManifestBin::Native { native } => {
-                let os = platform_os();
-                let arch = platform_arch();
-
-                let binary = native.iter().find(|bin| os == bin.os && arch == bin.arch);
-                let binary = match binary {
-                    Some(value) => value,
-                    None => {
-                        // No binary available for the plugin
-                        tracing::debug!(
-                            ?plugin_id,
-                            ?os,
-                            ?arch,
-                            "skipping starting plugin without binary for current platform"
-                        );
-                        self.set_plugin_task(&plugin_id, PluginTaskState::Unavailable);
-                        return;
-                    }
-                };
-
-                // No binary available for the plugin
-                tracing::debug!(?plugin_id, ?os, ?arch, "starting native plugin binary");
-
-                let plugin_path = plugin.path.clone();
-                let exe = binary.path.clone();
-
-                let connect_url = "ws://localhost:59371/plugins/ws".to_string();
-
-                spawn_native_task(self.clone(), plugin_path, exe, connect_url, plugin_id);
-            }
         }
     }
 }
 
 pub async fn load_plugins_into_registry(registry: Plugins, path: PathBuf) {
-    let plugins = match load_plugins(&path).await {
+    let plugins = match load_plugins_from_path(&path).await {
         Ok(value) => value,
         Err(cause) => {
             tracing::error!(?cause, ?path, "failed to load plugins for registry");
@@ -408,52 +365,5 @@ pub async fn load_plugins_into_registry(registry: Plugins, path: PathBuf) {
 
     tracing::debug!(?plugins, "loaded plugins");
 
-    registry.insert_plugins(plugins);
-}
-
-#[derive(Debug, Serialize, Clone)]
-pub struct Plugin {
-    pub path: PathBuf,
-    pub manifest: Manifest,
-}
-
-pub async fn load_plugins(path: &Path) -> anyhow::Result<Vec<Plugin>> {
-    let mut plugins = Vec::new();
-    let mut dir = tokio::fs::read_dir(path).await?;
-
-    while let Some(entry) = dir.next_entry().await? {
-        let path = entry.path();
-        let file_type = entry.file_type().await?;
-        if !file_type.is_dir() && !file_type.is_symlink_dir() {
-            continue;
-        }
-
-        if let Ok(plugin) = load_plugin(&path).await {
-            plugins.push(plugin);
-        }
-    }
-
-    Ok(plugins)
-}
-
-pub async fn load_plugin(path: &Path) -> anyhow::Result<Plugin> {
-    let manifest_path = path.join("manifest.toml");
-    let manifest = match load_manifest(&manifest_path).await {
-        Ok(value) => value,
-        Err(cause) => {
-            tracing::error!(?cause, ?manifest_path, "failed to load manifest file");
-            return Err(cause);
-        }
-    };
-    Ok(Plugin {
-        path: path.to_path_buf(),
-        manifest,
-    })
-}
-
-pub async fn load_manifest(path: &Path) -> anyhow::Result<Manifest> {
-    let data = tokio::fs::read_to_string(path).await?;
-    let manifest: Manifest = toml::from_str(&data)?;
-    manifest.validate()?;
-    Ok(manifest)
+    registry.load_plugins(plugins);
 }

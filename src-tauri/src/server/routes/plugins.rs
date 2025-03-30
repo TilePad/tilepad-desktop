@@ -34,11 +34,8 @@ pub async fn get_plugin_file(
     Path((plugin_id, path)): Path<(PluginId, String)>,
     Extension(plugins): Extension<Plugins>,
 ) -> Result<Response<Body>, DynHttpError> {
-    let plugin_path = plugins
-        .get_plugin_path(&plugin_id)
-        .context("unknown plugin")?;
-
-    let file_path = plugin_path.join(path);
+    let plugin = plugins.get_plugin(&plugin_id).context("unknown plugin")?;
+    let file_path = plugin.path.join(path);
 
     // TODO: Assert file path is within plugin path
 

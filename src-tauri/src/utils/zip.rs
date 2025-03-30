@@ -3,17 +3,27 @@ use std::path::{Path, PathBuf};
 use anyhow::Context;
 use async_zip::tokio::read::seek::ZipFileReader;
 use tokio::{
-    fs::{create_dir_all, File, OpenOptions},
-    io::BufReader,
+    fs::{create_dir_all, OpenOptions},
+    io::{AsyncBufRead, AsyncSeek},
 };
 use tokio_util::compat::FuturesAsyncReadCompatExt;
 
+/// Create a zip reader from the tokio readable type
+pub async fn create_zip_reader<R>(reader: R) -> anyhow::Result<ZipFileReader<R>>
+where
+    R: AsyncBufRead + AsyncSeek + Unpin,
+{
+    ZipFileReader::with_tokio(reader)
+        .await
+        .context("failed to create zip reader")
+}
+
 /// Extracts the provided zip file reader to the provided `out_dir`
 #[allow(unused)]
-pub async fn extract_zip(
-    mut zip: ZipFileReader<BufReader<File>>,
-    out_dir: &Path,
-) -> anyhow::Result<()> {
+pub async fn extract_zip<R>(mut zip: ZipFileReader<R>, out_dir: &Path) -> anyhow::Result<()>
+where
+    R: AsyncBufRead + AsyncSeek + Unpin,
+{
     for index in 0..zip.file().entries().len() {
         let entry = zip
             .file()
@@ -65,6 +75,44 @@ pub async fn extract_zip(
     }
 
     Ok(())
+}
+
+/// Attempts to extract the contents of a file named `file_name` from the provided
+/// `zip` zip file, returns the bytes of the file if one was found
+pub async fn extract_zip_file<R>(
+    mut zip: ZipFileReader<R>,
+    file_name: &str,
+) -> anyhow::Result<Option<Vec<u8>>>
+where
+    R: AsyncBufRead + AsyncSeek + Unpin,
+{
+    // Find the file entry index of the file
+    let file_index = zip.file().entries().iter().position(|entry| {
+        entry
+            .filename()
+            .as_str()
+            .is_ok_and(|value| value == file_name)
+    });
+
+    let file_index = match file_index {
+        Some(value) => value,
+        None => return Ok(None),
+    };
+
+    // Create a reader for the manifest file
+    let mut file_reader = zip
+        .reader_without_entry(file_index)
+        .await
+        .context("failed to read file from zip")?
+        .compat();
+
+    // Read the manifest file
+    let mut data = Vec::new();
+    tokio::io::copy(&mut file_reader, &mut data)
+        .await
+        .context("failed to read manifest file")?;
+
+    Ok(Some(data))
 }
 
 /// Returns a relative path without reserved names, redundant separators, ".", or "..".
