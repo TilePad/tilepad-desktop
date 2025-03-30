@@ -89,6 +89,13 @@ export async function installPlugin(file: File) {
 
   invalidatePluginsQuery();
 }
+export async function uninstallPlugin(pluginId: PluginId) {
+  await invoke<void>("plugins_uninstall_plugin", {
+    pluginId,
+  });
+
+  invalidatePluginsQuery();
+}
 
 // [QUERIES] ------------------------------------------------------
 

@@ -14,7 +14,7 @@ use crate::utils::zip::{create_zip_reader, extract_zip};
 use super::loader::read_plugin_manifest_zip;
 
 /// Removes any existing plugin data from the provided `path`
-pub async fn remove_existing_plugin(path: &Path) -> anyhow::Result<()> {
+pub async fn remove_plugin_files(path: &Path) -> anyhow::Result<()> {
     // Remove old directory if present
     if path.is_symlink() || path.is_dir() {
         remove_dir_all(&path)

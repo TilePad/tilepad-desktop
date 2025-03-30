@@ -2,7 +2,7 @@ use crate::{
     commands::CmdResult,
     events::InspectorContext,
     plugin::{
-        install::{install_plugin_zip, remove_existing_plugin},
+        install::{install_plugin_zip, remove_plugin_files},
         loader::{load_plugin_from_path, read_plugin_manifest_zip},
         manifest::PluginId,
         PluginWithState, Plugins,
@@ -28,14 +28,13 @@ pub async fn plugins_install_plugin_manual(
 
     // Determine plugin install directory
     let plugin_id = manifest.plugin.id;
-    let directory_name = format!("{plugin_id}.tilepadPlugin");
-    let path = user_plugins.join(directory_name);
+    let path = user_plugins.join(&plugin_id.0);
 
     // Unload the plugin
     plugins.unload_plugin(&plugin_id);
 
     // Cleanup old files
-    remove_existing_plugin(&path).await?;
+    remove_plugin_files(&path).await?;
 
     // Install the plugin zip file
     install_plugin_zip(&data, &path).await?;
@@ -46,6 +45,30 @@ pub async fn plugins_install_plugin_manual(
         .context("failed to load plugin")?;
 
     plugins.load_plugin(plugin);
+
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn plugins_uninstall_plugin(
+    app: AppHandle,
+    plugins: State<'_, Plugins>,
+    plugin_id: PluginId,
+) -> CmdResult<()> {
+    let app_data_path = app
+        .path()
+        .app_data_dir()
+        .context("failed to get app data dir")?;
+    let user_plugins = app_data_path.join("plugins");
+
+    // Determine plugin install directory
+    let path = user_plugins.join(&plugin_id.0);
+
+    // Unload the plugin
+    plugins.unload_plugin(&plugin_id);
+
+    // Cleanup old files
+    remove_plugin_files(&path).await?;
 
     Ok(())
 }

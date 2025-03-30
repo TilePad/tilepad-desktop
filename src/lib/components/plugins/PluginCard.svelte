@@ -3,8 +3,8 @@
   import type { PluginWithState } from "$lib/api/types/plugin";
 
   import { toast } from "svelte-sonner";
-  import { reloadPlugin } from "$lib/api/plugins";
   import { toastErrorMessage } from "$lib/api/utils/error";
+  import { reloadPlugin, uninstallPlugin } from "$lib/api/plugins";
 
   import Button from "../input/Button.svelte";
   type Props = {
@@ -23,6 +23,16 @@
       error: toastErrorMessage("Failed to reload plugin"),
     });
   }
+
+  function handleUninstall() {
+    const revokePromise = uninstallPlugin(manifest.plugin.id);
+
+    toast.promise(revokePromise, {
+      loading: "Uninstalling plugin",
+      success: "Uninstalled plugin",
+      error: toastErrorMessage("Failed to uninstall plugin"),
+    });
+  }
 </script>
 
 <div class="plugin">
@@ -36,7 +46,10 @@
 
   <span class="state">{state}</span>
 
-  <Button onclick={handleReload}>Reload</Button>
+  <div class="plugin__actions">
+    <Button onclick={handleReload}>Reload</Button>
+    <Button onclick={handleUninstall}>Uninstall</Button>
+  </div>
 </div>
 
 <style>
@@ -55,6 +68,7 @@
     color: #ccc;
     font-size: 0.8rem;
   }
+
   .plugin__version {
     color: #ccc;
     font-size: 0.8rem;
@@ -62,6 +76,11 @@
 
   .plugin__name {
     font-size: 1.2rem;
+  }
+
+  .plugin__actions {
+    display: flex;
+    gap: 1rem;
   }
 
   .state {
