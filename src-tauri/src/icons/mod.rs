@@ -5,6 +5,8 @@ use parking_lot::RwLock;
 use serde::Serialize;
 use tilepad_manifest::icons::{Icon, IconPackId, Manifest as IconPackManifest};
 
+use crate::events::{AppEvent, AppEventSender, IconPackAppEvent};
+
 pub mod install;
 pub mod loader;
 
@@ -13,8 +15,10 @@ pub struct Icons {
     inner: Arc<IconsInner>,
 }
 
-#[derive(Default)]
 struct IconsInner {
+    /// Sender for app events
+    event_tx: AppEventSender,
+
     /// Collection of currently loaded plugins
     packs: RwLock<HashMap<IconPackId, Arc<IconPack>>>,
 }
@@ -27,9 +31,12 @@ pub struct IconPack {
 }
 
 impl Icons {
-    pub fn new() -> Self {
+    pub fn new(event_tx: AppEventSender) -> Self {
         Self {
-            inner: Default::default(),
+            inner: Arc::new(IconsInner {
+                event_tx,
+                packs: Default::default(),
+            }),
         }
     }
 
@@ -52,7 +59,15 @@ impl Icons {
         let pack_id = pack.manifest.icons.id.clone();
 
         // Store the plugin
-        packs.insert(pack_id, Arc::new(pack));
+        packs.insert(pack_id.clone(), Arc::new(pack));
+
+        // Emit loaded event
+        _ = self
+            .inner
+            .event_tx
+            .send(AppEvent::IconPack(IconPackAppEvent::IconPackLoaded {
+                pack_id,
+            }));
     }
 
     pub fn get_icon_packs(&self) -> Vec<Arc<IconPack>> {
@@ -69,6 +84,14 @@ impl Icons {
 
     pub fn unload_pack(&self, pack_id: &IconPackId) {
         self.inner.packs.write().remove(pack_id);
+
+        // Emit loaded event
+        _ = self
+            .inner
+            .event_tx
+            .send(AppEvent::IconPack(IconPackAppEvent::IconPackUnloaded {
+                pack_id: pack_id.clone(),
+            }));
     }
 }
 

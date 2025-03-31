@@ -111,7 +111,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
     let (app_event_tx, app_event_rx) = mpsc::unbounded_channel();
     let plugins = Plugins::new(app_event_tx.clone(), db.clone());
     let devices = Devices::new(app_event_tx.clone(), db.clone(), plugins.clone());
-    let icons = Icons::new();
+    let icons = Icons::new(app_event_tx.clone());
 
     app.manage(app_event_tx.clone());
     app.manage(db.clone());

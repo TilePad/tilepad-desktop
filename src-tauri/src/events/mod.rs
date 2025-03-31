@@ -20,6 +20,8 @@ pub enum AppEvent {
     Device(DeviceAppEvent),
 
     Plugin(PluginAppEvent),
+
+    IconPack(IconPackAppEvent),
 }
 
 #[derive(Debug)]
@@ -72,4 +74,11 @@ pub enum PluginAppEvent {
     PluginUnloaded {
         plugin_id: PluginId,
     },
+}
+
+#[derive(Debug)]
+pub enum IconPackAppEvent {
+    IconPackLoaded { pack_id: IconPackId },
+
+    IconPackUnloaded { pack_id: IconPackId },
 }

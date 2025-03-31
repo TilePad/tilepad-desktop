@@ -7,7 +7,10 @@ use tracing::{debug, error};
 
 use crate::{database::DbPool, events::InspectorContext};
 
-use super::{AppEvent, AppEventReceiver, DeviceAppEvent, DeviceRequestAppEvent, PluginAppEvent};
+use super::{
+    AppEvent, AppEventReceiver, DeviceAppEvent, DeviceRequestAppEvent, IconPackAppEvent,
+    PluginAppEvent,
+};
 
 pub async fn process_events(app_handle: AppHandle, db: DbPool, mut event_rx: AppEventReceiver) {
     let mut futures = FuturesUnordered::new();
@@ -84,6 +87,14 @@ async fn process_event(
             }
             PluginAppEvent::PluginUnloaded { plugin_id } => {
                 app_handle.emit("plugins:unloaded", plugin_id)?;
+            }
+        },
+        AppEvent::IconPack(icon_pack_app_event) => match icon_pack_app_event {
+            IconPackAppEvent::IconPackLoaded { pack_id } => {
+                app_handle.emit("icon_packs:loaded", pack_id)?;
+            }
+            IconPackAppEvent::IconPackUnloaded { pack_id } => {
+                app_handle.emit("icon_packs:unloaded", pack_id)?;
             }
         },
     }
