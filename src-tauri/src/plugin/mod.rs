@@ -127,7 +127,13 @@ impl Plugins {
         tasks.start(plugin_id.clone(), plugin_path, &plugin.manifest);
 
         // Store the plugin
-        plugins.insert(plugin_id, Arc::new(plugin));
+        plugins.insert(plugin_id.clone(), Arc::new(plugin));
+
+        // Emit loaded event
+        _ = self
+            .inner
+            .event_tx
+            .send(AppEvent::Plugin(PluginAppEvent::PluginLoaded { plugin_id }));
     }
 
     /// Unloads the plugin with the provided `plugin_id`
@@ -135,9 +141,21 @@ impl Plugins {
         // Stop any running plugin tasks
         self.tasks().stop(plugin_id);
 
-        // Remove the plugin from the plugins list
-        let mut plugins = &mut *self.inner.plugins.write();
-        plugins.remove(plugin_id)
+        let plugin = {
+            // Remove the plugin from the plugins list
+            let mut plugins = &mut *self.inner.plugins.write();
+            plugins.remove(plugin_id)
+        };
+
+        // Emit unloaded event
+        _ = self
+            .inner
+            .event_tx
+            .send(AppEvent::Plugin(PluginAppEvent::PluginUnloaded {
+                plugin_id: plugin_id.clone(),
+            }));
+
+        plugin
     }
 
     /// Get a specific plugin

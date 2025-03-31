@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use tilepad_manifest::icons::IconPackId;
 use tokio::sync::mpsc;
 
 use crate::{
@@ -62,5 +63,13 @@ pub enum PluginAppEvent {
     RecvPluginMessage {
         context: InspectorContext,
         message: serde_json::Value,
+    },
+
+    PluginLoaded {
+        plugin_id: PluginId,
+    },
+
+    PluginUnloaded {
+        plugin_id: PluginId,
     },
 }

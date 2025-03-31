@@ -79,6 +79,12 @@ async fn process_event(
 
                 app_handle.emit("plugin:recv_plugin_message", &Payload { context, message })?;
             }
+            PluginAppEvent::PluginLoaded { plugin_id } => {
+                app_handle.emit("plugins:loaded", plugin_id)?;
+            }
+            PluginAppEvent::PluginUnloaded { plugin_id } => {
+                app_handle.emit("plugins:unloaded", plugin_id)?;
+            }
         },
     }
 
