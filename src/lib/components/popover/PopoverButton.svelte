@@ -13,6 +13,7 @@
   import Button from "../input/Button.svelte";
 
   type Props = {
+    button?: PopoverTriggerProps["child"];
     children?: Snippet;
     content?: Snippet;
     transparent?: boolean;
@@ -23,6 +24,7 @@
   } & HTMLButtonAttributes;
 
   const {
+    button,
     content,
     children,
     transparent,
@@ -36,7 +38,9 @@
 <Popover.Root {...rootProps}>
   <Popover.Trigger {...triggerProps}>
     {#snippet child({ props })}
-      {#if transparent}
+      {#if button}
+        {@render button({ props })}
+      {:else if transparent}
         <button
           class="transparent"
           {...props}

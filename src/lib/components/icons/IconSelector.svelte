@@ -44,7 +44,9 @@
 </script>
 
 <PopoverButton>
-  Icon
+  {#snippet button({ props })}
+    <button class="btn" {...props} type="button"> + </button>
+  {/snippet}
 
   {#snippet content()}
     <div class="content">
@@ -79,5 +81,28 @@
     max-height: 30rem;
     overflow-y: auto;
     overflow-x: hidden;
+  }
+
+  .btn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 1;
+    cursor: pointer;
+
+    width: 1.5rem;
+    height: 1.5rem;
+
+    padding: 0.35rem;
+    background-color: #544d5e;
+    border: none;
+    color: #fff;
+    border-radius: 0.25rem;
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 1em;
+    text-decoration: none;
   }
 </style>
