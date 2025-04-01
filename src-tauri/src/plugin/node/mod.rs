@@ -1,4 +1,3 @@
-pub mod arch;
 pub mod download;
 
 use std::path::{Path, PathBuf};
