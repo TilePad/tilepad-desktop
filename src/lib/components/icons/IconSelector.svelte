@@ -57,7 +57,12 @@
           Failed to load icon packs: {getErrorMessage($iconPacksQuery.error)}
         </p>
       {:else if $iconPacksQuery.isSuccess}
-        <TextInput placeholder="Search" bind:value={search} />
+        <TextInput
+          fullWidth
+          placeholder="Search"
+          bind:value={search}
+          style="margin-bottom: 8px"
+        />
 
         <div class="categories">
           {#each filteredPacks as pack}

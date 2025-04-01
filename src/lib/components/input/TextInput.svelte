@@ -3,12 +3,18 @@
 
   type Props = {
     type?: "text" | "password";
+    fullWidth?: boolean;
   } & Omit<HTMLInputAttributes, "type">;
 
-  let { value = $bindable(), type = "text", ...props }: Props = $props();
+  let {
+    value = $bindable(),
+    type = "text",
+    fullWidth,
+    ...props
+  }: Props = $props();
 </script>
 
-<input bind:value {...props} {type} />
+<input bind:value {...props} {type} class:input--full-width={fullWidth} />
 
 <style>
   input {
@@ -20,5 +26,9 @@
     align-items: center;
     display: flex;
     gap: 0.5rem;
+  }
+
+  .input--full-width {
+    width: 100%;
   }
 </style>
