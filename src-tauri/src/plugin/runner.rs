@@ -1,11 +1,17 @@
 use std::{
+    future::Future,
     path::{Path, PathBuf},
-    process::Stdio,
+    pin::Pin,
+    process::{ExitCode, ExitStatus, Stdio},
+    task::Poll,
 };
 
+use futures::channel::oneshot;
 use serde::{Serialize, Serializer};
 use tokio::{
-    process::{Child, Command},
+    io::{AsyncBufReadExt, BufReader, Lines},
+    process::{Child, ChildStderr, ChildStdout, Command},
+    select,
     sync::mpsc,
     task::AbortHandle,
 };
@@ -32,7 +38,7 @@ pub enum PluginTaskState {
 
     /// Process is running
     Running {
-        abort: AbortHandle,
+        handle: ChildTaskHandle,
     },
 
     /// Plugin task ended with an error itself
@@ -107,12 +113,14 @@ pub fn spawn_native_task(
         }
     };
 
-    let abort_handle = tokio::spawn({
+    let (task, handle) = ChildTask::create(child);
+    tokio::spawn({
         let plugins = tasks.clone();
         let plugin_id = plugin_id.clone();
+        let task = task;
 
         async move {
-            let output = match child.wait_with_output().await {
+            let status = match task.run().await {
                 Ok(child) => child,
                 Err(cause) => {
                     tracing::error!(?cause, "failed to get plugin output");
@@ -121,7 +129,7 @@ pub fn spawn_native_task(
                 }
             };
 
-            if output.status.success() {
+            if status.success() {
                 plugins.set_state(plugin_id, PluginTaskState::Stopped);
             } else {
                 plugins.set_state(plugin_id, PluginTaskState::Error);
@@ -130,10 +138,71 @@ pub fn spawn_native_task(
     })
     .abort_handle();
 
-    tasks.set_state(
-        plugin_id,
-        PluginTaskState::Running {
-            abort: abort_handle,
-        },
-    );
+    tasks.set_state(plugin_id, PluginTaskState::Running { handle });
+}
+
+#[derive(Debug, Clone)]
+pub struct ChildTaskHandle {
+    tx: mpsc::Sender<ChildTaskMessage>,
+}
+
+impl ChildTaskHandle {
+    pub async fn kill(&self) {
+        let (tx, rx) = oneshot::channel();
+        if self.tx.send(ChildTaskMessage::Kill { tx }).await.is_err() {
+            return;
+        }
+        _ = rx.await;
+    }
+}
+
+enum ChildTaskMessage {
+    Kill {
+        // Channel to notify when the process is killed
+        tx: oneshot::Sender<()>,
+    },
+}
+
+pub struct ChildTask {
+    child: Child,
+    rx: mpsc::Receiver<ChildTaskMessage>,
+}
+
+impl ChildTask {
+    pub fn create(mut child: Child) -> (ChildTask, ChildTaskHandle) {
+        // Take the error and output pipes
+        // let stdout = child.stdout.take().map(|io| BufReader::new(io).lines());
+        // let stderr = child.stderr.take().map(|io| BufReader::new(io).lines());
+
+        let (tx, rx) = mpsc::channel(1);
+
+        let task = ChildTask { child, rx };
+
+        (task, ChildTaskHandle { tx })
+    }
+
+    pub async fn run(mut self) -> std::io::Result<ExitStatus> {
+        loop {
+            select! {
+                result = self.rx.recv() => {
+                    let msg = match result {
+                        Some(msg) => msg,
+                        None => continue,
+                    };
+
+                    match msg {
+                        ChildTaskMessage::Kill { tx } => {
+                            self.child.kill().await;
+                            tx.send(());
+                            return Ok(ExitStatus::default())
+                        },
+                    }
+                }
+
+                output = self.child.wait() => {
+                    return output;
+                }
+            }
+        }
+    }
 }

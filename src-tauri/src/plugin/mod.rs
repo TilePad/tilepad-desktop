@@ -99,35 +99,31 @@ impl Plugins {
         &self.inner.tasks
     }
 
-    /// Load a single plugin
-    pub fn load_plugin(&self, plugin: Plugin) {
-        let mut plugins = &mut *self.inner.plugins.write();
-        self.load_plugin_inner(plugins, plugin);
-    }
-
     /// Load in bulk many plugins from `plugins`
-    pub fn load_plugins(&self, plugins: Vec<Plugin>) {
-        let mut plugins_map = &mut *self.inner.plugins.write();
+    pub async fn load_plugins(&self, plugins: Vec<Plugin>) {
         for plugin in plugins {
-            self.load_plugin_inner(plugins_map, plugin);
+            self.load_plugin(plugin).await;
         }
     }
 
-    /// Performs the actual plugin loading process for a specific plugin
-    fn load_plugin_inner(&self, plugins: &mut HashMap<PluginId, Arc<Plugin>>, plugin: Plugin) {
+    /// Load a single plugin
+    pub async fn load_plugin(&self, plugin: Plugin) {
         let plugin_id = plugin.manifest.plugin.id.clone();
         let plugin_path = plugin.path.clone();
 
         let tasks = self.tasks();
 
         // Stop any existing plugin tasks for the matching plugin ID
-        tasks.stop(&plugin_id);
+        tasks.stop(&plugin_id).await;
 
         // Start a new task for the plugin
         tasks.start(plugin_id.clone(), plugin_path, &plugin.manifest);
 
         // Store the plugin
-        plugins.insert(plugin_id.clone(), Arc::new(plugin));
+        {
+            let mut plugins = &mut *self.inner.plugins.write();
+            plugins.insert(plugin_id.clone(), Arc::new(plugin));
+        }
 
         // Emit loaded event
         _ = self
@@ -137,9 +133,9 @@ impl Plugins {
     }
 
     /// Unloads the plugin with the provided `plugin_id`
-    pub fn unload_plugin(&self, plugin_id: &PluginId) -> Option<Arc<Plugin>> {
+    pub async fn unload_plugin(&self, plugin_id: &PluginId) -> Option<Arc<Plugin>> {
         // Stop any running plugin tasks
-        self.tasks().stop(plugin_id);
+        self.tasks().stop(plugin_id).await;
 
         let plugin = {
             // Remove the plugin from the plugins list
@@ -383,5 +379,5 @@ pub async fn load_plugins_into_registry(registry: Plugins, path: PathBuf) {
 
     tracing::debug!(?plugins, "loaded plugins");
 
-    registry.load_plugins(plugins);
+    registry.load_plugins(plugins).await;
 }

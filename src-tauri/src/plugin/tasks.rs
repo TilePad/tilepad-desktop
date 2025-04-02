@@ -37,23 +37,30 @@ impl PluginTasks {
     }
 
     /// Stop a task by plugin ID
-    pub fn stop(&self, plugin_id: &PluginId) {
-        let mut tasks = self.inner.tasks.write();
-
-        // Get the current state
-        let state = match tasks.remove(plugin_id) {
-            Some(value) => value,
-            None => return,
+    pub async fn stop(&self, plugin_id: &PluginId) {
+        let state = {
+            let mut tasks = self.inner.tasks.write();
+            match tasks.remove(plugin_id) {
+                Some(value) => value,
+                None => return,
+            }
         };
 
+        // Get the current state
+
         // Abort the plugin background task
-        if let PluginTaskState::Running { abort } = state {
-            abort.abort();
+        if let PluginTaskState::Running { handle } = state {
+            handle.kill().await;
         }
     }
 
-    pub fn restart(&self, plugin_id: PluginId, plugin_path: PathBuf, manifest: &PluginManifest) {
-        self.stop(&plugin_id);
+    pub async fn restart(
+        &self,
+        plugin_id: PluginId,
+        plugin_path: PathBuf,
+        manifest: &PluginManifest,
+    ) {
+        self.stop(&plugin_id).await;
         self.start(plugin_id, plugin_path, manifest);
     }
 

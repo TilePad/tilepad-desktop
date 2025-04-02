@@ -31,7 +31,7 @@ pub async fn plugins_install_plugin_manual(
     let path = user_plugins.join(&plugin_id.0);
 
     // Unload the plugin
-    plugins.unload_plugin(&plugin_id);
+    plugins.unload_plugin(&plugin_id).await;
 
     // Cleanup old files
     remove_plugin_files(&path).await?;
@@ -44,7 +44,7 @@ pub async fn plugins_install_plugin_manual(
         .await
         .context("failed to load plugin")?;
 
-    plugins.load_plugin(plugin);
+    plugins.load_plugin(plugin).await;
 
     Ok(())
 }
@@ -65,7 +65,7 @@ pub async fn plugins_uninstall_plugin(
     let path = user_plugins.join(&plugin_id.0);
 
     // Unload the plugin
-    plugins.unload_plugin(&plugin_id);
+    plugins.unload_plugin(&plugin_id).await;
 
     // Cleanup old files
     remove_plugin_files(&path).await?;
@@ -127,8 +127,11 @@ pub fn plugins_get_plugins(plugins: State<'_, Plugins>) -> Vec<PluginWithState> 
 }
 
 #[tauri::command]
-pub fn plugins_stop_plugin_task(plugins: State<'_, Plugins>, plugin_id: PluginId) -> CmdResult<()> {
-    plugins.tasks().stop(&plugin_id);
+pub async fn plugins_stop_plugin_task(
+    plugins: State<'_, Plugins>,
+    plugin_id: PluginId,
+) -> CmdResult<()> {
+    plugins.tasks().stop(&plugin_id).await;
     Ok(())
 }
 
@@ -147,7 +150,7 @@ pub fn plugins_start_plugin_task(
 }
 
 #[tauri::command]
-pub fn plugins_restart_plugin_task(
+pub async fn plugins_restart_plugin_task(
     plugins: State<'_, Plugins>,
     plugin_id: PluginId,
 ) -> CmdResult<()> {
@@ -155,7 +158,8 @@ pub fn plugins_restart_plugin_task(
 
     plugins
         .tasks()
-        .restart(plugin_id, plugin.path.clone(), &plugin.manifest);
+        .restart(plugin_id, plugin.path.clone(), &plugin.manifest)
+        .await;
 
     Ok(())
 }
@@ -168,12 +172,13 @@ pub async fn plugins_reload_plugin(
     // Unload the plugin
     let plugin = plugins
         .unload_plugin(&plugin_id)
+        .await
         .context("plugin was never loaded")?;
 
     // Load the new plugin from the same path
     let new_plugin = load_plugin_from_path(&plugin.path).await?;
 
     // Load the new plugin into the plugins registry
-    plugins.load_plugin(new_plugin);
+    plugins.load_plugin(new_plugin).await;
     Ok(())
 }
