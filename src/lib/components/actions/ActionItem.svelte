@@ -20,10 +20,6 @@
 
   <div class="action__text">
     <span class="label">{action.label}</span>
-
-    {#if action.description !== null}
-      <span class="description">{action.description}</span>
-    {/if}
   </div>
 </div>
 
@@ -34,11 +30,11 @@
   }
 
   .action {
+    width: 15rem;
     padding: 0.5rem;
     display: flex;
     flex-flow: row;
     gap: 0.5rem;
-    width: 20rem;
     background-color: #1a181d;
   }
 
@@ -54,10 +50,5 @@
   .label {
     font-weight: bold;
     font-size: 0.9rem;
-  }
-
-  .description {
-    font-size: 0.8rem;
-    color: #ccc;
   }
 </style>

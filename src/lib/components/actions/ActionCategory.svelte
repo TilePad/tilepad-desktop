@@ -59,9 +59,11 @@
 
   .content {
     flex: auto;
+    width: 15rem;
   }
 
   .section {
+    width: 15rem;
   }
 
   .icon {

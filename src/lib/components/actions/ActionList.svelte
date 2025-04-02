@@ -28,6 +28,7 @@
   let shouldIgnoreDndEvents = $state(false);
 
   function handleDndConsider(e: CustomEvent<DndEvent<MovableAction>>) {
+    console.log(e);
     const { trigger, id } = e.detail.info;
     if (trigger === TRIGGERS.DRAG_STARTED) {
       console.warn(`copying ${id}`);
@@ -40,6 +41,15 @@
       items = e.detail.items;
       shouldIgnoreDndEvents = true;
     } else if (!shouldIgnoreDndEvents) {
+      if (
+        e.target &&
+        e.target instanceof HTMLElement &&
+        e.target.classList.contains("action-list")
+      ) {
+        items = [...items];
+        return;
+      }
+
       items = e.detail.items;
     } else {
       items = [...items];
@@ -64,7 +74,7 @@
 </script>
 
 <section
-  class="list"
+  class="list action-list"
   use:dndzone={{
     items,
     flipDurationMs: 0,
