@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <div class="tile-item">
+        <label class="tile-label" for="profile">Profile</label>
+        <select class="tile-select" name="profile" id="profile">
+            <option disabled value="">Loading...</option>
+        </select>
+        <p class="tile-description">Profile this tile will switch to when clicked</p>
+    </div>
+
+
+</body>
+
+<script>
+    const profile = document.getElementById("profile");
+
+    let properties;
+
+    // Handle properties received
+    window.tilepad.onProperties((newProperties) => {
+        properties = newProperties;
+
+        // Request the profile options
+        window.tilepad.sendPluginMessage({
+            type: "GET_PROFILE_OPTIONS"
+        })
+    });
+
+
+    // Handle messages from plugin
+    window.tilepad.onPluginMessage((data) => {
+        switch (data.type) {
+            case "PROFILE_OPTIONS": {
+                addProfileOptions(data.options)
+                break;
+            }
+        }
+    });
+
+    // Request the current properties
+    window.tilepad.requestProperties();
+
+    profile.onchange = (event) => onChangeProfile(event.target.value);
+
+    function onChangeProfile(value) {
+        if (value === "") {
+            window.tilepad.setProperty("profile", null);
+        } else {
+            window.tilepad.setProperty("profile", value);
+        }
+    }
+
+    function addProfileOptions(options) {
+        profile.innerHTML = "";
+
+        // Add default option
+        {
+            const defaultOption = document.createElement("option");
+            defaultOption.disabled = true;
+            defaultOption.value = "";
+            defaultOption.textContent = "None";
+            defaultOption.selected = true;
+            profile.options.add(defaultOption);
+        }
+
+        // Add real options
+        for (const profileOption of options) {
+            const option = document.createElement("option");
+            option.value = profileOption.value;
+            option.textContent = profileOption.label;
+            profile.options.add(option);
+        }
+
+        if (properties.profile) {
+            const profileIndex = getProfileOptionIndex(properties.profile);
+            if (profileIndex !== -1) {
+                profile.selectedIndex = profileIndex;
+            }
+        }
+    }
+
+    function getProfileOptionIndex(value) {
+        for (let i = 0; i < profile.options.length; i++) {
+            let option = profile.options.item(i);
+            if (option === null) break;
+            if (option.value !== value) continue;
+            return i;
+        }
+
+        return -1
+    }
+</script>
+
+</html>
