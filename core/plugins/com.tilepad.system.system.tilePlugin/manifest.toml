@@ -1,0 +1,41 @@
+[plugin]
+id = "com.tilepad.system.system"
+name = "System"
+version = "0.0.1"
+authors = ["Jacobtread"]
+description = "Tilepad system actions"
+internal = true
+
+[category]
+label = "System"
+icon = "images/pc.svg"
+
+[actions.website]
+label = "Website"
+icon = "images/internet.svg"
+description = "Open a website in your default browser"
+inspector = "ui/open-website.html"
+
+[actions.open]
+label = "Open"
+icon = "images/open.svg"
+description = "Open a specific app"
+inspector = "ui/open-app.html"
+
+[actions.close]
+label = "Close"
+icon = "images/close.svg"
+description = "Close a specific app"
+inspector = "ui/close-app.html"
+
+[actions.text]
+label = "Text"
+icon = "images/type.svg"
+description = "Type out a specific text"
+inspector = "ui/text.html"
+
+[actions.multimedia]
+label = "Multimedia"
+icon = "images/play-pause.svg"
+description = "Perform a multimedia action"
+inspector = "ui/multimedia.html"
