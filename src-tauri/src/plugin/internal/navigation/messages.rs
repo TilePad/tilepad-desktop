@@ -1,4 +1,3 @@
-use anyhow::Context;
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -10,31 +9,7 @@ use crate::{
     plugin::Plugins,
 };
 
-pub async fn handle_internal_send_message(
-    plugins: &Plugins,
-    app_tx: &AppEventSender,
-    db: &DbPool,
-
-    context: InspectorContext,
-    message: serde_json::Value,
-) -> anyhow::Result<()> {
-    let tile = TileModel::get_by_id(db, context.tile_id)
-        .await?
-        .context("tile instance not found")?;
-
-    match context.plugin_id.as_str() {
-        "com.tilepad.system.navigation" => {
-            handle_internal_navigation(plugins, app_tx, db, &tile, context, message).await?;
-        }
-
-        plugin_id => {
-            tracing::warn!(?plugin_id, ?context, "unknown internal action");
-        }
-    }
-
-    Ok(())
-}
-
+/// Messages from the inspectors
 #[derive(Deserialize)]
 #[serde(tag = "type", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum NavigationInspectorMessage {
@@ -42,6 +17,7 @@ pub enum NavigationInspectorMessage {
     GetProfileOptions,
 }
 
+/// Messages from the plugin
 #[derive(Serialize)]
 #[serde(tag = "type", rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum NavigationPluginMessage {
@@ -55,9 +31,8 @@ pub struct SelectOption {
     pub value: String,
 }
 
-async fn handle_internal_navigation(
-    _plugins: &Plugins,
-    app_tx: &AppEventSender,
+pub async fn handle(
+    plugins: &Plugins,
     db: &DbPool,
     _tile: &TileModel,
 
@@ -79,10 +54,7 @@ async fn handle_internal_navigation(
 
             let message = NavigationPluginMessage::FolderOptions { options };
             let message = serde_json::to_value(message)?;
-            app_tx.send(AppEvent::Plugin(PluginAppEvent::RecvPluginMessage {
-                context,
-                message,
-            }))?;
+            plugins.send_to_inspector(context, message);
         }
         NavigationInspectorMessage::GetProfileOptions => {
             let profiles = ProfileModel::all(db).await?;
@@ -96,10 +68,7 @@ async fn handle_internal_navigation(
 
             let message = NavigationPluginMessage::ProfileOptions { options };
             let message = serde_json::to_value(message)?;
-            app_tx.send(AppEvent::Plugin(PluginAppEvent::RecvPluginMessage {
-                context,
-                message,
-            }))?;
+            plugins.send_to_inspector(context, message);
         }
     }
 

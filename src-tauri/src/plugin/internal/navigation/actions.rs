@@ -1,5 +1,6 @@
 use anyhow::Context;
 use serde::Deserialize;
+use tauri_plugin_opener::open_url;
 
 use crate::{
     database::{
@@ -16,26 +17,6 @@ use crate::{
     plugin::Plugins,
 };
 
-pub async fn handle_internal_action(
-    plugins: &Plugins,
-    devices: &Devices,
-    db: &DbPool,
-    context: TileInteractionContext,
-    tile: TileModel,
-) -> anyhow::Result<()> {
-    match context.plugin_id.as_str() {
-        "com.tilepad.system.navigation" => {
-            handle_internal_navigation(devices, plugins, db, context, tile).await?;
-        }
-
-        plugin_id => {
-            tracing::warn!(?plugin_id, ?context, "unknown internal action");
-        }
-    }
-
-    Ok(())
-}
-
 #[derive(Deserialize)]
 pub struct SwitchFolderProperties {
     folder: FolderId,
@@ -46,7 +27,7 @@ pub struct SwitchProfileProperties {
     profile: ProfileId,
 }
 
-async fn handle_internal_navigation(
+pub async fn handle(
     devices: &Devices,
     plugins: &Plugins,
     db: &DbPool,

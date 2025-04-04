@@ -264,14 +264,7 @@ impl Plugins {
             .context("plugin not found")?;
 
         if plugin.manifest.plugin.internal.is_some_and(|value| value) {
-            internal::messages::handle_internal_send_message(
-                self,
-                &self.inner.event_tx,
-                &self.inner.db,
-                context,
-                message,
-            )
-            .await?;
+            internal::handle_internal_message(self, &self.inner.db, context, message).await?;
         } else {
             let session = match self.get_plugin_session(&context.plugin_id) {
                 Some(value) => value,
@@ -300,8 +293,7 @@ impl Plugins {
             .context("plugin not found")?;
 
         if plugin.manifest.plugin.internal.is_some_and(|value| value) {
-            internal::actions::handle_internal_action(self, devices, &self.inner.db, context, tile)
-                .await?;
+            internal::handle_internal_action(self, devices, &self.inner.db, context, tile).await?;
         } else {
             let session = match self.get_plugin_session(&context.plugin_id) {
                 Some(value) => value,
