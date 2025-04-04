@@ -203,7 +203,7 @@ impl Plugins {
     ) -> Option<ActionWithCategory> {
         let plugins = self.inner.plugins.read();
         let plugin = plugins.get(plugin_id)?;
-        let manifest_action = plugin.manifest.actions.get(action_id)?;
+        let manifest_action = plugin.manifest.actions.0.get(action_id)?;
 
         Some(ActionWithCategory {
             action: Action {

@@ -50,7 +50,7 @@ where
             actions: Vec::new(),
         };
 
-        for (action_id, manifest_action) in &manifest.actions {
+        for (action_id, manifest_action) in manifest.actions.0.iter() {
             let action = Action {
                 action_id: action_id.clone(),
                 plugin_id: manifest.plugin.id.clone(),
@@ -63,10 +63,6 @@ where
 
             category.actions.push(action);
         }
-
-        category
-            .actions
-            .sort_by(|a, b| a.action_id.cmp(&b.action_id));
 
         categories.push(category);
     }

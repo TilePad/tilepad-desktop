@@ -5327,6 +5327,7 @@ version = "0.0.0"
 dependencies = [
  "dirs",
  "garde",
+ "indexmap 2.8.0",
  "node-semver",
  "serde",
  "serde_json",
