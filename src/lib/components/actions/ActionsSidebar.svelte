@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { ActionCategory } from "$lib/api/types/actions";
+
   import { createActionsQuery } from "$lib/api/actions";
   import { getErrorMessage } from "$lib/api/utils/error";
 
@@ -7,6 +9,34 @@
   const actionsQuery = createActionsQuery();
 
   let search = $state("");
+
+  const filteredCategories = $derived.by(() => {
+    const data = $actionsQuery.data ?? [];
+    const query = search.trim();
+
+    if (query.length < 1) {
+      return data;
+    }
+
+    return filterCategories(data, query);
+  });
+
+  function filterCategories(categories: ActionCategory[], query: string) {
+    query = query.toLowerCase();
+
+    return categories
+      .map((category) => {
+        return {
+          ...category,
+
+          actions: category.actions.filter((action) => {
+            const name = action.label.toLowerCase();
+            return name === query || name.includes(query);
+          }),
+        };
+      })
+      .filter((pack) => pack.actions.length > 0);
+  }
 </script>
 
 <div class="sidebar">
@@ -25,8 +55,10 @@
     {:else if $actionsQuery.isError}
       Failed to load actions: {getErrorMessage($actionsQuery.error)}
     {:else if $actionsQuery.isSuccess}
-      {#each $actionsQuery.data as category}
+      {#each filteredCategories as category}
         <ActionsSidebarCategory {category} />
+      {:else}
+        <p class="none">No results found...</p>
       {/each}
     {/if}
   </div>
@@ -54,6 +86,10 @@
   }
 
   .search-wrapper {
+    padding: 0.5rem;
+  }
+
+  .none {
     padding: 0.5rem;
   }
 </style>
