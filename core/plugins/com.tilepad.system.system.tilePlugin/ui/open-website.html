@@ -10,93 +10,37 @@
 <body>
 
     <div class="tile-item">
-        <label class="tile-label" for="folder">Folder</label>
-        <select class="tile-select" name="folder" id="folder">
-            <option disabled value="">Loading...</option>
-        </select>
-        <p class="tile-description">Folder this tile will switch to when clicked</p>
+        <label class="tile-label" for="website">Website URL</label>
+        <input type="url" class="tile-input" name="website" id="website">
+        <p class="tile-description">URL of the website that will open when the tile is clicked</p>
     </div>
 
 
 </body>
 
 <script>
-    const folder = document.getElementById("folder");
+    const website = document.getElementById("website");
+
+    website.setAttribute('disabled', 'true')
 
     let properties;
 
     // Handle properties received
     window.tilepad.onProperties((newProperties) => {
         properties = newProperties;
-
-        // Request the folder options
-        window.tilepad.sendPluginMessage({
-            type: "GET_FOLDER_OPTIONS"
-        })
+        website.removeAttribute('disabled');
+        website.value = properties.url ?? '';
     });
 
-
-    // Handle messages from plugin
-    window.tilepad.onPluginMessage((data) => {
-        switch (data.type) {
-            case "FOLDER_OPTIONS": {
-                addFolderOptions(data.options)
-                break;
-            }
-        }
-    });
 
     // Request the current properties
     window.tilepad.requestProperties();
 
-    folder.onchange = (event) => onChangeFolder(event.target.value);
 
-    function onChangeFolder(value) {
-        if (value === "") {
-            window.tilepad.setProperty("folder", null);
-        } else {
-            window.tilepad.setProperty("folder", value);
-        }
-    }
+    website.onchange = (event) => onChangeWebsite(event.target.value);
 
-    function addFolderOptions(options) {
-        folder.innerHTML = "";
-
-        // Add default option
-        {
-            const defaultOption = document.createElement("option");
-            defaultOption.disabled = true;
-            defaultOption.value = "";
-            defaultOption.textContent = "None";
-            defaultOption.selected = true;
-            folder.options.add(defaultOption);
-        }
-
-        // Add real options
-        for (const folderOption of options) {
-            const option = document.createElement("option");
-            option.value = folderOption.value;
-            option.textContent = folderOption.label;
-            folder.options.add(option);
-        }
-
-        if (properties.folder) {
-            const folderIndex = getFolderOptionIndex(properties.folder);
-            if (folderIndex !== -1) {
-                folder.selectedIndex = folderIndex;
-            }
-        }
-    }
-
-    function getFolderOptionIndex(value) {
-        for (let i = 0; i < folder.options.length; i++) {
-            let option = folder.options.item(i);
-            if (option === null) break;
-            if (option.value !== value) continue;
-            return i;
-        }
-
-        return -1
+    function onChangeWebsite(value) {
+        window.tilepad.setProperty("url", value);
     }
 </script>
 
