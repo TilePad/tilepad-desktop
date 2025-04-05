@@ -68,6 +68,7 @@ pub fn run() {
             icons::icons_get_icon_packs,
             icons::icons_install_icon_pack,
             icons::icons_uninstall_icon_pack,
+            icons::icons_upload_user_icon,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

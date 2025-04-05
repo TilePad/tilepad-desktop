@@ -25,6 +25,15 @@ export async function installIconPack(file: File) {
 
   invalidateIconPacksQuery();
 }
+
+export async function uploadUserIcon(file: File): Promise<string> {
+  const data = await file.arrayBuffer();
+  return await invoke<string>("icons_upload_user_icon", {
+    name: file.name,
+    data,
+  });
+}
+
 export async function uninstallIconPack(packId: IconPackId) {
   await invoke<void>("icons_uninstall_icon_pack", {
     packId,

@@ -1,12 +1,12 @@
 use anyhow::Context;
-use tauri::State;
+use tauri::{AppHandle, Manager, State};
 
 use crate::{
     commands::CmdResult,
     database::{
         entity::{
             folder::FolderId,
-            tile::{CreateTile, TileId, TileModel, UpdateTile},
+            tile::{CreateTile, TileIcon, TileId, TileModel, UpdateTile},
         },
         DbPool,
     },
@@ -58,6 +58,7 @@ pub async fn tiles_create_tile(
 /// Update a specific tile
 #[tauri::command]
 pub async fn tiles_update_tile(
+    app: AppHandle,
     db: State<'_, DbPool>,
     devices: State<'_, Devices>,
 
@@ -68,6 +69,27 @@ pub async fn tiles_update_tile(
     let tile = TileModel::get_by_id(db, tile_id)
         .await?
         .context("tile not found")?;
+
+    let previous_icon = &tile.config.icon;
+
+    // Handle change in icon when using an uploaded icon (Remove the old file)
+    if update
+        .config
+        .as_ref()
+        .is_some_and(|config| previous_icon.ne(&config.icon))
+    {
+        if let TileIcon::Uploaded { path } = previous_icon {
+            let app_data_path = app
+                .path()
+                .app_data_dir()
+                .context("failed to get app data dir")?;
+            let uploaded_icons = app_data_path.join("uploaded_icons");
+            let file_path = uploaded_icons.join(path);
+            if file_path.exists() {
+                tokio::fs::remove_file(file_path).await?;
+            }
+        }
+    }
 
     let tile = tile.update(db, update).await?;
 

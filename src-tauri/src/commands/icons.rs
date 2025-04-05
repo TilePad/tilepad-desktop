@@ -1,8 +1,9 @@
-use std::sync::Arc;
+use std::{path::Path, sync::Arc};
 
 use anyhow::Context;
 use tauri::{AppHandle, Manager, State};
 use tilepad_manifest::icons::IconPackId;
+use uuid::Uuid;
 
 use crate::{
     commands::CmdResult,
@@ -79,4 +80,36 @@ pub async fn icons_uninstall_icon_pack(
     remove_icon_pack_files(&path).await?;
 
     Ok(())
+}
+
+#[tauri::command]
+pub async fn icons_upload_user_icon(
+    app: AppHandle,
+    name: String,
+    data: Vec<u8>,
+) -> CmdResult<String> {
+    let app_data_path = app
+        .path()
+        .app_data_dir()
+        .context("failed to get app data dir")?;
+    let uploaded_icons = app_data_path.join("uploaded_icons");
+
+    if !uploaded_icons.exists() {
+        tokio::fs::create_dir_all(&uploaded_icons).await?;
+    }
+
+    let file_path_name = Path::new(&name);
+    let extension = file_path_name
+        .extension()
+        .context("missing file extension")?
+        .to_string_lossy();
+    let file_id = Uuid::new_v4();
+    let file_name = format!("{}.{}", file_id, extension);
+    let file_path = uploaded_icons.join(&file_name);
+
+    tokio::fs::write(&file_path, data)
+        .await
+        .context("save file")?;
+
+    Ok(file_name)
 }

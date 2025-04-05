@@ -1,11 +1,9 @@
 <script lang="ts">
-  import type { Icon, IconPackId } from "$lib/api/types/icons";
-
   import { updateTile } from "$lib/api/tiles";
   import {
     type TileId,
-    TileIconType,
     type TileConfig,
+    type TileIcon as ITileIcon,
   } from "$lib/api/types/tiles";
 
   import TileIcon from "./TileIcon.svelte";
@@ -19,11 +17,11 @@
 
   const { tileId, config }: Props = $props();
 
-  const onClickIconPackIcon = (packId: IconPackId, icon: Icon) => {
+  const onClickIconPackIcon = (icon: ITileIcon) => {
     updateTile(tileId, {
       config: {
         ...config,
-        icon: { type: TileIconType.IconPack, pack_id: packId, path: icon.path },
+        icon,
       },
     });
   };
@@ -37,7 +35,7 @@
 </script>
 
 <div class="tile" style="--font-size-adjustment: {sizeAdjust};">
-  <IconSelector onClickIcon={onClickIconPackIcon} />
+  <IconSelector onSelectIcon={onClickIconPackIcon} />
   <TileIcon icon={config.icon} />
   <TileLabelElm label={config.label} />
 </div>

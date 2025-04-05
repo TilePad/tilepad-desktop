@@ -80,7 +80,7 @@ pub enum LabelAlign {
     Top,
 }
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(tag = "type")]
 pub enum TileIcon {
     /// No icon
@@ -100,6 +100,12 @@ pub enum TileIcon {
         /// ID of the icon pack
         pack_id: IconPackId,
         /// Path to the icon file
+        path: String,
+    },
+
+    /// User uploaded file
+    Uploaded {
+        /// Path to the uploaded file
         path: String,
     },
 }

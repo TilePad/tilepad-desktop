@@ -25,5 +25,9 @@ pub fn router() -> Router {
                 Router::new().route("/assets/{*path}", get(icons::get_icon_file)),
             ),
         )
+        .nest(
+            "/uploaded-icons",
+            Router::new().route("/{*path}", get(icons::get_uploaded_icon_file)),
+        )
         .nest("/devices", Router::new().route("/ws", get(devices::ws)))
 }

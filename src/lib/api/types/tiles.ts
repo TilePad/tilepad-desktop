@@ -31,17 +31,22 @@ export type TileIconIconPack = {
   pack_id: IconPackId;
   path: string;
 };
+export type TileIconUploaded = {
+  path: string;
+};
 
 export enum TileIconType {
   None = "None",
   PluginIcon = "PluginIcon",
   IconPack = "IconPack",
+  Uploaded = "Uploaded",
 }
 
 export type TileIcon =
   | ({ type: TileIconType.None } & TileIconNone)
   | ({ type: TileIconType.PluginIcon } & TileIconPluginIcon)
-  | ({ type: TileIconType.IconPack } & TileIconIconPack);
+  | ({ type: TileIconType.IconPack } & TileIconIconPack)
+  | ({ type: TileIconType.Uploaded } & TileIconUploaded);
 
 export type CreateTile = Omit<TileModel, "id">;
 

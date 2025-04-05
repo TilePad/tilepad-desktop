@@ -1,6 +1,10 @@
 <script lang="ts">
   import { TileIconType, type TileIcon } from "$lib/api/types/tiles";
-  import { getIconAssetPath, getPluginAssetPath } from "$lib/api/utils/url";
+  import {
+    getIconAssetPath,
+    getPluginAssetPath,
+    getUploadedIconAssetPath,
+  } from "$lib/api/utils/url";
 
   type Props = {
     icon: TileIcon;
@@ -19,6 +23,12 @@
   <img
     class="tile__icon"
     src={getIconAssetPath(icon.pack_id, icon.path)}
+    alt="Tile Icon"
+  />
+{:else if icon.type === TileIconType.Uploaded}
+  <img
+    class="tile__icon"
+    src={getUploadedIconAssetPath(icon.path)}
     alt="Tile Icon"
   />
 {/if}
