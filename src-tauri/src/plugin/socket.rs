@@ -15,6 +15,7 @@ use axum::extract::ws::{Message, WebSocket};
 use parking_lot::RwLock;
 use serde_json::{Map, Value};
 use tauri::async_runtime::spawn;
+use tauri_plugin_opener::open_url;
 use tracing::{debug, error};
 use uuid::Uuid;
 
@@ -165,6 +166,11 @@ impl PluginSession {
                         error!(?cause, "failed to save plugin properties");
                     }
                 });
+            }
+            ClientPluginMessage::OpenUrl { url } => {
+                if let Err(cause) = open_url(url, None::<&str>) {
+                    error!(?cause, "failed to open url");
+                }
             }
         }
     }

@@ -28,6 +28,9 @@ pub enum ClientPluginMessage {
         /// Message to send the inspector
         message: serde_json::Value,
     },
+
+    /// Open a URL
+    OpenUrl { url: String },
 }
 
 /// Plugin message coming from the server side
