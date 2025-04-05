@@ -1,4 +1,4 @@
-use std::error::Error;
+use std::{error::Error, str::FromStr};
 
 use anyhow::Context;
 use device::Devices;
@@ -8,6 +8,8 @@ use tauri::{
     async_runtime::{block_on, spawn},
     App, Manager,
 };
+use tauri_plugin_deep_link::DeepLinkExt;
+use tilepad_manifest::plugin::PluginId;
 use tokio::sync::mpsc;
 use tracing_subscriber::EnvFilter;
 
@@ -26,6 +28,8 @@ pub fn run() {
     use commands::{actions, devices, folders, icons, plugins, profiles, server, tiles};
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|_app, _argv, _cwd| {}))
+        .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_opener::init())
         .setup(setup)
         .invoke_handler(tauri::generate_handler![
@@ -75,6 +79,12 @@ pub fn run() {
 }
 
 fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
+    #[cfg(any(target_os = "linux", all(debug_assertions, windows)))]
+    {
+        use tauri_plugin_deep_link::DeepLinkExt;
+        app.deep_link().register_all()?;
+    }
+
     let filter = EnvFilter::from_default_env();
     let subscriber = tracing_subscriber::fmt()
         .compact()
@@ -155,6 +165,45 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         plugins.clone(),
         icons.clone(),
     ));
+
+    // Handle deep links (tilepad://deep-link/com.tilepad.system.system.tilePlugin#code=1)
+    app.deep_link().on_open_url(move |event| {
+        for url in event.urls() {
+            tracing::debug!(?url, "execute deep link url");
+
+            // Domain part must be "deep-link" to be treated as a deep link
+            match url.domain() {
+                Some("deep-link") => {}
+                _ => continue,
+            }
+
+            let mut path = match url.path_segments() {
+                Some(value) => value,
+                None => continue,
+            };
+
+            let plugin_id = match path.next() {
+                Some(value) => PluginId::from_str(value),
+                None => continue,
+            };
+
+            let plugin_id = match plugin_id {
+                Ok(value) => value,
+                Err(cause) => {
+                    tracing::error!(?cause, "invalid deep link plugin id");
+                    continue;
+                }
+            };
+
+            let host = url.host_str().map(|value| value.to_string());
+            let path = url.path().to_string();
+            let query = url.query().map(|value| value.to_string());
+            let fragment = url.fragment().map(|value| value.to_string());
+            let url = url.to_string();
+
+            plugins.deep_link(&plugin_id, url, host, path, query, fragment);
+        }
+    });
 
     Ok(())
 }

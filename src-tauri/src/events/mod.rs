@@ -60,6 +60,15 @@ pub struct TileInteractionContext {
     pub tile_id: TileId,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DeepLinkContext {
+    pub url: String,
+    pub host: Option<String>,
+    pub path: String,
+    pub query: Option<String>,
+    pub fragment: Option<String>,
+}
+
 #[derive(Debug)]
 pub enum PluginAppEvent {
     RecvPluginMessage {

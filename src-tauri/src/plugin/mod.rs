@@ -30,7 +30,10 @@ use crate::{
         DbPool,
     },
     device::Devices,
-    events::{AppEvent, AppEventSender, InspectorContext, PluginAppEvent, TileInteractionContext},
+    events::{
+        AppEvent, AppEventSender, DeepLinkContext, InspectorContext, PluginAppEvent,
+        TileInteractionContext,
+    },
 };
 
 pub mod action;
@@ -356,6 +359,28 @@ impl Plugins {
     pub fn close_inspector(&self, inspector: InspectorContext) {
         if let Some(session) = self.get_plugin_session(&inspector.plugin_id) {
             _ = session.send_message(ServerPluginMessage::InspectorClose { ctx: inspector });
+        }
+    }
+
+    pub fn deep_link(
+        &self,
+        plugin_id: &PluginId,
+        url: String,
+        host: Option<String>,
+        path: String,
+        query: Option<String>,
+        fragment: Option<String>,
+    ) {
+        if let Some(session) = self.get_plugin_session(plugin_id) {
+            _ = session.send_message(ServerPluginMessage::DeepLink {
+                ctx: DeepLinkContext {
+                    url,
+                    host,
+                    path,
+                    query,
+                    fragment,
+                },
+            });
         }
     }
 }

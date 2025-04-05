@@ -3,7 +3,7 @@ use uuid::Uuid;
 
 use crate::{
     database::entity::{folder::FolderModel, tile::TileModel},
-    events::{InspectorContext, TileInteractionContext},
+    events::{DeepLinkContext, InspectorContext, TileInteractionContext},
 };
 
 use super::manifest::{ActionId, PluginId};
@@ -60,4 +60,7 @@ pub enum ServerPluginMessage {
 
     /// Inspector was closed
     InspectorClose { ctx: InspectorContext },
+
+    /// Received a deep link message for the plugin
+    DeepLink { ctx: DeepLinkContext },
 }

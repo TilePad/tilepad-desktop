@@ -69,6 +69,7 @@ gethostname = "1"
 
 # Manifest definitions
 tilepad-manifest = { version = "0.0.0", path = "../../tilepad-manifest" }
+tauri-plugin-deep-link = "2"
 
 [dependencies.sqlx]
 version = "0.8.2"
@@ -102,3 +103,6 @@ features = [
     "with-uuid",
     "runtime-tokio-rustls",
 ]
+
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-single-instance = { version = "2", features = ["deep-link"] }

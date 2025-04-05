@@ -34,5 +34,14 @@
     "resources": {
       "../core/": "core/"
     }
+  },
+  "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": [
+          "tilepad"
+        ]
+      }
+    }
   }
 }
