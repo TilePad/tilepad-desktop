@@ -282,7 +282,7 @@ impl Plugins {
         context: TileInteractionContext,
         tile: TileModel,
     ) -> anyhow::Result<()> {
-        tracing::debug!(?context, "invoking action");
+        tracing::debug!(?context, ?tile, "invoking action");
 
         let plugin = self
             .get_plugin(&context.plugin_id)
