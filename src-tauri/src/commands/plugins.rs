@@ -131,7 +131,7 @@ pub async fn plugins_stop_plugin_task(
     plugins: State<'_, Plugins>,
     plugin_id: PluginId,
 ) -> CmdResult<()> {
-    plugins.tasks().stop(&plugin_id).await;
+    plugins.stop_task(&plugin_id).await;
     Ok(())
 }
 
@@ -142,9 +142,7 @@ pub fn plugins_start_plugin_task(
 ) -> CmdResult<()> {
     let plugin = plugins.get_plugin(&plugin_id).context("plugin not found")?;
 
-    plugins
-        .tasks()
-        .start(plugin_id, plugin.path.clone(), &plugin.manifest);
+    plugins.start_task(plugin_id, plugin.path.clone(), &plugin.manifest);
 
     Ok(())
 }
@@ -157,8 +155,7 @@ pub async fn plugins_restart_plugin_task(
     let plugin = plugins.get_plugin(&plugin_id).context("plugin not found")?;
 
     plugins
-        .tasks()
-        .restart(plugin_id, plugin.path.clone(), &plugin.manifest)
+        .restart_task(plugin_id, plugin.path.clone(), &plugin.manifest)
         .await;
 
     Ok(())

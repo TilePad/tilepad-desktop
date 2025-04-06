@@ -20,7 +20,6 @@ use super::{
     manifest::{
         platform_arch, platform_os, Arch, ManifestBin, ManifestBinNative, OperatingSystem, PluginId,
     },
-    tasks::PluginTasks,
     Plugin, Plugins,
 };
 
@@ -70,7 +69,7 @@ pub enum PluginTaskType {
 }
 
 pub fn spawn_native_task(
-    tasks: PluginTasks,
+    plugins: Plugins,
 
     plugin_path: PathBuf,
     exe: String,
@@ -82,12 +81,12 @@ pub fn spawn_native_task(
 
     // Exe does not exist
     if !exe_path.exists() {
-        tasks.set_state(plugin_id, PluginTaskState::Unavailable);
+        plugins.set_task_state(plugin_id, PluginTaskState::Unavailable);
         return;
     }
 
     // Starting the exe
-    tasks.set_state(plugin_id.clone(), PluginTaskState::Starting);
+    plugins.set_task_state(plugin_id.clone(), PluginTaskState::Starting);
 
     tracing::debug!(?plugin_id, ?exe, ?plugin_path, "starting native plugin");
 
@@ -108,14 +107,14 @@ pub fn spawn_native_task(
         Ok(child) => child,
         Err(cause) => {
             tracing::error!(?cause, "failed to start plugin executable");
-            tasks.set_state(plugin_id, PluginTaskState::Error);
+            plugins.set_task_state(plugin_id, PluginTaskState::Error);
             return;
         }
     };
 
     let (task, handle) = ChildTask::create(child);
     tokio::spawn({
-        let plugins = tasks.clone();
+        let plugins = plugins.clone();
         let plugin_id = plugin_id.clone();
         let task = task;
 
@@ -124,21 +123,21 @@ pub fn spawn_native_task(
                 Ok(child) => child,
                 Err(cause) => {
                     tracing::error!(?cause, "failed to get plugin output");
-                    plugins.set_state(plugin_id, PluginTaskState::Error);
+                    plugins.set_task_state(plugin_id, PluginTaskState::Error);
                     return;
                 }
             };
 
             if status.success() {
-                plugins.set_state(plugin_id, PluginTaskState::Stopped);
+                plugins.set_task_state(plugin_id, PluginTaskState::Stopped);
             } else {
-                plugins.set_state(plugin_id, PluginTaskState::Error);
+                plugins.set_task_state(plugin_id, PluginTaskState::Error);
             }
         }
     })
     .abort_handle();
 
-    tasks.set_state(plugin_id, PluginTaskState::Running { handle });
+    plugins.set_task_state(plugin_id, PluginTaskState::Running { handle });
 }
 
 #[derive(Debug, Clone)]

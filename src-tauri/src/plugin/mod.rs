@@ -18,9 +18,9 @@ use runner::{spawn_native_task, PluginTaskState};
 use serde::Serialize;
 use serde_json::Map;
 use socket::{PluginSessionId, PluginSessionRef};
-use tasks::PluginTasks;
 use tauri::plugin;
 pub use tilepad_manifest::plugin as manifest;
+use tilepad_manifest::plugin::{ManifestBin, ManifestBinNative};
 use tokio::io::{BufReader, BufWriter};
 use tokio_util::compat::FuturesAsyncReadCompatExt;
 
@@ -44,7 +44,6 @@ pub mod node;
 pub mod protocol;
 pub mod runner;
 pub mod socket;
-pub mod tasks;
 
 #[derive(Clone)]
 pub struct Plugins {
@@ -61,8 +60,8 @@ struct PluginsInner {
     /// Collection of currently loaded plugins
     plugins: RwLock<HashMap<PluginId, Arc<Plugin>>>,
 
-    /// Tasks running for plugins
-    tasks: PluginTasks,
+    /// Mapping for the current plugin tasks
+    tasks: RwLock<HashMap<PluginId, PluginTaskState>>,
 
     /// Current plugin socket sessions
     sessions: RwLock<HashMap<PluginSessionId, PluginSessionRef>>,
@@ -98,10 +97,6 @@ impl Plugins {
         }
     }
 
-    pub fn tasks(&self) -> &PluginTasks {
-        &self.inner.tasks
-    }
-
     /// Load in bulk many plugins from `plugins`
     pub async fn load_plugins(&self, plugins: Vec<Plugin>) {
         for plugin in plugins {
@@ -114,13 +109,11 @@ impl Plugins {
         let plugin_id = plugin.manifest.plugin.id.clone();
         let plugin_path = plugin.path.clone();
 
-        let tasks = self.tasks();
-
         // Stop any existing plugin tasks for the matching plugin ID
-        tasks.stop(&plugin_id).await;
+        self.stop_task(&plugin_id).await;
 
         // Start a new task for the plugin
-        tasks.start(plugin_id.clone(), plugin_path, &plugin.manifest);
+        self.start_task(plugin_id.clone(), plugin_path, &plugin.manifest);
 
         // Store the plugin
         {
@@ -138,7 +131,7 @@ impl Plugins {
     /// Unloads the plugin with the provided `plugin_id`
     pub async fn unload_plugin(&self, plugin_id: &PluginId) -> Option<Arc<Plugin>> {
         // Stop any running plugin tasks
-        self.tasks().stop(plugin_id).await;
+        self.stop_task(plugin_id).await;
 
         let plugin = {
             // Remove the plugin from the plugins list
@@ -165,7 +158,7 @@ impl Plugins {
     /// Get a list of all plugins and the state of the plugins task
     pub fn get_plugins_with_state(&self) -> Vec<PluginWithState> {
         let plugins = self.inner.plugins.read();
-        let states = self.inner.tasks.get_states();
+        let states = self.get_task_states();
 
         plugins
             .iter()
@@ -381,6 +374,101 @@ impl Plugins {
                     fragment,
                 },
             });
+        }
+    }
+
+    pub fn get_task_states(&self) -> Vec<(PluginId, PluginTaskState)> {
+        self.inner
+            .tasks
+            .read()
+            .iter()
+            .map(|(key, value)| (key.clone(), value.clone()))
+            .collect()
+    }
+
+    /// Sets the task state for a plugin by ID
+    pub fn set_task_state(&self, plugin_id: PluginId, plugin_task: PluginTaskState) {
+        self.inner.tasks.write().insert(plugin_id, plugin_task);
+    }
+
+    pub async fn restart_task(
+        &self,
+        plugin_id: PluginId,
+        plugin_path: PathBuf,
+        manifest: &PluginManifest,
+    ) {
+        self.stop_task(&plugin_id).await;
+        self.start_task(plugin_id, plugin_path, manifest);
+    }
+
+    pub fn start_task(&self, plugin_id: PluginId, plugin_path: PathBuf, manifest: &PluginManifest) {
+        let plugin_id = manifest.plugin.id.clone();
+        let connect_url = "ws://localhost:59371/plugins/ws".to_string();
+
+        tracing::debug!(?plugin_id, "starting background task for plugin");
+
+        let binary = match manifest.bin.as_ref() {
+            Some(value) => value,
+            None => {
+                // No binary available for the plugin
+                tracing::debug!(?plugin_id, "skipping starting plugin without binary");
+                self.set_task_state(plugin_id, PluginTaskState::Unavailable);
+                return;
+            }
+        };
+
+        match binary {
+            ManifestBin::Node { node } => todo!("node task support"),
+            ManifestBin::Native { native } => {
+                let binary = match Self::get_native_binary(native) {
+                    Some(value) => value,
+                    None => {
+                        // No binary available for the plugin on the current os + arch
+                        tracing::debug!(
+                            ?plugin_id,
+                            "skipping starting plugin without compatible native binary"
+                        );
+                        self.set_task_state(plugin_id.clone(), PluginTaskState::Unavailable);
+                        return;
+                    }
+                };
+
+                // No binary available for the plugin
+                tracing::debug!(?plugin_id, os = ?binary.os, arch = ?binary.arch, "starting native plugin binary");
+
+                runner::spawn_native_task(
+                    self.clone(),
+                    plugin_path,
+                    binary.path.clone(),
+                    connect_url,
+                    plugin_id,
+                );
+            }
+        }
+    }
+
+    /// Find the `native` binary compatible with the current platform
+    fn get_native_binary(native: &[ManifestBinNative]) -> Option<&ManifestBinNative> {
+        let os = platform_os();
+        let arch = platform_arch();
+        native.iter().find(|bin| os == bin.os && arch == bin.arch)
+    }
+
+    /// Stop a task by plugin ID
+    pub async fn stop_task(&self, plugin_id: &PluginId) {
+        let state = {
+            let mut tasks = self.inner.tasks.write();
+            match tasks.remove(plugin_id) {
+                Some(value) => value,
+                None => return,
+            }
+        };
+
+        // Get the current state
+
+        // Abort the plugin background task
+        if let PluginTaskState::Running { handle } = state {
+            handle.kill().await;
         }
     }
 }
