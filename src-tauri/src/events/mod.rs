@@ -5,7 +5,10 @@ use tokio::sync::mpsc;
 use crate::{
     database::entity::{device::DeviceId, folder::FolderId, profile::ProfileId, tile::TileId},
     device::DeviceRequestId,
-    plugin::manifest::{ActionId, PluginId},
+    plugin::{
+        manifest::{ActionId, PluginId},
+        runner::PluginTaskState,
+    },
 };
 
 pub mod processing;
@@ -71,17 +74,22 @@ pub struct DeepLinkContext {
 
 #[derive(Debug)]
 pub enum PluginAppEvent {
+    /// Got a message from the plugin for the inspector
     RecvPluginMessage {
         context: InspectorContext,
         message: serde_json::Value,
     },
 
-    PluginLoaded {
-        plugin_id: PluginId,
-    },
+    /// Plugin was loaded
+    PluginLoaded { plugin_id: PluginId },
 
-    PluginUnloaded {
+    /// Plugin was unloaded
+    PluginUnloaded { plugin_id: PluginId },
+
+    /// Plugin task state has changed
+    PluginTaskStateChanged {
         plugin_id: PluginId,
+        state: PluginTaskState,
     },
 }
 

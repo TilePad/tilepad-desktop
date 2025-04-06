@@ -371,8 +371,21 @@ impl Plugins {
     }
 
     /// Sets the task state for a plugin by ID
-    pub fn set_task_state(&self, plugin_id: PluginId, plugin_task: PluginTaskState) {
-        self.inner.tasks.write().insert(plugin_id, plugin_task);
+    pub fn set_task_state(&self, plugin_id: PluginId, task_state: PluginTaskState) {
+        {
+            self.inner
+                .tasks
+                .write()
+                .insert(plugin_id.clone(), task_state.clone());
+        }
+
+        _ = self
+            .inner
+            .event_tx
+            .send(AppEvent::Plugin(PluginAppEvent::PluginTaskStateChanged {
+                plugin_id,
+                state: task_state,
+            }));
     }
 
     pub async fn restart_task(

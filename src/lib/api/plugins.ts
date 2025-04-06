@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import { createQuery } from "@tanstack/svelte-query";
 
 import type {
@@ -114,3 +115,20 @@ function invalidatePluginsQuery() {
     exact: false,
   });
 }
+
+// [LISTENERS] ------------------------------------------------------
+
+listen<PluginId>("plugins:loaded", ({ payload: plugin_id }) => {
+  invalidatePluginsQuery();
+});
+
+listen<PluginId>("plugins:unloaded", ({ payload: plugin_id }) => {
+  invalidatePluginsQuery();
+});
+
+listen<{ plugin_id: PluginId; state: string }>(
+  "plugins:task_state_changed",
+  ({ payload: { plugin_id, state } }) => {
+    invalidatePluginsQuery();
+  },
+);

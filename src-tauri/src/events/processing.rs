@@ -3,9 +3,10 @@ use std::{future::poll_fn, task::Poll};
 use futures::{stream::FuturesUnordered, Stream};
 use serde::Serialize;
 use tauri::{AppHandle, Emitter};
+use tilepad_manifest::plugin::PluginId;
 use tracing::{debug, error};
 
-use crate::{database::DbPool, events::InspectorContext};
+use crate::{database::DbPool, events::InspectorContext, plugin::runner::PluginTaskState};
 
 use super::{
     AppEvent, AppEventReceiver, DeviceAppEvent, DeviceRequestAppEvent, IconPackAppEvent,
@@ -87,6 +88,15 @@ async fn process_event(
             }
             PluginAppEvent::PluginUnloaded { plugin_id } => {
                 app_handle.emit("plugins:unloaded", plugin_id)?;
+            }
+            PluginAppEvent::PluginTaskStateChanged { plugin_id, state } => {
+                #[derive(Serialize)]
+                struct Payload {
+                    plugin_id: PluginId,
+                    state: PluginTaskState,
+                }
+
+                app_handle.emit("plugins:task_state_changed", &Payload { plugin_id, state })?;
             }
         },
         AppEvent::IconPack(icon_pack_app_event) => match icon_pack_app_event {
