@@ -21,6 +21,10 @@ pub struct SystemWebsiteProperties {
 pub struct SystemOpenProperties {
     path: Option<String>,
 }
+#[derive(Deserialize)]
+pub struct SystemOpenFolderProperties {
+    path: Option<String>,
+}
 
 #[derive(Deserialize)]
 pub struct SystemCloseProperties {
@@ -65,6 +69,12 @@ pub async fn handle(
         }
         "open" => {
             let data: SystemOpenProperties = serde_json::from_value(tile.config.properties)?;
+            if let Some(path) = data.path {
+                open_path(path, None::<&str>)?;
+            }
+        }
+        "open_folder" => {
+            let data: SystemOpenFolderProperties = serde_json::from_value(tile.config.properties)?;
             if let Some(path) = data.path {
                 open_path(path, None::<&str>)?;
             }

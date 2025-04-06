@@ -22,6 +22,12 @@ icon = "images/open.svg"
 description = "Open a specific app"
 inspector = "ui/open-app.html"
 
+[actions.open_folder]
+label = "Open Folder"
+icon = "images/open.svg"
+description = "Open a specific folder"
+inspector = "ui/open-folder.html"
+
 [actions.close]
 label = "Close"
 icon = "images/close.svg"
