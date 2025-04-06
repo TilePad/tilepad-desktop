@@ -31,6 +31,7 @@ pub enum AppEvent {
 pub enum DeviceAppEvent {
     Authenticated { device_id: DeviceId },
     Revoked { device_id: DeviceId },
+    Disconnected { device_id: DeviceId },
 }
 
 #[derive(Debug)]

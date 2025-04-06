@@ -89,9 +89,13 @@ impl Devices {
     }
 
     /// Remove a session
-    pub fn remove_session(&self, session_id: DeviceSessionId) {
+    pub fn remove_session(&self, session_id: DeviceSessionId, device_id: Option<DeviceId>) {
         self.inner.sessions.write().remove(&session_id);
         self.remove_session_device_requests(session_id);
+
+        if let Some(device_id) = device_id {
+            self.emit_app_event(AppEvent::Device(DeviceAppEvent::Disconnected { device_id }));
+        }
     }
 
     /// Removes any device requests associated with the provided session

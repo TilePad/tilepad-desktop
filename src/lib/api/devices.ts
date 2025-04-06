@@ -120,6 +120,10 @@ listen<DeviceId>("device:authenticated", () => {
   invalidateConnectedDevices();
 });
 
+listen<DeviceId>("device:disconnected", () => {
+  invalidateConnectedDevices();
+});
+
 listen<DeviceId>("device:revoked", () => {
   invalidateDevices();
   invalidateConnectedDevices();

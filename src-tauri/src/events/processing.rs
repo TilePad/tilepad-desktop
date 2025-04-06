@@ -72,6 +72,9 @@ async fn process_event(
             DeviceAppEvent::Revoked { device_id } => {
                 app_handle.emit("device:revoked", device_id)?;
             }
+            DeviceAppEvent::Disconnected { device_id } => {
+                app_handle.emit("device:disconnected", device_id)?;
+            }
         },
         AppEvent::Plugin(plugin_app_event) => match plugin_app_event {
             PluginAppEvent::RecvPluginMessage { context, message } => {

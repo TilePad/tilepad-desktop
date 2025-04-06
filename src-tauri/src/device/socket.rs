@@ -80,8 +80,10 @@ impl DeviceSession {
                     error!(?cause, "error running device session future");
                 }
 
+                let device_id = session.get_device_id();
+
                 // Remove the session thats no longer running
-                session.devices.remove_session(session.id);
+                session.devices.remove_session(session.id, device_id);
             }
         });
 
