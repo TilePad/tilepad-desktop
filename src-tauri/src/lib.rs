@@ -114,6 +114,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
 
     let core_plugins = core_resources.join("plugins");
     let user_plugins = app_data_path.join("plugins");
+    let runtimes_path = app_data_path.join("runtimes");
 
     let user_icons = app_data_path.join("icons");
 
@@ -121,7 +122,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         .context("failed to load database")?;
 
     let (app_event_tx, app_event_rx) = mpsc::unbounded_channel();
-    let plugins = Plugins::new(app_event_tx.clone(), db.clone());
+    let plugins = Plugins::new(app_event_tx.clone(), db.clone(), runtimes_path);
     let devices = Devices::new(app_event_tx.clone(), db.clone(), plugins.clone());
     let icons = Icons::new(app_event_tx.clone());
 

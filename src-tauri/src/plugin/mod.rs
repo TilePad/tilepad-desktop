@@ -10,6 +10,7 @@ use action::{actions_from_manifests, Action, ActionCategory, ActionWithCategory}
 use anyhow::{anyhow, Context};
 use async_zip::base::read::seek::ZipFileReader;
 use garde::Validate;
+use install::get_node_runtime;
 use loader::{load_plugin_from_path, load_plugins_from_path, read_plugin_manifest};
 use manifest::{platform_arch, platform_os, ActionId, Manifest as PluginManifest, PluginId};
 use parking_lot::RwLock;
@@ -57,6 +58,9 @@ struct PluginsInner {
     /// Access to the database
     db: DbPool,
 
+    /// Runtimes path
+    runtimes_path: PathBuf,
+
     /// Collection of currently loaded plugins
     plugins: RwLock<HashMap<PluginId, Arc<Plugin>>>,
 
@@ -84,11 +88,12 @@ pub struct Plugin {
 }
 
 impl Plugins {
-    pub fn new(event_tx: AppEventSender, db: DbPool) -> Self {
+    pub fn new(event_tx: AppEventSender, db: DbPool, runtimes_path: PathBuf) -> Self {
         Self {
             inner: Arc::new(PluginsInner {
                 event_tx,
                 db,
+                runtimes_path,
                 plugins: Default::default(),
                 sessions: Default::default(),
                 plugin_to_session: Default::default(),
@@ -113,7 +118,8 @@ impl Plugins {
         self.stop_task(&plugin_id).await;
 
         // Start a new task for the plugin
-        self.start_task(plugin_id.clone(), plugin_path, &plugin.manifest);
+        self.start_task(plugin_id.clone(), plugin_path, &plugin.manifest)
+            .await;
 
         // Store the plugin
         {
@@ -398,7 +404,12 @@ impl Plugins {
         self.start_task(plugin_id, plugin_path, manifest);
     }
 
-    pub fn start_task(&self, plugin_id: PluginId, plugin_path: PathBuf, manifest: &PluginManifest) {
+    pub async fn start_task(
+        &self,
+        plugin_id: PluginId,
+        plugin_path: PathBuf,
+        manifest: &PluginManifest,
+    ) {
         let plugin_id = manifest.plugin.id.clone();
         let connect_url = "ws://localhost:59371/plugins/ws".to_string();
 
@@ -415,7 +426,41 @@ impl Plugins {
         };
 
         match binary {
-            ManifestBin::Node { node } => todo!("node task support"),
+            ManifestBin::Node { node } => {
+                let runtime_path =
+                    match get_node_runtime(&self.inner.runtimes_path, &node.version.0).await {
+                        Ok(Some(value)) => value,
+                        Ok(None) => {
+                            // No binary available for the plugin on the current os + arch
+                            tracing::debug!(
+                                ?plugin_id,
+                                "skipping node plugin, runtime unavailable"
+                            );
+                            self.set_task_state(plugin_id.clone(), PluginTaskState::Unavailable);
+                            return;
+                        }
+                        Err(cause) => {
+                            tracing::debug!(
+                                ?cause,
+                                ?plugin_id,
+                                "skipping node plugin, failed to find runtime"
+                            );
+                            self.set_task_state(plugin_id.clone(), PluginTaskState::Unavailable);
+                            return;
+                        }
+                    };
+                // No binary available for the plugin
+                tracing::debug!(?plugin_id, ?runtime_path, entrypoint = ?node.entrypoint, "starting node plugin");
+
+                runner::spawn_node_task(
+                    self.clone(),
+                    runtime_path,
+                    plugin_path,
+                    node.entrypoint.clone(),
+                    connect_url,
+                    plugin_id,
+                );
+            }
             ManifestBin::Native { native } => {
                 let binary = match Self::get_native_binary(native) {
                     Some(value) => value,

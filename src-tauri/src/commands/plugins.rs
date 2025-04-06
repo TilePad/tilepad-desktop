@@ -2,7 +2,7 @@ use crate::{
     commands::CmdResult,
     events::InspectorContext,
     plugin::{
-        install::{install_plugin_zip, remove_plugin_files},
+        install::{install_plugin_requirements, install_plugin_zip, remove_plugin_files},
         loader::{load_plugin_from_path, read_plugin_manifest_zip},
         manifest::PluginId,
         PluginWithState, Plugins,
@@ -22,22 +22,26 @@ pub async fn plugins_install_plugin_manual(
         .app_data_dir()
         .context("failed to get app data dir")?;
     let user_plugins = app_data_path.join("plugins");
+    let runtimes_path = app_data_path.join("runtimes");
 
     // Read the plugin manifest from within the zip file
     let manifest = read_plugin_manifest_zip(&data).await?;
 
     // Determine plugin install directory
-    let plugin_id = manifest.plugin.id;
+    let plugin_id = &manifest.plugin.id;
     let path = user_plugins.join(&plugin_id.0);
 
     // Unload the plugin
-    plugins.unload_plugin(&plugin_id).await;
+    plugins.unload_plugin(plugin_id).await;
 
     // Cleanup old files
     remove_plugin_files(&path).await?;
 
     // Install the plugin zip file
     install_plugin_zip(&data, &path).await?;
+
+    // Install plugin runtime if one is required
+    install_plugin_requirements(&manifest, &runtimes_path).await?;
 
     // Load the plugin
     let plugin = load_plugin_from_path(&path)
@@ -136,13 +140,15 @@ pub async fn plugins_stop_plugin_task(
 }
 
 #[tauri::command]
-pub fn plugins_start_plugin_task(
+pub async fn plugins_start_plugin_task(
     plugins: State<'_, Plugins>,
     plugin_id: PluginId,
 ) -> CmdResult<()> {
     let plugin = plugins.get_plugin(&plugin_id).context("plugin not found")?;
 
-    plugins.start_task(plugin_id, plugin.path.clone(), &plugin.manifest);
+    plugins
+        .start_task(plugin_id, plugin.path.clone(), &plugin.manifest)
+        .await;
 
     Ok(())
 }

@@ -7,6 +7,7 @@ use std::{
 };
 
 use futures::channel::oneshot;
+use garde::rules::AsStr;
 use serde::{Serialize, Serializer};
 use tokio::{
     io::{AsyncBufReadExt, BufReader, Lines},
@@ -93,6 +94,91 @@ pub fn spawn_native_task(
     let child = Command::new(exe_path)
         .current_dir(plugin_path)
         .args([
+            "--connect-url",
+            connect_url.as_str(),
+            "--plugin-id",
+            plugin_id.0.as_str(),
+        ])
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .kill_on_drop(true)
+        .spawn();
+
+    let child = match child {
+        Ok(child) => child,
+        Err(cause) => {
+            tracing::error!(?cause, "failed to start plugin executable");
+            plugins.set_task_state(plugin_id, PluginTaskState::Error);
+            return;
+        }
+    };
+
+    let (task, handle) = ChildTask::create(child);
+    tokio::spawn({
+        let plugins = plugins.clone();
+        let plugin_id = plugin_id.clone();
+        let task = task;
+
+        async move {
+            let status = match task.run().await {
+                Ok(child) => child,
+                Err(cause) => {
+                    tracing::error!(?cause, "failed to get plugin output");
+                    plugins.set_task_state(plugin_id, PluginTaskState::Error);
+                    return;
+                }
+            };
+
+            if status.success() {
+                plugins.set_task_state(plugin_id, PluginTaskState::Stopped);
+            } else {
+                plugins.set_task_state(plugin_id, PluginTaskState::Error);
+            }
+        }
+    })
+    .abort_handle();
+
+    plugins.set_task_state(plugin_id, PluginTaskState::Running { handle });
+}
+
+pub fn spawn_node_task(
+    plugins: Plugins,
+
+    node_path: PathBuf,
+    plugin_path: PathBuf,
+    entrypoint: String,
+
+    connect_url: String,
+    plugin_id: PluginId,
+) {
+    let entry_path = plugin_path.join(&entrypoint);
+    let entry_path = entry_path.to_string_lossy();
+
+    #[cfg(windows)]
+    let exe_path = node_path.join("node.exe");
+    #[cfg(not(windows))]
+    let exe_path = todo!("node not supported on this platform");
+
+    // Exe does not exist
+    if !exe_path.exists() {
+        plugins.set_task_state(plugin_id, PluginTaskState::Unavailable);
+        return;
+    }
+
+    // Starting the exe
+    plugins.set_task_state(plugin_id.clone(), PluginTaskState::Starting);
+
+    tracing::debug!(
+        ?plugin_id,
+        ?entrypoint,
+        ?plugin_path,
+        "starting native plugin"
+    );
+
+    let child = Command::new(exe_path)
+        .current_dir(plugin_path)
+        .args([
+            entry_path.as_str(),
             "--connect-url",
             connect_url.as_str(),
             "--plugin-id",

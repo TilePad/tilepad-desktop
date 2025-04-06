@@ -1,8 +1,9 @@
 use crate::utils::{file::move_directory, zip::extract_zip};
 
-use crate::plugin::manifest::{Arch, NodeVersion};
-use anyhow::{bail, Context};
+use crate::plugin::manifest::{Arch, BinaryNodeVersion};
+use anyhow::{bail, ensure, Context};
 use async_zip::tokio::read::seek::ZipFileReader;
+use serde::Deserialize;
 use std::path::Path;
 use tempfile::{env::temp_dir, tempfile};
 use tokio::{
@@ -12,11 +13,30 @@ use tokio::{
 
 const NODE_DIST_BASE_URL: &str = "https://nodejs.org/dist";
 
+#[derive(Deserialize)]
+pub struct NodeDist {
+    pub version: node_semver::Version,
+    pub files: Vec<String>,
+}
+
+/// Request the list of available node versions from the official repository
+pub async fn get_node_versions(client: &reqwest::Client) -> anyhow::Result<Vec<NodeDist>> {
+    let res = client
+        .get("https://nodejs.org/dist/index.json")
+        .send()
+        .await?;
+
+    let res = res
+        .error_for_status()
+        .context("response error when requesting download")?;
+
+    let result: Vec<NodeDist> = res.json().await?;
+    Ok(result)
+}
+
 /// Get a node download URL for the windows platform
 ///
 /// https://nodejs.org/dist/v22.13.1/node-v22.13.1-win-x64.zip
-/// https://nodejs.org/dist/v22.13.1/node-v22.13.1-linux-x64.tar.xz
-/// https://nodejs.org/dist/v22.13.1/node-v22.13.1-darwin-x64.tar.gz
 #[cfg(windows)]
 fn node_download_url(version: &str, arch: Arch) -> String {
     format!(
@@ -27,21 +47,29 @@ fn node_download_url(version: &str, arch: Arch) -> String {
     )
 }
 
+/// https://nodejs.org/dist/v22.13.1/node-v22.13.1-linux-x64.tar.xz
+/// https://nodejs.org/dist/v22.13.1/node-v22.13.1-darwin-x64.tar.gz
+#[cfg(not(windows))]
+fn node_download_url(version: &str, arch: Arch) -> String {
+    todo!("platform unsupported")
+}
+
 /// Downloads the requested node version
 pub async fn download_node<P: AsRef<Path>>(
     client: &reqwest::Client,
     path: P,
-    version: NodeVersion,
+    version: node_semver::Version,
     arch: Arch,
 ) -> anyhow::Result<()> {
     let path = path.as_ref();
-    if path.exists() && !path.is_dir() {
-        bail!("node output path is a file")
+
+    if path.exists() {
+        ensure!(path.is_dir(), "node output path is a file")
+    } else {
+        create_dir_all(path).await?;
     }
 
-    create_dir_all(path).await?;
-
-    let version = version.0.to_string();
+    let version = version.to_string();
     let url = node_download_url(&version, arch);
 
     let res = client
@@ -92,8 +120,6 @@ pub async fn download_node<P: AsRef<Path>>(
 
     let install_folder = install_folder.path();
 
-    dbg!(&install_folder);
-
     move_directory(&install_folder, &path).await?;
 
     Ok(())
@@ -107,20 +133,15 @@ mod test {
 
     use crate::plugin::{
         manifest::Arch,
-        node::{download::download_node, NodeVersion},
+        node::{download_node, BinaryNodeVersion},
     };
 
     #[tokio::test]
     async fn test_download_latest() {
         let client = reqwest::Client::new();
         let path = Path::new("runtimes/22.13.1");
-        download_node(
-            &client,
-            path,
-            NodeVersion(Version::new(22, 13, 1)),
-            Arch::default(),
-        )
-        .await
-        .unwrap();
+        download_node(&client, path, Version::new(22, 13, 1), Arch::default())
+            .await
+            .unwrap();
     }
 }

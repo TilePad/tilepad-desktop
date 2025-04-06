@@ -61,6 +61,7 @@ impl PluginPropertiesModel {
         .await
     }
 
+    #[allow(unused)]
     pub async fn delete(db: &DbPool, plugin_id: PluginId) -> DbResult<()> {
         sql_exec(
             db,

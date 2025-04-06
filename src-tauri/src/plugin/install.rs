@@ -2,8 +2,9 @@ use anyhow::{bail, Context};
 use std::{
     io::Cursor,
     path::{Path, PathBuf},
+    str::FromStr,
 };
-use tilepad_manifest::plugin::Manifest as PluginManifest;
+use tilepad_manifest::plugin::{Arch, BinaryNodeVersion, Manifest as PluginManifest, ManifestBin};
 use tokio::{
     fs::{create_dir_all, remove_dir_all, remove_file},
     io::BufReader,
@@ -11,7 +12,10 @@ use tokio::{
 
 use crate::utils::zip::{create_zip_reader, extract_zip};
 
-use super::loader::read_plugin_manifest_zip;
+use super::{
+    loader::read_plugin_manifest_zip,
+    node::{download_node, get_node_versions},
+};
 
 /// Removes any existing plugin data from the provided `path`
 pub async fn remove_plugin_files(path: &Path) -> anyhow::Result<()> {
@@ -44,6 +48,117 @@ pub async fn install_plugin_zip(data: &[u8], path: &Path) -> anyhow::Result<()> 
     extract_zip(zip, path)
         .await
         .context("failed to extract plugin file")?;
+
+    Ok(())
+}
+
+/// Attempts to find an existing installed node runtime matching the provided
+/// version range requirement
+pub async fn get_node_runtime(
+    runtimes_path: &Path,
+    desired: &node_semver::Range,
+) -> anyhow::Result<Option<PathBuf>> {
+    if !runtimes_path.exists() {
+        return Ok(None);
+    }
+
+    let mut runtime_path_entries = tokio::fs::read_dir(runtimes_path).await?;
+
+    while let Some(entry) = runtime_path_entries.next_entry().await? {
+        let metadata = match entry.metadata().await {
+            Ok(value) => value,
+            Err(cause) => {
+                tracing::error!(?cause, "failed to get directory metadata");
+                continue;
+            }
+        };
+
+        // Skip non directories
+        if !metadata.is_dir() {
+            continue;
+        }
+
+        let path = entry.path();
+        let name = entry.file_name().to_string_lossy().to_string();
+
+        let version = match name.strip_prefix("node-") {
+            Some(value) => value,
+            // Not a node runtime directory
+            None => continue,
+        };
+
+        let version = match node_semver::Version::from_str(version) {
+            Ok(value) => value,
+            Err(cause) => {
+                tracing::warn!(
+                    ?cause,
+                    ?version,
+                    "invalid node version in node runtime path"
+                );
+                continue;
+            }
+        };
+
+        // We already have a runtime installed that satisfies the version requirement
+        if version.satisfies(desired) {
+            return Ok(Some(path));
+        }
+    }
+
+    Ok(None)
+}
+
+pub async fn install_plugin_requirements(
+    manifest: &PluginManifest,
+    runtimes_path: &Path,
+) -> anyhow::Result<()> {
+    let binary = match &manifest.bin {
+        Some(value) => value,
+        // No requirements
+        None => return Ok(()),
+    };
+
+    let node = match binary {
+        ManifestBin::Node { node } => node,
+        // Native binary does not need installing
+        ManifestBin::Native { .. } => return Ok(()),
+    };
+
+    let desired_version = &node.version;
+
+    // Check if we already have a runtime installed
+    if get_node_runtime(runtimes_path, &desired_version.0)
+        .await
+        .context("checking existing node runtimes")?
+        .is_some()
+    {
+        return Ok(());
+    }
+
+    let client = reqwest::Client::new();
+
+    // Request available node versions
+    let versions = get_node_versions(&client)
+        .await
+        .context("getting available node versions")?;
+
+    let matching = versions
+        .into_iter()
+        .find(|version| version.version.satisfies(&desired_version.0))
+        .context("failed to find a node runtime version compatible with the plugin")?;
+
+    let output_path_name = format!("node-{}", matching.version);
+    let output_path = runtimes_path.join(output_path_name);
+    if !output_path.exists() {
+        create_dir_all(&output_path)
+            .await
+            .context("creating output directory")?;
+    }
+
+    let arch = Arch::default();
+    download_node(&client, output_path, matching.version, arch)
+        .await
+        .context("downloading node runtime")?;
 
     Ok(())
 }

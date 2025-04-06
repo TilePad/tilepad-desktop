@@ -45,7 +45,7 @@ mime_guess = "2"
 # HTTP
 axum = { version = "0.8.1", features = ["ws"] }
 tower-http = { version = "0.6.2", features = ["cors"] }
-reqwest = "0.12.12"
+reqwest = { version = "0.12", features = ["json"] }
 
 # Files
 tempfile = "3.16.0"
