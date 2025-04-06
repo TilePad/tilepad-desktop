@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use tauri_plugin_opener::open_url;
+use tauri_plugin_opener::{open_path, open_url};
 
 use crate::{
     database::{entity::tile::TileModel, DbPool},
@@ -10,7 +10,12 @@ use crate::{
 
 #[derive(Deserialize)]
 pub struct SystemWebsiteProperties {
-    url: String,
+    url: Option<String>,
+}
+
+#[derive(Deserialize)]
+pub struct SystemOpenProperties {
+    path: Option<String>,
 }
 
 pub async fn handle(
@@ -23,9 +28,16 @@ pub async fn handle(
     match context.action_id.as_str() {
         "website" => {
             let data: SystemWebsiteProperties = serde_json::from_value(tile.config.properties)?;
-            open_url(data.url, None::<&str>)?;
+            if let Some(url) = data.url {
+                open_url(url, None::<&str>)?;
+            }
         }
-        "open" => {}
+        "open" => {
+            let data: SystemOpenProperties = serde_json::from_value(tile.config.properties)?;
+            if let Some(path) = data.path {
+                open_path(path, None::<&str>)?;
+            }
+        }
         "close" => {}
         "text" => {}
         "multimedia" => {}
