@@ -1,3 +1,4 @@
+use enigo::{Enigo, Keyboard};
 use serde::Deserialize;
 use tauri_plugin_opener::{open_path, open_url};
 
@@ -16,6 +17,11 @@ pub struct SystemWebsiteProperties {
 #[derive(Deserialize)]
 pub struct SystemOpenProperties {
     path: Option<String>,
+}
+
+#[derive(Deserialize)]
+pub struct SystemTextProperties {
+    text: Option<String>,
 }
 
 pub async fn handle(
@@ -39,7 +45,14 @@ pub async fn handle(
             }
         }
         "close" => {}
-        "text" => {}
+        "text" => {
+            let data: SystemTextProperties = serde_json::from_value(tile.config.properties)?;
+            if let Some(text) = data.text {
+                let mut enigo = Enigo::new(&enigo::Settings::default()).unwrap();
+                // Enter text
+                enigo.text(&text);
+            }
+        }
         "multimedia" => {}
         action_id => {
             tracing::warn!(?action_id, ?context, "unknown internal action");

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <div class="tile-item">
+        <label class="tile-label" for="text">Text</label>
+        <input type="url" class="tile-input" name="text" id="text">
+        <p class="tile-description">Text to type out</p>
+    </div>
+
+
+</body>
+
+<script>
+    const text = document.getElementById("text");
+
+    text.setAttribute('disabled', 'true')
+
+    let properties;
+
+    // Handle properties received
+    window.tilepad.onProperties((newProperties) => {
+        properties = newProperties;
+        text.removeAttribute('disabled');
+        text.value = properties.text ?? '';
+    });
+
+
+    // Request the current properties
+    window.tilepad.requestProperties();
+
+
+    text.onchange = (event) => onChangeWebsite(event.target.value);
+
+    function onChangeWebsite(value) {
+        window.tilepad.setProperty("text", value);
+    }
+</script>
+
+</html>
