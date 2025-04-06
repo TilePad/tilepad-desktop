@@ -49,7 +49,7 @@
     />
   </div>
 
-  <div>
+  <div class="content">
     {#if $actionsQuery.isLoading}
       Loading actions...
     {:else if $actionsQuery.isError}
@@ -71,6 +71,9 @@
     background-color: #29262e;
     height: 100%;
     border-left: 1px solid #333;
+    overflow: hidden;
+    display: flex;
+    flex-flow: column;
   }
 
   .search {
@@ -91,5 +94,10 @@
 
   .none {
     padding: 0.5rem;
+  }
+
+  .content {
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 </style>
