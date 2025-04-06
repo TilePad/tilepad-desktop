@@ -1,5 +1,8 @@
+use std::path::Path;
+
 use enigo::{Enigo, Key, Keyboard};
 use serde::Deserialize;
+use sysinfo::{ProcessRefreshKind, ProcessesToUpdate, RefreshKind, System, UpdateKind};
 use tauri_plugin_opener::{open_path, open_url};
 
 use crate::{
@@ -16,6 +19,11 @@ pub struct SystemWebsiteProperties {
 
 #[derive(Deserialize)]
 pub struct SystemOpenProperties {
+    path: Option<String>,
+}
+
+#[derive(Deserialize)]
+pub struct SystemCloseProperties {
     path: Option<String>,
 }
 
@@ -61,7 +69,25 @@ pub async fn handle(
                 open_path(path, None::<&str>)?;
             }
         }
-        "close" => {}
+        "close" => {
+            let data: SystemCloseProperties = serde_json::from_value(tile.config.properties)?;
+            if let Some(path) = data.path {
+                let path = Path::new(&path);
+                let mut system = System::new_with_specifics(RefreshKind::nothing().with_processes(
+                    ProcessRefreshKind::nothing().with_exe(UpdateKind::OnlyIfNotSet),
+                ));
+                system.refresh_processes(ProcessesToUpdate::All, true);
+
+                for process in system.processes().values() {
+                    if let Some(exe_path) = process.exe() {
+                        if exe_path == path {
+                            tracing::debug!(?process, ?exe_path, "stopping program at path");
+                            let _ = process.kill();
+                        }
+                    }
+                }
+            }
+        }
         "text" => {
             let data: SystemTextProperties = serde_json::from_value(tile.config.properties)?;
             if let Some(text) = data.text {

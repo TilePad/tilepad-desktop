@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        .row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .row .tile-input {
+            flex: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="tile-item">
+        <label class="tile-label" for="path">App Path</label>
+        <div class="row">
+            <input type="text" class="tile-input" name="path" id="path">
+            <button class="tile-button" id="pickFileBtn">+</button>
+        </div>
+        <p class="tile-description">Path to the app executable to close</p>
+    </div>
+
+
+</body>
+
+
+<script>
+    const path = document.getElementById("path");
+    const pickFileBtn = document.getElementById("pickFileBtn");
+
+    let properties;
+
+    // Handle properties received
+    window.tilepad.onProperties((newProperties) => {
+        properties = newProperties;
+        path.value = properties.path ?? '';
+    });
+
+
+    // Request the current properties
+    window.tilepad.requestProperties();
+
+    path.onchange = onChangePath;
+    pickFileBtn.onclick = pickFile;
+
+    function onChangePath(event) {
+        window.tilepad.setProperty("path", event.target.value);
+    }
+
+    function pickFile() {
+        // Request the picking of a file
+        window.tilepad.sendPluginMessage({
+            type: "PICK_EXECUTABLE_FILE"
+        })
+    }
+
+    // Handle messages from plugin
+    window.tilepad.onPluginMessage((data) => {
+        switch (data.type) {
+            case "PICKED_EXECUTABLE_FILE": {
+                window.tilepad.setProperty("path", data.path);
+                path.value = data.path;
+                break;
+            }
+        }
+    });
+</script>
+
+</html>
