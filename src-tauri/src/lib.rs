@@ -2,6 +2,7 @@ use std::{error::Error, str::FromStr};
 
 use anyhow::Context;
 use device::Devices;
+use events::DeepLinkContext;
 use icons::Icons;
 use plugin::Plugins;
 use tauri::{
@@ -201,7 +202,16 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
             let fragment = url.fragment().map(|value| value.to_string());
             let url = url.to_string();
 
-            plugins.deep_link(&plugin_id, url, host, path, query, fragment);
+            plugins.deep_link(
+                &plugin_id,
+                DeepLinkContext {
+                    url,
+                    host,
+                    path,
+                    query,
+                    fragment,
+                },
+            );
         }
     });
 

@@ -355,25 +355,9 @@ impl Plugins {
         }
     }
 
-    pub fn deep_link(
-        &self,
-        plugin_id: &PluginId,
-        url: String,
-        host: Option<String>,
-        path: String,
-        query: Option<String>,
-        fragment: Option<String>,
-    ) {
+    pub fn deep_link(&self, plugin_id: &PluginId, ctx: DeepLinkContext) {
         if let Some(session) = self.get_plugin_session(plugin_id) {
-            _ = session.send_message(ServerPluginMessage::DeepLink {
-                ctx: DeepLinkContext {
-                    url,
-                    host,
-                    path,
-                    query,
-                    fragment,
-                },
-            });
+            _ = session.send_message(ServerPluginMessage::DeepLink { ctx });
         }
     }
 
