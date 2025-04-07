@@ -91,7 +91,14 @@ pub fn spawn_native_task(
 
     tracing::debug!(?plugin_id, ?exe, ?plugin_path, "starting native plugin");
 
-    let child = Command::new(exe_path)
+    let mut cmd = Command::new(exe_path);
+
+    // Windows creation flag to prevent showing windows for the process
+    // (CREATE_NO_WINDOW https://learn.microsoft.com/en-us/windows/win32/procthread/process-creation-flags)
+    #[cfg(windows)]
+    cmd.creation_flags(0x08000000);
+
+    let child = cmd
         .current_dir(plugin_path)
         .args([
             "--connect-url",
@@ -175,7 +182,14 @@ pub fn spawn_node_task(
         "starting native plugin"
     );
 
-    let child = Command::new(exe_path)
+    let mut cmd = Command::new(exe_path);
+
+    // Windows creation flag to prevent showing windows for the process
+    // (CREATE_NO_WINDOW https://learn.microsoft.com/en-us/windows/win32/procthread/process-creation-flags)
+    #[cfg(windows)]
+    cmd.creation_flags(0x08000000);
+
+    let child = cmd
         .current_dir(plugin_path)
         .args([
             entry_path.as_str(),
