@@ -19,21 +19,16 @@ use crate::{
 pub async fn handle_internal_message(
     plugins: &Arc<Plugins>,
     db: &DbPool,
-
     context: InspectorContext,
     message: serde_json::Value,
 ) -> anyhow::Result<()> {
-    let tile = TileModel::get_by_id(db, context.tile_id)
-        .await?
-        .context("tile instance not found")?;
-
     match context.plugin_id.as_str() {
         "com.tilepad.system.navigation" => {
-            navigation::messages::handle(plugins, db, &tile, context, message).await?;
+            navigation::messages::handle(plugins, db, context, message).await?;
         }
 
         "com.tilepad.system.system" => {
-            system::messages::handle(plugins, db, &tile, context, message).await?;
+            system::messages::handle(plugins, db, context, message).await?;
         }
 
         plugin_id => {

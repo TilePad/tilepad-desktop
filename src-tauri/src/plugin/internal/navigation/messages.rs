@@ -36,8 +36,6 @@ pub struct SelectOption {
 pub async fn handle(
     plugins: &Arc<Plugins>,
     db: &DbPool,
-    _tile: &TileModel,
-
     context: InspectorContext,
     message: serde_json::Value,
 ) -> anyhow::Result<()> {
