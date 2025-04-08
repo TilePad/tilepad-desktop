@@ -77,7 +77,7 @@ async fn process_event(
             }
         },
         AppEvent::Plugin(plugin_app_event) => match plugin_app_event {
-            PluginAppEvent::RecvPluginMessage { context, message } => {
+            PluginAppEvent::Message { context, message } => {
                 #[derive(Serialize)]
                 struct Payload {
                     context: InspectorContext,
@@ -86,13 +86,13 @@ async fn process_event(
 
                 app_handle.emit("plugin:recv_plugin_message", &Payload { context, message })?;
             }
-            PluginAppEvent::PluginLoaded { plugin_id } => {
+            PluginAppEvent::Loaded { plugin_id } => {
                 app_handle.emit("plugins:loaded", plugin_id)?;
             }
-            PluginAppEvent::PluginUnloaded { plugin_id } => {
+            PluginAppEvent::Unloaded { plugin_id } => {
                 app_handle.emit("plugins:unloaded", plugin_id)?;
             }
-            PluginAppEvent::PluginTaskStateChanged { plugin_id, state } => {
+            PluginAppEvent::TaskStateChanged { plugin_id, state } => {
                 #[derive(Serialize)]
                 struct Payload {
                     plugin_id: PluginId,
@@ -103,10 +103,10 @@ async fn process_event(
             }
         },
         AppEvent::IconPack(icon_pack_app_event) => match icon_pack_app_event {
-            IconPackAppEvent::IconPackLoaded { pack_id } => {
+            IconPackAppEvent::Loaded { pack_id } => {
                 app_handle.emit("icon_packs:loaded", pack_id)?;
             }
-            IconPackAppEvent::IconPackUnloaded { pack_id } => {
+            IconPackAppEvent::Unloaded { pack_id } => {
                 app_handle.emit("icon_packs:unloaded", pack_id)?;
             }
         },

@@ -76,19 +76,19 @@ pub struct DeepLinkContext {
 #[derive(Debug)]
 pub enum PluginAppEvent {
     /// Got a message from the plugin for the inspector
-    RecvPluginMessage {
+    Message {
         context: InspectorContext,
         message: serde_json::Value,
     },
 
     /// Plugin was loaded
-    PluginLoaded { plugin_id: PluginId },
+    Loaded { plugin_id: PluginId },
 
     /// Plugin was unloaded
-    PluginUnloaded { plugin_id: PluginId },
+    Unloaded { plugin_id: PluginId },
 
     /// Plugin task state has changed
-    PluginTaskStateChanged {
+    TaskStateChanged {
         plugin_id: PluginId,
         state: PluginTaskState,
     },
@@ -96,7 +96,7 @@ pub enum PluginAppEvent {
 
 #[derive(Debug)]
 pub enum IconPackAppEvent {
-    IconPackLoaded { pack_id: IconPackId },
+    Loaded { pack_id: IconPackId },
 
-    IconPackUnloaded { pack_id: IconPackId },
+    Unloaded { pack_id: IconPackId },
 }

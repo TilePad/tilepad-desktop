@@ -131,7 +131,7 @@ impl Plugins {
         _ = self
             .inner
             .event_tx
-            .send(AppEvent::Plugin(PluginAppEvent::PluginLoaded { plugin_id }));
+            .send(AppEvent::Plugin(PluginAppEvent::Loaded { plugin_id }));
     }
 
     /// Unloads the plugin with the provided `plugin_id`
@@ -149,7 +149,7 @@ impl Plugins {
         _ = self
             .inner
             .event_tx
-            .send(AppEvent::Plugin(PluginAppEvent::PluginUnloaded {
+            .send(AppEvent::Plugin(PluginAppEvent::Unloaded {
                 plugin_id: plugin_id.clone(),
             }));
 
@@ -329,7 +329,7 @@ impl Plugins {
         _ = self
             .inner
             .event_tx
-            .send(AppEvent::Plugin(PluginAppEvent::RecvPluginMessage {
+            .send(AppEvent::Plugin(PluginAppEvent::Message {
                 context: ctx,
                 message,
             }));
@@ -388,7 +388,7 @@ impl Plugins {
         _ = self
             .inner
             .event_tx
-            .send(AppEvent::Plugin(PluginAppEvent::PluginTaskStateChanged {
+            .send(AppEvent::Plugin(PluginAppEvent::TaskStateChanged {
                 plugin_id,
                 state: task_state,
             }));

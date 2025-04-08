@@ -97,9 +97,7 @@ impl Icons {
         // Emit loaded event
         _ = self
             .event_tx
-            .send(AppEvent::IconPack(IconPackAppEvent::IconPackLoaded {
-                pack_id,
-            }));
+            .send(AppEvent::IconPack(IconPackAppEvent::Loaded { pack_id }));
     }
 
     /// Get a list of all icon packs
@@ -122,9 +120,7 @@ impl Icons {
         // Emit unloaded event
         _ = self
             .event_tx
-            .send(AppEvent::IconPack(IconPackAppEvent::IconPackUnloaded {
-                pack_id,
-            }));
+            .send(AppEvent::IconPack(IconPackAppEvent::Unloaded { pack_id }));
     }
 
     /// Uploads a user generated icon to a randomly generated file path
