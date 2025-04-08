@@ -26,23 +26,28 @@ use super::{
 };
 
 pub type PluginSessionId = Uuid;
+
 pub type PluginSessionRef = Arc<PluginSession>;
 
 pub struct PluginSession {
     /// Unique ID of the session
-    pub id: PluginSessionId,
+    id: PluginSessionId,
     /// Session state
     state: RwLock<PluginSessionState>,
-
     /// Access to the plugins registry
     plugins: Arc<Plugins>,
-
     /// Sender to send messages to the session socket
     tx: WsTx<ServerPluginMessage>,
 }
 
+#[derive(Default)]
+struct PluginSessionState {
+    /// Device ID if authenticated as a device
+    plugin_id: Option<PluginId>,
+}
+
 impl PluginSession {
-    pub fn new(plugins: Arc<Plugins>, socket: WebSocket) -> (PluginSessionId, PluginSessionRef) {
+    pub fn start(plugins: Arc<Plugins>, socket: WebSocket) {
         let id = Uuid::new_v4();
 
         // Create and spawn a future for the websocket
@@ -62,31 +67,24 @@ impl PluginSession {
             tx: ws_tx,
         });
 
-        spawn({
-            let session = session.clone();
+        spawn(async move {
+            // Add the session
+            session.plugins.insert_session(id, session.clone());
 
-            async move {
-                let mut ws_rx = ws_rx;
+            let mut ws_rx = ws_rx;
 
-                // Process messages from the session
-                while let Some(msg) = ws_rx.recv().await {
-                    session.handle_message(msg);
-                }
+            // Process messages from the session
+            while let Some(msg) = ws_rx.recv().await {
+                session.handle_message(msg);
+            }
 
-                // Remove the session thats no longer running
-                session.plugins.remove_session(session.id);
+            // Remove the session thats no longer running
+            session.plugins.remove_session(session.id);
 
-                if let Some(plugin_id) = session.get_plugin_id() {
-                    session.plugins.remove_plugin_session(plugin_id);
-                }
+            if let Some(plugin_id) = session.get_plugin_id() {
+                session.plugins.remove_plugin_session(plugin_id);
             }
         });
-
-        (id, session)
-    }
-
-    pub fn is_closed(&self) -> bool {
-        self.tx.is_closed()
     }
 
     pub fn get_plugin_id(&self) -> Option<PluginId> {
@@ -97,9 +95,8 @@ impl PluginSession {
         self.state.write().plugin_id = plugin_id;
     }
 
-    pub fn send_message(&self, msg: ServerPluginMessage) -> anyhow::Result<()> {
-        self.tx.send(msg)?;
-        Ok(())
+    pub fn send_message(&self, msg: ServerPluginMessage) -> bool {
+        self.tx.send(msg).is_ok()
     }
 
     pub fn handle_message(self: &Arc<Self>, message: ClientPluginMessage) {
@@ -114,7 +111,7 @@ impl PluginSession {
                 self.plugins.set_plugin_session(plugin_id.clone(), self.id);
                 self.set_plugin_id(Some(plugin_id.clone()));
 
-                _ = self.send_message(ServerPluginMessage::Registered { plugin_id });
+                self.send_message(ServerPluginMessage::Registered { plugin_id });
             }
             ClientPluginMessage::GetProperties => {
                 let plugin_id = match self.get_plugin_id() {
@@ -135,11 +132,7 @@ impl PluginSession {
                         }
                     };
 
-                    if let Err(cause) =
-                        session.send_message(ServerPluginMessage::Properties { properties })
-                    {
-                        error!(?cause, "failed to send plugin properties")
-                    }
+                    session.send_message(ServerPluginMessage::Properties { properties });
                 });
             }
             ClientPluginMessage::SendToInspector { ctx, message } => {
@@ -169,10 +162,4 @@ impl PluginSession {
             }
         }
     }
-}
-
-#[derive(Default)]
-pub struct PluginSessionState {
-    /// Device ID if authenticated as a device
-    plugin_id: Option<PluginId>,
 }

@@ -36,8 +36,7 @@ pub async fn ws(
 
 /// Handle the connection of a new plugin socket
 pub async fn handle_plugin_socket(plugins: Arc<Plugins>, socket: WebSocket) {
-    let (session_id, session_ref) = PluginSession::new(plugins.clone(), socket);
-    plugins.insert_session(session_id, session_ref);
+    PluginSession::start(plugins, socket);
 }
 
 static INSPECTOR_SCRIPT: &str = include_str!("../resources/propertyInspectorScript.js");

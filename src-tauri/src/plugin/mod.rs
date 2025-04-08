@@ -296,7 +296,7 @@ impl Plugins {
             session.send_message(ServerPluginMessage::RecvFromInspector {
                 ctx: context,
                 message,
-            })?;
+            });
         }
 
         Ok(())
@@ -325,7 +325,7 @@ impl Plugins {
             session.send_message(ServerPluginMessage::TileClicked {
                 ctx: context,
                 properties: tile.config.properties,
-            })?;
+            });
         }
 
         Ok(())
@@ -368,7 +368,7 @@ impl Plugins {
     /// inspector plugin
     pub fn open_inspector(&self, inspector: InspectorContext) {
         if let Some(session) = self.get_plugin_session(&inspector.plugin_id) {
-            _ = session.send_message(ServerPluginMessage::InspectorOpen { ctx: inspector });
+            session.send_message(ServerPluginMessage::InspectorOpen { ctx: inspector });
         }
     }
 
@@ -376,13 +376,13 @@ impl Plugins {
     /// inspector plugin
     pub fn close_inspector(&self, inspector: InspectorContext) {
         if let Some(session) = self.get_plugin_session(&inspector.plugin_id) {
-            _ = session.send_message(ServerPluginMessage::InspectorClose { ctx: inspector });
+            session.send_message(ServerPluginMessage::InspectorClose { ctx: inspector });
         }
     }
 
     pub fn deep_link(&self, plugin_id: &PluginId, ctx: DeepLinkContext) {
         if let Some(session) = self.get_plugin_session(plugin_id) {
-            _ = session.send_message(ServerPluginMessage::DeepLink { ctx });
+            session.send_message(ServerPluginMessage::DeepLink { ctx });
         }
     }
 
