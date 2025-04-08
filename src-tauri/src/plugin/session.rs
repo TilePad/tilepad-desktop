@@ -87,19 +87,26 @@ impl PluginSession {
         });
     }
 
+    /// Get the current plugin ID
     pub fn get_plugin_id(&self) -> Option<PluginId> {
         self.state.read().plugin_id.clone()
     }
 
-    pub fn set_plugin_id(&self, plugin_id: Option<PluginId>) {
-        self.state.write().plugin_id = plugin_id;
-    }
-
+    /// Send a message to the plugin session
     pub fn send_message(&self, msg: ServerPluginMessage) -> bool {
         self.tx.send(msg).is_ok()
     }
 
-    pub fn handle_message(self: &Arc<Self>, message: ClientPluginMessage) {
+    /// Handle messages from the socket
+    pub async fn handle_message(&self, message: ClientPluginMessage) {
+        match self.get_plugin_id() {
+            Some(plugin_id) => self.handle_message_authenticated(plugin_id, message).await,
+            None => self.handle_message_unauthenticated(message).await,
+        };
+    }
+
+    /// Handle messages when unauthenticated
+    pub async fn handle_message_unauthenticated(&self, message: ClientPluginMessage) {
         match message {
             ClientPluginMessage::RegisterPlugin { plugin_id } => {
                 // Handle unknown plugin
@@ -109,56 +116,61 @@ impl PluginSession {
                 }
 
                 self.plugins.set_plugin_session(plugin_id.clone(), self.id);
-                self.set_plugin_id(Some(plugin_id.clone()));
+
+                // Set the current plugin ID
+                {
+                    self.state.write().plugin_id = Some(plugin_id.clone());
+                }
 
                 self.send_message(ServerPluginMessage::Registered { plugin_id });
             }
+            message => {
+                tracing::warn!(?message, "got unexpected message from unauthorized plugin");
+            }
+        }
+    }
+
+    /// Handle message when authenticated as `plugin_id`
+    pub async fn handle_message_authenticated(
+        &self,
+        plugin_id: PluginId,
+        message: ClientPluginMessage,
+    ) {
+        match message {
             ClientPluginMessage::GetProperties => {
-                let plugin_id = match self.get_plugin_id() {
-                    Some(value) => value,
-                    None => {
-                        debug!("plugin requested properties before registering");
+                let properties = match self.plugins.get_plugin_properties(plugin_id).await {
+                    Ok(value) => value,
+                    Err(cause) => {
+                        tracing::error!(?cause, "failed to load plugin properties");
                         return;
                     }
                 };
 
-                let session = self.clone();
-                tokio::spawn(async move {
-                    let properties = match session.plugins.get_plugin_properties(plugin_id).await {
-                        Ok(value) => value,
-                        Err(cause) => {
-                            error!(?cause, "failed to load plugin properties");
-                            return;
-                        }
-                    };
-
-                    session.send_message(ServerPluginMessage::Properties { properties });
-                });
+                self.send_message(ServerPluginMessage::Properties { properties });
             }
+
+            ClientPluginMessage::SetProperties { properties } => {
+                if let Err(cause) = self
+                    .plugins
+                    .set_plugin_properties(plugin_id, properties)
+                    .await
+                {
+                    tracing::error!(?cause, "failed to save plugin properties");
+                }
+            }
+
             ClientPluginMessage::SendToInspector { ctx, message } => {
                 self.plugins.send_to_inspector(ctx, message);
             }
-            ClientPluginMessage::SetProperties { properties } => {
-                let plugin_id = match self.get_plugin_id() {
-                    Some(value) => value,
-                    None => return,
-                };
 
-                let session = self.clone();
-                tokio::spawn(async move {
-                    if let Err(cause) = session
-                        .plugins
-                        .set_plugin_properties(plugin_id, properties)
-                        .await
-                    {
-                        error!(?cause, "failed to save plugin properties");
-                    }
-                });
-            }
             ClientPluginMessage::OpenUrl { url } => {
                 if let Err(cause) = open_url(url, None::<&str>) {
-                    error!(?cause, "failed to open url");
+                    tracing::error!(?cause, "failed to open url");
                 }
+            }
+
+            message => {
+                tracing::warn!(?message, "got unexpected message from authorized plugin");
             }
         }
     }

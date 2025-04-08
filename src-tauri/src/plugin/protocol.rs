@@ -9,7 +9,7 @@ use crate::{
 use super::manifest::{ActionId, PluginId};
 
 /// Plugin message coming from the client side
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 #[serde(tag = "type")]
 pub enum ClientPluginMessage {
     /// Register the current plugin with the server
@@ -34,7 +34,7 @@ pub enum ClientPluginMessage {
 }
 
 /// Plugin message coming from the server side
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 #[serde(tag = "type")]
 pub enum ServerPluginMessage {
     /// Plugin has registered with the server
