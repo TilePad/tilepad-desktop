@@ -11,7 +11,7 @@ use mime_guess::mime::TEXT_HTML;
 use reqwest::{header::CONTENT_TYPE, StatusCode};
 
 use crate::{
-    plugin::{manifest::PluginId, socket::PluginSession, Plugins},
+    plugin::{manifest::PluginId, session::PluginSession, Plugins},
     server::models::error::DynHttpError,
 };
 

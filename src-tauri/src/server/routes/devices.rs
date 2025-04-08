@@ -6,7 +6,7 @@ use axum::{
     Extension,
 };
 
-use crate::device::{socket::DeviceSession, Devices};
+use crate::device::{session::DeviceSession, Devices};
 
 /// GET /devices/ws
 ///

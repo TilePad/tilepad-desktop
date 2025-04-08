@@ -18,7 +18,7 @@ use protocol::ServerPluginMessage;
 use runner::{spawn_native_task, PluginTaskState};
 use serde::Serialize;
 use serde_json::Map;
-use socket::{PluginSessionId, PluginSessionRef};
+use session::{PluginSessionId, PluginSessionRef};
 use tauri::plugin;
 pub use tilepad_manifest::plugin as manifest;
 use tilepad_manifest::plugin::{ManifestBin, ManifestBinNative};
@@ -44,7 +44,7 @@ pub mod loader;
 pub mod node;
 pub mod protocol;
 pub mod runner;
-pub mod socket;
+pub mod session;
 
 #[derive(Clone)]
 pub struct Plugins {

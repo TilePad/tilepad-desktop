@@ -4,7 +4,7 @@ use anyhow::Context;
 use parking_lot::RwLock;
 use protocol::ServerDeviceMessage;
 use serde::{Deserialize, Serialize};
-use socket::{DeviceSessionId, DeviceSessionRef};
+use session::{DeviceSessionId, DeviceSessionRef};
 use uuid::Uuid;
 
 use crate::{
@@ -25,7 +25,7 @@ use crate::{
 };
 
 pub mod protocol;
-pub mod socket;
+pub mod session;
 
 pub type DeviceRequestId = Uuid;
 
