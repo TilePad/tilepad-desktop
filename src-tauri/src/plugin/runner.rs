@@ -271,8 +271,30 @@ pub struct ChildTask {
 impl ChildTask {
     pub fn create(mut child: Child) -> (ChildTask, ChildTaskHandle) {
         // Take the error and output pipes
-        // let stdout = child.stdout.take().map(|io| BufReader::new(io).lines());
-        // let stderr = child.stderr.take().map(|io| BufReader::new(io).lines());
+        let stdout = child.stdout.take().map(|io| BufReader::new(io).lines());
+        let stderr = child.stderr.take().map(|io| BufReader::new(io).lines());
+
+        tokio::spawn(async move {
+            let mut stdout = match stdout {
+                Some(value) => value,
+                None => return,
+            };
+
+            while let Ok(Some(line)) = stdout.next_line().await {
+                println!("{line}");
+            }
+        });
+
+        tokio::spawn(async move {
+            let mut stderr = match stderr {
+                Some(value) => value,
+                None => return,
+            };
+
+            while let Ok(Some(line)) = stderr.next_line().await {
+                println!("{line}");
+            }
+        });
 
         let (tx, rx) = mpsc::channel(1);
 

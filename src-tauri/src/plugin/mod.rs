@@ -281,6 +281,8 @@ impl Plugins {
         context: InspectorContext,
         message: serde_json::Value,
     ) -> anyhow::Result<()> {
+        tracing::debug!(?context, ?message, "sending message to plugin");
+
         let plugin = self
             .get_plugin(&context.plugin_id)
             .context("plugin not found")?;
@@ -288,6 +290,7 @@ impl Plugins {
         if plugin.manifest.plugin.internal.is_some_and(|value| value) {
             internal::handle_internal_message(self, &self.db, context, message).await?;
         } else {
+            tracing::debug!("sent message to plugin");
             let session = match self.get_plugin_session(&context.plugin_id) {
                 Some(value) => value,
                 None => return Ok(()),
