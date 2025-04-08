@@ -74,7 +74,7 @@ impl DeviceSession {
 
                 // Process messages from the session
                 while let Some(msg) = ws_rx.recv().await {
-                    session.handle_message(msg);
+                    session.handle_message(msg).await;
                 }
 
                 let device_id = session.get_device_id();
@@ -103,7 +103,16 @@ impl DeviceSession {
         self.tx.send(msg).is_ok()
     }
 
-    pub fn handle_message(self: &Arc<Self>, message: ClientDeviceMessage) {
+    /// Handle messages from the socket
+    pub async fn handle_message(&self, message: ClientDeviceMessage) {
+        match self.get_device_id() {
+            Some(device_id) => self.handle_message_authenticated(device_id, message).await,
+            None => self.handle_message_unauthenticated(message).await,
+        };
+    }
+
+    /// Handle messages when unauthenticated
+    pub async fn handle_message_unauthenticated(&self, message: ClientDeviceMessage) {
         match message {
             ClientDeviceMessage::RequestApproval { name } => {
                 self.devices
@@ -111,53 +120,43 @@ impl DeviceSession {
             }
 
             ClientDeviceMessage::Authenticate { access_token } => {
-                let session_id = self.id;
-                let devices = self.devices.clone();
-
-                _ = tokio::spawn(async move {
-                    if let Err(cause) = devices
-                        .attempt_authenticate_device(session_id, access_token)
-                        .await
-                    {
-                        tracing::error!(?cause, "failed to authenticate device");
-                    }
-                });
+                if let Err(cause) = self
+                    .devices
+                    .attempt_authenticate_device(self.id, access_token)
+                    .await
+                {
+                    tracing::error!(?cause, "failed to authenticate device");
+                }
             }
 
+            message => {
+                tracing::warn!(?message, "got unexpected message from unauthorized device");
+            }
+        }
+    }
+
+    /// Handle message when authenticated as `device_id`
+    pub async fn handle_message_authenticated(
+        &self,
+        device_id: DeviceId,
+        message: ClientDeviceMessage,
+    ) {
+        match message {
             ClientDeviceMessage::RequestTiles => {
-                let session = self.clone();
-                let device_id = match self.get_device_id() {
-                    Some(value) => value,
-                    None => {
-                        tracing::error!("unauthenticated device requested tiles");
+                // Get the current folder the device is using
+                let (folder, tiles) = match self.devices.request_device_tiles(device_id).await {
+                    Ok(value) => value,
+                    Err(cause) => {
+                        tracing::error!(?cause, "failed to request device tiles");
                         return;
                     }
                 };
-                let devices = self.devices.clone();
 
-                _ = tokio::spawn(async move {
-                    // Get the current folder the device is using
-                    let (folder, tiles) = match devices.request_device_tiles(device_id).await {
-                        Ok(value) => value,
-                        Err(cause) => {
-                            tracing::error!(?cause, "failed to request device tiles");
-                            return;
-                        }
-                    };
-
-                    // Send the tiles to the device
-                    _ = session.send_message(ServerDeviceMessage::Tiles { tiles, folder });
-                });
+                // Send the tiles to the device
+                self.send_message(ServerDeviceMessage::Tiles { tiles, folder });
             }
 
             ClientDeviceMessage::TileClicked { tile_id } => {
-                let device_id = match self.get_device_id() {
-                    Some(value) => value,
-                    None => {
-                        tracing::error!("unauthenticated device requested tiles");
-                        return;
-                    }
-                };
                 let devices = self.devices.clone();
 
                 _ = tokio::spawn(async move {
@@ -165,6 +164,10 @@ impl DeviceSession {
                         tracing::error!(?cause, "failed to execute tile");
                     }
                 });
+            }
+
+            message => {
+                tracing::warn!(?message, "got unexpected message from authorized device");
             }
         }
     }

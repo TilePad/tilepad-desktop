@@ -4,7 +4,7 @@ use uuid::Uuid;
 use crate::database::entity::{folder::FolderModel, tile::TileModel};
 
 /// Device message coming from the client side
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 #[serde(tag = "type")]
 pub enum ClientDeviceMessage {
     /// Requests an access token and approval for a device
@@ -30,7 +30,7 @@ pub enum ClientDeviceMessage {
 }
 
 /// Device message coming from the server side
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 #[serde(tag = "type")]
 pub enum ServerDeviceMessage {
     /// Device access was denied
