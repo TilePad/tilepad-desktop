@@ -14,7 +14,7 @@ use anyhow::anyhow;
 use axum::extract::ws::{Message, WebSocket};
 use parking_lot::RwLock;
 use serde_json::{Map, Value};
-use tauri::async_runtime::spawn;
+use tauri::async_runtime::{spawn, spawn_blocking};
 use tauri_plugin_opener::open_url;
 use tracing::{debug, error};
 use uuid::Uuid;
@@ -34,10 +34,10 @@ pub struct PluginSession {
     id: PluginSessionId,
     /// Session state
     state: RwLock<PluginSessionState>,
-    /// Access to the plugins registry
-    plugins: Arc<Plugins>,
     /// Sender to send messages to the session socket
     tx: WsTx<ServerPluginMessage>,
+    /// Access to the plugins registry the session is apart of
+    plugins: Arc<Plugins>,
 }
 
 #[derive(Default)]
@@ -164,9 +164,12 @@ impl PluginSession {
             }
 
             ClientPluginMessage::OpenUrl { url } => {
-                if let Err(cause) = open_url(url, None::<&str>) {
-                    tracing::error!(?cause, "failed to open url");
-                }
+                _ = spawn_blocking(move || {
+                    if let Err(cause) = open_url(url, None::<&str>) {
+                        tracing::error!(?cause, "failed to open url");
+                    }
+                })
+                .await;
             }
 
             message => {
