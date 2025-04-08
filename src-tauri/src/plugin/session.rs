@@ -75,7 +75,7 @@ impl PluginSession {
 
             // Process messages from the session
             while let Some(msg) = ws_rx.recv().await {
-                session.handle_message(msg);
+                session.handle_message(msg).await;
             }
 
             let plugin_id = session.get_plugin_id();
