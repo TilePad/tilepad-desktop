@@ -40,8 +40,8 @@ pub async fn handle_internal_message(
 }
 
 pub async fn handle_internal_action(
-    plugins: &Arc<Plugins>,
-    devices: &Arc<Devices>,
+    plugins: &Plugins,
+    devices: &Devices,
     context: TileInteractionContext,
     properties: serde_json::Value,
 ) -> anyhow::Result<()> {

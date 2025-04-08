@@ -29,8 +29,8 @@ pub struct SwitchProfileProperties {
 }
 
 pub async fn handle(
-    devices: &Arc<Devices>,
-    plugins: &Arc<Plugins>,
+    devices: &Devices,
+    plugins: &Plugins,
     context: TileInteractionContext,
     properties: serde_json::Value,
 ) -> anyhow::Result<()> {

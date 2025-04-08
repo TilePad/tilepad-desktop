@@ -303,9 +303,8 @@ impl Plugins {
     }
 
     pub async fn handle_action(
-        self: &Arc<Self>,
-
-        devices: &Arc<Devices>,
+        &self,
+        devices: &Devices,
         ctx: TileInteractionContext,
         properties: serde_json::Value,
     ) -> anyhow::Result<()> {

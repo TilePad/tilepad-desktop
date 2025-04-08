@@ -399,7 +399,7 @@ impl Devices {
     }
 
     pub async fn device_execute_tile(
-        self: &Arc<Self>,
+        &self,
         device_id: DeviceId,
         tile_id: TileId,
     ) -> anyhow::Result<()> {
