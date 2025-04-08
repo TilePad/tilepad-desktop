@@ -255,31 +255,21 @@ impl Devices {
     /// Attempt to authenticate a session using a access token
     pub async fn attempt_authenticate_device(
         &self,
-        session_id: DeviceSessionId,
         access_token: String,
-    ) -> anyhow::Result<()> {
-        let session = self.get_session(&session_id).context("session not found")?;
-        let mut device = match DeviceModel::get_by_access_token(&self.db, &access_token).await? {
-            Some(device) => device,
-            None => {
-                session.send_message(ServerDeviceMessage::InvalidAccessToken);
-                return Ok(());
-            }
-        };
+    ) -> anyhow::Result<DeviceId> {
+        let mut device = DeviceModel::get_by_access_token(&self.db, &access_token)
+            .await?
+            .context("access token not found")?;
 
         // Update last connected
         device.set_connected_now(&self.db).await?;
-
-        // Authenticate the device session
-        session.set_device_id(Some(device.id));
-        session.send_message(ServerDeviceMessage::Authenticated);
 
         // Notify frontend
         self.emit_app_event(AppEvent::Device(DeviceAppEvent::Authenticated {
             device_id: device.id,
         }));
 
-        Ok(())
+        Ok(device.id)
     }
 
     /// Revoke access for a device

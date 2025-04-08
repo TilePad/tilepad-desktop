@@ -78,12 +78,10 @@ impl PluginSession {
                 session.handle_message(msg);
             }
 
-            // Remove the session thats no longer running
-            session.plugins.remove_session(session.id);
+            let plugin_id = session.get_plugin_id();
 
-            if let Some(plugin_id) = session.get_plugin_id() {
-                session.plugins.remove_plugin_session(plugin_id);
-            }
+            // Remove the session thats no longer running
+            session.plugins.remove_session(session.id, plugin_id);
         });
     }
 

@@ -255,16 +255,16 @@ impl Plugins {
     }
 
     /// Remove a session
-    pub fn remove_session(&self, session_id: PluginSessionId) {
+    pub fn remove_session(&self, session_id: PluginSessionId, plugin_id: Option<PluginId>) {
         self.sessions.write().remove(&session_id);
+
+        if let Some(plugin_id) = plugin_id {
+            self.plugin_to_session.write().remove(&plugin_id);
+        }
     }
 
     pub fn set_plugin_session(&self, plugin_id: PluginId, session_id: PluginSessionId) {
         self.plugin_to_session.write().insert(plugin_id, session_id);
-    }
-
-    pub fn remove_plugin_session(&self, plugin_id: PluginId) {
-        self.plugin_to_session.write().remove(&plugin_id);
     }
 
     pub fn get_plugin_session(&self, plugin_id: &PluginId) -> Option<PluginSessionRef> {

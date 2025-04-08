@@ -32,6 +32,7 @@ pub struct DeviceSession {
     /// Channel to send messages to the session
     tx: WsTx<ServerDeviceMessage>,
 
+    /// Access to the devices registry the session is apart of
     devices: Arc<Devices>,
 }
 
@@ -42,16 +43,13 @@ pub struct DeviceSessionState {
 }
 
 impl DeviceSession {
-    pub fn new(
-        devices: Arc<Devices>,
-        socket_addr: SocketAddr,
-        socket: WebSocket,
-    ) -> (DeviceSessionId, DeviceSessionRef) {
+    pub fn start(devices: Arc<Devices>, socket_addr: SocketAddr, socket: WebSocket) {
         let id = Uuid::new_v4();
 
         // Create and spawn a future for the websocket
         let (ws_future, ws_rx, ws_tx) =
             WebSocketFuture::<ServerDeviceMessage, ClientDeviceMessage>::new(socket);
+
         spawn(async move {
             if let Err(cause) = ws_future.await {
                 error!(?cause, "error running device websocket future");
@@ -66,31 +64,29 @@ impl DeviceSession {
             devices,
         });
 
-        spawn({
-            let session = session.clone();
+        spawn(async move {
+            // Add the session
+            session.devices.insert_session(id, session.clone());
 
-            async move {
-                let mut ws_rx = ws_rx;
+            let mut ws_rx = ws_rx;
 
-                // Process messages from the session
-                while let Some(msg) = ws_rx.recv().await {
-                    session.handle_message(msg).await;
-                }
-
-                let device_id = session.get_device_id();
-
-                // Remove the session thats no longer running
-                session.devices.remove_session(session.id, device_id);
+            // Process messages from the session
+            while let Some(msg) = ws_rx.recv().await {
+                session.handle_message(msg).await;
             }
-        });
 
-        (id, session)
+            let device_id = session.get_device_id();
+
+            // Remove the session thats no longer running
+            session.devices.remove_session(session.id, device_id);
+        });
     }
 
     pub fn is_closed(&self) -> bool {
         self.tx.is_closed()
     }
 
+    /// Get the current device ID
     pub fn get_device_id(&self) -> Option<DeviceId> {
         self.state.read().device_id
     }
@@ -120,13 +116,18 @@ impl DeviceSession {
             }
 
             ClientDeviceMessage::Authenticate { access_token } => {
-                if let Err(cause) = self
-                    .devices
-                    .attempt_authenticate_device(self.id, access_token)
-                    .await
-                {
-                    tracing::error!(?cause, "failed to authenticate device");
-                }
+                let device_id = match self.devices.attempt_authenticate_device(access_token).await {
+                    Ok(value) => value,
+                    Err(cause) => {
+                        tracing::error!(?cause, "failed to authenticate device");
+                        self.send_message(ServerDeviceMessage::InvalidAccessToken);
+                        return;
+                    }
+                };
+
+                // Authenticate the device session
+                self.set_device_id(Some(device_id));
+                self.send_message(ServerDeviceMessage::Authenticated);
             }
 
             message => {

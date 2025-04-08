@@ -25,6 +25,5 @@ pub async fn handle_device_socket(
     socket_addr: SocketAddr,
     socket: WebSocket,
 ) {
-    let (session_id, session_ref) = DeviceSession::new(devices.clone(), socket_addr, socket);
-    devices.insert_session(session_id, session_ref);
+    DeviceSession::start(devices, socket_addr, socket);
 }
