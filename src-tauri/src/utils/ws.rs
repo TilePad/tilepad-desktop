@@ -7,6 +7,7 @@ use std::{
 use axum::extract::ws::{Message as WsMessage, WebSocket};
 use futures::{SinkExt, StreamExt};
 use serde::{de::DeserializeOwned, Serialize};
+use thiserror::Error;
 use tokio::sync::mpsc;
 
 /// Abstraction for easily implementing a JSON protocol
@@ -49,12 +50,23 @@ where
     }
 }
 
+#[derive(Debug, Error)]
+pub enum WsError {
+    /// Got an axum generic error
+    #[error(transparent)]
+    Axum(#[from] axum::Error),
+
+    /// Got a binary message for a text protocol
+    #[error("unexpected binary message")]
+    UnexpectedBinaryMessage,
+}
+
 impl<MsgOut, MsgIn> Future for WebSocketFuture<MsgOut, MsgIn>
 where
     MsgOut: Serialize,
     MsgIn: DeserializeOwned,
 {
-    type Output = anyhow::Result<()>;
+    type Output = Result<(), WsError>;
 
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
         let this = self.get_mut();
@@ -75,9 +87,7 @@ where
             let msg = match msg {
                 WsMessage::Text(utf8_bytes) => utf8_bytes,
                 // Expecting a text based protocol
-                WsMessage::Binary(_) => {
-                    return Poll::Ready(Err(anyhow::anyhow!("unexpected binary message")))
-                }
+                WsMessage::Binary(_) => return Poll::Ready(Err(WsError::UnexpectedBinaryMessage)),
 
                 // Ping and pong are handled internally
                 WsMessage::Ping(_) | WsMessage::Pong(_) => continue,
