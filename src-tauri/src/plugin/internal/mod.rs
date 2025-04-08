@@ -47,17 +47,16 @@ pub async fn handle_internal_message(
 pub async fn handle_internal_action(
     plugins: &Arc<Plugins>,
     devices: &Arc<Devices>,
-    db: &DbPool,
     context: TileInteractionContext,
-    tile: TileModel,
+    properties: serde_json::Value,
 ) -> anyhow::Result<()> {
     match context.plugin_id.as_str() {
         "com.tilepad.system.navigation" => {
-            navigation::actions::handle(devices, plugins, db, context, tile).await?;
+            navigation::actions::handle(devices, plugins, context, properties).await?;
         }
 
         "com.tilepad.system.system" => {
-            system::actions::handle(devices, plugins, db, context, tile).await?;
+            system::actions::handle(devices, plugins, context, properties).await?;
         }
 
         plugin_id => {

@@ -304,28 +304,26 @@ impl Plugins {
 
     pub async fn handle_action(
         self: &Arc<Self>,
+
         devices: &Arc<Devices>,
-        context: TileInteractionContext,
-        tile: TileModel,
+        ctx: TileInteractionContext,
+        properties: serde_json::Value,
     ) -> anyhow::Result<()> {
-        tracing::debug!(?context, ?tile, "invoking action");
+        tracing::debug!(?ctx, ?properties, "invoking action");
 
         let plugin = self
-            .get_plugin(&context.plugin_id)
+            .get_plugin(&ctx.plugin_id)
             .context("plugin not found")?;
 
         if plugin.manifest.plugin.internal.is_some_and(|value| value) {
-            internal::handle_internal_action(self, devices, &self.db, context, tile).await?;
+            internal::handle_internal_action(self, devices, ctx, properties).await?;
         } else {
-            let session = match self.get_plugin_session(&context.plugin_id) {
+            let session = match self.get_plugin_session(&ctx.plugin_id) {
                 Some(value) => value,
                 None => return Ok(()),
             };
 
-            session.send_message(ServerPluginMessage::TileClicked {
-                ctx: context,
-                properties: tile.config.properties,
-            });
+            session.send_message(ServerPluginMessage::TileClicked { ctx, properties });
         }
 
         Ok(())

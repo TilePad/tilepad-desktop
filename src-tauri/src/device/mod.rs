@@ -10,9 +10,9 @@ use uuid::Uuid;
 use crate::{
     database::{
         entity::{
-            device::{CreateDevice, DeviceConfig, DeviceId, DeviceModel},
+            device::{CreateDevice, DeviceConfig, DeviceId, DeviceModel, UpdateDevice},
             folder::{FolderId, FolderModel},
-            profile::ProfileModel,
+            profile::{ProfileId, ProfileModel},
             tile::{TileId, TileModel},
         },
         DbPool,
@@ -304,6 +304,70 @@ impl Devices {
         Ok((folder, tiles))
     }
 
+    pub async fn update_device_profile(
+        &self,
+        device_id: DeviceId,
+        profile_id: ProfileId,
+    ) -> anyhow::Result<()> {
+        let db = &self.db;
+        let device = DeviceModel::get_by_id(db, device_id)
+            .await?
+            .context("device not found")?;
+        let folder = FolderModel::get_default(db, profile_id)
+            .await?
+            .context("unknown folder")?;
+        let tiles = TileModel::get_by_folder(db, folder.id).await?;
+
+        // Update the profile on the device
+        device
+            .update(
+                db,
+                UpdateDevice {
+                    profile_id: Some(profile_id),
+                    folder_id: Some(folder.id),
+                    ..Default::default()
+                },
+            )
+            .await?;
+
+        if let Some(session) = self.get_session_by_device(device_id) {
+            session.send_message(ServerDeviceMessage::Tiles { tiles, folder });
+        }
+
+        Ok(())
+    }
+
+    pub async fn update_device_folder(
+        &self,
+        device_id: DeviceId,
+        folder_id: FolderId,
+    ) -> anyhow::Result<()> {
+        let db = &self.db;
+        let device = DeviceModel::get_by_id(db, device_id)
+            .await?
+            .context("device not found")?;
+        let folder = FolderModel::get_by_id(db, folder_id)
+            .await?
+            .context("unknown folder")?;
+        let tiles = TileModel::get_by_folder(db, folder.id).await?;
+
+        device
+            .update(
+                db,
+                UpdateDevice {
+                    folder_id: Some(folder_id),
+                    ..Default::default()
+                },
+            )
+            .await?;
+
+        if let Some(session) = self.get_session_by_device(device_id) {
+            session.send_message(ServerDeviceMessage::Tiles { tiles, folder });
+        }
+
+        Ok(())
+    }
+
     /// Updates the tiles on all devices that are using the
     /// provided `folder_id` folder
     pub async fn update_devices_tiles(&self, folder_id: FolderId) -> anyhow::Result<()> {
@@ -321,17 +385,15 @@ impl Devices {
 
         let tiles = TileModel::get_by_folder(db, folder_id).await?;
 
-        for device in devices {
-            let session = match self.get_session_by_device(device.id) {
-                Some(value) => value,
-                None => continue,
-            };
-
-            _ = session.send_message(ServerDeviceMessage::Tiles {
-                tiles: tiles.clone(),
-                folder: folder.clone(),
+        devices
+            .iter()
+            .filter_map(|device| self.get_session_by_device(device.id))
+            .for_each(|session| {
+                _ = session.send_message(ServerDeviceMessage::Tiles {
+                    tiles: tiles.clone(),
+                    folder: folder.clone(),
+                });
             });
-        }
 
         Ok(())
     }
@@ -341,19 +403,20 @@ impl Devices {
         device_id: DeviceId,
         tile_id: TileId,
     ) -> anyhow::Result<()> {
-        let db = &self.db;
-        let tile = TileModel::get_by_id(db, tile_id)
+        let tile = TileModel::get_by_id(&self.db, tile_id)
             .await?
             .context("tile instance not found")?;
 
         let context = TileInteractionContext {
             device_id,
-            plugin_id: tile.config.plugin_id.clone(),
-            action_id: tile.config.action_id.clone(),
+            plugin_id: tile.config.plugin_id,
+            action_id: tile.config.action_id,
             tile_id,
         };
 
-        self.plugins.handle_action(self, context, tile).await?;
+        self.plugins
+            .handle_action(self, context, tile.config.properties)
+            .await?;
 
         Ok(())
     }
