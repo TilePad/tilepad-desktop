@@ -1,13 +1,6 @@
-use std::{
-    future::Future,
-    net::SocketAddr,
-    pin::Pin,
-    sync::Arc,
-    task::{ready, Context, Poll},
-};
+use std::{net::SocketAddr, sync::Arc};
 
-use anyhow::anyhow;
-use axum::extract::ws::{Message, WebSocket};
+use axum::extract::ws::WebSocket;
 use parking_lot::RwLock;
 use tauri::async_runtime::spawn;
 use tracing::error;
@@ -15,7 +8,7 @@ use uuid::Uuid;
 
 use crate::{
     database::entity::device::DeviceId,
-    utils::ws::{WebSocketFuture, WsRx, WsTx},
+    utils::ws::{WebSocketFuture, WsTx},
 };
 
 use super::{
@@ -36,9 +29,16 @@ pub struct DeviceSession {
     /// Session state
     state: RwLock<DeviceSessionState>,
 
-    tx: WsTx,
+    /// Channel to send messages to the session
+    tx: WsTx<ServerDeviceMessage>,
 
     devices: Devices,
+}
+
+#[derive(Default)]
+pub struct DeviceSessionState {
+    /// Device ID if authenticated as a device
+    device_id: Option<DeviceId>,
 }
 
 impl DeviceSession {
@@ -50,7 +50,8 @@ impl DeviceSession {
         let id = Uuid::new_v4();
 
         // Create and spawn a future for the websocket
-        let (ws_future, ws_rx, ws_tx) = WebSocketFuture::new(socket);
+        let (ws_future, ws_rx, ws_tx) =
+            WebSocketFuture::<ServerDeviceMessage, ClientDeviceMessage>::new(socket);
         spawn(async move {
             if let Err(cause) = ws_future.await {
                 error!(?cause, "error running device websocket future");
@@ -65,19 +66,15 @@ impl DeviceSession {
             devices,
         });
 
-        // Create and spawn a future to process session messages
-        let session_future = DeviceSessionFuture {
-            session: session.clone(),
-            rx: ws_rx,
-        };
-
         spawn({
             let session = session.clone();
 
             async move {
-                // Run the session to completion
-                if let Err(cause) = session_future.await {
-                    error!(?cause, "error running device session future");
+                let mut ws_rx = ws_rx;
+
+                // Process messages from the session
+                while let Some(msg) = ws_rx.recv().await {
+                    session.handle_message(msg);
                 }
 
                 let device_id = session.get_device_id();
@@ -102,11 +99,8 @@ impl DeviceSession {
         self.state.write().device_id = device_id;
     }
 
-    pub fn send_message(&self, msg: ServerDeviceMessage) -> anyhow::Result<()> {
-        let msg = serde_json::to_string(&msg)?;
-        let message = Message::text(msg);
-        self.tx.send(message)?;
-        Ok(())
+    pub fn send_message(&self, msg: ServerDeviceMessage) -> bool {
+        self.tx.send(msg).is_ok()
     }
 
     pub fn handle_message(self: &Arc<Self>, message: ClientDeviceMessage) {
@@ -142,6 +136,7 @@ impl DeviceSession {
                 let devices = self.devices.clone();
 
                 _ = tokio::spawn(async move {
+                    // Get the current folder the device is using
                     let (folder, tiles) = match devices.request_device_tiles(device_id).await {
                         Ok(value) => value,
                         Err(cause) => {
@@ -150,11 +145,8 @@ impl DeviceSession {
                         }
                     };
 
-                    if let Err(cause) =
-                        session.send_message(ServerDeviceMessage::Tiles { tiles, folder })
-                    {
-                        tracing::error!(?cause, "failed to send device tiles");
-                    }
+                    // Send the tiles to the device
+                    _ = session.send_message(ServerDeviceMessage::Tiles { tiles, folder });
                 });
             }
 
@@ -175,48 +167,5 @@ impl DeviceSession {
                 });
             }
         }
-    }
-}
-
-#[derive(Default)]
-pub struct DeviceSessionState {
-    /// Device ID if authenticated as a device
-    device_id: Option<DeviceId>,
-}
-
-/// Futures that processes messages for a device session
-pub struct DeviceSessionFuture {
-    session: DeviceSessionRef,
-    rx: WsRx,
-}
-
-impl Future for DeviceSessionFuture {
-    type Output = anyhow::Result<()>;
-
-    fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-        let this = self.get_mut();
-
-        while let Some(msg) = ready!(this.rx.poll_recv(cx)) {
-            let message = match msg {
-                Message::Text(utf8_bytes) => utf8_bytes,
-
-                // Ping and pong are handled internally
-                Message::Ping(_) | Message::Pong(_) => continue,
-
-                // Expecting a text based protocol
-                Message::Binary(_) => {
-                    return Poll::Ready(Err(anyhow!("unexpected binary message")))
-                }
-
-                // Socket is closed
-                Message::Close(_) => return Poll::Ready(Ok(())),
-            };
-
-            let msg: ClientDeviceMessage = serde_json::from_str(message.as_str())?;
-            this.session.handle_message(msg);
-        }
-
-        // No more messages, session is terminated
-        Poll::Ready(Ok(()))
     }
 }

@@ -58,7 +58,7 @@ pub async fn handle(
                 .await?;
 
             if let Some(session) = devices.get_session_by_device(context.device_id) {
-                session.send_message(ServerDeviceMessage::Tiles { tiles, folder })?;
+                session.send_message(ServerDeviceMessage::Tiles { tiles, folder });
             }
         }
         "switch_profile" => {
@@ -88,7 +88,7 @@ pub async fn handle(
                 .await?;
 
             if let Some(session) = devices.get_session_by_device(context.device_id) {
-                session.send_message(ServerDeviceMessage::Tiles { tiles, folder })?;
+                _ = session.send_message(ServerDeviceMessage::Tiles { tiles, folder });
             }
         }
         action_id => {

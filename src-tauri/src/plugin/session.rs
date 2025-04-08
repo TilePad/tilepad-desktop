@@ -38,7 +38,7 @@ pub struct PluginSession {
     plugins: Plugins,
 
     /// Sender to send messages to the session socket
-    tx: WsTx,
+    tx: WsTx<ServerPluginMessage>,
 }
 
 impl PluginSession {
@@ -46,7 +46,9 @@ impl PluginSession {
         let id = Uuid::new_v4();
 
         // Create and spawn a future for the websocket
-        let (ws_future, ws_rx, ws_tx) = WebSocketFuture::new(socket);
+        let (ws_future, ws_rx, ws_tx) =
+            WebSocketFuture::<ServerPluginMessage, ClientPluginMessage>::new(socket);
+
         spawn(async move {
             if let Err(cause) = ws_future.await {
                 error!(?cause, "error running device websocket future");
@@ -60,19 +62,15 @@ impl PluginSession {
             tx: ws_tx,
         });
 
-        // Create and spawn a future to process session messages
-        let session_future = PluginSessionFuture {
-            session: session.clone(),
-            rx: ws_rx,
-        };
-
         spawn({
             let session = session.clone();
 
             async move {
-                // Run the session to completion
-                if let Err(cause) = session_future.await {
-                    error!(?cause, "error running device session future");
+                let mut ws_rx = ws_rx;
+
+                // Process messages from the session
+                while let Some(msg) = ws_rx.recv().await {
+                    session.handle_message(msg);
                 }
 
                 // Remove the session thats no longer running
@@ -100,10 +98,7 @@ impl PluginSession {
     }
 
     pub fn send_message(&self, msg: ServerPluginMessage) -> anyhow::Result<()> {
-        let msg = serde_json::to_string(&msg)?;
-        let message = Message::text(msg);
-        self.tx.send(message)?;
-
+        self.tx.send(msg)?;
         Ok(())
     }
 
@@ -180,41 +175,4 @@ impl PluginSession {
 pub struct PluginSessionState {
     /// Device ID if authenticated as a device
     plugin_id: Option<PluginId>,
-}
-
-/// Futures that processes messages for a device session
-pub struct PluginSessionFuture {
-    session: PluginSessionRef,
-    rx: WsRx,
-}
-
-impl Future for PluginSessionFuture {
-    type Output = anyhow::Result<()>;
-
-    fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-        let this = self.get_mut();
-
-        while let Some(msg) = ready!(this.rx.poll_recv(cx)) {
-            let message = match msg {
-                Message::Text(utf8_bytes) => utf8_bytes,
-
-                // Ping and pong are handled internally
-                Message::Ping(_) | Message::Pong(_) => continue,
-
-                // Expecting a text based protocol
-                Message::Binary(_) => {
-                    return Poll::Ready(Err(anyhow!("unexpected binary message")))
-                }
-
-                // Socket is closed
-                Message::Close(_) => return Poll::Ready(Ok(())),
-            };
-
-            let msg: ClientPluginMessage = serde_json::from_str(message.as_str())?;
-            this.session.handle_message(msg);
-        }
-
-        // No more messages, session is terminated
-        Poll::Ready(Ok(()))
-    }
 }

@@ -186,7 +186,7 @@ impl Devices {
         session.send_message(ServerDeviceMessage::Approved {
             device_id: device.id,
             access_token,
-        })?;
+        });
 
         self.emit_app_event(AppEvent::DeviceRequest(DeviceRequestAppEvent::Accepted {
             request_id,
@@ -205,7 +205,7 @@ impl Devices {
             .context("session not found")?;
 
         session.set_device_id(None);
-        session.send_message(ServerDeviceMessage::Declined)?;
+        session.send_message(ServerDeviceMessage::Declined);
 
         self.emit_app_event(AppEvent::DeviceRequest(DeviceRequestAppEvent::Decline {
             request_id,
@@ -243,7 +243,7 @@ impl Devices {
             match DeviceModel::get_by_access_token(&self.inner.db, &access_token).await? {
                 Some(device) => device,
                 None => {
-                    session.send_message(ServerDeviceMessage::InvalidAccessToken)?;
+                    session.send_message(ServerDeviceMessage::InvalidAccessToken);
                     return Ok(());
                 }
             };
@@ -253,7 +253,7 @@ impl Devices {
 
         // Authenticate the device session
         session.set_device_id(Some(device.id));
-        session.send_message(ServerDeviceMessage::Authenticated)?;
+        session.send_message(ServerDeviceMessage::Authenticated);
 
         // Notify frontend
         self.emit_app_event(AppEvent::Device(DeviceAppEvent::Authenticated {
@@ -272,7 +272,7 @@ impl Devices {
         // Tell the session its been revoked
         if let Some(session) = self.get_session_by_device(device_id) {
             session.set_device_id(None);
-            session.send_message(ServerDeviceMessage::Revoked)?;
+            session.send_message(ServerDeviceMessage::Revoked);
         }
 
         Ok(())
