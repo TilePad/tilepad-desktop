@@ -1,4 +1,4 @@
-use std::{error::Error, str::FromStr};
+use std::{error::Error, str::FromStr, sync::Arc};
 
 use anyhow::Context;
 use device::Devices;
@@ -117,6 +117,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
     let runtimes_path = app_data_path.join("runtimes");
 
     let user_icons = app_data_path.join("icons");
+    let uploaded_icons = app_data_path.join("uploaded_icons");
 
     let db = block_on(database::connect_database(app_data_path.join("app.db")))
         .context("failed to load database")?;
@@ -124,7 +125,11 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
     let (app_event_tx, app_event_rx) = mpsc::unbounded_channel();
     let plugins = Plugins::new(app_event_tx.clone(), db.clone(), runtimes_path);
     let devices = Devices::new(app_event_tx.clone(), db.clone(), plugins.clone());
-    let icons = Icons::new(app_event_tx.clone());
+    let icons = Arc::new(Icons::new(
+        app_event_tx.clone(),
+        user_icons.clone(),
+        uploaded_icons,
+    ));
 
     app.manage(app_event_tx.clone());
     app.manage(db.clone());
@@ -147,10 +152,12 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
     ));
 
     // Load the user icon packs into the registry
-    spawn(icons::load_icon_packs_into_registry(
-        icons.clone(),
-        user_icons,
-    ));
+    spawn({
+        let icons = icons.clone();
+        async move {
+            icons.load_defaults().await;
+        }
+    });
 
     // Spawn event processor
     spawn(events::processing::process_events(

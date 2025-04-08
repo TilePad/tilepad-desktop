@@ -1,4 +1,7 @@
-use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
+use std::{
+    net::{Ipv4Addr, SocketAddr, SocketAddrV4},
+    sync::Arc,
+};
 
 use anyhow::Context;
 use axum::Extension;
@@ -17,7 +20,7 @@ pub async fn start_http_server(
     devices: Devices,
     app_handle: AppHandle,
     plugins: Plugins,
-    icons: Icons,
+    icons: Arc<Icons>,
 ) -> anyhow::Result<()> {
     // build our application with a single route
     let app = routes::router()

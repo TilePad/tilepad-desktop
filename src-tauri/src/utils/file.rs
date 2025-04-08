@@ -1,5 +1,18 @@
 use std::{collections::VecDeque, path::Path};
 
+use anyhow::Context;
+
+/// Get the file extension from a file name
+pub fn file_extension(name: String) -> anyhow::Result<String> {
+    let file_path_name = Path::new(&name);
+    let extension = file_path_name
+        .extension()
+        .context("missing file extension")?
+        .to_string_lossy();
+
+    Ok(extension.to_string())
+}
+
 /// Moves a directory from one path to another
 ///
 /// This is safe for cross volume moving unlike [std::fs::rename]

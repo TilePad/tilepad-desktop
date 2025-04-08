@@ -1,28 +1,35 @@
 use std::{collections::HashMap, path::PathBuf, sync::Arc};
 
+use anyhow::Context;
 use loader::load_icon_packs_from_path;
 use parking_lot::RwLock;
 use serde::Serialize;
 use tilepad_manifest::icons::{Icon, IconPackId, Manifest as IconPackManifest};
+use uuid::Uuid;
 
-use crate::events::{AppEvent, AppEventSender, IconPackAppEvent};
+use crate::{
+    events::{AppEvent, AppEventSender, IconPackAppEvent},
+    utils::file::file_extension,
+};
 
 pub mod install;
 pub mod loader;
 
-#[derive(Clone)]
 pub struct Icons {
-    inner: Arc<IconsInner>,
-}
-
-struct IconsInner {
     /// Sender for app events
     event_tx: AppEventSender,
+
+    /// Path for icon packs
+    packs_path: PathBuf,
+
+    /// Path for user uploaded icons
+    uploaded_path: PathBuf,
 
     /// Collection of currently loaded plugins
     packs: RwLock<HashMap<IconPackId, Arc<IconPack>>>,
 }
 
+/// Pack of icons loaded from the disk
 #[derive(Debug, Serialize, Clone)]
 pub struct IconPack {
     pub path: PathBuf,
@@ -31,85 +38,114 @@ pub struct IconPack {
 }
 
 impl Icons {
-    pub fn new(event_tx: AppEventSender) -> Self {
+    pub fn new(event_tx: AppEventSender, packs_path: PathBuf, uploaded_path: PathBuf) -> Self {
         Self {
-            inner: Arc::new(IconsInner {
-                event_tx,
-                packs: Default::default(),
-            }),
+            event_tx,
+            packs_path,
+            uploaded_path,
+            packs: Default::default(),
+        }
+    }
+
+    /// Get the path to the icon packs directory
+    pub fn packs_path(&self) -> PathBuf {
+        self.packs_path.clone()
+    }
+
+    /// Get the path to the user uploaded icons
+    pub fn uploaded_path(&self) -> PathBuf {
+        self.uploaded_path.clone()
+    }
+
+    /// Loads all icon packs from the default icon pack paths
+    pub async fn load_defaults(&self) {
+        self.load_icon_packs_from_path(&self.packs_path).await;
+    }
+
+    /// Loads all icon packs from the provided path
+    pub async fn load_icon_packs_from_path(&self, path: &PathBuf) {
+        let packs = match load_icon_packs_from_path(path).await {
+            Ok(value) => value,
+            Err(cause) => {
+                tracing::error!(?cause, ?path, "failed to load icon packs for registry");
+                return;
+            }
+        };
+
+        let pack_ids: Vec<IconPackId> = packs
+            .iter()
+            .map(|pack| (pack.manifest.icons.id.clone()))
+            .collect();
+
+        tracing::debug!(?pack_ids, "loaded icon packs");
+
+        for pack in packs {
+            self.load_pack(pack);
         }
     }
 
     /// Load a single plugin
     pub fn load_pack(&self, pack: IconPack) {
-        let packs = &mut *self.inner.packs.write();
-        self.load_pack_inner(packs, pack);
-    }
-
-    /// Load in bulk many plugins from `plugins`
-    pub fn load_packs(&self, packs: Vec<IconPack>) {
-        let plugins_map = &mut *self.inner.packs.write();
-        for pack in packs {
-            self.load_pack_inner(plugins_map, pack);
-        }
-    }
-
-    /// Performs the actual plugin loading process for a specific plugin
-    fn load_pack_inner(&self, packs: &mut HashMap<IconPackId, Arc<IconPack>>, pack: IconPack) {
         let pack_id = pack.manifest.icons.id.clone();
 
         // Store the plugin
-        packs.insert(pack_id.clone(), Arc::new(pack));
+        {
+            let packs = &mut *self.packs.write();
+            packs.insert(pack_id.clone(), Arc::new(pack));
+        }
 
         // Emit loaded event
         _ = self
-            .inner
             .event_tx
             .send(AppEvent::IconPack(IconPackAppEvent::IconPackLoaded {
                 pack_id,
             }));
     }
 
+    /// Get a list of all icon packs
     pub fn get_icon_packs(&self) -> Vec<Arc<IconPack>> {
-        self.inner.packs.read().values().cloned().collect()
+        self.packs.read().values().cloned().collect()
     }
 
+    /// Get the file system path to the files for the pack with
+    /// the provided `pack_id`
     pub fn get_pack_path(&self, pack_id: &IconPackId) -> Option<PathBuf> {
-        self.inner
-            .packs
-            .read()
-            .get(pack_id)
-            .map(|pack| pack.path.clone())
+        self.packs.read().get(pack_id).map(|pack| pack.path.clone())
     }
 
+    /// Upload the specified pack
     pub fn unload_pack(&self, pack_id: &IconPackId) {
-        self.inner.packs.write().remove(pack_id);
+        self.packs.write().remove(pack_id);
 
-        // Emit loaded event
+        let pack_id = pack_id.clone();
+
+        // Emit unloaded event
         _ = self
-            .inner
             .event_tx
             .send(AppEvent::IconPack(IconPackAppEvent::IconPackUnloaded {
-                pack_id: pack_id.clone(),
+                pack_id,
             }));
     }
-}
 
-pub async fn load_icon_packs_into_registry(registry: Icons, path: PathBuf) {
-    let packs = match load_icon_packs_from_path(&path).await {
-        Ok(value) => value,
-        Err(cause) => {
-            tracing::error!(?cause, ?path, "failed to load icon packs for registry");
-            return;
+    /// Uploads a user generated icon to a randomly generated file path
+    /// with the collection. Returns the name of the generated file
+    pub async fn upload_user_icon(&self, name: String, data: Vec<u8>) -> anyhow::Result<String> {
+        let uploaded_icons = self.uploaded_path();
+        if !uploaded_icons.exists() {
+            tokio::fs::create_dir_all(&uploaded_icons).await?;
         }
-    };
 
-    let pack_ids: Vec<IconPackId> = packs
-        .iter()
-        .map(|pack| (pack.manifest.icons.id.clone()))
-        .collect();
+        // Generate a unique file name
+        let extension = file_extension(name)?;
+        let file_id = Uuid::new_v4();
+        let file_name = format!("{file_id}.{extension}");
 
-    tracing::debug!(?pack_ids, "loaded icon packs");
+        let file_path = uploaded_icons.join(&file_name);
 
-    registry.load_packs(packs);
+        tokio::fs::write(&file_path, data)
+            .await
+            .context("save file")?;
+
+        Ok(file_name)
+    }
 }

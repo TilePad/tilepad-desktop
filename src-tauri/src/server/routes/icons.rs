@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use anyhow::Context;
 use axum::{body::Body, extract::Path, response::Response, Extension};
 use reqwest::{header::CONTENT_TYPE, StatusCode};
@@ -9,7 +11,7 @@ use crate::{icons::Icons, server::models::error::DynHttpError};
 /// GET /icons/{pack_id}/assets/{file_path*}
 pub async fn get_icon_file(
     Path((pack_id, path)): Path<(IconPackId, String)>,
-    Extension(icons): Extension<Icons>,
+    Extension(icons): Extension<Arc<Icons>>,
 ) -> Result<Response<Body>, DynHttpError> {
     let icon_path = icons.get_pack_path(&pack_id).context("unknown plugin")?;
     let file_path = icon_path.join(path);
