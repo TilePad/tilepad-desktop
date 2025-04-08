@@ -82,10 +82,6 @@ impl DeviceSession {
         });
     }
 
-    pub fn is_closed(&self) -> bool {
-        self.tx.is_closed()
-    }
-
     /// Get the current device ID
     pub fn get_device_id(&self) -> Option<DeviceId> {
         self.state.read().device_id
@@ -97,6 +93,16 @@ impl DeviceSession {
 
     pub fn send_message(&self, msg: ServerDeviceMessage) -> bool {
         self.tx.send(msg).is_ok()
+    }
+
+    pub fn revoke(&self) {
+        self.set_device_id(None);
+        self.send_message(ServerDeviceMessage::Revoked);
+    }
+
+    pub fn decline(&self) {
+        self.set_device_id(None);
+        self.send_message(ServerDeviceMessage::Declined);
     }
 
     /// Handle messages from the socket

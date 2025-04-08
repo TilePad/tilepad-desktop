@@ -95,13 +95,7 @@ impl Devices {
             .read()
             .iter()
             .filter_map(|(session_id, session_ref)| {
-                // Skip closed sessions
-                if session_ref.is_closed() {
-                    return None;
-                }
-
                 let device_id = session_ref.get_device_id()?;
-
                 Some(ConnectedDevice {
                     device_id,
                     session_id: *session_id,
@@ -116,7 +110,9 @@ impl Devices {
         self.remove_session_device_requests(session_id);
 
         if let Some(device_id) = device_id {
-            self.emit_app_event(AppEvent::Device(DeviceAppEvent::Disconnected { device_id }));
+            _ = self
+                .event_tx
+                .send(AppEvent::Device(DeviceAppEvent::Disconnected { device_id }));
         }
     }
 
@@ -125,9 +121,11 @@ impl Devices {
     pub fn remove_session_device_requests(&self, session_id: DeviceSessionId) {
         self.requests.write().retain(|request| {
             if request.session_id == session_id {
-                self.emit_app_event(AppEvent::DeviceRequest(DeviceRequestAppEvent::Removed {
-                    request_id: request.id,
-                }));
+                _ = self
+                    .event_tx
+                    .send(AppEvent::DeviceRequest(DeviceRequestAppEvent::Removed {
+                        request_id: request.id,
+                    }));
                 false
             } else {
                 true
@@ -163,9 +161,11 @@ impl Devices {
             device_name,
         });
 
-        self.emit_app_event(AppEvent::DeviceRequest(DeviceRequestAppEvent::Added {
-            request_id,
-        }));
+        _ = self
+            .event_tx
+            .send(AppEvent::DeviceRequest(DeviceRequestAppEvent::Added {
+                request_id,
+            }));
     }
 
     pub fn get_device_requests(&self) -> Vec<DeviceRequest> {
@@ -208,9 +208,11 @@ impl Devices {
             access_token,
         });
 
-        self.emit_app_event(AppEvent::DeviceRequest(DeviceRequestAppEvent::Accepted {
-            request_id,
-        }));
+        _ = self
+            .event_tx
+            .send(AppEvent::DeviceRequest(DeviceRequestAppEvent::Accepted {
+                request_id,
+            }));
 
         Ok(())
     }
@@ -224,12 +226,13 @@ impl Devices {
             .get_session(&request.session_id)
             .context("session not found")?;
 
-        session.set_device_id(None);
-        session.send_message(ServerDeviceMessage::Declined);
+        session.decline();
 
-        self.emit_app_event(AppEvent::DeviceRequest(DeviceRequestAppEvent::Decline {
-            request_id,
-        }));
+        _ = self
+            .event_tx
+            .send(AppEvent::DeviceRequest(DeviceRequestAppEvent::Decline {
+                request_id,
+            }));
 
         Ok(())
     }
@@ -237,13 +240,7 @@ impl Devices {
     /// Find a session from its device ID
     pub fn get_session_by_device(&self, device_id: DeviceId) -> Option<DeviceSessionRef> {
         self.sessions.read().values().find_map(|session_ref| {
-            // Skip closed sessions
-            if session_ref.is_closed() {
-                return None;
-            }
-
             let session_device_id = session_ref.get_device_id()?;
-
             if session_device_id != device_id {
                 return None;
             }
@@ -265,9 +262,11 @@ impl Devices {
         device.set_connected_now(&self.db).await?;
 
         // Notify frontend
-        self.emit_app_event(AppEvent::Device(DeviceAppEvent::Authenticated {
-            device_id: device.id,
-        }));
+        _ = self
+            .event_tx
+            .send(AppEvent::Device(DeviceAppEvent::Authenticated {
+                device_id: device.id,
+            }));
 
         Ok(device.id)
     }
@@ -276,12 +275,13 @@ impl Devices {
     pub async fn revoke_device(&self, device_id: DeviceId) -> anyhow::Result<()> {
         DeviceModel::delete(&self.db, device_id).await?;
 
-        self.emit_app_event(AppEvent::Device(DeviceAppEvent::Revoked { device_id }));
+        _ = self
+            .event_tx
+            .send(AppEvent::Device(DeviceAppEvent::Revoked { device_id }));
 
         // Tell the session its been revoked
         if let Some(session) = self.get_session_by_device(device_id) {
-            session.set_device_id(None);
-            session.send_message(ServerDeviceMessage::Revoked);
+            session.revoke();
         }
 
         Ok(())
@@ -304,7 +304,8 @@ impl Devices {
         Ok((folder, tiles))
     }
 
-    /// Updates the device tiles on all devices using the provided folder
+    /// Updates the tiles on all devices that are using the
+    /// provided `folder_id` folder
     pub async fn update_devices_tiles(&self, folder_id: FolderId) -> anyhow::Result<()> {
         let db = &self.db;
         let devices = DeviceModel::all_by_folder(db, folder_id).await?;
@@ -321,25 +322,18 @@ impl Devices {
         let tiles = TileModel::get_by_folder(db, folder_id).await?;
 
         for device in devices {
-            self.send_to_device(
-                device.id,
-                ServerDeviceMessage::Tiles {
-                    tiles: tiles.clone(),
-                    folder: folder.clone(),
-                },
-            )
+            let session = match self.get_session_by_device(device.id) {
+                Some(value) => value,
+                None => continue,
+            };
+
+            _ = session.send_message(ServerDeviceMessage::Tiles {
+                tiles: tiles.clone(),
+                folder: folder.clone(),
+            });
         }
 
         Ok(())
-    }
-
-    pub fn send_to_device(&self, device_id: DeviceId, message: ServerDeviceMessage) {
-        let session = match self.get_session_by_device(device_id) {
-            Some(value) => value,
-            None => return,
-        };
-
-        _ = session.send_message(message);
     }
 
     pub async fn device_execute_tile(
@@ -362,10 +356,5 @@ impl Devices {
         self.plugins.handle_action(self, context, tile).await?;
 
         Ok(())
-    }
-
-    fn emit_app_event(&self, event: AppEvent) {
-        // Notify frontend
-        _ = self.event_tx.send(event);
     }
 }
