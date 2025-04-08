@@ -1,7 +1,9 @@
-use anyhow::Context;
+use std::net::SocketAddr;
+
+use anyhow::{anyhow, Context};
 use axum::{
     body::Body,
-    extract::{ws::WebSocket, Path, WebSocketUpgrade},
+    extract::{ws::WebSocket, ConnectInfo, Path, WebSocketUpgrade},
     response::Response,
     Extension,
 };
@@ -16,8 +18,20 @@ use crate::{
 /// GET /plugins/ws
 ///
 /// Accept a new plugin websocket connection upgrade
-pub async fn ws(Extension(plugins): Extension<Plugins>, ws: WebSocketUpgrade) -> Response {
-    ws.on_upgrade(move |socket| handle_plugin_socket(plugins, socket))
+pub async fn ws(
+    Extension(plugins): Extension<Plugins>,
+    Extension(connect_info): Extension<ConnectInfo<SocketAddr>>,
+    ws: WebSocketUpgrade,
+) -> Result<Response, DynHttpError> {
+    if !connect_info.ip().is_loopback() {
+        return Err(
+            anyhow!("plugin sessions cannot be started from hosts other than loopback").into(),
+        );
+    }
+
+    tracing::debug!(?connect_info, "plugin session starting");
+
+    Ok(ws.on_upgrade(move |socket| handle_plugin_socket(plugins, socket)))
 }
 
 /// Handle the connection of a new plugin socket
