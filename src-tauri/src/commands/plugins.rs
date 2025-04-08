@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::{
     commands::CmdResult,
     events::InspectorContext,
@@ -14,7 +16,7 @@ use tauri::{AppHandle, Manager, State};
 #[tauri::command]
 pub async fn plugins_install_plugin_manual(
     app: AppHandle,
-    plugins: State<'_, Plugins>,
+    plugins: State<'_, Arc<Plugins>>,
     data: Vec<u8>,
 ) -> CmdResult<()> {
     let app_data_path = app
@@ -56,7 +58,7 @@ pub async fn plugins_install_plugin_manual(
 #[tauri::command]
 pub async fn plugins_uninstall_plugin(
     app: AppHandle,
-    plugins: State<'_, Plugins>,
+    plugins: State<'_, Arc<Plugins>>,
     plugin_id: PluginId,
 ) -> CmdResult<()> {
     let app_data_path = app
@@ -79,7 +81,7 @@ pub async fn plugins_uninstall_plugin(
 
 #[tauri::command]
 pub async fn plugins_send_plugin_message(
-    plugins: State<'_, Plugins>,
+    plugins: State<'_, Arc<Plugins>>,
     context: InspectorContext,
     message: serde_json::Value,
 ) -> CmdResult<()> {
@@ -90,7 +92,7 @@ pub async fn plugins_send_plugin_message(
 
 #[tauri::command]
 pub async fn plugins_open_inspector(
-    plugins: State<'_, Plugins>,
+    plugins: State<'_, Arc<Plugins>>,
     context: InspectorContext,
 ) -> CmdResult<()> {
     plugins.open_inspector(context);
@@ -99,7 +101,7 @@ pub async fn plugins_open_inspector(
 
 #[tauri::command]
 pub async fn plugins_close_inspector(
-    plugins: State<'_, Plugins>,
+    plugins: State<'_, Arc<Plugins>>,
     context: InspectorContext,
 ) -> CmdResult<()> {
     plugins.close_inspector(context);
@@ -108,7 +110,7 @@ pub async fn plugins_close_inspector(
 
 #[tauri::command]
 pub async fn plugins_get_plugin_properties(
-    plugins: State<'_, Plugins>,
+    plugins: State<'_, Arc<Plugins>>,
     plugin_id: PluginId,
 ) -> CmdResult<serde_json::Value> {
     let result = plugins.get_plugin_properties(plugin_id).await?;
@@ -117,7 +119,7 @@ pub async fn plugins_get_plugin_properties(
 
 #[tauri::command]
 pub async fn plugins_set_plugin_properties(
-    plugins: State<'_, Plugins>,
+    plugins: State<'_, Arc<Plugins>>,
     plugin_id: PluginId,
     properties: serde_json::Value,
 ) -> CmdResult<()> {
@@ -126,13 +128,13 @@ pub async fn plugins_set_plugin_properties(
 }
 
 #[tauri::command]
-pub fn plugins_get_plugins(plugins: State<'_, Plugins>) -> Vec<PluginWithState> {
+pub fn plugins_get_plugins(plugins: State<'_, Arc<Plugins>>) -> Vec<PluginWithState> {
     plugins.get_plugins_with_state()
 }
 
 #[tauri::command]
 pub async fn plugins_stop_plugin_task(
-    plugins: State<'_, Plugins>,
+    plugins: State<'_, Arc<Plugins>>,
     plugin_id: PluginId,
 ) -> CmdResult<()> {
     plugins.stop_task(&plugin_id).await;
@@ -141,7 +143,7 @@ pub async fn plugins_stop_plugin_task(
 
 #[tauri::command]
 pub async fn plugins_start_plugin_task(
-    plugins: State<'_, Plugins>,
+    plugins: State<'_, Arc<Plugins>>,
     plugin_id: PluginId,
 ) -> CmdResult<()> {
     let plugin = plugins.get_plugin(&plugin_id).context("plugin not found")?;
@@ -155,7 +157,7 @@ pub async fn plugins_start_plugin_task(
 
 #[tauri::command]
 pub async fn plugins_restart_plugin_task(
-    plugins: State<'_, Plugins>,
+    plugins: State<'_, Arc<Plugins>>,
     plugin_id: PluginId,
 ) -> CmdResult<()> {
     let plugin = plugins.get_plugin(&plugin_id).context("plugin not found")?;
@@ -169,7 +171,7 @@ pub async fn plugins_restart_plugin_task(
 
 #[tauri::command]
 pub async fn plugins_reload_plugin(
-    plugins: State<'_, Plugins>,
+    plugins: State<'_, Arc<Plugins>>,
     plugin_id: PluginId,
 ) -> CmdResult<()> {
     // Unload the plugin

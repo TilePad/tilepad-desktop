@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -32,7 +34,7 @@ pub struct SelectOption {
 }
 
 pub async fn handle(
-    plugins: &Plugins,
+    plugins: &Arc<Plugins>,
     db: &DbPool,
     _tile: &TileModel,
 

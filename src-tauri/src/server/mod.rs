@@ -19,7 +19,7 @@ pub async fn start_http_server(
     db: DbPool,
     devices: Arc<Devices>,
     app_handle: AppHandle,
-    plugins: Plugins,
+    plugins: Arc<Plugins>,
     icons: Arc<Icons>,
 ) -> anyhow::Result<()> {
     // build our application with a single route

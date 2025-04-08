@@ -38,7 +38,7 @@ pub struct Devices {
     db: DbPool,
 
     /// Access to the plugins registry
-    plugins: Plugins,
+    plugins: Arc<Plugins>,
 
     /// Current device socket sessions
     sessions: RwLock<HashMap<DeviceSessionId, DeviceSessionRef>>,
@@ -68,7 +68,7 @@ pub struct DeviceRequest {
 const DEVICES_TOKEN_LENGTH: usize = 32;
 
 impl Devices {
-    pub fn new(event_tx: AppEventSender, db: DbPool, plugins: Plugins) -> Self {
+    pub fn new(event_tx: AppEventSender, db: DbPool, plugins: Arc<Plugins>) -> Self {
         Self {
             event_tx,
             db,

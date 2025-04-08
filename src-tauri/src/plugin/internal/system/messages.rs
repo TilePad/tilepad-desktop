@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use anyhow::Context;
 use rfd::AsyncFileDialog;
 use serde::{Deserialize, Serialize};
@@ -25,7 +27,7 @@ pub enum SystemPluginMessage {
 }
 
 pub async fn handle(
-    plugins: &Plugins,
+    plugins: &Arc<Plugins>,
     db: &DbPool,
     _tile: &TileModel,
 

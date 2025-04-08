@@ -35,14 +35,14 @@ pub struct PluginSession {
     state: RwLock<PluginSessionState>,
 
     /// Access to the plugins registry
-    plugins: Plugins,
+    plugins: Arc<Plugins>,
 
     /// Sender to send messages to the session socket
     tx: WsTx<ServerPluginMessage>,
 }
 
 impl PluginSession {
-    pub fn new(plugins: Plugins, socket: WebSocket) -> (PluginSessionId, PluginSessionRef) {
+    pub fn new(plugins: Arc<Plugins>, socket: WebSocket) -> (PluginSessionId, PluginSessionRef) {
         let id = Uuid::new_v4();
 
         // Create and spawn a future for the websocket

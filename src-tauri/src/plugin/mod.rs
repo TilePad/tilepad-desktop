@@ -46,12 +46,7 @@ pub mod protocol;
 pub mod runner;
 pub mod session;
 
-#[derive(Clone)]
 pub struct Plugins {
-    inner: Arc<PluginsInner>,
-}
-
-struct PluginsInner {
     /// Sender for app events
     event_tx: AppEventSender,
 
@@ -90,27 +85,25 @@ pub struct Plugin {
 impl Plugins {
     pub fn new(event_tx: AppEventSender, db: DbPool, runtimes_path: PathBuf) -> Self {
         Self {
-            inner: Arc::new(PluginsInner {
-                event_tx,
-                db,
-                runtimes_path,
-                plugins: Default::default(),
-                sessions: Default::default(),
-                plugin_to_session: Default::default(),
-                tasks: Default::default(),
-            }),
+            event_tx,
+            db,
+            runtimes_path,
+            plugins: Default::default(),
+            sessions: Default::default(),
+            plugin_to_session: Default::default(),
+            tasks: Default::default(),
         }
     }
 
     /// Load in bulk many plugins from `plugins`
-    pub async fn load_plugins(&self, plugins: Vec<Plugin>) {
+    pub async fn load_plugins(self: &Arc<Self>, plugins: Vec<Plugin>) {
         for plugin in plugins {
             self.load_plugin(plugin).await;
         }
     }
 
     /// Load a single plugin
-    pub async fn load_plugin(&self, plugin: Plugin) {
+    pub async fn load_plugin(self: &Arc<Self>, plugin: Plugin) {
         let plugin_id = plugin.manifest.plugin.id.clone();
         let plugin_path = plugin.path.clone();
 
@@ -123,13 +116,12 @@ impl Plugins {
 
         // Store the plugin
         {
-            let mut plugins = &mut *self.inner.plugins.write();
+            let mut plugins = &mut *self.plugins.write();
             plugins.insert(plugin_id.clone(), Arc::new(plugin));
         }
 
         // Emit loaded event
         _ = self
-            .inner
             .event_tx
             .send(AppEvent::Plugin(PluginAppEvent::Loaded { plugin_id }));
     }
@@ -141,13 +133,12 @@ impl Plugins {
 
         let plugin = {
             // Remove the plugin from the plugins list
-            let mut plugins = &mut *self.inner.plugins.write();
+            let mut plugins = &mut *self.plugins.write();
             plugins.remove(plugin_id)
         };
 
         // Emit unloaded event
         _ = self
-            .inner
             .event_tx
             .send(AppEvent::Plugin(PluginAppEvent::Unloaded {
                 plugin_id: plugin_id.clone(),
@@ -158,12 +149,12 @@ impl Plugins {
 
     /// Get a specific plugin
     pub fn get_plugin(&self, plugin_id: &PluginId) -> Option<Arc<Plugin>> {
-        self.inner.plugins.read().get(plugin_id).cloned()
+        self.plugins.read().get(plugin_id).cloned()
     }
 
     /// Get a list of all plugins and the state of the plugins task
     pub fn get_plugins_with_state(&self) -> Vec<PluginWithState> {
-        let plugins = self.inner.plugins.read();
+        let plugins = self.plugins.read();
         let states = self.get_task_states();
 
         plugins
@@ -189,13 +180,7 @@ impl Plugins {
     }
 
     pub fn get_action_collection(&self) -> Vec<ActionCategory> {
-        actions_from_manifests(
-            self.inner
-                .plugins
-                .read()
-                .values()
-                .map(|value| &value.manifest),
-        )
+        actions_from_manifests(self.plugins.read().values().map(|value| &value.manifest))
     }
 
     pub fn get_action(
@@ -203,7 +188,7 @@ impl Plugins {
         plugin_id: &PluginId,
         action_id: &ActionId,
     ) -> Option<ActionWithCategory> {
-        let plugins = self.inner.plugins.read();
+        let plugins = self.plugins.read();
         let plugin = plugins.get(plugin_id)?;
         let manifest_action = plugin.manifest.actions.0.get(action_id)?;
 
@@ -223,33 +208,30 @@ impl Plugins {
 
     /// Insert a new session
     pub fn insert_session(&self, session_id: PluginSessionId, session_ref: PluginSessionRef) {
-        self.inner.sessions.write().insert(session_id, session_ref);
+        self.sessions.write().insert(session_id, session_ref);
     }
 
     /// Insert a new session
     pub fn get_session(&self, session_id: &PluginSessionId) -> Option<PluginSessionRef> {
-        self.inner.sessions.write().get(session_id).cloned()
+        self.sessions.write().get(session_id).cloned()
     }
 
     /// Remove a session
     pub fn remove_session(&self, session_id: PluginSessionId) {
-        self.inner.sessions.write().remove(&session_id);
+        self.sessions.write().remove(&session_id);
     }
 
     pub fn set_plugin_session(&self, plugin_id: PluginId, session_id: PluginSessionId) {
-        self.inner
-            .plugin_to_session
-            .write()
-            .insert(plugin_id, session_id);
+        self.plugin_to_session.write().insert(plugin_id, session_id);
     }
 
     pub fn remove_plugin_session(&self, plugin_id: PluginId) {
-        self.inner.plugin_to_session.write().remove(&plugin_id);
+        self.plugin_to_session.write().remove(&plugin_id);
     }
 
     pub fn get_plugin_session(&self, plugin_id: &PluginId) -> Option<PluginSessionRef> {
         let session_id = {
-            let plugin_to_session = self.inner.plugin_to_session.read();
+            let plugin_to_session = self.plugin_to_session.read();
             plugin_to_session.get(plugin_id).cloned()
         }?;
 
@@ -257,7 +239,7 @@ impl Plugins {
     }
 
     pub async fn handle_send_message(
-        &self,
+        self: &Arc<Self>,
         context: InspectorContext,
         message: serde_json::Value,
     ) -> anyhow::Result<()> {
@@ -266,7 +248,7 @@ impl Plugins {
             .context("plugin not found")?;
 
         if plugin.manifest.plugin.internal.is_some_and(|value| value) {
-            internal::handle_internal_message(self, &self.inner.db, context, message).await?;
+            internal::handle_internal_message(self, &self.db, context, message).await?;
         } else {
             let session = match self.get_plugin_session(&context.plugin_id) {
                 Some(value) => value,
@@ -283,7 +265,7 @@ impl Plugins {
     }
 
     pub async fn handle_action(
-        &self,
+        self: &Arc<Self>,
         devices: &Arc<Devices>,
         context: TileInteractionContext,
         tile: TileModel,
@@ -295,7 +277,7 @@ impl Plugins {
             .context("plugin not found")?;
 
         if plugin.manifest.plugin.internal.is_some_and(|value| value) {
-            internal::handle_internal_action(self, devices, &self.inner.db, context, tile).await?;
+            internal::handle_internal_action(self, devices, &self.db, context, tile).await?;
         } else {
             let session = match self.get_plugin_session(&context.plugin_id) {
                 Some(value) => value,
@@ -316,7 +298,7 @@ impl Plugins {
         &self,
         plugin_id: PluginId,
     ) -> anyhow::Result<serde_json::Value> {
-        let result = PluginPropertiesModel::get_by_plugin(&self.inner.db, plugin_id).await?;
+        let result = PluginPropertiesModel::get_by_plugin(&self.db, plugin_id).await?;
 
         Ok(result
             .map(|value| value.properties)
@@ -327,7 +309,6 @@ impl Plugins {
     /// a plugin session
     pub fn send_to_inspector(&self, ctx: InspectorContext, message: serde_json::Value) {
         _ = self
-            .inner
             .event_tx
             .send(AppEvent::Plugin(PluginAppEvent::Message {
                 context: ctx,
@@ -341,7 +322,7 @@ impl Plugins {
         plugin_id: PluginId,
         properties: serde_json::Value,
     ) -> anyhow::Result<()> {
-        PluginPropertiesModel::set(&self.inner.db, plugin_id, properties).await?;
+        PluginPropertiesModel::set(&self.db, plugin_id, properties).await?;
         Ok(())
     }
 
@@ -368,8 +349,7 @@ impl Plugins {
     }
 
     pub fn get_task_states(&self) -> Vec<(PluginId, PluginTaskState)> {
-        self.inner
-            .tasks
+        self.tasks
             .read()
             .iter()
             .map(|(key, value)| (key.clone(), value.clone()))
@@ -379,14 +359,12 @@ impl Plugins {
     /// Sets the task state for a plugin by ID
     pub fn set_task_state(&self, plugin_id: PluginId, task_state: PluginTaskState) {
         {
-            self.inner
-                .tasks
+            self.tasks
                 .write()
                 .insert(plugin_id.clone(), task_state.clone());
         }
 
         _ = self
-            .inner
             .event_tx
             .send(AppEvent::Plugin(PluginAppEvent::TaskStateChanged {
                 plugin_id,
@@ -395,7 +373,7 @@ impl Plugins {
     }
 
     pub async fn restart_task(
-        &self,
+        self: &Arc<Self>,
         plugin_id: PluginId,
         plugin_path: PathBuf,
         manifest: &PluginManifest,
@@ -405,7 +383,7 @@ impl Plugins {
     }
 
     pub async fn start_task(
-        &self,
+        self: &Arc<Self>,
         plugin_id: PluginId,
         plugin_path: PathBuf,
         manifest: &PluginManifest,
@@ -427,28 +405,26 @@ impl Plugins {
 
         match binary {
             ManifestBin::Node { node } => {
-                let runtime_path =
-                    match get_node_runtime(&self.inner.runtimes_path, &node.version.0).await {
-                        Ok(Some(value)) => value,
-                        Ok(None) => {
-                            // No binary available for the plugin on the current os + arch
-                            tracing::debug!(
-                                ?plugin_id,
-                                "skipping node plugin, runtime unavailable"
-                            );
-                            self.set_task_state(plugin_id.clone(), PluginTaskState::Unavailable);
-                            return;
-                        }
-                        Err(cause) => {
-                            tracing::debug!(
-                                ?cause,
-                                ?plugin_id,
-                                "skipping node plugin, failed to find runtime"
-                            );
-                            self.set_task_state(plugin_id.clone(), PluginTaskState::Unavailable);
-                            return;
-                        }
-                    };
+                let runtime_path = match get_node_runtime(&self.runtimes_path, &node.version.0)
+                    .await
+                {
+                    Ok(Some(value)) => value,
+                    Ok(None) => {
+                        // No binary available for the plugin on the current os + arch
+                        tracing::debug!(?plugin_id, "skipping node plugin, runtime unavailable");
+                        self.set_task_state(plugin_id.clone(), PluginTaskState::Unavailable);
+                        return;
+                    }
+                    Err(cause) => {
+                        tracing::debug!(
+                            ?cause,
+                            ?plugin_id,
+                            "skipping node plugin, failed to find runtime"
+                        );
+                        self.set_task_state(plugin_id.clone(), PluginTaskState::Unavailable);
+                        return;
+                    }
+                };
                 // No binary available for the plugin
                 tracing::debug!(?plugin_id, ?runtime_path, entrypoint = ?node.entrypoint, "starting node plugin");
 
@@ -499,7 +475,7 @@ impl Plugins {
     /// Stop a task by plugin ID
     pub async fn stop_task(&self, plugin_id: &PluginId) {
         let state = {
-            let mut tasks = self.inner.tasks.write();
+            let mut tasks = self.tasks.write();
             match tasks.remove(plugin_id) {
                 Some(value) => value,
                 None => return,
@@ -515,7 +491,7 @@ impl Plugins {
     }
 }
 
-pub async fn load_plugins_into_registry(registry: Plugins, path: PathBuf) {
+pub async fn load_plugins_into_registry(registry: Arc<Plugins>, path: PathBuf) {
     let plugins = match load_plugins_from_path(&path).await {
         Ok(value) => value,
         Err(cause) => {

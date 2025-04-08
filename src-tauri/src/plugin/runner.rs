@@ -3,6 +3,7 @@ use std::{
     path::{Path, PathBuf},
     pin::Pin,
     process::{ExitCode, ExitStatus, Stdio},
+    sync::Arc,
     task::Poll,
 };
 
@@ -70,7 +71,7 @@ pub enum PluginTaskType {
 }
 
 pub fn spawn_native_task(
-    plugins: Plugins,
+    plugins: Arc<Plugins>,
 
     plugin_path: PathBuf,
     exe: String,
@@ -149,7 +150,7 @@ pub fn spawn_native_task(
 }
 
 pub fn spawn_node_task(
-    plugins: Plugins,
+    plugins: Arc<Plugins>,
 
     node_path: PathBuf,
     plugin_path: PathBuf,

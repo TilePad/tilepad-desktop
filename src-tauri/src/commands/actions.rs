@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use tauri::State;
 
 use crate::plugin::{
@@ -8,14 +10,14 @@ use crate::plugin::{
 
 /// Get a list of all available actions from the plugin registry
 #[tauri::command]
-pub fn actions_get_actions(plugins: State<'_, Plugins>) -> Vec<ActionCategory> {
+pub fn actions_get_actions(plugins: State<'_, Arc<Plugins>>) -> Vec<ActionCategory> {
     plugins.get_action_collection()
 }
 
 /// Get a specific action
 #[tauri::command]
 pub fn actions_get_action(
-    plugins: State<'_, Plugins>,
+    plugins: State<'_, Arc<Plugins>>,
     plugin_id: PluginId,
     action_id: ActionId,
 ) -> Option<ActionWithCategory> {

@@ -31,7 +31,7 @@ pub struct SwitchProfileProperties {
 
 pub async fn handle(
     devices: &Arc<Devices>,
-    plugins: &Plugins,
+    plugins: &Arc<Plugins>,
     db: &DbPool,
     context: TileInteractionContext,
     tile: TileModel,

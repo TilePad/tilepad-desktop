@@ -17,7 +17,7 @@ use crate::{
 };
 
 pub async fn handle_internal_message(
-    plugins: &Plugins,
+    plugins: &Arc<Plugins>,
     db: &DbPool,
 
     context: InspectorContext,
@@ -45,7 +45,7 @@ pub async fn handle_internal_message(
 }
 
 pub async fn handle_internal_action(
-    plugins: &Plugins,
+    plugins: &Arc<Plugins>,
     devices: &Arc<Devices>,
     db: &DbPool,
     context: TileInteractionContext,

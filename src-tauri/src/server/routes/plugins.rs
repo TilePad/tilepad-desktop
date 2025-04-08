@@ -1,4 +1,4 @@
-use std::net::SocketAddr;
+use std::{net::SocketAddr, sync::Arc};
 
 use anyhow::{anyhow, Context};
 use axum::{
@@ -19,7 +19,7 @@ use crate::{
 ///
 /// Accept a new plugin websocket connection upgrade
 pub async fn ws(
-    Extension(plugins): Extension<Plugins>,
+    Extension(plugins): Extension<Arc<Plugins>>,
     Extension(connect_info): Extension<ConnectInfo<SocketAddr>>,
     ws: WebSocketUpgrade,
 ) -> Result<Response, DynHttpError> {
@@ -35,7 +35,7 @@ pub async fn ws(
 }
 
 /// Handle the connection of a new plugin socket
-pub async fn handle_plugin_socket(plugins: Plugins, socket: WebSocket) {
+pub async fn handle_plugin_socket(plugins: Arc<Plugins>, socket: WebSocket) {
     let (session_id, session_ref) = PluginSession::new(plugins.clone(), socket);
     plugins.insert_session(session_id, session_ref);
 }
@@ -46,7 +46,7 @@ static INSPECTOR_STYLES: &str = include_str!("../resources/propertyInspectorStyl
 /// GET /plugins/{plugin_id}/assets/{file_path*}
 pub async fn get_plugin_file(
     Path((plugin_id, path)): Path<(PluginId, String)>,
-    Extension(plugins): Extension<Plugins>,
+    Extension(plugins): Extension<Arc<Plugins>>,
 ) -> Result<Response<Body>, DynHttpError> {
     let plugin = plugins.get_plugin(&plugin_id).context("unknown plugin")?;
     let file_path = plugin.path.join(path);
