@@ -53,6 +53,12 @@ pub struct Plugins {
     /// Access to the database
     db: DbPool,
 
+    /// Path to the core plugins directory
+    core_path: PathBuf,
+
+    /// Path to the user plugins directory
+    user_path: PathBuf,
+
     /// Runtimes path
     runtimes_path: PathBuf,
 
@@ -83,16 +89,48 @@ pub struct Plugin {
 }
 
 impl Plugins {
-    pub fn new(event_tx: AppEventSender, db: DbPool, runtimes_path: PathBuf) -> Self {
+    pub fn new(
+        event_tx: AppEventSender,
+        db: DbPool,
+        core_path: PathBuf,
+        user_path: PathBuf,
+        runtimes_path: PathBuf,
+    ) -> Self {
         Self {
             event_tx,
             db,
+            core_path,
+            user_path,
             runtimes_path,
+
             plugins: Default::default(),
             sessions: Default::default(),
             plugin_to_session: Default::default(),
             tasks: Default::default(),
         }
+    }
+
+    /// Loads all icon packs from the default icon pack paths
+    pub async fn load_defaults(self: &Arc<Self>) {
+        // Load from the core plugins directory
+        self.load_plugins_from_path(&self.core_path).await;
+
+        // Load from the user plugins directory
+        self.load_plugins_from_path(&self.user_path).await;
+    }
+
+    pub async fn load_plugins_from_path(self: &Arc<Self>, path: &Path) {
+        let plugins = match load_plugins_from_path(path).await {
+            Ok(value) => value,
+            Err(cause) => {
+                tracing::error!(?cause, ?path, "failed to load plugins");
+                return;
+            }
+        };
+
+        tracing::debug!(?plugins, "loaded plugins");
+
+        self.load_plugins(plugins).await;
     }
 
     /// Load in bulk many plugins from `plugins`
@@ -489,18 +527,4 @@ impl Plugins {
             handle.kill().await;
         }
     }
-}
-
-pub async fn load_plugins_into_registry(registry: Arc<Plugins>, path: PathBuf) {
-    let plugins = match load_plugins_from_path(&path).await {
-        Ok(value) => value,
-        Err(cause) => {
-            tracing::error!(?cause, ?path, "failed to load plugins for registry");
-            return;
-        }
-    };
-
-    tracing::debug!(?plugins, "loaded plugins");
-
-    registry.load_plugins(plugins).await;
 }

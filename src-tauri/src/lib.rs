@@ -126,6 +126,8 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
     let plugins = Arc::new(Plugins::new(
         app_event_tx.clone(),
         db.clone(),
+        core_plugins,
+        user_plugins,
         runtimes_path,
     ));
     let devices = Arc::new(Devices::new(
@@ -133,11 +135,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         db.clone(),
         plugins.clone(),
     ));
-    let icons = Arc::new(Icons::new(
-        app_event_tx.clone(),
-        user_icons.clone(),
-        uploaded_icons,
-    ));
+    let icons = Arc::new(Icons::new(app_event_tx.clone(), user_icons, uploaded_icons));
 
     app.manage(app_event_tx.clone());
     app.manage(db.clone());
@@ -147,19 +145,15 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
 
     tracing::debug!("starting event processor");
 
-    // Load the core plugins into the registry
-    spawn(plugin::load_plugins_into_registry(
-        plugins.clone(),
-        core_plugins,
-    ));
+    // Load the plugins from the default paths
+    spawn({
+        let plugins = plugins.clone();
+        async move {
+            plugins.load_defaults().await;
+        }
+    });
 
-    // Load the user plugins into the registry
-    spawn(plugin::load_plugins_into_registry(
-        plugins.clone(),
-        user_plugins,
-    ));
-
-    // Load the user icon packs into the registry
+    // Load icon packs from the default paths
     spawn({
         let icons = icons.clone();
         async move {

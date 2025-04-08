@@ -1,4 +1,8 @@
-use std::{collections::HashMap, path::PathBuf, sync::Arc};
+use std::{
+    collections::HashMap,
+    path::{Path, PathBuf},
+    sync::Arc,
+};
 
 use anyhow::Context;
 use loader::load_icon_packs_from_path;
@@ -63,11 +67,11 @@ impl Icons {
     }
 
     /// Loads all icon packs from the provided path
-    pub async fn load_icon_packs_from_path(&self, path: &PathBuf) {
+    pub async fn load_icon_packs_from_path(&self, path: &Path) {
         let packs = match load_icon_packs_from_path(path).await {
             Ok(value) => value,
             Err(cause) => {
-                tracing::error!(?cause, ?path, "failed to load icon packs for registry");
+                tracing::error!(?cause, ?path, "failed to load icon packs");
                 return;
             }
         };

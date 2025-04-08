@@ -73,6 +73,7 @@ impl Devices {
             event_tx,
             db,
             plugins,
+
             sessions: Default::default(),
             requests: Default::default(),
         }
