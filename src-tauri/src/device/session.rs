@@ -32,7 +32,7 @@ pub struct DeviceSession {
     /// Channel to send messages to the session
     tx: WsTx<ServerDeviceMessage>,
 
-    devices: Devices,
+    devices: Arc<Devices>,
 }
 
 #[derive(Default)]
@@ -43,7 +43,7 @@ pub struct DeviceSessionState {
 
 impl DeviceSession {
     pub fn new(
-        devices: Devices,
+        devices: Arc<Devices>,
         socket_addr: SocketAddr,
         socket: WebSocket,
     ) -> (DeviceSessionId, DeviceSessionRef) {

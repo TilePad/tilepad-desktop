@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use tauri::State;
 
 use crate::{
@@ -12,7 +14,7 @@ use super::CmdResult;
 
 /// Gets a list of current device approval requests
 #[tauri::command]
-pub fn devices_get_requests(devices: State<'_, Devices>) -> Vec<DeviceRequest> {
+pub fn devices_get_requests(devices: State<'_, Arc<Devices>>) -> Vec<DeviceRequest> {
     devices.get_device_requests()
 }
 
@@ -25,7 +27,7 @@ pub async fn devices_get_devices(db: State<'_, DbPool>) -> CmdResult<Vec<DeviceM
 
 /// Deny a specific device request
 #[tauri::command]
-pub fn devices_get_connected_devices(devices: State<'_, Devices>) -> Vec<ConnectedDevice> {
+pub fn devices_get_connected_devices(devices: State<'_, Arc<Devices>>) -> Vec<ConnectedDevice> {
     devices.get_connected_devices()
 }
 
@@ -33,7 +35,7 @@ pub fn devices_get_connected_devices(devices: State<'_, Devices>) -> Vec<Connect
 #[tauri::command]
 pub async fn devices_approve_request(
     request_id: DeviceRequestId,
-    devices: State<'_, Devices>,
+    devices: State<'_, Arc<Devices>>,
 ) -> CmdResult<()> {
     devices.approve_device_request(request_id).await?;
     Ok(())
@@ -43,7 +45,7 @@ pub async fn devices_approve_request(
 #[tauri::command]
 pub async fn devices_decline_request(
     request_id: DeviceRequestId,
-    devices: State<'_, Devices>,
+    devices: State<'_, Arc<Devices>>,
 ) -> CmdResult<()> {
     devices.decline_device_request(request_id)?;
     Ok(())
@@ -53,7 +55,7 @@ pub async fn devices_decline_request(
 #[tauri::command]
 pub async fn devices_revoke_device(
     device_id: DeviceId,
-    devices: State<'_, Devices>,
+    devices: State<'_, Arc<Devices>>,
 ) -> CmdResult<()> {
     devices.revoke_device(device_id).await?;
     Ok(())

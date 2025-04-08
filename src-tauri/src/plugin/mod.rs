@@ -284,7 +284,7 @@ impl Plugins {
 
     pub async fn handle_action(
         &self,
-        devices: &Devices,
+        devices: &Arc<Devices>,
         context: TileInteractionContext,
         tile: TileModel,
     ) -> anyhow::Result<()> {

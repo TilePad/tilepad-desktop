@@ -1,4 +1,4 @@
-use std::net::SocketAddr;
+use std::{net::SocketAddr, sync::Arc};
 
 use axum::{
     extract::{ws::WebSocket, ConnectInfo, WebSocketUpgrade},
@@ -12,7 +12,7 @@ use crate::device::{session::DeviceSession, Devices};
 ///
 /// Accept a new device websocket connection upgrade
 pub async fn ws(
-    Extension(devices): Extension<Devices>,
+    Extension(devices): Extension<Arc<Devices>>,
     Extension(connect_info): Extension<ConnectInfo<SocketAddr>>,
     ws: WebSocketUpgrade,
 ) -> Response {
@@ -20,7 +20,11 @@ pub async fn ws(
 }
 
 /// Handle the connection of a new device socket
-pub async fn handle_device_socket(devices: Devices, socket_addr: SocketAddr, socket: WebSocket) {
+pub async fn handle_device_socket(
+    devices: Arc<Devices>,
+    socket_addr: SocketAddr,
+    socket: WebSocket,
+) {
     let (session_id, session_ref) = DeviceSession::new(devices.clone(), socket_addr, socket);
     devices.insert_session(session_id, session_ref);
 }

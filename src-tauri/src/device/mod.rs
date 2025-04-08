@@ -30,9 +30,21 @@ pub mod session;
 pub type DeviceRequestId = Uuid;
 
 /// Store for device sessions and requests
-#[derive(Clone)]
 pub struct Devices {
-    inner: Arc<DevicesInner>,
+    /// Sender for app events
+    event_tx: AppEventSender,
+
+    /// Access to the database
+    db: DbPool,
+
+    /// Access to the plugins registry
+    plugins: Plugins,
+
+    /// Current device socket sessions
+    sessions: RwLock<HashMap<DeviceSessionId, DeviceSessionRef>>,
+
+    /// Current requests for authorization from devices
+    requests: RwLock<Vec<DeviceRequest>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -41,35 +53,44 @@ pub struct ConnectedDevice {
     pub session_id: DeviceSessionId,
 }
 
+#[derive(Clone, Serialize)]
+pub struct DeviceRequest {
+    /// Unique ID for the request itself
+    id: DeviceRequestId,
+    /// Address of the connecting device
+    socket_addr: SocketAddr,
+    /// ID of the session the request is for
+    session_id: DeviceSessionId,
+    /// Name of the device requesting approval
+    device_name: String,
+}
+
 const DEVICES_TOKEN_LENGTH: usize = 32;
 
 impl Devices {
     pub fn new(event_tx: AppEventSender, db: DbPool, plugins: Plugins) -> Self {
         Self {
-            inner: Arc::new(DevicesInner {
-                event_tx,
-                db,
-                plugins,
-                sessions: Default::default(),
-                requests: Default::default(),
-            }),
+            event_tx,
+            db,
+            plugins,
+            sessions: Default::default(),
+            requests: Default::default(),
         }
     }
 
     /// Insert a new session
     pub fn insert_session(&self, session_id: DeviceSessionId, session_ref: DeviceSessionRef) {
-        self.inner.sessions.write().insert(session_id, session_ref);
+        self.sessions.write().insert(session_id, session_ref);
     }
 
     /// Insert a new session
     pub fn get_session(&self, session_id: &DeviceSessionId) -> Option<DeviceSessionRef> {
-        self.inner.sessions.write().get(session_id).cloned()
+        self.sessions.write().get(session_id).cloned()
     }
 
     /// Get all devices that have active sessions
     pub fn get_connected_devices(&self) -> Vec<ConnectedDevice> {
-        self.inner
-            .sessions
+        self.sessions
             .read()
             .iter()
             .filter_map(|(session_id, session_ref)| {
@@ -90,7 +111,7 @@ impl Devices {
 
     /// Remove a session
     pub fn remove_session(&self, session_id: DeviceSessionId, device_id: Option<DeviceId>) {
-        self.inner.sessions.write().remove(&session_id);
+        self.sessions.write().remove(&session_id);
         self.remove_session_device_requests(session_id);
 
         if let Some(device_id) = device_id {
@@ -101,7 +122,7 @@ impl Devices {
     /// Removes any device requests associated with the provided session
     /// (Notifying by sending an event)
     pub fn remove_session_device_requests(&self, session_id: DeviceSessionId) {
-        self.inner.requests.write().retain(|request| {
+        self.requests.write().retain(|request| {
             if request.session_id == session_id {
                 self.emit_app_event(AppEvent::DeviceRequest(DeviceRequestAppEvent::Removed {
                     request_id: request.id,
@@ -115,7 +136,7 @@ impl Devices {
 
     /// Consume a device request by ID
     pub fn take_device_request(&self, request_id: DeviceRequestId) -> Option<DeviceRequest> {
-        let requests = &mut *self.inner.requests.write();
+        let requests = &mut *self.requests.write();
         let index = requests
             .iter()
             .position(|request| request.id == request_id)?;
@@ -133,10 +154,8 @@ impl Devices {
     ) {
         self.remove_session_device_requests(session_id);
 
-        let inner = &*self.inner;
-
         let request_id = Uuid::new_v4();
-        inner.requests.write().push(DeviceRequest {
+        self.requests.write().push(DeviceRequest {
             id: request_id,
             socket_addr,
             session_id,
@@ -149,12 +168,12 @@ impl Devices {
     }
 
     pub fn get_device_requests(&self) -> Vec<DeviceRequest> {
-        self.inner.requests.read().clone()
+        self.requests.read().clone()
     }
 
     /// Approve a device request, creates a new device in the database
     pub async fn approve_device_request(&self, request_id: DeviceRequestId) -> anyhow::Result<()> {
-        let db = &self.inner.db;
+        let db = &self.db;
         let default_profile = ProfileModel::get_default_profile(db)
             .await?
             .context("no default profile")?;
@@ -216,7 +235,7 @@ impl Devices {
 
     /// Find a session from its device ID
     pub fn get_session_by_device(&self, device_id: DeviceId) -> Option<DeviceSessionRef> {
-        self.inner.sessions.read().values().find_map(|session_ref| {
+        self.sessions.read().values().find_map(|session_ref| {
             // Skip closed sessions
             if session_ref.is_closed() {
                 return None;
@@ -239,17 +258,16 @@ impl Devices {
         access_token: String,
     ) -> anyhow::Result<()> {
         let session = self.get_session(&session_id).context("session not found")?;
-        let mut device =
-            match DeviceModel::get_by_access_token(&self.inner.db, &access_token).await? {
-                Some(device) => device,
-                None => {
-                    session.send_message(ServerDeviceMessage::InvalidAccessToken);
-                    return Ok(());
-                }
-            };
+        let mut device = match DeviceModel::get_by_access_token(&self.db, &access_token).await? {
+            Some(device) => device,
+            None => {
+                session.send_message(ServerDeviceMessage::InvalidAccessToken);
+                return Ok(());
+            }
+        };
 
         // Update last connected
-        device.set_connected_now(&self.inner.db).await?;
+        device.set_connected_now(&self.db).await?;
 
         // Authenticate the device session
         session.set_device_id(Some(device.id));
@@ -265,7 +283,7 @@ impl Devices {
 
     /// Revoke access for a device
     pub async fn revoke_device(&self, device_id: DeviceId) -> anyhow::Result<()> {
-        DeviceModel::delete(&self.inner.db, device_id).await?;
+        DeviceModel::delete(&self.db, device_id).await?;
 
         self.emit_app_event(AppEvent::Device(DeviceAppEvent::Revoked { device_id }));
 
@@ -282,7 +300,7 @@ impl Devices {
         &self,
         device_id: DeviceId,
     ) -> anyhow::Result<(FolderModel, Vec<TileModel>)> {
-        let db = &self.inner.db;
+        let db = &self.db;
         let device = DeviceModel::get_by_id(db, device_id)
             .await?
             .context("device not found")?;
@@ -297,7 +315,7 @@ impl Devices {
 
     /// Updates the device tiles on all devices using the provided folder
     pub async fn update_devices_tiles(&self, folder_id: FolderId) -> anyhow::Result<()> {
-        let db = &self.inner.db;
+        let db = &self.db;
         let devices = DeviceModel::all_by_folder(db, folder_id).await?;
 
         // No devices to update
@@ -334,11 +352,11 @@ impl Devices {
     }
 
     pub async fn device_execute_tile(
-        &self,
+        self: &Arc<Self>,
         device_id: DeviceId,
         tile_id: TileId,
     ) -> anyhow::Result<()> {
-        let db = &self.inner.db;
+        let db = &self.db;
         let tile = TileModel::get_by_id(db, tile_id)
             .await?
             .context("tile instance not found")?;
@@ -350,45 +368,13 @@ impl Devices {
             tile_id,
         };
 
-        self.inner
-            .plugins
-            .handle_action(self, context, tile)
-            .await?;
+        self.plugins.handle_action(self, context, tile).await?;
 
         Ok(())
     }
 
     fn emit_app_event(&self, event: AppEvent) {
         // Notify frontend
-        _ = self.inner.event_tx.send(event);
+        _ = self.event_tx.send(event);
     }
-}
-
-pub struct DevicesInner {
-    /// Sender for app events
-    event_tx: AppEventSender,
-
-    /// Access to the database
-    db: DbPool,
-
-    /// Access to the plugins registry
-    plugins: Plugins,
-
-    /// Current device socket sessions
-    sessions: RwLock<HashMap<DeviceSessionId, DeviceSessionRef>>,
-
-    /// Current requests for authorization from devices
-    requests: RwLock<Vec<DeviceRequest>>,
-}
-
-#[derive(Clone, Serialize)]
-pub struct DeviceRequest {
-    /// Unique ID for the request itself
-    id: DeviceRequestId,
-    /// Address of the connecting device
-    socket_addr: SocketAddr,
-    /// ID of the session the request is for
-    session_id: DeviceSessionId,
-    /// Name of the device requesting approval
-    device_name: String,
 }

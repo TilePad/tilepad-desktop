@@ -17,7 +17,7 @@ pub const HTTP_PORT: u16 = 59371;
 
 pub async fn start_http_server(
     db: DbPool,
-    devices: Devices,
+    devices: Arc<Devices>,
     app_handle: AppHandle,
     plugins: Plugins,
     icons: Arc<Icons>,

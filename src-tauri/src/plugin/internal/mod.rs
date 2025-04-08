@@ -1,6 +1,8 @@
 pub mod navigation;
 pub mod system;
 
+use std::sync::Arc;
+
 use anyhow::Context;
 use serde::{Deserialize, Serialize};
 
@@ -44,7 +46,7 @@ pub async fn handle_internal_message(
 
 pub async fn handle_internal_action(
     plugins: &Plugins,
-    devices: &Devices,
+    devices: &Arc<Devices>,
     db: &DbPool,
     context: TileInteractionContext,
     tile: TileModel,

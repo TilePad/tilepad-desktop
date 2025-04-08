@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use anyhow::Context;
 use tauri::State;
 
@@ -48,7 +50,7 @@ pub async fn folders_create_folder(
 #[tauri::command]
 pub async fn folders_update_folder(
     db: State<'_, DbPool>,
-    devices: State<'_, Devices>,
+    devices: State<'_, Arc<Devices>>,
     folder_id: FolderId,
     update: UpdateFolder,
 ) -> CmdResult<FolderModel> {
@@ -74,7 +76,7 @@ pub async fn folders_update_folder(
 #[tauri::command]
 pub async fn folders_delete_folder(
     db: State<'_, DbPool>,
-    devices: State<'_, Devices>,
+    devices: State<'_, Arc<Devices>>,
     folder_id: FolderId,
 ) -> CmdResult<()> {
     let db = db.inner();

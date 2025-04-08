@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use anyhow::Context;
 use tauri::{AppHandle, Manager, State};
 
@@ -37,7 +39,7 @@ pub async fn tiles_get_tile(
 #[tauri::command]
 pub async fn tiles_create_tile(
     db: State<'_, DbPool>,
-    devices: State<'_, Devices>,
+    devices: State<'_, Arc<Devices>>,
     create: CreateTile,
 ) -> CmdResult<TileModel> {
     let tile = TileModel::create(db.inner(), create).await?;
@@ -60,7 +62,7 @@ pub async fn tiles_create_tile(
 pub async fn tiles_update_tile(
     app: AppHandle,
     db: State<'_, DbPool>,
-    devices: State<'_, Devices>,
+    devices: State<'_, Arc<Devices>>,
 
     tile_id: TileId,
     update: UpdateTile,
@@ -110,7 +112,7 @@ pub async fn tiles_update_tile(
 #[tauri::command]
 pub async fn tiles_delete_tile(
     db: State<'_, DbPool>,
-    devices: State<'_, Devices>,
+    devices: State<'_, Arc<Devices>>,
     tile_id: TileId,
 ) -> CmdResult<()> {
     let db = db.inner();

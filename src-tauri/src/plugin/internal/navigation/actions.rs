@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use anyhow::Context;
 use serde::Deserialize;
 use tauri_plugin_opener::open_url;
@@ -28,7 +30,7 @@ pub struct SwitchProfileProperties {
 }
 
 pub async fn handle(
-    devices: &Devices,
+    devices: &Arc<Devices>,
     plugins: &Plugins,
     db: &DbPool,
     context: TileInteractionContext,

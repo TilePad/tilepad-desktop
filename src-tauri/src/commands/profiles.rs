@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::{
     commands::CmdResult,
     database::{
@@ -61,7 +63,7 @@ pub async fn profiles_update_profile(
 #[tauri::command]
 pub async fn profiles_delete_profile(
     db: State<'_, DbPool>,
-    devices: State<'_, Devices>,
+    devices: State<'_, Arc<Devices>>,
     profile_id: ProfileId,
 ) -> CmdResult<()> {
     let db = db.inner();

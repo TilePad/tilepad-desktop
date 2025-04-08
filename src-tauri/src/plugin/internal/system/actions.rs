@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::{path::Path, sync::Arc};
 
 use enigo::{Enigo, Key, Keyboard};
 use serde::Deserialize;
@@ -54,7 +54,7 @@ pub enum MultimediaAction {
 }
 
 pub async fn handle(
-    devices: &Devices,
+    devices: &Arc<Devices>,
     plugins: &Plugins,
     db: &DbPool,
     context: TileInteractionContext,
