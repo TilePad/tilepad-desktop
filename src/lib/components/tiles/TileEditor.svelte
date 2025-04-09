@@ -5,9 +5,13 @@
   import { toast } from "svelte-sonner";
   import { createActionQuery } from "$lib/api/actions";
   import { sendPluginMessage } from "$lib/api/plugins";
-  import { updateTile, deleteTile, createTileQuery } from "$lib/api/tiles";
   import { getErrorMessage, toastErrorMessage } from "$lib/api/utils/error";
   import SolarTrashBinTrashBoldDuotone from "~icons/solar/trash-bin-trash-bold-duotone";
+  import {
+    createTileQuery,
+    createDeleteTileMutation,
+    createUpdateTileMutation,
+  } from "$lib/api/tiles";
 
   import Button from "../input/Button.svelte";
   import TileNameEditor from "./TileNameEditor.svelte";
@@ -28,6 +32,9 @@
 
   const currentFolder = $derived.by(folder);
   const currentProfile = $derived.by(profile);
+
+  const deleteTile = $derived(createDeleteTileMutation(currentFolder.id));
+  const updateTile = createUpdateTileMutation();
 
   const tileQuery = createTileQuery(
     () => currentFolder.id,
@@ -52,7 +59,9 @@
   );
 
   function onRemove() {
-    const deletePromise = deleteTile(currentFolder.id, tileId);
+    const deletePromise = $deleteTile.mutateAsync({
+      tileId,
+    });
 
     toast.promise(deletePromise, {
       loading: "Deleting tile",
@@ -95,12 +104,15 @@
             inspector={action.inspector}
             properties={tile.config.properties}
             onSetProperties={(properties) => {
-              updateTile(tile.id, {
-                config: {
-                  ...tile.config,
-                  properties: {
-                    ...tile.config.properties,
-                    ...properties,
+              $updateTile.mutate({
+                tileId: tile.id,
+                update: {
+                  config: {
+                    ...tile.config,
+                    properties: {
+                      ...tile.config.properties,
+                      ...properties,
+                    },
                   },
                 },
               });

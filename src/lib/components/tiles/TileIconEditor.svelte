@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { updateTile } from "$lib/api/tiles";
+  import { createUpdateTileMutation } from "$lib/api/tiles";
   import {
     type TileId,
     type TileConfig,
@@ -17,11 +17,16 @@
 
   const { tileId, config }: Props = $props();
 
+  const updateTile = createUpdateTileMutation();
+
   const onClickIconPackIcon = (icon: ITileIcon) => {
-    updateTile(tileId, {
-      config: {
-        ...config,
-        icon,
+    $updateTile.mutate({
+      tileId,
+      update: {
+        config: {
+          ...config,
+          icon,
+        },
       },
     });
   };

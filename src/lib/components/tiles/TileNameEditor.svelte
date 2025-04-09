@@ -1,7 +1,7 @@
 <script lang="ts">
   import { watch, useDebounce } from "runed";
-  import { updateTile } from "$lib/api/tiles";
   import ColorPicker from "svelte-awesome-color-picker";
+  import { createUpdateTileMutation } from "$lib/api/tiles";
   import SolarTextBoldDuotone from "~icons/solar/text-bold-duotone";
   import SolarAlignTopBoldDuotone from "~icons/solar/align-top-bold-duotone";
   import SolarTextBoldBoldDuotone from "~icons/solar/text-bold-bold-duotone";
@@ -28,14 +28,19 @@
 
   const { tileId, config }: Props = $props();
 
+  const updateTile = createUpdateTileMutation();
+
   let label = $state(config.label);
   let dirty: TileId | null = $state(null);
 
   const updateLabel = useDebounce((label: TileLabel) => {
-    updateTile(tileId, {
-      config: {
-        ...config,
-        label,
+    $updateTile.mutate({
+      tileId,
+      update: {
+        config: {
+          ...config,
+          label,
+        },
       },
     });
   }, 150);

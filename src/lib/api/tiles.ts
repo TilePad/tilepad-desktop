@@ -28,36 +28,21 @@ function getTile(tileId: TileId) {
   return invoke<TileModel | null>("tiles_get_tile", { tileId });
 }
 
-export async function createTile(create: CreateTile) {
-  const tile = await invoke<TileModel>("tiles_create_tile", {
+function createTile(create: CreateTile) {
+  return invoke<TileModel>("tiles_create_tile", {
     create,
   });
-
-  invalidateTilesList(tile.folder_id);
-  queryClient.setQueryData(tilesKeys.specific(tile.folder_id, tile.id), tile);
-
-  return tile;
 }
 
-export async function updateTile(tileId: TileId, update: UpdateTile) {
-  const tile = await invoke<TileModel>("tiles_update_tile", {
+function updateTile(tileId: TileId, update: UpdateTile) {
+  return invoke<TileModel>("tiles_update_tile", {
     tileId,
     update,
   });
-
-  invalidateTilesList(tile.folder_id);
-  queryClient.setQueryData(tilesKeys.specific(tile.folder_id, tile.id), tile);
-
-  return tile;
 }
 
-export async function deleteTile(folderId: FolderId, tileId: TileId) {
-  await invoke("tiles_delete_tile", { tileId });
-
-  invalidateTilesList(folderId);
-  queryClient.removeQueries({
-    queryKey: tilesKeys.specific(folderId, tileId),
-  });
+function deleteTile(tileId: TileId) {
+  return invoke("tiles_delete_tile", { tileId });
 }
 
 // [QUERIES] ------------------------------------------------------
@@ -95,6 +80,39 @@ export function createTileQuery(
 export function createCreateTileMutation() {
   return createMutation({
     mutationFn: ({ create }: { create: CreateTile }) => createTile(create),
+    onSuccess: (tile) => {
+      invalidateTilesList(tile.folder_id);
+      queryClient.setQueryData(
+        tilesKeys.specific(tile.folder_id, tile.id),
+        tile,
+      );
+    },
+  });
+}
+
+export function createUpdateTileMutation() {
+  return createMutation({
+    mutationFn: ({ tileId, update }: { tileId: TileId; update: UpdateTile }) =>
+      updateTile(tileId, update),
+    onSuccess: (tile) => {
+      invalidateTilesList(tile.folder_id);
+      queryClient.setQueryData(
+        tilesKeys.specific(tile.folder_id, tile.id),
+        tile,
+      );
+    },
+  });
+}
+
+export function createDeleteTileMutation(folderId: FolderId) {
+  return createMutation({
+    mutationFn: ({ tileId }: { tileId: TileId }) => deleteTile(tileId),
+    onSuccess: (_, { tileId }) => {
+      invalidateTilesList(folderId);
+      queryClient.removeQueries({
+        queryKey: tilesKeys.specific(folderId, tileId),
+      });
+    },
   });
 }
 
