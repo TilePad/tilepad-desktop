@@ -6,16 +6,16 @@ use std::{
     sync::Arc,
 };
 
-use action::{actions_from_manifests, Action, ActionCategory, ActionWithCategory};
-use anyhow::{anyhow, Context};
+use action::{Action, ActionCategory, ActionWithCategory, actions_from_manifests};
+use anyhow::{Context, anyhow};
 use async_zip::base::read::seek::ZipFileReader;
 use garde::Validate;
 use install::get_node_runtime;
 use loader::{load_plugin_from_path, load_plugins_from_path, read_plugin_manifest};
-use manifest::{platform_arch, platform_os, ActionId, Manifest as PluginManifest, PluginId};
+use manifest::{ActionId, Manifest as PluginManifest, PluginId, platform_arch, platform_os};
 use parking_lot::RwLock;
 use protocol::ServerPluginMessage;
-use runner::{spawn_native_task, PluginTaskState};
+use runner::{PluginTaskState, spawn_native_task};
 use serde::Serialize;
 use serde_json::Map;
 use session::{PluginSessionId, PluginSessionRef};
@@ -27,8 +27,8 @@ use tokio_util::compat::FuturesAsyncReadCompatExt;
 
 use crate::{
     database::{
-        entity::{plugin_properties::PluginPropertiesModel, tile::TileModel},
         DbPool,
+        entity::{plugin_properties::PluginPropertiesModel, tile::TileModel},
     },
     device::Devices,
     events::{
@@ -154,8 +154,9 @@ impl Plugins {
 
         // Store the plugin
         {
-            let mut plugins = &mut *self.plugins.write();
-            plugins.insert(plugin_id.clone(), Arc::new(plugin));
+            self.plugins
+                .write()
+                .insert(plugin_id.clone(), Arc::new(plugin));
         }
 
         // Emit loaded event
@@ -171,8 +172,7 @@ impl Plugins {
 
         let plugin = {
             // Remove the plugin from the plugins list
-            let mut plugins = &mut *self.plugins.write();
-            plugins.remove(plugin_id)
+            self.plugins.write().remove(plugin_id)
         };
 
         // Emit unloaded event
@@ -512,15 +512,11 @@ impl Plugins {
 
     /// Stop a task by plugin ID
     pub async fn stop_task(&self, plugin_id: &PluginId) {
-        let state = {
-            let mut tasks = self.tasks.write();
-            match tasks.remove(plugin_id) {
-                Some(value) => value,
-                None => return,
-            }
-        };
-
         // Get the current state
+        let state = match self.tasks.write().remove(plugin_id) {
+            Some(value) => value,
+            None => return,
+        };
 
         // Abort the plugin background task
         if let PluginTaskState::Running { handle } = state {

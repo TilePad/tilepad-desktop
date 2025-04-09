@@ -94,8 +94,7 @@ impl Icons {
 
         // Store the plugin
         {
-            let packs = &mut *self.packs.write();
-            packs.insert(pack_id.clone(), Arc::new(pack));
+            self.packs.write().insert(pack_id.clone(), Arc::new(pack));
         }
 
         // Emit loaded event
