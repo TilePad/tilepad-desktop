@@ -1,17 +1,17 @@
 use std::{net::SocketAddr, sync::Arc};
 
-use anyhow::{anyhow, Context};
+use anyhow::{Context, anyhow};
 use axum::{
-    body::Body,
-    extract::{ws::WebSocket, ConnectInfo, Path, WebSocketUpgrade},
-    response::Response,
     Extension,
+    body::Body,
+    extract::{ConnectInfo, Path, WebSocketUpgrade, ws::WebSocket},
+    response::Response,
 };
 use mime_guess::mime::TEXT_HTML;
-use reqwest::{header::CONTENT_TYPE, StatusCode};
+use reqwest::{StatusCode, header::CONTENT_TYPE};
 
 use crate::{
-    plugin::{manifest::PluginId, session::PluginSession, Plugins},
+    plugin::{Plugins, manifest::PluginId, session::PluginSession},
     server::models::error::DynHttpError,
 };
 
@@ -47,7 +47,15 @@ pub async fn get_plugin_file(
     Path((plugin_id, path)): Path<(PluginId, String)>,
     Extension(plugins): Extension<Arc<Plugins>>,
 ) -> Result<Response<Body>, DynHttpError> {
-    let plugin = plugins.get_plugin(&plugin_id).context("unknown plugin")?;
+    let plugin = match plugins.get_plugin(&plugin_id) {
+        Some(value) => value,
+        None => {
+            return Ok(Response::builder()
+                .status(StatusCode::NOT_FOUND)
+                .body(vec![].into())
+                .context("failed to make response")?);
+        }
+    };
     let file_path = plugin.path.join(path);
 
     // TODO: Assert file path is within plugin path
