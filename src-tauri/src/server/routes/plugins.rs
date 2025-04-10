@@ -1,4 +1,4 @@
-use std::{net::SocketAddr, sync::Arc};
+use std::{borrow::Cow, net::SocketAddr, sync::Arc};
 
 use anyhow::{Context, anyhow};
 use axum::{
@@ -9,6 +9,7 @@ use axum::{
 };
 use mime_guess::mime::TEXT_HTML;
 use reqwest::{StatusCode, header::CONTENT_TYPE};
+use tokio::join;
 
 use crate::{
     plugin::{Plugins, manifest::PluginId, session::PluginSession},
@@ -39,8 +40,51 @@ pub async fn handle_plugin_socket(plugins: Arc<Plugins>, socket: WebSocket) {
     PluginSession::start(plugins, socket);
 }
 
-static INSPECTOR_SCRIPT: &str = include_str!("../resources/propertyInspectorScript.js");
-static INSPECTOR_STYLES: &str = include_str!("../resources/propertyInspectorStyles.css");
+/// In release mode bake in the inspector script
+#[cfg(not(debug_assertions))]
+async fn get_inspector_script() -> Cow<'static, str> {
+    Cow::Borrowed(include_str!("../../../../inspector/dist/inspector.js"))
+}
+
+/// When debugging, load the inspector script directly from the file system
+/// this allows updating it at runtime
+#[cfg(debug_assertions)]
+async fn get_inspector_script() -> Cow<'static, str> {
+    let manifest_dir = std::env::var("CARGO_MANIFEST_DIR")
+        .expect("CARGO_MANIFEST_DIR environment variable missing");
+
+    let manifest_dir = std::path::Path::new(&manifest_dir);
+    let inspector_script_path = manifest_dir.join("../inspector/dist/inspector.js");
+
+    Cow::Owned(
+        tokio::fs::read_to_string(inspector_script_path)
+            .await
+            .unwrap(),
+    )
+}
+
+/// In release mode bake in the inspector script
+#[cfg(not(debug_assertions))]
+async fn get_inspector_styles() -> Cow<'static, str> {
+    Cow::Borrowed(include_str!("../../../../inspector/dist/inspector.css"))
+}
+
+/// When debugging, load the inspector script directly from the file system
+/// this allows updating it at runtime
+#[cfg(debug_assertions)]
+async fn get_inspector_styles() -> Cow<'static, str> {
+    let manifest_dir = std::env::var("CARGO_MANIFEST_DIR")
+        .expect("CARGO_MANIFEST_DIR environment variable missing");
+
+    let manifest_dir = std::path::Path::new(&manifest_dir);
+    let inspector_script_path = manifest_dir.join("../inspector/dist/inspector.css");
+
+    Cow::Owned(
+        tokio::fs::read_to_string(inspector_script_path)
+            .await
+            .unwrap(),
+    )
+}
 
 /// GET /plugins/{plugin_id}/assets/{file_path*}
 pub async fn get_plugin_file(
@@ -76,7 +120,11 @@ pub async fn get_plugin_file(
                 .await
                 .context("failed to read file content")?;
 
-            let file_text = inject_property_inspector_script(&file_text);
+            let (inspector_script, inspector_styles) =
+                join!(get_inspector_script(), get_inspector_styles());
+
+            let file_text =
+                inject_property_inspector_script(&file_text, &inspector_script, &inspector_styles);
 
             return Ok(Response::builder()
                 .status(StatusCode::OK)
@@ -97,12 +145,13 @@ pub async fn get_plugin_file(
         .context("failed to make response")?)
 }
 
-fn inject_property_inspector_script(value: &str) -> String {
+fn inject_property_inspector_script(
+    value: &str,
+    inspector_script: &str,
+    inspector_styles: &str,
+) -> String {
     value.replace(
         "<head>",
-        &format!(
-            "<head><script>{}</script><style>{}</style>",
-            INSPECTOR_SCRIPT, INSPECTOR_STYLES
-        ),
+        &format!("<head><script>{inspector_script}</script><style>{inspector_styles}</style>",),
     )
 }
