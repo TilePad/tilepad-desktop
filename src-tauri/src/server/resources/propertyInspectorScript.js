@@ -106,6 +106,14 @@ function onProperties(callback) {
   };
 }
 
+function setLabel() {
+
+}
+
+function setIcon() {
+
+}
+
 window.tilepad = {
   onPluginMessage,
   onProperties,
@@ -113,4 +121,7 @@ window.tilepad = {
   requestProperties,
   sendPluginMessage,
   setProperty: debounce(setProperty, 100),
+  setProperties,
+  setLabel,
+  setIcon
 };

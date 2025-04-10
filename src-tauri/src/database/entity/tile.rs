@@ -1,7 +1,7 @@
 use crate::{
     database::{
-        helpers::{sql_exec, sql_query_all, sql_query_maybe_one, UpdateStatementExt},
         DbPool, DbResult,
+        helpers::{UpdateStatementExt, sql_exec, sql_query_all, sql_query_maybe_one},
     },
     plugin::manifest::{ActionId, PluginId},
 };
@@ -39,6 +39,19 @@ pub struct TileConfig {
     /// Label to display on top of the tile
     #[serde(default)]
     pub label: TileLabel,
+    /// States for whether a part of the config has been modified
+    /// by the user or not
+    #[serde(default)]
+    pub user_flags: UserFlags,
+}
+
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+pub struct UserFlags {
+    /// User has modified the icon
+    pub icon: bool,
+
+    /// User has modified the label
+    pub label: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -101,6 +114,11 @@ pub enum TileIcon {
         pack_id: IconPackId,
         /// Path to the icon file
         path: String,
+    },
+
+    // Image at some remote URL
+    Url {
+        src: String,
     },
 
     /// User uploaded file

@@ -1,0 +1,11 @@
+{
+  "name": "tilepad-inspector",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "node esbuild.mjs"
+  },
+  "author": "Jacobtread",
+  "license": "MIT",
+  "description": ""
+}
