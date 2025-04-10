@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
@@ -15,33 +14,24 @@
         <p class="tile-description">URL of the website that will open when the tile is clicked</p>
     </div>
 
-
 </body>
 
 <script>
     const website = document.getElementById("website");
-
     website.setAttribute('disabled', 'true')
 
-    let properties;
-
-    // Handle properties received
-    window.tilepad.onProperties((newProperties) => {
-        properties = newProperties;
-        website.removeAttribute('disabled');
-        website.value = properties.url ?? '';
-    });
-
-
     // Request the current properties
-    window.tilepad.requestProperties();
+    tilepad.tile.getProperties()
+        // Handle properties received
+        .then((properties) => {
+            website.removeAttribute('disabled');
+            website.value = properties.url ?? '';
+        })
 
-
-    website.onchange = (event) => onChangeWebsite(event.target.value);
-
-    function onChangeWebsite(value) {
-        window.tilepad.setProperty("url", value);
-    }
+    website.onchange = (event) => {
+        const value = event.target.value;
+        tilepad.tile.setProperty("url", value);
+    };
 </script>
 
 </html>

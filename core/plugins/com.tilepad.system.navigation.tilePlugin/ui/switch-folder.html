@@ -21,23 +21,25 @@
 </body>
 
 <script>
-    const folder = document.getElementById("folder");
+    const folderSelect = document.getElementById("folder");
 
     let properties;
 
-    // Handle properties received
-    window.tilepad.onProperties((newProperties) => {
-        properties = newProperties;
+    // Request the current properties
+    tilepad.tile.getProperties()
+        // Handle properties received
+        .then((newProperties) => {
+            properties = newProperties;
 
-        // Request the folder options
-        window.tilepad.sendPluginMessage({
-            type: "GET_FOLDER_OPTIONS"
+            // Request the folder options
+            tilepad.plugin.send({
+                type: "GET_FOLDER_OPTIONS"
+            })
         })
-    });
 
 
     // Handle messages from plugin
-    window.tilepad.onPluginMessage((data) => {
+    tilepad.plugin.onMessage((data) => {
         switch (data.type) {
             case "FOLDER_OPTIONS": {
                 addFolderOptions(data.options)
@@ -46,21 +48,17 @@
         }
     });
 
-    // Request the current properties
-    window.tilepad.requestProperties();
-
-    folder.onchange = (event) => onChangeFolder(event.target.value);
-
-    function onChangeFolder(value) {
+    folderSelect.onchange = (event) => {
+        const value = event.target.value;
         if (value === "") {
-            window.tilepad.setProperty("folder", null);
+            tilepad.tile.setProperty("folder", null);
         } else {
-            window.tilepad.setProperty("folder", value);
+            tilepad.tile.setProperty("folder", value);
         }
     }
 
     function addFolderOptions(options) {
-        folder.innerHTML = "";
+        folderSelect.innerHTML = "";
 
         // Add default option
         {
@@ -69,7 +67,7 @@
             defaultOption.value = "";
             defaultOption.textContent = "None";
             defaultOption.selected = true;
-            folder.options.add(defaultOption);
+            folderSelect.options.add(defaultOption);
         }
 
         // Add real options
@@ -77,20 +75,20 @@
             const option = document.createElement("option");
             option.value = folderOption.value;
             option.textContent = folderOption.label;
-            folder.options.add(option);
+            folderSelect.options.add(option);
         }
 
         if (properties.folder) {
             const folderIndex = getFolderOptionIndex(properties.folder);
             if (folderIndex !== -1) {
-                folder.selectedIndex = folderIndex;
+                folderSelect.selectedIndex = folderIndex;
             }
         }
     }
 
     function getFolderOptionIndex(value) {
-        for (let i = 0; i < folder.options.length; i++) {
-            let option = folder.options.item(i);
+        for (let i = 0; i < folderSelect.options.length; i++) {
+            let option = folderSelect.options.item(i);
             if (option === null) break;
             if (option.value !== value) continue;
             return i;

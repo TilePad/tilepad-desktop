@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
@@ -28,31 +27,27 @@
 <script>
     const action = document.getElementById("action");
 
-    // Handle properties received
-    window.tilepad.onProperties((properties) => {
-
-        // Ignore missing action
-        if (!properties.action) return;
-
-        // Set the current selected action
-        for (let i = 0; i < action.options.length; i++) {
-            let option = action.options.item(i);
-            if (option === null) break;
-            if (option.value !== properties.action) continue;
-            action.selectedIndex = i;
-            break;
-        }
-
-    });
-
-
     // Request the current properties
-    window.tilepad.requestProperties();
+    tilepad.tile.getProperties()
+        // Handle properties received
+        .then((properties) => {
+            // Ignore missing action
+            if (!properties.action) return;
 
-    action.onchange = (event) => onChangeAction(event.target.value);
+            // Set the current selected action
+            for (let i = 0; i < action.options.length; i++) {
+                let option = action.options.item(i);
+                if (option === null) break;
+                if (option.value !== properties.action) continue;
+                action.selectedIndex = i;
+                break;
+            }
 
-    function onChangeAction(value) {
-        window.tilepad.setProperty("action", value);
+        })
+
+    action.onchange = (event) => {
+        const value = event.target.value;
+        tilepad.tile.setProperty("action", value);
     }
 </script>
 

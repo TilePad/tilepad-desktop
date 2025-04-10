@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
 
     <style>
         .row {
@@ -25,51 +24,44 @@
         <label class="tile-label" for="path">Folder Path</label>
         <div class="row">
             <input type="text" class="tile-input" name="path" id="path">
-            <button class="tile-button" id="pickFileBtn">+</button>
+            <button class="tile-button" id="pickFolderBtn">+</button>
         </div>
         <p class="tile-description">Path to the folder</p>
     </div>
 
-
 </body>
 
-
 <script>
-    const path = document.getElementById("path");
-    const pickFileBtn = document.getElementById("pickFileBtn");
-
-    let properties;
-
-    // Handle properties received
-    window.tilepad.onProperties((newProperties) => {
-        properties = newProperties;
-        path.value = properties.path ?? '';
-    });
-
+    const pathInput = document.getElementById("path");
+    const pickFolderBtn = document.getElementById("pickFolderBtn");
 
     // Request the current properties
-    window.tilepad.requestProperties();
+    tilepad.tile.getProperties()
+        // Handle properties received
+        .then((properties) => {
+            pathInput.value = properties.path ?? '';
+        })
 
-    path.onchange = onChangePath;
-    pickFileBtn.onclick = pickFile;
+    // Handle the folder path changing
+    pathInput.onchange = (event) => {
+        const value = event.target.value;
+        tilepad.tile.setProperty("path", value);
+    };
 
-    function onChangePath(event) {
-        window.tilepad.setProperty("path", event.target.value);
-    }
-
-    function pickFile() {
-        // Request the picking of a file
-        window.tilepad.sendPluginMessage({
+    // Handle the pick folder button being used
+    pickFolderBtn.onclick = () => {
+        // Request the picking of a folder from the plugin 
+        tilepad.plugin.send({
             type: "PICK_FOLDER"
         })
-    }
+    };
 
     // Handle messages from plugin
-    window.tilepad.onPluginMessage((data) => {
+    tilepad.plugin.onMessage((data) => {
         switch (data.type) {
             case "PICKED_FOLDER": {
-                window.tilepad.setProperty("path", data.path);
-                path.value = data.path;
+                tilepad.tile.setProperty("path", data.path);
+                pathInput.value = data.path;
                 break;
             }
         }

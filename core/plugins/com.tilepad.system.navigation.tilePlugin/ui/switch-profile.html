@@ -25,19 +25,21 @@
 
     let properties;
 
-    // Handle properties received
-    window.tilepad.onProperties((newProperties) => {
-        properties = newProperties;
+    // Request the current properties
+    tilepad.tile.getProperties()
+        // Handle properties received
+        .then((newProperties) => {
+            properties = newProperties;
 
-        // Request the profile options
-        window.tilepad.sendPluginMessage({
-            type: "GET_PROFILE_OPTIONS"
+            // Request the profile options
+            tilepad.plugin.send({
+                type: "GET_PROFILE_OPTIONS"
+            })
         })
-    });
 
 
     // Handle messages from plugin
-    window.tilepad.onPluginMessage((data) => {
+    tilepad.plugin.onMessage((data) => {
         switch (data.type) {
             case "PROFILE_OPTIONS": {
                 addProfileOptions(data.options)
@@ -46,18 +48,15 @@
         }
     });
 
-    // Request the current properties
-    window.tilepad.requestProperties();
+    profile.onchange = (event) => {
+        const value = event.target.value;
 
-    profile.onchange = (event) => onChangeProfile(event.target.value);
-
-    function onChangeProfile(value) {
         if (value === "") {
-            window.tilepad.setProperty("profile", null);
+            tilepad.tile.setProperty("profile", null);
         } else {
-            window.tilepad.setProperty("profile", value);
+            tilepad.tile.setProperty("profile", value);
         }
-    }
+    };
 
     function addProfileOptions(options) {
         profile.innerHTML = "";

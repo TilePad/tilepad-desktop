@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
 
     <style>
         .row {
@@ -35,41 +34,36 @@
 
 
 <script>
-    const path = document.getElementById("path");
+    const pathInput = document.getElementById("path");
     const pickFileBtn = document.getElementById("pickFileBtn");
 
-    let properties;
-
-    // Handle properties received
-    window.tilepad.onProperties((newProperties) => {
-        properties = newProperties;
-        path.value = properties.path ?? '';
-    });
-
-
     // Request the current properties
-    window.tilepad.requestProperties();
+    tilepad.tile.getProperties()
+        // Handle properties received
+        .then((properties) => {
+            pathInput.value = properties.path ?? '';
+        });
 
-    path.onchange = onChangePath;
-    pickFileBtn.onclick = pickFile;
+    // Handle the file path changing
+    pathInput.onchange = (event) => {
+        const value = event.target.value;
+        tilepad.tile.setProperty("path", value);
+    };
 
-    function onChangePath(event) {
-        window.tilepad.setProperty("path", event.target.value);
-    }
-
-    function pickFile() {
+    // Handle the pick file button being used
+    pickFileBtn.onclick = () => {
         // Request the picking of a file
-        window.tilepad.sendPluginMessage({
+        tilepad.plugin.send({
             type: "PICK_EXECUTABLE_FILE"
         })
-    }
+    };
 
     // Handle messages from plugin
-    window.tilepad.onPluginMessage((data) => {
+    tilepad.plugin.onMessage((data) => {
         switch (data.type) {
             case "PICKED_EXECUTABLE_FILE": {
-                window.tilepad.setProperty("path", data.path);
-                path.value = data.path;
+                tilepad.tile.setProperty("path", data.path);
+                pathInput.value = data.path;
                 break;
             }
         }
