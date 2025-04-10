@@ -18,13 +18,54 @@ export interface TilepadPlugin {
   onMessage(callback: (message: unknown) => void): VoidFunction;
 }
 
+interface Tile {
+  profileId: string;
+  folderId: string;
+  pluginId: string;
+  tileId: string;
+  actionId: string;
+  properties: unknown;
+}
+
 export interface TilepadTile {
+  /**
+   * Request the current tile details
+   */
+  requestTile();
+
+  /**
+   * Get the current tile details
+   */
+  getTile(): Promise<Tile>;
+
+  /**
+   * Subscribes to tile, will receive the outcome
+   * of {@link Tilepad.requestTile}
+   *
+   * The returned function can be used to remove the subscription
+   *
+   * @param callback The callback to invoke when a message is received
+   * @returns Function that will remove the listener when called
+   */
+  onTile(callback: (tile: Tile) => void): VoidFunction;
+
   /**
    * Requests the current properties for the tile.
    * When the properties are received {@link Tilepad.onProperties}
    * will be run
    */
   requestProperties();
+
+  /**
+   * Subscribes to properties for the tile, will receive the outcome
+   * of {@link Tilepad.requestProperties}
+   *
+   * The returned function can be used to remove the subscription
+   *
+   * @param callback The callback to invoke when a message is received
+   * @returns Function that will remove the listener when called
+   */
+  onProperties(callback: (properties: unknown) => void): VoidFunction;
 
   /**
    * Requests the current properties waiting until they're
@@ -52,17 +93,6 @@ export interface TilepadTile {
    * @param properties The partial tile properties data
    */
   setProperties(properties: unknown): VoidFunction;
-
-  /**
-   * Subscribes to messages sent to the inspector via the
-   * associated plugin for the action
-   *
-   * The returned function can be used to remove the subscription
-   *
-   * @param callback The callback to invoke when a message is received
-   * @returns Function that will remove the listener when called
-   */
-  onProperties(callback: (properties: unknown) => void): VoidFunction;
 
   /**
    * Set the current label of the tile. Will not
@@ -119,7 +149,5 @@ export interface Tilepad {
 }
 
 declare global {
-  interface Window {
-    tilepad: Tilepad;
-  }
+  export const tilepad: Tilepad;
 }

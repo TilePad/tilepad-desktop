@@ -13,10 +13,11 @@ window.addEventListener("message", (event) => {
 
     // Handled when properties are received
     if (type === "PROPERTIES") {
-        events.emit("properties", data.properties, {
-            tileId: data.tileId,
-            actionId: data.actionId,
-        });
+        events.emit("properties", data.properties);
+    }
+    // Handled when the tile is received
+    else if (type === "TILE") {
+        events.emit("tile", data.tile);
     }
     // Handled when a message comes in from the plugin
     else if (type === "PLUGIN_MESSAGE") {
@@ -36,11 +37,43 @@ function postInspectorMessage(msg) {
  * @type {TilepadTile}
  */
 const tile = {
+    requestTile: () => {
+        postInspectorMessage({
+            type: "GET_TILE",
+        });
+    },
+
+    onTile: (callback) => {
+        events.on("tile", callback);
+        return () => {
+            events.off("tile", callback);
+        };
+    },
+
+    getTile: () => {
+        return new Promise((resolve) => {
+            let dispose;
+            dispose = tile.onTile((tile) => {
+                resolve(tile);
+                dispose();
+            })
+            tile.requestTile();
+        })
+    },
+
     requestProperties: () => {
         postInspectorMessage({
             type: "GET_PROPERTIES",
         });
     },
+
+    onProperties: (callback) => {
+        events.on("properties", callback);
+        return () => {
+            events.off("properties", callback);
+        };
+    },
+
     getProperties: () => {
         return new Promise((resolve) => {
             let dispose;
@@ -51,21 +84,18 @@ const tile = {
             tile.requestProperties();
         })
     },
+
     setProperty: debounce((name, value) => {
         tile.setProperties({ [name]: value });
     }, 100),
+
     setProperties: (properties) => {
         postInspectorMessage({
             type: "SET_PROPERTIES",
             properties,
         });
     },
-    onProperties: (callback) => {
-        events.on("properties", callback);
-        return () => {
-            events.off("properties", callback);
-        };
-    },
+
     setLabel: (label) => { },
     setIcon: (icon) => { }
 }
@@ -93,4 +123,4 @@ const plugin = {
  */
 const tilepad = { tile, plugin }
 
-window.tilepad = tilepad;
+globalThis.tilepad = tilepad;

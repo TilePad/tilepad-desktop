@@ -44,11 +44,24 @@
         break;
       }
 
+      case "GET_TILE": {
+        sendFrameEvent({
+          type: "TILE",
+          tile: {
+            profileId: ctx.profile_id,
+            folderId: ctx.folder_id,
+            pluginId: ctx.plugin_id,
+            tileId: ctx.tile_id,
+            actionId: ctx.action_id,
+            properties,
+          },
+        });
+        break;
+      }
+
       case "GET_PROPERTIES": {
         sendFrameEvent({
           type: "PROPERTIES",
-          tileId: ctx.tile_id,
-          actionId: ctx.action_id,
           properties,
         });
         break;
