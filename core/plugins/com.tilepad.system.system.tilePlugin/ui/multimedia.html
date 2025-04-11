@@ -27,6 +27,28 @@
 <script>
     const action = document.getElementById("action");
 
+    const ACTION_ICONS = {
+        'PlayPause': 'images/multimedia/play-pause.svg',
+        'Play': 'images/multimedia/play.svg',
+        'Pause': 'images/multimedia/pause.svg',
+        'NextTrack': 'images/multimedia/next-track.svg',
+        'PreviousTrack': 'images/multimedia/previous-track.svg',
+        'VolumeUp': 'images/multimedia/volume-up.svg',
+        'VolumeDown': 'images/multimedia/volume-down.svg',
+        'Mute': 'images/multimedia/mute.svg',
+    }
+
+    const ACTION_LABELS = {
+        'PlayPause': { label: "Play/Pause" },
+        'Play': { label: "Play" },
+        'Pause': { label: "Pause" },
+        'NextTrack': { label: "Next Track" },
+        'PreviousTrack': { label: "Previous Track" },
+        'VolumeUp': { label: "Volume Up" },
+        'VolumeDown': { label: "Volume Down" },
+        'Mute': { label: "Mute" },
+    }
+
     // Request the current properties
     tilepad.tile.getProperties()
         // Handle properties received
@@ -48,6 +70,20 @@
     action.onchange = (event) => {
         const value = event.target.value;
         tilepad.tile.setProperty("action", value);
+
+        const icon = ACTION_ICONS[value];
+        if (icon !== undefined) {
+            tilepad.tile.setIcon({
+                type: "PluginIcon",
+                plugin_id: "com.tilepad.system.system",
+                icon: icon
+            });
+        }
+
+        const label = ACTION_LABELS[value];
+        if (label !== undefined) {
+            tilepad.tile.setLabel(label)
+        }
     }
 </script>
 

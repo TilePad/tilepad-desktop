@@ -42,6 +42,6 @@ inspector = "ui/text.html"
 
 [actions.multimedia]
 label = "Multimedia"
-icon = "images/play-pause.svg"
+icon = "images/multimedia/play-pause.svg"
 description = "Perform a multimedia action"
 inspector = "ui/multimedia.html"
