@@ -1,13 +1,15 @@
 <script lang="ts">
-  import type { TileId } from "$lib/api/types/tiles";
+  import type { TileId, TileIcon, TileLabel } from "$lib/api/types/tiles";
 
   import { watch } from "runed";
   import { toast } from "svelte-sonner";
+  import { Mutex } from "$lib/utils/mutex";
   import { createActionQuery } from "$lib/api/actions";
   import { sendPluginMessage } from "$lib/api/plugins";
   import { getErrorMessage, toastErrorMessage } from "$lib/api/utils/error";
   import SolarTrashBinTrashBoldDuotone from "~icons/solar/trash-bin-trash-bold-duotone";
   import {
+    getTile,
     createTileQuery,
     createDeleteTileMutation,
     createUpdateTileMutation,
@@ -50,6 +52,7 @@
   );
 
   const action = $derived($actionQuery.data);
+  const updateMutex = new Mutex();
 
   watch(
     () => $tileQuery.data,
@@ -70,6 +73,107 @@
     });
 
     onClose();
+  }
+
+  async function onSetProperties(properties: Record<string, unknown>) {
+    const unlock = await updateMutex.lock();
+
+    try {
+      // No tile active
+      if (!tile) {
+        return;
+      }
+
+      const currentTile = await getTile(tile.id);
+
+      // No tile active
+      if (!currentTile) {
+        return;
+      }
+
+      await $updateTile.mutateAsync({
+        tileId: tile.id,
+        update: {
+          config: {
+            ...currentTile.config,
+            properties: {
+              ...currentTile.config.properties,
+              ...properties,
+            },
+          },
+        },
+      });
+    } finally {
+      unlock();
+    }
+  }
+  async function onSetIcon(icon: TileIcon) {
+    const unlock = await updateMutex.lock();
+
+    try {
+      // No tile active
+      if (!tile) {
+        return;
+      }
+
+      const currentTile = await getTile(tile.id);
+
+      // No tile active
+      if (!currentTile) {
+        return;
+      }
+      // User already has an icon override
+      if (tile.config.user_flags.icon) {
+        return;
+      }
+
+      await $updateTile.mutateAsync({
+        tileId: currentTile.id,
+        update: {
+          config: {
+            ...currentTile.config,
+            icon,
+          },
+        },
+      });
+    } finally {
+      unlock();
+    }
+  }
+
+  async function onSetLabel(label: TileLabel) {
+    const unlock = await updateMutex.lock();
+
+    try {
+      // No tile active
+      if (!tile) {
+        return;
+      }
+
+      const currentTile = await getTile(tile.id);
+
+      // No tile active
+      if (!currentTile) {
+        return;
+      }
+
+      // User already has a label override
+      if (currentTile.config.user_flags.label) {
+        return;
+      }
+
+      await $updateTile.mutateAsync({
+        tileId: currentTile.id,
+        update: {
+          config: {
+            ...currentTile.config,
+            label,
+          },
+        },
+      });
+    } finally {
+      unlock();
+    }
   }
 </script>
 
@@ -94,6 +198,7 @@
       {#if action.inspector !== null}
         <div class="right">
           <PropertyInspector
+            config={tile.config}
             ctx={{
               profile_id: currentProfile.id,
               folder_id: currentFolder.id,
@@ -102,21 +207,9 @@
               tile_id: tile.id,
             }}
             inspector={action.inspector}
-            properties={tile.config.properties}
-            onSetProperties={(properties) => {
-              $updateTile.mutate({
-                tileId: tile.id,
-                update: {
-                  config: {
-                    ...tile.config,
-                    properties: {
-                      ...tile.config.properties,
-                      ...properties,
-                    },
-                  },
-                },
-              });
-            }}
+            {onSetProperties}
+            {onSetIcon}
+            {onSetLabel}
             onSendPluginMessage={sendPluginMessage}
           />
         </div>

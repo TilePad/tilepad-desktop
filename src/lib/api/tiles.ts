@@ -7,7 +7,7 @@ import type { TileId, TileModel, CreateTile, UpdateTile } from "./types/tiles";
 import { queryClient } from "./client";
 import { runeStore } from "./utils/svelte.svelte";
 
-const tilesKeys = {
+export const tilesKeys = {
   root: ["tiles"],
   list: (folderId: FolderId | null) => ["tiles", folderId, "list"],
   specific: (folderId: FolderId | null, tileId: TileId | null) => [
@@ -24,7 +24,7 @@ function getTiles(folderId: FolderId) {
   return invoke<TileModel[]>("tiles_get_tiles", { folderId });
 }
 
-function getTile(tileId: TileId) {
+export function getTile(tileId: TileId) {
   return invoke<TileModel | null>("tiles_get_tile", { tileId });
 }
 

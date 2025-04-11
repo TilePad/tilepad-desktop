@@ -96,8 +96,18 @@ const tile = {
         });
     },
 
-    setLabel: (label) => { },
-    setIcon: (icon) => { }
+    setLabel: (label) => {
+        postInspectorMessage({
+            type: "SET_LABEL",
+            label,
+        });
+    },
+    setIcon: (icon) => {
+        postInspectorMessage({
+            type: "SET_ICON",
+            icon,
+        });
+    }
 }
 
 /**

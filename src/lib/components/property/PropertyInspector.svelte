@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { TileIcon, TileLabel, TileConfig } from "$lib/api/types/tiles";
+
   import { watch } from "runed";
   import { onMount, onDestroy } from "svelte";
   import { listen } from "@tauri-apps/api/event";
@@ -12,21 +14,27 @@
 
   type Props = {
     ctx: InspectorContext;
+    config: TileConfig;
 
     inspector: string;
-    properties: object;
 
     onSendPluginMessage: (ctx: InspectorContext, message: string) => void;
     onSetProperties: (properties: Record<string, unknown>) => void;
+    onSetIcon: (icon: TileIcon) => void;
+    onSetLabel: (label: TileLabel) => void;
   };
 
   const {
     ctx,
     inspector,
-    properties,
+    config,
     onSendPluginMessage,
     onSetProperties,
+    onSetIcon,
+    onSetLabel,
   }: Props = $props();
+
+  const properties = $derived(config.properties);
 
   let iframe: HTMLIFrameElement | undefined = $state(undefined);
   let currentCtx: InspectorContext | null = null;
@@ -69,6 +77,16 @@
 
       case "SET_PROPERTIES": {
         onSetProperties(data.properties);
+        break;
+      }
+
+      case "SET_LABEL": {
+        onSetLabel(data.label);
+        break;
+      }
+
+      case "SET_ICON": {
+        onSetIcon(data.icon);
         break;
       }
     }
