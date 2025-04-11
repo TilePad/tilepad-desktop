@@ -63,6 +63,10 @@
                   icon: action.icon,
                 },
           properties: {},
+          user_flags: {
+            icon: false,
+            label: false,
+          },
         },
       },
     });

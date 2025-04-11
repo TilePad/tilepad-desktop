@@ -45,11 +45,28 @@
     });
   }, 150);
 
+  const updateLabelText = useDebounce((labelValue: string) => {
+    $updateTile.mutate({
+      tileId,
+      update: {
+        config: {
+          ...config,
+          label: { ...config.label, label: labelValue },
+          user_flags: {
+            ...config.user_flags,
+            // Label is only dirt if the user has provided a value
+            label: labelValue.trim().length > 0,
+          },
+        },
+      },
+    });
+  }, 150);
+
   const onChangeTileName = (event: Event) => {
     const value = (event.target as HTMLInputElement).value;
     dirty = tileId;
     label = { ...label, label: value };
-    updateLabel(label);
+    updateLabelText(value);
   };
 
   const onChangeFontSize = (event: Event) => {

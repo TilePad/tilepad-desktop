@@ -1,16 +1,22 @@
 <script lang="ts">
   import { TileIconType, type TileIcon } from "$lib/api/types/tiles";
 
+  import Button from "../input/Button.svelte";
   import IconFilePicker from "./IconFilePicker.svelte";
   import IconPackSelector from "./IconPackSelector.svelte";
   import PopoverButton from "../popover/PopoverButton.svelte";
 
-  type Props = { onSelectIcon: (icon: TileIcon) => void };
+  type Props = {
+    onSelectIcon: (icon: TileIcon) => void;
+    onResetDefault: VoidFunction;
+  };
 
-  const { onSelectIcon }: Props = $props();
+  const { onSelectIcon, onResetDefault }: Props = $props();
+
+  let open = $state(false);
 </script>
 
-<PopoverButton>
+<PopoverButton rootProps={{ open, onOpenChange: (value) => (open = value) }}>
   {#snippet button({ props })}
     <button class="btn" {...props} type="button"> + </button>
   {/snippet}
@@ -24,9 +30,25 @@
             pack_id: packId,
             path: icon.path,
           });
+          open = false;
         }}
       />
-      <IconFilePicker {onSelectIcon} />
+      <IconFilePicker
+        onSelectIcon={(icon) => {
+          onSelectIcon(icon);
+          open = false;
+        }}
+      />
+      <Button
+        type="button"
+        onclick={() => {
+          onResetDefault();
+          open = false;
+        }}
+        style="width: 100%"
+      >
+        Reset to default
+      </Button>
     </div>
   {/snippet}
 </PopoverButton>

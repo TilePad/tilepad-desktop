@@ -20,6 +20,7 @@ export interface TileConfig {
   icon: TileIcon;
   properties: object;
   label: TileLabel;
+  user_flags: UserFlags;
 }
 
 export type TileIconNone = object;
@@ -67,4 +68,9 @@ export enum LabelAlign {
   Bottom = "Bottom",
   Middle = "Middle",
   Top = "Top",
+}
+
+export interface UserFlags {
+  icon: boolean;
+  label: boolean;
 }

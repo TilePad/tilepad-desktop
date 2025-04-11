@@ -1,7 +1,10 @@
 <script lang="ts">
+  import type { ActionWithCategory } from "$lib/api/types/actions";
+
   import { createUpdateTileMutation } from "$lib/api/tiles";
   import {
     type TileId,
+    TileIconType,
     type TileConfig,
     type TileIcon as ITileIcon,
   } from "$lib/api/types/tiles";
@@ -12,10 +15,11 @@
 
   type Props = {
     tileId: TileId;
+    action: ActionWithCategory | undefined;
     config: TileConfig;
   };
 
-  const { tileId, config }: Props = $props();
+  const { tileId, action, config }: Props = $props();
 
   const updateTile = createUpdateTileMutation();
 
@@ -26,6 +30,33 @@
         config: {
           ...config,
           icon,
+          user_flags: {
+            ...config.user_flags,
+            icon: true,
+          },
+        },
+      },
+    });
+  };
+
+  const onResetDefault = () => {
+    $updateTile.mutate({
+      tileId,
+      update: {
+        config: {
+          ...config,
+          icon:
+            !action || action.icon === null
+              ? { type: TileIconType.None }
+              : {
+                  type: TileIconType.PluginIcon,
+                  plugin_id: action.plugin_id,
+                  icon: action.icon,
+                },
+          user_flags: {
+            ...config.user_flags,
+            icon: false,
+          },
         },
       },
     });
@@ -40,7 +71,7 @@
 </script>
 
 <div class="tile" style="--font-size-adjustment: {sizeAdjust};">
-  <IconSelector onSelectIcon={onClickIconPackIcon} />
+  <IconSelector onSelectIcon={onClickIconPackIcon} {onResetDefault} />
   <TileIcon icon={config.icon} />
   <TileLabelElm label={config.label} />
 </div>
