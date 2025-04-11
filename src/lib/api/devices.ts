@@ -2,6 +2,8 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { createQuery } from "@tanstack/svelte-query";
 
+import type { FolderId } from "./types/folders";
+import type { ProfileId } from "./types/profiles";
 import type {
   DeviceId,
   DeviceModel,
@@ -43,6 +45,19 @@ export function declineDeviceRequest(requestId: DeviceRequestId) {
 
 export function revokeDevice(deviceId: DeviceId) {
   return invoke<void>("devices_revoke_device", { deviceId });
+}
+
+export async function setDeviceProfile(
+  deviceId: DeviceId,
+  profileId: ProfileId,
+) {
+  await invoke<void>("devices_set_device_profile", { deviceId, profileId });
+  invalidateDevices();
+}
+
+export async function setDeviceFolder(deviceId: DeviceId, folderId: FolderId) {
+  await invoke<void>("devices_set_device_folder", { deviceId, folderId });
+  invalidateDevices();
 }
 
 // [QUERIES] ------------------------------------------------------

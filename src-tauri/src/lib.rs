@@ -6,8 +6,8 @@ use events::DeepLinkContext;
 use icons::Icons;
 use plugin::Plugins;
 use tauri::{
-    async_runtime::{block_on, spawn},
     App, Manager,
+    async_runtime::{block_on, spawn},
 };
 use tauri_plugin_deep_link::DeepLinkExt;
 use tilepad_manifest::plugin::PluginId;
@@ -40,6 +40,8 @@ pub fn run() {
             devices::devices_approve_request,
             devices::devices_decline_request,
             devices::devices_revoke_device,
+            devices::devices_set_device_profile,
+            devices::devices_set_device_folder,
             server::server_get_connection_info,
             profiles::profiles_get_profiles,
             profiles::profiles_get_profile,

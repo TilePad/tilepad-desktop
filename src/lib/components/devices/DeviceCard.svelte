@@ -1,14 +1,22 @@
 <!-- Card for a known device -->
 <script lang="ts">
+  import type { FolderId } from "$lib/api/types/folders";
+  import type { ProfileId } from "$lib/api/types/profiles";
   import type { DeviceModel } from "$lib/api/types/devices";
 
   import { toast } from "svelte-sonner";
-  import { revokeDevice } from "$lib/api/devices";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import SolarTrashBin2BoldDuotone from "~icons/solar/trash-bin-2-bold-duotone";
   import SolarTranslationBoldDuotone from "~icons/solar/translation-bold-duotone";
+  import {
+    revokeDevice,
+    setDeviceFolder,
+    setDeviceProfile,
+  } from "$lib/api/devices";
 
   import Button from "../input/Button.svelte";
+  import DeviceFolderSelector from "./DeviceFolderSelector.svelte";
+  import DeviceProfileSelector from "./DeviceProfileSelector.svelte";
   type Props = {
     device: DeviceModel;
     connected: boolean;
@@ -24,6 +32,14 @@
       success: "Revoked device",
       error: toastErrorMessage("Failed to revoke device"),
     });
+  }
+
+  function onChangeProfile(profileId: ProfileId) {
+    setDeviceProfile(device.id, profileId);
+  }
+
+  function onChangeFolder(folderId: FolderId) {
+    setDeviceFolder(device.id, folderId);
   }
 </script>
 
@@ -44,9 +60,20 @@
     </span>
   </h2>
 
-  <Button variant="error" onclick={handleRevoke}
-    ><SolarTrashBin2BoldDuotone /> Revoke</Button
-  >
+  <DeviceProfileSelector
+    profileId={device.profile_id}
+    setProfileId={onChangeProfile}
+  />
+
+  <DeviceFolderSelector
+    profileId={device.profile_id}
+    folderId={device.folder_id}
+    setFolderId={onChangeFolder}
+  />
+
+  <Button variant="error" onclick={handleRevoke}>
+    <SolarTrashBin2BoldDuotone /> Revoke
+  </Button>
 </div>
 
 <style>

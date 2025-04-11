@@ -1,5 +1,6 @@
+import type { Uuid } from "./shared";
+import type { FolderId } from "./folders";
 import type { ProfileId } from "./profiles";
-import type { Option, Uuid } from "./shared";
 
 export type DeviceId = Uuid;
 
@@ -19,12 +20,13 @@ export interface DeviceModel {
   name: string;
   config: DeviceConfig;
   order: number;
-  profile_id: Option<ProfileId>;
+  profile_id: ProfileId;
+  folder_id: FolderId;
   created_at: string;
   last_connected_at: string;
 }
 
-export interface DeviceConfig {}
+export type DeviceConfig = object;
 
 export interface ConnectedDevice {
   device_id: DeviceId;

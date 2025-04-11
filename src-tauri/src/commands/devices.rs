@@ -4,8 +4,12 @@ use tauri::State;
 
 use crate::{
     database::{
-        entity::device::{DeviceId, DeviceModel},
         DbPool,
+        entity::{
+            device::{DeviceId, DeviceModel},
+            folder::FolderId,
+            profile::ProfileId,
+        },
     },
     device::{ConnectedDevice, DeviceRequest, DeviceRequestId, Devices},
 };
@@ -58,5 +62,27 @@ pub async fn devices_revoke_device(
     devices: State<'_, Arc<Devices>>,
 ) -> CmdResult<()> {
     devices.revoke_device(device_id).await?;
+    Ok(())
+}
+
+/// Set the current profile for a device
+#[tauri::command]
+pub async fn devices_set_device_profile(
+    device_id: DeviceId,
+    profile_id: ProfileId,
+    devices: State<'_, Arc<Devices>>,
+) -> CmdResult<()> {
+    devices.update_device_profile(device_id, profile_id).await?;
+    Ok(())
+}
+
+/// Set the current folder for a device
+#[tauri::command]
+pub async fn devices_set_device_folder(
+    device_id: DeviceId,
+    folder_id: FolderId,
+    devices: State<'_, Arc<Devices>>,
+) -> CmdResult<()> {
+    devices.update_device_folder(device_id, folder_id).await?;
     Ok(())
 }
