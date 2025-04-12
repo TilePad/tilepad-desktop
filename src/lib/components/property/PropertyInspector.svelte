@@ -127,7 +127,6 @@
     removeEventListener = undefined;
 
     if (currentCtx !== null) {
-      console.debug("closed plugin inspector (destroy)");
       closePluginInspector(currentCtx);
       currentCtx = null;
     }
@@ -143,12 +142,10 @@
 
       // Notify the previous inspector of closing
       if (currentCtx !== null) {
-        console.debug("closed plugin inspector");
         closePluginInspector(currentCtx);
         currentCtx = null;
       }
 
-      console.debug("opened plugin inspector");
       openPluginInspector(ctx);
       currentCtx = ctx;
     },

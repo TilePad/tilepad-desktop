@@ -28,10 +28,8 @@
   let shouldIgnoreDndEvents = $state(false);
 
   function handleDndConsider(e: CustomEvent<DndEvent<MovableAction>>) {
-    console.log(e);
     const { trigger, id } = e.detail.info;
     if (trigger === TRIGGERS.DRAG_STARTED) {
-      console.warn(`copying ${id}`);
       const idx = items.findIndex((item) => item.id === id);
       const newId = `${id}_copy_${Math.round(Math.random() * 100000)}`;
       e.detail.items = e.detail.items.filter(
