@@ -30,10 +30,13 @@
 
   const updateTile = createUpdateTileMutation();
 
+  // Last persisted update
+  let lastUpdate: TileLabel = $state(config.label);
   let label = $state(config.label);
-  let dirty: TileId | null = $state(null);
 
   const updateLabel = useDebounce((label: TileLabel) => {
+    lastUpdate = label;
+
     $updateTile.mutate({
       tileId,
       update: {
@@ -46,6 +49,8 @@
   }, 150);
 
   const updateLabelText = useDebounce((labelValue: string) => {
+    lastUpdate = label;
+
     $updateTile.mutate({
       tileId,
       update: {
@@ -64,63 +69,52 @@
 
   const onChangeTileName = (event: Event) => {
     const value = (event.target as HTMLInputElement).value;
-    dirty = tileId;
     label = { ...label, label: value };
     updateLabelText(value);
   };
 
   const onChangeFontSize = (event: Event) => {
     const value = (event.target as HTMLInputElement).value;
-    dirty = tileId;
     label = { ...label, font_size: Number(value) };
     updateLabel(label);
   };
 
   const onChangeColor = (value: string) => {
-    dirty = tileId;
     label = { ...label, color: value };
     updateLabel(label);
   };
 
   const onToggleEnabled = () => {
-    dirty = tileId;
     label = { ...label, enabled: !label.enabled };
     updateLabel(label);
   };
 
   const onToggleBold = () => {
-    dirty = tileId;
     label = { ...label, bold: !label.bold };
     updateLabel(label);
   };
 
   const onToggleItalic = () => {
-    dirty = tileId;
     label = { ...label, italic: !label.italic };
     updateLabel(label);
   };
 
   const onToggleUnderline = () => {
-    dirty = tileId;
     label = { ...label, underline: !label.underline };
     updateLabel(label);
   };
 
   const onChangeAlign = (align: LabelAlign) => {
-    dirty = tileId;
     label = { ...label, align };
     updateLabel(label);
   };
 
-  // Only set initial site when not dirty (Prevent UI flickering from changes)
+  // Only update label state when remote state is different from the
+  // last debounced saved state (Prevent UI flickering from controlled changes)
   watch(
-    () => ({
-      config,
-      dirty,
-      tileId,
-    }),
-    ({ config, dirty, tileId }) => {
-      if (dirty === tileId) return;
+    () => ({ config }),
+    ({ config }) => {
+      if (JSON.stringify(lastUpdate) === JSON.stringify(config.label)) return;
       label = config.label;
     },
   );
