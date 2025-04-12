@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { TileIcon, TileLabel, TileConfig } from "$lib/api/types/tiles";
+  import type { TileIcon, TileLabel } from "$lib/api/types/tiles";
 
   import { watch } from "runed";
   import { onMount, onDestroy } from "svelte";
@@ -14,7 +14,7 @@
 
   type Props = {
     ctx: InspectorContext;
-    config: TileConfig;
+    properties: object;
 
     inspector: string;
 
@@ -36,7 +36,7 @@
   const {
     ctx,
     inspector,
-    config,
+    properties,
     onSendPluginMessage,
     onSetProperties,
     onGetPluginProperties,
@@ -44,8 +44,6 @@
     onSetIcon,
     onSetLabel,
   }: Props = $props();
-
-  const properties = $derived(config.properties);
 
   let iframe: HTMLIFrameElement | undefined = $state(undefined);
   let currentCtx: InspectorContext | null = null;

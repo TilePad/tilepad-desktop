@@ -20,6 +20,8 @@ pub struct TileModel {
     pub id: TileId,
     #[sqlx(json)]
     pub config: TileConfig,
+    #[sqlx(json)]
+    pub properties: JsonObject,
     pub folder_id: FolderId,
     pub row: u32,
     pub column: u32,
@@ -34,8 +36,6 @@ pub struct TileConfig {
     /// Icon to use
     #[serde(default)]
     pub icon: TileIcon,
-    /// Configuration for the action
-    pub properties: JsonObject,
     /// Label to display on top of the tile
     #[serde(default)]
     pub label: TileLabel,
@@ -139,6 +139,7 @@ pub struct CreateTile {
 #[derive(Deserialize)]
 pub struct UpdateTile {
     pub config: Option<TileConfig>,
+    pub properties: Option<JsonObject>,
     pub folder_id: Option<FolderId>,
     pub row: Option<u32>,
     pub column: Option<u32>,
@@ -150,12 +151,14 @@ impl TileModel {
         let model = TileModel {
             id: Uuid::new_v4(),
             config: create.config,
+            properties: Default::default(),
             folder_id: create.folder_id,
             row: create.row,
             column: create.column,
         };
 
         let config = serde_json::to_value(&model.config)?;
+        let properties = serde_json::Value::Object(Default::default());
 
         sql_exec(
             db,
@@ -164,6 +167,7 @@ impl TileModel {
                 .columns([
                     TilesColumn::Id,
                     TilesColumn::Config,
+                    TilesColumn::Properties,
                     TilesColumn::FolderId,
                     TilesColumn::Row,
                     TilesColumn::Column,
@@ -171,6 +175,7 @@ impl TileModel {
                 .values_panic([
                     model.id.into(),
                     config.into(),
+                    properties.into(),
                     model.folder_id.into(),
                     model.row.into(),
                     model.column.into(),
@@ -188,6 +193,13 @@ impl TileModel {
                 .table(TilesTable)
                 .and_where(Expr::col(TilesColumn::Id).eq(self.id))
                 .cond_value_json(TilesColumn::Config, update.config.as_ref())?
+                .cond_value(
+                    TilesColumn::Properties,
+                    update
+                        .properties
+                        .as_ref()
+                        .map(|value| serde_json::Value::Object(value.clone())),
+                )
                 .cond_value(TilesColumn::FolderId, update.folder_id)
                 .cond_value(TilesColumn::Column, update.column)
                 .cond_value(TilesColumn::Row, update.row),
@@ -195,6 +207,7 @@ impl TileModel {
         .await?;
 
         self.config = update.config.unwrap_or(self.config);
+        self.properties = update.properties.unwrap_or(self.properties);
         self.folder_id = update.folder_id.unwrap_or(self.folder_id);
         self.column = update.column.unwrap_or(self.column);
         self.row = update.row.unwrap_or(self.row);
@@ -210,6 +223,7 @@ impl TileModel {
                 .columns([
                     TilesColumn::Id,
                     TilesColumn::Config,
+                    TilesColumn::Properties,
                     TilesColumn::FolderId,
                     TilesColumn::Row,
                     TilesColumn::Column,
@@ -227,6 +241,7 @@ impl TileModel {
                 .columns([
                     TilesColumn::Id,
                     TilesColumn::Config,
+                    TilesColumn::Properties,
                     TilesColumn::FolderId,
                     TilesColumn::Row,
                     TilesColumn::Column,
@@ -257,6 +272,8 @@ pub enum TilesColumn {
     Id,
     /// Tile configuration (JSON)
     Config,
+    /// Plugin properties for this tile
+    Properties,
     /// ID of a folder this tile is within
     FolderId,
     /// Row the tile is on

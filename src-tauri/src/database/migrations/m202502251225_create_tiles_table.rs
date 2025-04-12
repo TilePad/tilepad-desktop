@@ -1,7 +1,7 @@
 use super::{
+    Migration,
     m202502251153_create_folders_table::{FoldersColumn, FoldersTable},
     schema::*,
-    Migration,
 };
 use sea_query::{ForeignKey, ForeignKeyAction, IdenStatic, SqliteQueryBuilder, Table};
 
@@ -20,6 +20,7 @@ impl Migration for TilesMigration {
                 .if_not_exists()
                 .col(pk_uuid(TilesColumn::Id))
                 .col(json(TilesColumn::Config))
+                .col(json(TilesColumn::Properties))
                 .col(uuid_null(TilesColumn::FolderId))
                 .col(integer(TilesColumn::Row))
                 .col(integer(TilesColumn::Column))
@@ -51,6 +52,8 @@ pub enum TilesColumn {
     Id,
     /// Tile configuration (JSON)
     Config,
+    /// Plugin properties for this tile
+    Properties,
     /// ID of a folder this tile is within
     FolderId,
     /// Row the tile is on

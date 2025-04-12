@@ -373,7 +373,7 @@ impl Plugins {
         tile_id: TileId,
     ) -> anyhow::Result<JsonObject> {
         let tile = self.get_plugin_tile(plugin_id, tile_id).await?;
-        Ok(tile.config.properties)
+        Ok(tile.properties)
     }
 
     pub async fn set_tile_properties(
@@ -386,7 +386,7 @@ impl Plugins {
         let tile = self.get_plugin_tile(plugin_id, tile_id).await?;
 
         let properties = if partial {
-            let mut existing_properties = tile.config.properties.clone();
+            let mut existing_properties = tile.properties.clone();
             // Merge the new properties onto the old
             for (key, value) in properties {
                 existing_properties.insert(key, value);

@@ -62,12 +62,12 @@
                   plugin_id: action.plugin_id,
                   icon: action.icon,
                 },
-          properties: {},
           user_flags: {
             icon: false,
             label: false,
           },
         },
+        properties: {},
       },
     });
 

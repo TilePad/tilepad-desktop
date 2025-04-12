@@ -9,6 +9,7 @@ export type TileId = Uuid;
 export interface TileModel {
   id: TileId;
   config: TileConfig;
+  properties: object;
   folder_id: FolderId;
   row: number;
   column: number;
@@ -18,7 +19,6 @@ export interface TileConfig {
   plugin_id: PluginId;
   action_id: ActionId;
   icon: TileIcon;
-  properties: object;
   label: TileLabel;
   user_flags: UserFlags;
 }

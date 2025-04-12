@@ -9,13 +9,13 @@ use uuid::Uuid;
 
 use crate::{
     database::{
+        DbPool,
         entity::{
             device::{CreateDevice, DeviceConfig, DeviceId, DeviceModel, UpdateDevice},
             folder::{FolderId, FolderModel},
             profile::{ProfileId, ProfileModel},
             tile::{TileId, TileModel},
         },
-        DbPool,
     },
     events::{
         AppEvent, AppEventSender, DeviceAppEvent, DeviceRequestAppEvent, TileInteractionContext,
@@ -415,7 +415,7 @@ impl Devices {
         };
 
         self.plugins
-            .handle_action(self, context, tile.config.properties)
+            .handle_action(self, context, tile.properties)
             .await?;
 
         Ok(())

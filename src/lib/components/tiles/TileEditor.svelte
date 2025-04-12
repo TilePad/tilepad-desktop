@@ -99,12 +99,9 @@
       await $updateTile.mutateAsync({
         tileId: tile.id,
         update: {
-          config: {
-            ...currentTile.config,
-            properties: {
-              ...currentTile.config.properties,
-              ...properties,
-            },
+          properties: {
+            ...currentTile.properties,
+            ...properties,
           },
         },
       });
@@ -196,6 +193,8 @@
   ) {
     await setPluginProperties(ctx.plugin_id, properties, partial);
   }
+
+  $inspect(tile);
 </script>
 
 <div class="editor">
@@ -219,7 +218,7 @@
       {#if action.inspector !== null}
         <div class="right">
           <PropertyInspector
-            config={tile.config}
+            properties={tile.properties}
             ctx={{
               profile_id: currentProfile.id,
               folder_id: currentFolder.id,
