@@ -22,6 +22,11 @@
     onSetProperties: (properties: Record<string, unknown>) => void;
     onSetIcon: (icon: TileIcon) => void;
     onSetLabel: (label: TileLabel) => void;
+    onGetPluginProperties: (
+      ctx: InspectorContext,
+      callback: (properties: object) => void,
+    ) => void;
+    onSetPluginProperties: (ctx: InspectorContext, properties: object) => void;
   };
 
   const {
@@ -30,6 +35,8 @@
     config,
     onSendPluginMessage,
     onSetProperties,
+    onGetPluginProperties,
+    onSetPluginProperties,
     onSetIcon,
     onSetLabel,
   }: Props = $props();
@@ -77,6 +84,21 @@
 
       case "SET_PROPERTIES": {
         onSetProperties(data.properties);
+        break;
+      }
+
+      case "GET_PLUGIN_PROPERTIES": {
+        onGetPluginProperties(ctx, (properties) => {
+          sendFrameEvent({
+            type: "PLUGIN_PROPERTIES",
+            properties,
+          });
+        });
+        break;
+      }
+
+      case "SET_PLUGIN_PROPERTIES": {
+        onSetPluginProperties(ctx, data.properties);
         break;
       }
 

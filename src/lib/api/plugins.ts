@@ -30,6 +30,17 @@ export function getPluginsWithState() {
   return invoke<PluginWithState[]>("plugins_get_plugins");
 }
 
+export function getPluginProperties(pluginId: PluginId) {
+  return invoke<object>("plugins_get_plugin_properties", { pluginId });
+}
+
+export function setPluginProperties(pluginId: PluginId, properties: object) {
+  return invoke<void>("plugins_set_plugin_properties", {
+    pluginId,
+    properties,
+  });
+}
+
 export function sendPluginMessage(context: InspectorContext, message: unknown) {
   return invoke<void>("plugins_send_plugin_message", {
     context,

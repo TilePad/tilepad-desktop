@@ -1,13 +1,18 @@
 <script lang="ts">
+  import type { InspectorContext } from "$lib/api/types/plugin";
   import type { TileId, TileIcon, TileLabel } from "$lib/api/types/tiles";
 
   import { watch } from "runed";
   import { toast } from "svelte-sonner";
   import { Mutex } from "$lib/utils/mutex";
   import { createActionQuery } from "$lib/api/actions";
-  import { sendPluginMessage } from "$lib/api/plugins";
   import { getErrorMessage, toastErrorMessage } from "$lib/api/utils/error";
   import SolarTrashBinTrashBoldDuotone from "~icons/solar/trash-bin-trash-bold-duotone";
+  import {
+    sendPluginMessage,
+    getPluginProperties,
+    setPluginProperties,
+  } from "$lib/api/plugins";
   import {
     getTile,
     createTileQuery,
@@ -175,6 +180,25 @@
       unlock();
     }
   }
+
+  async function onGetPluginProperties(
+    ctx: InspectorContext,
+    callback: (properties: object) => void,
+  ) {
+    const properties = await getPluginProperties(ctx.plugin_id);
+    callback(properties);
+  }
+
+  async function onSetPluginProperties(
+    ctx: InspectorContext,
+    properties: object,
+  ) {
+    const oldProperties = await getPluginProperties(ctx.plugin_id);
+    await setPluginProperties(ctx.plugin_id, {
+      ...oldProperties,
+      ...properties,
+    });
+  }
 </script>
 
 <div class="editor">
@@ -210,6 +234,8 @@
             {onSetProperties}
             {onSetIcon}
             {onSetLabel}
+            {onGetPluginProperties}
+            {onSetPluginProperties}
             onSendPluginMessage={sendPluginMessage}
           />
         </div>

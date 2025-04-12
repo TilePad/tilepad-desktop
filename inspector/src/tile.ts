@@ -1,22 +1,5 @@
-export interface TilepadPlugin {
-  /**
-   * Send a message to the plugin
-   *
-   * @param message The message to send
-   */
-  send(message: unknown);
-
-  /**
-   * Subscribes to messages sent to the inspector via the
-   * associated plugin for the action
-   *
-   * The returned function can be used to remove the subscription
-   *
-   * @param callback The callback to invoke when a message is received
-   * @returns Function that will remove the listener when called
-   */
-  onMessage(callback: (message: unknown) => void): VoidFunction;
-}
+import { debounce } from "./utils";
+import { inspector } from "./events";
 
 interface Tile {
   profileId: string;
@@ -25,96 +8,6 @@ interface Tile {
   tileId: string;
   actionId: string;
   properties: unknown;
-}
-
-export interface TilepadTile {
-  /**
-   * Request the current tile details
-   */
-  requestTile();
-
-  /**
-   * Get the current tile details
-   */
-  getTile(): Promise<Tile>;
-
-  /**
-   * Subscribes to tile, will receive the outcome
-   * of {@link Tilepad.requestTile}
-   *
-   * The returned function can be used to remove the subscription
-   *
-   * @param callback The callback to invoke when a message is received
-   * @returns Function that will remove the listener when called
-   */
-  onTile(callback: (tile: Tile) => void): VoidFunction;
-
-  /**
-   * Requests the current properties for the tile.
-   * When the properties are received {@link Tilepad.onProperties}
-   * will be run
-   */
-  requestProperties();
-
-  /**
-   * Subscribes to properties for the tile, will receive the outcome
-   * of {@link Tilepad.requestProperties}
-   *
-   * The returned function can be used to remove the subscription
-   *
-   * @param callback The callback to invoke when a message is received
-   * @returns Function that will remove the listener when called
-   */
-  onProperties(callback: (properties: unknown) => void): VoidFunction;
-
-  /**
-   * Requests the current properties waiting until they're
-   * obtained returning a promise that resolves with the
-   * properties
-   */
-  getProperties(): Promise<unknown>;
-
-  /**
-   * Set a property within the tile properties
-   *
-   * @param name The name of the property to set
-   * @param value The value of the property
-   */
-  setProperty(name: string, value: unknown): VoidFunction;
-
-  /**
-   * Sets the properties of the tile.
-   *
-   * This is a partial update, only the provided parts
-   * of the object will be updated, anything not specified
-   * already existing in the tile properties will continue
-   * to exist
-   *
-   * @param properties The partial tile properties data
-   */
-  setProperties(properties: unknown): VoidFunction;
-
-  /**
-   * Set the current label of the tile. Will not
-   * work if the user has already specified a label
-   * user must make their label blank for this to apply
-   *
-   * @todo Not implemented yet
-   *
-   * @param label
-   */
-  setLabel(label: TilepadLabel);
-
-  /**
-   * Set the current icon of the tile. Will not
-   * work if the user has already specified a icon
-   * user must set their icon to None for this to apply
-   *
-   * @todo Not implemented yet
-   *
-   * @param icon
-   */
-  setIcon(icon: TilepadIcon);
 }
 
 export type TilepadLabel = Partial<{
@@ -136,18 +29,141 @@ export type TilepadIcon =
   | { type: "IconPack"; pack_id: string; path: string }
   | { type: "Url"; src: string };
 
-export interface Tilepad {
+const tile = {
   /**
-   * Access to the plugin for the tile action
+   * Request the current tile details
    */
-  plugin: TilepadPlugin;
+  requestTile() {
+    inspector.send({
+      type: "GET_TILE",
+    });
+  },
 
   /**
-   * Access to the tile itself
+   * Get the current tile details
    */
-  tile: TilepadTile;
-}
+  getTile(): Promise<Tile> {
+    return new Promise((resolve) => {
+      const dispose = tile.onTile((tile) => {
+        resolve(tile);
+        dispose();
+      });
+      tile.requestTile();
+    });
+  },
 
-declare global {
-  export const tilepad: Tilepad;
-}
+  /**
+   * Subscribes to tile, will receive the outcome
+   * of {@link Tilepad.requestTile}
+   *
+   * The returned function can be used to remove the subscription
+   *
+   * @param callback The callback to invoke when a message is received
+   * @returns Function that will remove the listener when called
+   */
+  onTile: (callback: (tile: Tile) => void) => {
+    inspector.on("tile", callback);
+    return () => {
+      inspector.off("tile", callback);
+    };
+  },
+
+  /**
+   * Requests the current properties for the tile.
+   * When the properties are received {@link Tilepad.onProperties}
+   * will be run
+   */
+  requestProperties() {
+    inspector.send({
+      type: "GET_PROPERTIES",
+    });
+  },
+
+  /**
+   * Subscribes to properties for the tile, will receive the outcome
+   * of {@link Tilepad.requestProperties}
+   *
+   * The returned function can be used to remove the subscription
+   *
+   * @param callback The callback to invoke when a message is received
+   * @returns Function that will remove the listener when called
+   */
+  onProperties(callback: (properties: unknown) => void) {
+    inspector.on("properties", callback);
+    return () => {
+      inspector.off("properties", callback);
+    };
+  },
+
+  /**
+   * Requests the current properties waiting until they're
+   * obtained returning a promise that resolves with the
+   * properties
+   */
+  getProperties(): Promise<unknown> {
+    return new Promise((resolve) => {
+      const dispose = tile.onProperties((properties) => {
+        resolve(properties);
+        dispose();
+      });
+      tile.requestProperties();
+    });
+  },
+
+  /**
+   * Set a property within the tile properties
+   *
+   * @param name The name of the property to set
+   * @param value The value of the property
+   */
+  setProperty: debounce((name: string, value: unknown) => {
+    tile.setProperties({ [name]: value });
+  }, 100),
+
+  /**
+   * Sets the properties of the tile.
+   *
+   * This is a partial update, only the provided parts
+   * of the object will be updated, anything not specified
+   * already existing in the tile properties will continue
+   * to exist
+   *
+   * @param properties The partial tile properties data
+   */
+  setProperties(properties: unknown) {
+    inspector.send({
+      type: "SET_PROPERTIES",
+      properties,
+    });
+  },
+
+  /**
+   * Set the current label of the tile. Will not
+   * work if the user has already specified a label
+   * user must make their label blank for this to apply
+   *
+   * @param label
+   */
+  setLabel(label: TilepadLabel) {
+    inspector.send({
+      type: "SET_LABEL",
+      label,
+    });
+  },
+
+  /**
+   * Set the current icon of the tile. Will not
+   * work if the user has already specified a icon
+   * user must set their icon to None for this to apply
+   *
+   * @param icon
+   */
+  setIcon(icon: TilepadIcon) {
+    inspector.send({
+      type: "SET_ICON",
+      icon,
+    });
+  },
+};
+
+export default tile;
