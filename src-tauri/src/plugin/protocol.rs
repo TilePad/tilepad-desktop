@@ -43,6 +43,23 @@ pub enum ClientPluginMessage {
 
     /// Open a URL
     OpenUrl { url: String },
+
+    /// Request the current properties for a tile
+    GetTileProperties {
+        /// ID of the tile to get properties for
+        tile_id: TileId,
+    },
+
+    /// Set the current properties for a tile
+    SetTileProperties {
+        /// ID of the tile to set properties for
+        tile_id: TileId,
+        /// Properties for the tile
+        properties: JsonObject,
+        /// Whether to treat the properties update as a partial update
+        #[serde(default = "default_partial_value")]
+        partial: bool,
+    },
 }
 
 fn default_partial_value() -> bool {
@@ -79,4 +96,10 @@ pub enum ServerPluginMessage {
 
     /// Received a deep link message for the plugin
     DeepLink { ctx: DeepLinkContext },
+
+    /// Properties requested for a tile
+    TileProperties {
+        tile_id: TileId,
+        properties: JsonObject,
+    },
 }

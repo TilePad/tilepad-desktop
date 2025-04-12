@@ -28,7 +28,10 @@ use tokio_util::compat::FuturesAsyncReadCompatExt;
 use crate::{
     database::{
         DbPool, JsonObject,
-        entity::{plugin_properties::PluginPropertiesModel, tile::TileModel},
+        entity::{
+            plugin_properties::PluginPropertiesModel,
+            tile::{TileId, TileModel, UpdateTile},
+        },
     },
     device::Devices,
     events::{
@@ -334,7 +337,6 @@ impl Plugins {
     /// Retrieve the plugin properties from a specific plugin
     pub async fn get_plugin_properties(&self, plugin_id: PluginId) -> anyhow::Result<JsonObject> {
         let result = PluginPropertiesModel::get_by_plugin(&self.db, plugin_id).await?;
-
         Ok(result.map(|value| value.properties).unwrap_or_default())
     }
 
@@ -347,6 +349,56 @@ impl Plugins {
                 context: ctx,
                 message,
             }));
+    }
+
+    pub async fn get_plugin_tile(
+        &self,
+        plugin_id: PluginId,
+        tile_id: TileId,
+    ) -> anyhow::Result<TileModel> {
+        let tile = TileModel::get_by_id(&self.db, tile_id)
+            .await?
+            .context("tile not found")?;
+
+        if tile.config.plugin_id != plugin_id {
+            return Err(anyhow::anyhow!("tile is not apart of the same plugin"));
+        }
+
+        Ok(tile)
+    }
+
+    pub async fn get_tile_properties(
+        &self,
+        plugin_id: PluginId,
+        tile_id: TileId,
+    ) -> anyhow::Result<JsonObject> {
+        let tile = self.get_plugin_tile(plugin_id, tile_id).await?;
+        Ok(tile.config.properties)
+    }
+
+    pub async fn set_tile_properties(
+        &self,
+        plugin_id: PluginId,
+        tile_id: TileId,
+        properties: JsonObject,
+        partial: bool,
+    ) -> anyhow::Result<()> {
+        let tile = self.get_plugin_tile(plugin_id, tile_id).await?;
+
+        let properties = if partial {
+            let mut existing_properties = tile.config.properties.clone();
+            // Merge the new properties onto the old
+            for (key, value) in properties {
+                existing_properties.insert(key, value);
+            }
+            existing_properties
+        } else {
+            properties
+        };
+
+        // TODO: Update the properties
+
+        Ok(())
     }
 
     /// Handle setting the plugin properties

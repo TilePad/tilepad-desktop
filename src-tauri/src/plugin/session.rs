@@ -173,6 +173,35 @@ impl PluginSession {
                 .await;
             }
 
+            ClientPluginMessage::GetTileProperties { tile_id } => {
+                let properties = match self.plugins.get_tile_properties(plugin_id, tile_id).await {
+                    Ok(value) => value,
+                    Err(cause) => {
+                        tracing::error!(?cause, "failed to get tile properties");
+                        return;
+                    }
+                };
+
+                self.send_message(ServerPluginMessage::TileProperties {
+                    tile_id,
+                    properties,
+                });
+            }
+
+            ClientPluginMessage::SetTileProperties {
+                tile_id,
+                properties,
+                partial,
+            } => {
+                if let Err(cause) = self
+                    .plugins
+                    .set_tile_properties(plugin_id, tile_id, properties, partial)
+                    .await
+                {
+                    tracing::error!(?cause, "failed to save tile properties");
+                }
+            }
+
             message => {
                 tracing::warn!(?message, "got unexpected message from authorized plugin");
             }
