@@ -34,10 +34,15 @@ export function getPluginProperties(pluginId: PluginId) {
   return invoke<object>("plugins_get_plugin_properties", { pluginId });
 }
 
-export function setPluginProperties(pluginId: PluginId, properties: object) {
+export function setPluginProperties(
+  pluginId: PluginId,
+  properties: object,
+  partial: boolean = true,
+) {
   return invoke<void>("plugins_set_plugin_properties", {
     pluginId,
     properties,
+    partial,
   });
 }
 

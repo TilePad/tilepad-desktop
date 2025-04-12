@@ -26,7 +26,11 @@
       ctx: InspectorContext,
       callback: (properties: object) => void,
     ) => void;
-    onSetPluginProperties: (ctx: InspectorContext, properties: object) => void;
+    onSetPluginProperties: (
+      ctx: InspectorContext,
+      properties: object,
+      partial: boolean,
+    ) => void;
   };
 
   const {
@@ -98,7 +102,7 @@
       }
 
       case "SET_PLUGIN_PROPERTIES": {
-        onSetPluginProperties(ctx, data.properties);
+        onSetPluginProperties(ctx, data.properties, data.partial);
         break;
       }
 

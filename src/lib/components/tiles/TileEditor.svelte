@@ -192,12 +192,9 @@
   async function onSetPluginProperties(
     ctx: InspectorContext,
     properties: object,
+    partial: boolean = true,
   ) {
-    const oldProperties = await getPluginProperties(ctx.plugin_id);
-    await setPluginProperties(ctx.plugin_id, {
-      ...oldProperties,
-      ...properties,
-    });
+    await setPluginProperties(ctx.plugin_id, properties, partial);
   }
 </script>
 

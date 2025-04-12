@@ -3,7 +3,7 @@ use std::{
     net::SocketAddr,
     pin::Pin,
     sync::Arc,
-    task::{ready, Context, Poll},
+    task::{Context, Poll, ready},
 };
 
 use crate::{
@@ -20,9 +20,9 @@ use tracing::{debug, error};
 use uuid::Uuid;
 
 use super::{
+    Plugins,
     manifest::PluginId,
     protocol::{ClientPluginMessage, ServerPluginMessage},
-    Plugins,
 };
 
 pub type PluginSessionId = Uuid;
@@ -147,10 +147,13 @@ impl PluginSession {
                 self.send_message(ServerPluginMessage::Properties { properties });
             }
 
-            ClientPluginMessage::SetProperties { properties } => {
+            ClientPluginMessage::SetProperties {
+                properties,
+                partial,
+            } => {
                 if let Err(cause) = self
                     .plugins
-                    .set_plugin_properties(plugin_id, properties)
+                    .set_plugin_properties(plugin_id, properties, partial)
                     .await
                 {
                     tracing::error!(?cause, "failed to save plugin properties");

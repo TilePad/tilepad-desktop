@@ -354,6 +354,37 @@ impl Plugins {
         &self,
         plugin_id: PluginId,
         properties: JsonObject,
+        partial: bool,
+    ) -> anyhow::Result<()> {
+        match partial {
+            true => {
+                self.set_plugin_properties_partial(plugin_id, properties)
+                    .await
+            }
+            false => {
+                self.set_plugin_properties_replace(plugin_id, properties)
+                    .await
+            }
+        }
+    }
+
+    /// Handle setting the plugin properties
+    pub async fn set_plugin_properties_replace(
+        &self,
+        plugin_id: PluginId,
+        properties: JsonObject,
+    ) -> anyhow::Result<()> {
+        // Update the plugin properties
+        PluginPropertiesModel::set(&self.db, plugin_id, properties).await?;
+        Ok(())
+    }
+
+    /// Handle setting the plugin properties performing a partial update merging the
+    /// new properties onto the previous object
+    pub async fn set_plugin_properties_partial(
+        &self,
+        plugin_id: PluginId,
+        properties: JsonObject,
     ) -> anyhow::Result<()> {
         let model = PluginPropertiesModel::get_by_plugin(&self.db, plugin_id.clone()).await?;
 

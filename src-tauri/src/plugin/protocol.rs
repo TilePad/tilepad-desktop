@@ -25,7 +25,13 @@ pub enum ClientPluginMessage {
     GetProperties,
 
     /// Set the properties for the plugin (Partial update)
-    SetProperties { properties: JsonObject },
+    SetProperties {
+        properties: JsonObject,
+
+        /// Whether to treat the properties update as a partial update
+        #[serde(default = "default_partial_value")]
+        partial: bool,
+    },
 
     /// Send data to the current inspector window
     SendToInspector {
@@ -37,6 +43,10 @@ pub enum ClientPluginMessage {
 
     /// Open a URL
     OpenUrl { url: String },
+}
+
+fn default_partial_value() -> bool {
+    true
 }
 
 /// Plugin message coming from the server side

@@ -54,13 +54,14 @@ const plugin = {
   },
 
   setProperty: debounce((name: string, value: unknown) => {
-    plugin.setProperties({ [name]: value });
+    plugin.setProperties({ [name]: value }, true);
   }, 100),
 
-  setProperties(properties: unknown) {
+  setProperties(properties: unknown, partial: boolean = true) {
     inspector.send({
       type: "SET_PLUGIN_PROPERTIES",
       properties,
+      partial,
     });
   },
 };

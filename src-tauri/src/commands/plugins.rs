@@ -123,8 +123,11 @@ pub async fn plugins_set_plugin_properties(
     plugins: State<'_, Arc<Plugins>>,
     plugin_id: PluginId,
     properties: JsonObject,
+    partial: bool,
 ) -> CmdResult<()> {
-    plugins.set_plugin_properties(plugin_id, properties).await?;
+    plugins
+        .set_plugin_properties(plugin_id, properties, partial)
+        .await?;
     Ok(())
 }
 
