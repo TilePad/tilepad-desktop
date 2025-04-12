@@ -396,7 +396,17 @@ impl Plugins {
             properties
         };
 
-        // TODO: Update the properties
+        tile.update(
+            &self.db,
+            UpdateTile {
+                config: None,
+                properties: Some(properties),
+                folder_id: None,
+                row: None,
+                column: None,
+            },
+        )
+        .await?;
 
         Ok(())
     }
