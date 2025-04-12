@@ -1,6 +1,6 @@
 use crate::{
     database::{
-        DbPool, DbResult,
+        DbPool, DbResult, JsonObject,
         helpers::{UpdateStatementExt, sql_exec, sql_query_all, sql_query_maybe_one},
     },
     plugin::manifest::{ActionId, PluginId},
@@ -35,7 +35,7 @@ pub struct TileConfig {
     #[serde(default)]
     pub icon: TileIcon,
     /// Configuration for the action
-    pub properties: serde_json::Value,
+    pub properties: JsonObject,
     /// Label to display on top of the tile
     #[serde(default)]
     pub label: TileLabel,

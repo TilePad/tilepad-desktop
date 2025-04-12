@@ -2,7 +2,13 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{
-    database::entity::{folder::FolderModel, tile::TileModel},
+    database::{
+        JsonObject,
+        entity::{
+            folder::FolderModel,
+            tile::{TileId, TileModel},
+        },
+    },
     events::{DeepLinkContext, InspectorContext, TileInteractionContext},
 };
 
@@ -19,7 +25,7 @@ pub enum ClientPluginMessage {
     GetProperties,
 
     /// Set the properties for the plugin (Partial update)
-    SetProperties { properties: serde_json::Value },
+    SetProperties { properties: JsonObject },
 
     /// Send data to the current inspector window
     SendToInspector {
@@ -41,12 +47,12 @@ pub enum ServerPluginMessage {
     Registered { plugin_id: PluginId },
 
     /// Properties received from the server
-    Properties { properties: serde_json::Value },
+    Properties { properties: JsonObject },
 
     /// Tile was clicked on a remote device
     TileClicked {
         ctx: TileInteractionContext,
-        properties: serde_json::Value,
+        properties: JsonObject,
     },
 
     /// Got a message from the inspector

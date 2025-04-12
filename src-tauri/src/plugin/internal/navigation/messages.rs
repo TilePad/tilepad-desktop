@@ -4,8 +4,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     database::{
-        entity::{folder::FolderModel, profile::ProfileModel, tile::TileModel},
         DbPool,
+        entity::{folder::FolderModel, profile::ProfileModel, tile::TileModel},
     },
     events::{AppEvent, AppEventSender, InspectorContext, PluginAppEvent},
     plugin::Plugins,

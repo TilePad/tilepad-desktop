@@ -1,7 +1,7 @@
 use anyhow::Context;
-use sqlx::{sqlite::SqliteConnectOptions, SqlitePool};
+use sqlx::{SqlitePool, sqlite::SqliteConnectOptions};
 use std::{path::PathBuf, str::FromStr};
-use tokio::fs::{create_dir_all, File};
+use tokio::fs::{File, create_dir_all};
 
 pub mod entity;
 #[allow(unused)]
@@ -11,6 +11,7 @@ mod migrations;
 pub type DbPool = SqlitePool;
 pub type DbErr = sqlx::Error;
 pub type DbResult<T> = Result<T, DbErr>;
+pub type JsonObject = serde_json::Map<String, serde_json::Value>;
 
 /// Connects to the SQLite database at the provided path, creating a
 /// new database file if none exist

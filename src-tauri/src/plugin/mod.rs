@@ -27,7 +27,7 @@ use tokio_util::compat::FuturesAsyncReadCompatExt;
 
 use crate::{
     database::{
-        DbPool,
+        DbPool, JsonObject,
         entity::{plugin_properties::PluginPropertiesModel, tile::TileModel},
     },
     device::Devices,
@@ -309,7 +309,7 @@ impl Plugins {
         &self,
         devices: &Devices,
         ctx: TileInteractionContext,
-        properties: serde_json::Value,
+        properties: JsonObject,
     ) -> anyhow::Result<()> {
         tracing::debug!(?ctx, ?properties, "invoking action");
 
@@ -332,15 +332,10 @@ impl Plugins {
     }
 
     /// Retrieve the plugin properties from a specific plugin
-    pub async fn get_plugin_properties(
-        &self,
-        plugin_id: PluginId,
-    ) -> anyhow::Result<serde_json::Value> {
+    pub async fn get_plugin_properties(&self, plugin_id: PluginId) -> anyhow::Result<JsonObject> {
         let result = PluginPropertiesModel::get_by_plugin(&self.db, plugin_id).await?;
 
-        Ok(result
-            .map(|value| value.properties)
-            .unwrap_or_else(|| serde_json::Value::Object(Map::new())))
+        Ok(result.map(|value| value.properties).unwrap_or_default())
     }
 
     /// Handle sending a message to the provided inspector context from
@@ -358,9 +353,25 @@ impl Plugins {
     pub async fn set_plugin_properties(
         &self,
         plugin_id: PluginId,
-        properties: serde_json::Value,
+        properties: JsonObject,
     ) -> anyhow::Result<()> {
-        PluginPropertiesModel::set(&self.db, plugin_id, properties).await?;
+        let model = PluginPropertiesModel::get_by_plugin(&self.db, plugin_id.clone()).await?;
+
+        // Get existing object
+        let mut existing_properties = match model.map(|model| model.properties) {
+            Some(object) => object,
+
+            // Existing is missing or invalid
+            _ => serde_json::Map::new(),
+        };
+
+        // Merge the new properties onto the old
+        for (key, value) in properties {
+            existing_properties.insert(key, value);
+        }
+
+        // Update the plugin properties
+        PluginPropertiesModel::set(&self.db, plugin_id, existing_properties).await?;
         Ok(())
     }
 

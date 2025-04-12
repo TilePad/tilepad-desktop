@@ -8,8 +8,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     database::{
+        DbPool, JsonObject,
         entity::{folder::FolderModel, profile::ProfileModel, tile::TileModel},
-        DbPool,
     },
     device::Devices,
     events::{AppEvent, AppEventSender, InspectorContext, PluginAppEvent, TileInteractionContext},
@@ -43,7 +43,7 @@ pub async fn handle_internal_action(
     plugins: &Plugins,
     devices: &Devices,
     context: TileInteractionContext,
-    properties: serde_json::Value,
+    properties: JsonObject,
 ) -> anyhow::Result<()> {
     match context.plugin_id.as_str() {
         "com.tilepad.system.navigation" => {

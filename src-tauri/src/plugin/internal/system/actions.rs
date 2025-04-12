@@ -6,7 +6,7 @@ use sysinfo::{ProcessRefreshKind, ProcessesToUpdate, RefreshKind, System, Update
 use tauri_plugin_opener::{open_path, open_url};
 
 use crate::{
-    database::{entity::tile::TileModel, DbPool},
+    database::{DbPool, JsonObject, entity::tile::TileModel},
     device::Devices,
     events::TileInteractionContext,
     plugin::Plugins,
@@ -57,29 +57,33 @@ pub async fn handle(
     devices: &Devices,
     plugins: &Plugins,
     context: TileInteractionContext,
-    properties: serde_json::Value,
+    properties: JsonObject,
 ) -> anyhow::Result<()> {
     match context.action_id.as_str() {
         "website" => {
-            let data: SystemWebsiteProperties = serde_json::from_value(properties)?;
+            let data: SystemWebsiteProperties =
+                serde_json::from_value(serde_json::Value::Object(properties))?;
             if let Some(url) = data.url {
                 open_url(url, None::<&str>)?;
             }
         }
         "open" => {
-            let data: SystemOpenProperties = serde_json::from_value(properties)?;
+            let data: SystemOpenProperties =
+                serde_json::from_value(serde_json::Value::Object(properties))?;
             if let Some(path) = data.path {
                 open_path(path, None::<&str>)?;
             }
         }
         "open_folder" => {
-            let data: SystemOpenFolderProperties = serde_json::from_value(properties)?;
+            let data: SystemOpenFolderProperties =
+                serde_json::from_value(serde_json::Value::Object(properties))?;
             if let Some(path) = data.path {
                 open_path(path, None::<&str>)?;
             }
         }
         "close" => {
-            let data: SystemCloseProperties = serde_json::from_value(properties)?;
+            let data: SystemCloseProperties =
+                serde_json::from_value(serde_json::Value::Object(properties))?;
             if let Some(path) = data.path {
                 let path = Path::new(&path);
                 let mut system = System::new_with_specifics(RefreshKind::nothing().with_processes(
@@ -98,7 +102,8 @@ pub async fn handle(
             }
         }
         "text" => {
-            let data: SystemTextProperties = serde_json::from_value(properties)?;
+            let data: SystemTextProperties =
+                serde_json::from_value(serde_json::Value::Object(properties))?;
             if let Some(text) = data.text {
                 let mut enigo = Enigo::new(&enigo::Settings::default()).unwrap();
                 // Enter text
@@ -106,7 +111,8 @@ pub async fn handle(
             }
         }
         "multimedia" => {
-            let data: SystemMultimediaProperties = serde_json::from_value(properties)?;
+            let data: SystemMultimediaProperties =
+                serde_json::from_value(serde_json::Value::Object(properties))?;
 
             let action = match data.action {
                 Some(value) => value,

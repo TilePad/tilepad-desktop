@@ -2,12 +2,13 @@ use std::sync::Arc;
 
 use crate::{
     commands::CmdResult,
+    database::JsonObject,
     events::InspectorContext,
     plugin::{
+        PluginWithState, Plugins,
         install::{install_plugin_requirements, install_plugin_zip, remove_plugin_files},
         loader::{load_plugin_from_path, read_plugin_manifest_zip},
         manifest::PluginId,
-        PluginWithState, Plugins,
     },
 };
 use anyhow::Context;
@@ -112,7 +113,7 @@ pub async fn plugins_close_inspector(
 pub async fn plugins_get_plugin_properties(
     plugins: State<'_, Arc<Plugins>>,
     plugin_id: PluginId,
-) -> CmdResult<serde_json::Value> {
+) -> CmdResult<JsonObject> {
     let result = plugins.get_plugin_properties(plugin_id).await?;
     Ok(result)
 }
@@ -121,7 +122,7 @@ pub async fn plugins_get_plugin_properties(
 pub async fn plugins_set_plugin_properties(
     plugins: State<'_, Arc<Plugins>>,
     plugin_id: PluginId,
-    properties: serde_json::Value,
+    properties: JsonObject,
 ) -> CmdResult<()> {
     plugins.set_plugin_properties(plugin_id, properties).await?;
     Ok(())

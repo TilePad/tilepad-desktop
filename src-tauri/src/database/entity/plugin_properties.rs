@@ -1,7 +1,7 @@
 use crate::{
     database::{
+        DbPool, DbResult, JsonObject,
         helpers::{sql_exec, sql_query_maybe_one},
-        DbPool, DbResult,
     },
     plugin::manifest::PluginId,
 };
@@ -14,16 +14,12 @@ use sqlx::prelude::FromRow;
 pub struct PluginPropertiesModel {
     pub plugin_id: String,
     #[sqlx(json)]
-    pub properties: serde_json::Value,
+    pub properties: JsonObject,
 }
 
 impl PluginPropertiesModel {
     /// Create a new profile
-    pub async fn set(
-        db: &DbPool,
-        plugin_id: PluginId,
-        properties: serde_json::Value,
-    ) -> DbResult<()> {
+    pub async fn set(db: &DbPool, plugin_id: PluginId, properties: JsonObject) -> DbResult<()> {
         sql_exec(
             db,
             Query::insert()
@@ -32,7 +28,10 @@ impl PluginPropertiesModel {
                     PluginPropertiesColumn::PluginId,
                     PluginPropertiesColumn::Properties,
                 ])
-                .values_panic([plugin_id.0.into(), properties.into()])
+                .values_panic([
+                    plugin_id.0.into(),
+                    serde_json::Value::Object(properties).into(),
+                ])
                 .on_conflict(
                     OnConflict::column(PluginPropertiesColumn::PluginId)
                         .update_column(PluginPropertiesColumn::Properties)

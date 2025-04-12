@@ -5,7 +5,7 @@ use rfd::AsyncFileDialog;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    database::{entity::tile::TileModel, DbPool},
+    database::{DbPool, entity::tile::TileModel},
     events::InspectorContext,
     plugin::Plugins,
 };
