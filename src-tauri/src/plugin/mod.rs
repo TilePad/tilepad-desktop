@@ -113,6 +113,14 @@ impl Plugins {
         }
     }
 
+    pub fn user_path(&self) -> PathBuf {
+        self.user_path.clone()
+    }
+
+    pub fn runtimes_path(&self) -> PathBuf {
+        self.runtimes_path.clone()
+    }
+
     /// Loads all icon packs from the default icon pack paths
     pub async fn load_defaults(self: &Arc<Self>) {
         // Load from the core plugins directory

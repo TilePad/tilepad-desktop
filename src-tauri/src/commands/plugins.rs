@@ -14,27 +14,19 @@ use crate::{
 use tilepad_manifest::plugin::Manifest as PluginManifest;
 
 use anyhow::Context;
-use tauri::{AppHandle, Manager, State};
+use tauri::State;
 
 #[tauri::command]
 pub async fn plugins_install_plugin_manual(
-    app: AppHandle,
     plugins: State<'_, Arc<Plugins>>,
     data: Vec<u8>,
 ) -> CmdResult<()> {
-    let app_data_path = app
-        .path()
-        .app_data_dir()
-        .context("failed to get app data dir")?;
-    let user_plugins = app_data_path.join("plugins");
-    let runtimes_path = app_data_path.join("runtimes");
-
     // Read the plugin manifest from within the zip file
     let manifest = read_plugin_manifest_zip(&data).await?;
 
     // Determine plugin install directory
     let plugin_id = &manifest.plugin.id;
-    let path = user_plugins.join(&plugin_id.0);
+    let path = plugins.user_path().join(&plugin_id.0);
 
     // Unload the plugin
     plugins.unload_plugin(plugin_id).await;
@@ -46,7 +38,7 @@ pub async fn plugins_install_plugin_manual(
     install_plugin_zip(&data, &path).await?;
 
     // Install plugin runtime if one is required
-    install_plugin_requirements(&manifest, &runtimes_path).await?;
+    install_plugin_requirements(&manifest, &plugins.runtimes_path()).await?;
 
     // Load the plugin
     let plugin = load_plugin_from_path(&path)
@@ -60,18 +52,11 @@ pub async fn plugins_install_plugin_manual(
 
 #[tauri::command]
 pub async fn plugins_uninstall_plugin(
-    app: AppHandle,
     plugins: State<'_, Arc<Plugins>>,
     plugin_id: PluginId,
 ) -> CmdResult<()> {
-    let app_data_path = app
-        .path()
-        .app_data_dir()
-        .context("failed to get app data dir")?;
-    let user_plugins = app_data_path.join("plugins");
-
     // Determine plugin install directory
-    let path = user_plugins.join(&plugin_id.0);
+    let path = plugins.user_path().join(&plugin_id.0);
 
     // Unload the plugin
     plugins.unload_plugin(&plugin_id).await;
