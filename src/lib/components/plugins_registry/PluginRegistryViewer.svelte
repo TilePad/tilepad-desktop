@@ -2,6 +2,7 @@
   import type { PluginRegistryEntry } from "$lib/api/types/plugins_registry";
 
   import { toast } from "svelte-sonner";
+  import { uninstallPlugin } from "$lib/api/plugins";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import { replaceMarkdownRelativeUrls } from "$lib/utils/markdown";
   import {
@@ -15,9 +16,10 @@
 
   type Props = {
     item: PluginRegistryEntry;
+    installed: boolean;
   };
 
-  const { item }: Props = $props();
+  const { item, installed }: Props = $props();
 
   const manifestQuery = createPluginManifestQuery(() => item.repo);
   const readmeQuery = createPluginReadmeQuery(() => item.repo);
@@ -42,6 +44,16 @@
       error: toastErrorMessage("Failed to install plugin"),
     });
   }
+
+  function handleUninstall() {
+    const revokePromise = uninstallPlugin(item.id);
+
+    toast.promise(revokePromise, {
+      loading: "Uninstalling plugin",
+      success: "Uninstalled plugin",
+      error: toastErrorMessage("Failed to uninstall plugin"),
+    });
+  }
 </script>
 
 <div class="container">
@@ -55,7 +67,13 @@
       <p>{$manifestQuery.data.plugin.description}</p>
       <span>Version: {$manifestQuery.data.plugin.version}</span>
 
-      <Button disabled={$install.isPending} onclick={onInstall}>Install</Button>
+      {#if installed}
+        <Button onclick={handleUninstall}>Uninstall</Button>
+      {:else}
+        <Button disabled={$install.isPending} onclick={onInstall}
+          >Install</Button
+        >
+      {/if}
     {/if}
   </div>
 

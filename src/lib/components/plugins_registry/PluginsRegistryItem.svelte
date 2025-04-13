@@ -3,34 +3,36 @@
 
   type Props = {
     item: PluginRegistryEntry;
+    installed: boolean;
     onClick: VoidFunction;
   };
 
-  const { item, onClick }: Props = $props();
+  const { item, installed, onClick }: Props = $props();
 </script>
 
 <button onclick={onClick} class="item">
-  <h2 class="name">{item.name}</h2>
+  <p class="name">{item.name}</p>
   <p class="description"></p>
 
-  <span class="authors"> {item.authors.join(", ")} </span>
+  <p class="authors">{item.authors.join(", ")}</p>
 
-  {item.repo}
+  <p>{item.repo}</p>
+
+  <p>Installed: {installed}</p>
 </button>
 
 <style>
   .item {
     display: flex;
     flex-flow: column;
-    gap: 0.5rem;
-    background-color: #413c49;
+    gap: 0.25rem;
+    background-color: #544d5e;
     color: #fff;
     border: none;
     width: 100%;
     text-align: left;
     padding: 0.5rem;
     cursor: pointer;
-    background-color: #1a181d;
     font-size: 0.9rem;
   }
 
@@ -39,5 +41,6 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    font-weight: bold;
   }
 </style>
