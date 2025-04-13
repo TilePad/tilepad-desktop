@@ -8,6 +8,14 @@
   "permissions": [
     "core:default",
     "opener:default",
-    "deep-link:default"
+    "deep-link:default",
+    {
+      "identifier": "http:default",
+      "allow": [
+        {
+          "url": "https://*"
+        }
+      ]
+    }
   ]
 }

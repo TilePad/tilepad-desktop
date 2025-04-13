@@ -106,6 +106,15 @@ export async function installPlugin(file: File) {
 
   invalidatePluginsQuery();
 }
+
+export async function installPluginBlob(data: ArrayBuffer) {
+  await invoke<void>("plugins_install_plugin_manual", {
+    data,
+  });
+
+  invalidatePluginsQuery();
+}
+
 export async function uninstallPlugin(pluginId: PluginId) {
   await invoke<void>("plugins_uninstall_plugin", {
     pluginId,

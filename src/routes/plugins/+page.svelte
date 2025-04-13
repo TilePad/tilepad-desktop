@@ -2,6 +2,7 @@
   import { createPluginsQuery } from "$lib/api/plugins";
   import PluginCard from "$lib/components/plugins/PluginCard.svelte";
   import ManualImportPlugin from "$lib/components/plugins/ManualImportPlugin.svelte";
+  import PluginsRegistryDialog from "$lib/components/plugins_registry/PluginsRegistryDialog.svelte";
 
   const pluginsQuery = createPluginsQuery();
 </script>
@@ -15,7 +16,10 @@
     <div class="section">
       <div class="header">
         <h2>Plugins</h2>
-        <ManualImportPlugin />
+        <div class="actions">
+          <PluginsRegistryDialog buttonLabel={{ text: "Community Plugins" }} />
+          <ManualImportPlugin />
+        </div>
       </div>
 
       <div class="plugins">
@@ -58,5 +62,10 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.5rem;
   }
 </style>

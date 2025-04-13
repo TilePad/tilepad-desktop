@@ -11,6 +11,8 @@ use crate::{
         manifest::PluginId,
     },
 };
+use tilepad_manifest::plugin::Manifest as PluginManifest;
+
 use anyhow::Context;
 use tauri::{AppHandle, Manager, State};
 
@@ -190,4 +192,10 @@ pub async fn plugins_reload_plugin(
     // Load the new plugin into the plugins registry
     plugins.load_plugin(new_plugin).await;
     Ok(())
+}
+
+#[tauri::command]
+pub fn plugins_parse_manifest(manifest: String) -> CmdResult<PluginManifest> {
+    let manifest: PluginManifest = PluginManifest::parse(&manifest)?;
+    Ok(manifest)
 }
