@@ -81,5 +81,7 @@
   .viewer {
     height: 100%;
     overflow: auto;
+    flex: auto;
+    padding: 1rem;
   }
 </style>

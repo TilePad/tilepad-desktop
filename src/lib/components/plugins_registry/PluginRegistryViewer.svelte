@@ -2,7 +2,6 @@
   import type { PluginRegistryEntry } from "$lib/api/types/plugins_registry";
 
   import { toast } from "svelte-sonner";
-  import SvelteMarkdown from "@humanspeak/svelte-markdown";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import { replaceMarkdownRelativeUrls } from "$lib/utils/markdown";
   import {
@@ -12,6 +11,7 @@
   } from "$lib/api/plugins_registry";
 
   import Button from "../input/Button.svelte";
+  import Markdown from "../markdown/Markdown.svelte";
 
   type Props = {
     item: PluginRegistryEntry;
@@ -44,25 +44,55 @@
   }
 </script>
 
-{#if $manifestQuery.isLoading}
-  Loading manifest..
-{:else if $manifestQuery.isError}
-  Failed to load manifest
-{:else if $manifestQuery.isSuccess}
-  Success: {JSON.stringify($manifestQuery.data)}
+<div class="container">
+  <div class="toolbar">
+    {#if $manifestQuery.isLoading}
+      Loading manifest..
+    {:else if $manifestQuery.isError}
+      Failed to load manifest
+    {:else if $manifestQuery.isSuccess}
+      <h2>{$manifestQuery.data.plugin.name}</h2>
+      <p>{$manifestQuery.data.plugin.description}</p>
+      <span>Version: {$manifestQuery.data.plugin.version}</span>
 
-  <Button disabled={$install.isPending} onclick={onInstall}>Install</Button>
-{/if}
+      <Button disabled={$install.isPending} onclick={onInstall}>Install</Button>
+    {/if}
+  </div>
 
-{#if $readmeQuery.isLoading}
-  Loading readme..
-{:else if $readmeQuery.isError}
-  Failed to load readme
-{:else if $readmeQuery.isSuccess}
-  <SvelteMarkdown
-    source={replaceMarkdownRelativeUrls(
-      $readmeQuery.data.readme,
-      $readmeQuery.data.baseURL,
-    )}
-  />
-{/if}
+  <div class="readme">
+    {#if $readmeQuery.isLoading}
+      Loading readme..
+    {:else if $readmeQuery.isError}
+      Failed to load readme
+    {:else if $readmeQuery.isSuccess}
+      {@const markdown = replaceMarkdownRelativeUrls(
+        $readmeQuery.data.readme,
+        $readmeQuery.data.baseURL,
+      )}
+      <Markdown source={markdown} />
+    {/if}
+  </div>
+</div>
+
+<style>
+  .container {
+    display: flex;
+    flex-flow: column;
+    overflow: hidden;
+    height: 100%;
+  }
+
+  .readme {
+    flex: auto;
+    overflow: auto;
+  }
+
+  .toolbar {
+    display: flex;
+    flex-flow: column;
+    width: 100%;
+    background-color: #322e38;
+    padding: 1rem;
+    gap: 0.5rem;
+  }
+</style>
