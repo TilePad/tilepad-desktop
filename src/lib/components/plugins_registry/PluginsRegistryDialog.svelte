@@ -66,5 +66,20 @@
   .split {
     display: flex;
     flex-flow: row;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .plugins {
+    height: 100%;
+    overflow: auto;
+    max-width: 30rem;
+    flex: auto;
+    flex-shrink: 0;
+  }
+
+  .viewer {
+    height: 100%;
+    overflow: auto;
   }
 </style>
