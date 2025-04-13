@@ -12,8 +12,8 @@ use crate::{
 };
 
 use super::{
-    protocol::{ClientDeviceMessage, ServerDeviceMessage},
     Devices,
+    protocol::{ClientDeviceMessage, ServerDeviceMessage},
 };
 
 pub type DeviceSessionId = Uuid;

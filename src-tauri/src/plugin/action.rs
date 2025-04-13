@@ -4,8 +4,8 @@ use serde::Serialize;
 use tilepad_manifest::plugin::Manifest;
 
 use super::{
-    manifest::{ActionId, PluginId},
     Plugin,
+    manifest::{ActionId, PluginId},
 };
 
 #[derive(Debug, Serialize)]

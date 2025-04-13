@@ -1,8 +1,8 @@
 use super::{
+    Migration,
     m202502251151_create_profiles_table::{ProfilesColumn, ProfilesTable},
     m202502251153_create_folders_table::{FoldersColumn, FoldersTable},
     schema::*,
-    Migration,
 };
 use sea_query::{ForeignKey, ForeignKeyAction, IdenStatic, SqliteQueryBuilder, Table};
 

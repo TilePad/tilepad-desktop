@@ -1,7 +1,7 @@
 use crate::utils::{file::move_directory, zip::extract_zip};
 
 use crate::plugin::manifest::{Arch, BinaryNodeVersion};
-use anyhow::{bail, ensure, Context};
+use anyhow::{Context, bail, ensure};
 use async_zip::tokio::read::seek::ZipFileReader;
 use serde::Deserialize;
 use std::path::Path;
@@ -133,7 +133,7 @@ mod test {
 
     use crate::plugin::{
         manifest::Arch,
-        node::{download_node, BinaryNodeVersion},
+        node::{BinaryNodeVersion, download_node},
     };
 
     #[tokio::test]

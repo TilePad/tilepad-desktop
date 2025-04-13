@@ -4,8 +4,8 @@ use sqlx::prelude::FromRow;
 use uuid::Uuid;
 
 use crate::database::{
-    helpers::{sql_exec, sql_query_all, sql_query_maybe_one, UpdateStatementExt},
     DbPool, DbResult,
+    helpers::{UpdateStatementExt, sql_exec, sql_query_all, sql_query_maybe_one},
 };
 
 use super::profile::ProfileId;

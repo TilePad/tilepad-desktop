@@ -1,9 +1,9 @@
 use crate::{
     commands::CmdResult,
     icons::{
+        IconPack, Icons,
         install::{install_icon_pack_zip, remove_icon_pack_files},
         loader::{load_icon_pack_from_path, read_icon_pack_manifest_zip},
-        IconPack, Icons,
     },
 };
 use anyhow::Context;

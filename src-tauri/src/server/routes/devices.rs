@@ -1,12 +1,12 @@
 use std::{net::SocketAddr, sync::Arc};
 
 use axum::{
-    extract::{ws::WebSocket, ConnectInfo, WebSocketUpgrade},
-    response::Response,
     Extension,
+    extract::{ConnectInfo, WebSocketUpgrade, ws::WebSocket},
+    response::Response,
 };
 
-use crate::device::{session::DeviceSession, Devices};
+use crate::device::{Devices, session::DeviceSession};
 
 /// GET /devices/ws
 ///

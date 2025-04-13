@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use anyhow::Context;
 use async_zip::tokio::read::seek::ZipFileReader;
 use tokio::{
-    fs::{create_dir_all, OpenOptions},
+    fs::{OpenOptions, create_dir_all},
     io::{AsyncBufRead, AsyncSeek},
 };
 use tokio_util::compat::FuturesAsyncReadCompatExt;

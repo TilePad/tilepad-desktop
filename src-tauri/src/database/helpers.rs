@@ -2,8 +2,8 @@ use sea_query::{IntoIden, SimpleExpr, SqliteQueryBuilder, UpdateStatement};
 use sea_query_binder::SqlxBinder;
 use serde::Serialize;
 use sqlx::{
-    sqlite::{SqliteQueryResult, SqliteRow},
     FromRow, Sqlite,
+    sqlite::{SqliteQueryResult, SqliteRow},
 };
 
 use super::DbResult;

@@ -3,12 +3,12 @@ use std::sync::Arc;
 use crate::{
     commands::CmdResult,
     database::{
+        DbPool,
         entity::{
             device::{DeviceModel, UpdateDevice},
             folder::FolderModel,
             profile::{CreateProfile, ProfileId, ProfileModel, UpdateProfile},
         },
-        DbPool,
     },
     device::Devices,
 };

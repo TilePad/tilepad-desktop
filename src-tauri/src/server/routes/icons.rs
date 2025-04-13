@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
 use anyhow::Context;
-use axum::{body::Body, extract::Path, response::Response, Extension};
-use reqwest::{header::CONTENT_TYPE, StatusCode};
+use axum::{Extension, body::Body, extract::Path, response::Response};
+use reqwest::{StatusCode, header::CONTENT_TYPE};
 use tauri::{AppHandle, Manager};
 use tilepad_manifest::icons::IconPackId;
 

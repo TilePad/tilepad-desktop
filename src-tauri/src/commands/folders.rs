@@ -6,12 +6,12 @@ use tauri::State;
 use crate::{
     commands::CmdResult,
     database::{
+        DbPool,
         entity::{
             device::{DeviceModel, UpdateDevice},
             folder::{CreateFolder, FolderId, FolderModel, UpdateFolder},
             profile::ProfileId,
         },
-        DbPool,
     },
     device::Devices,
 };

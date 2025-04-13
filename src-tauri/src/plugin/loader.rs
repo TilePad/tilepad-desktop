@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Context};
+use anyhow::{Context, anyhow};
 use async_zip::tokio::read::seek::ZipFileReader;
 use std::{io::Cursor, os::windows::fs::FileTypeExt, path::Path};
 use tilepad_manifest::plugin::Manifest as PluginManifest;
@@ -17,7 +17,7 @@ pub async fn read_plugin_manifest(path: &Path) -> anyhow::Result<PluginManifest>
 }
 
 /// Reads a plugin manifest from the provided `bytes`
-pub async fn read_plugin_manifest_bytes(bytes: Vec<u8>) -> anyhow::Result<PluginManifest> {
+pub fn read_plugin_manifest_bytes(bytes: Vec<u8>) -> anyhow::Result<PluginManifest> {
     let data = String::from_utf8(bytes).context("manifest file bytes are not valid utf8")?;
     let manifest: PluginManifest = PluginManifest::parse(&data)?;
     Ok(manifest)
@@ -78,5 +78,5 @@ pub async fn read_plugin_manifest_zip(data: &[u8]) -> anyhow::Result<PluginManif
         .await?
         .context("plugin missing manifest.toml")?;
 
-    read_plugin_manifest_bytes(manifest_data).await
+    read_plugin_manifest_bytes(manifest_data)
 }

@@ -1,6 +1,6 @@
 use std::{future::poll_fn, task::Poll};
 
-use futures::{stream::FuturesUnordered, Stream};
+use futures::{Stream, stream::FuturesUnordered};
 use serde::Serialize;
 use tauri::{AppHandle, Emitter};
 use tilepad_manifest::plugin::PluginId;

@@ -3,9 +3,9 @@ use std::sync::Arc;
 use tauri::State;
 
 use crate::plugin::{
+    Plugins,
     action::{ActionCategory, ActionWithCategory},
     manifest::{ActionId, PluginId},
-    Plugins,
 };
 
 /// Get a list of all available actions from the plugin registry

@@ -19,10 +19,10 @@ use tokio::{
 };
 
 use super::{
-    manifest::{
-        platform_arch, platform_os, Arch, ManifestBin, ManifestBinNative, OperatingSystem, PluginId,
-    },
     Plugin, Plugins,
+    manifest::{
+        Arch, ManifestBin, ManifestBinNative, OperatingSystem, PluginId, platform_arch, platform_os,
+    },
 };
 
 #[derive(Debug, Default, Clone)]

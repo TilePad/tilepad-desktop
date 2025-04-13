@@ -1,4 +1,4 @@
-use super::{schema::*, Migration};
+use super::{Migration, schema::*};
 use sea_query::{IdenStatic, SqliteQueryBuilder, Table};
 
 pub struct ProfilesMigration;

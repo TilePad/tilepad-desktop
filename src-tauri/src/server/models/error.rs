@@ -10,8 +10,8 @@ use thiserror::Error;
 use tracing::error;
 
 use axum::{
-    response::{IntoResponse, Response},
     Json,
+    response::{IntoResponse, Response},
 };
 use serde::Serialize;
 

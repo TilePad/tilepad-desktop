@@ -6,11 +6,11 @@ use tauri::{AppHandle, Manager, State};
 use crate::{
     commands::CmdResult,
     database::{
+        DbPool,
         entity::{
             folder::FolderId,
             tile::{CreateTile, TileIcon, TileId, TileModel, UpdateTile},
         },
-        DbPool,
     },
     device::Devices,
 };
