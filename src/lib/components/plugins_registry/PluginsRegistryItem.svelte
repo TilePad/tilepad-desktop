@@ -3,22 +3,25 @@
 
   type Props = {
     item: PluginRegistryEntry;
+    selected: boolean;
     installed: boolean;
     onClick: VoidFunction;
   };
 
-  const { item, installed, onClick }: Props = $props();
+  const { item, selected, installed, onClick }: Props = $props();
 </script>
 
-<button onclick={onClick} class="item">
+<button onclick={onClick} class="item" class:item--selected={selected}>
   <p class="name">{item.name}</p>
-  <p class="description"></p>
+  <p class="description">{item.description}</p>
 
   <p class="authors">{item.authors.join(", ")}</p>
 
-  <p>{item.repo}</p>
+  <p class="repo">{item.repo}</p>
 
-  <p>Installed: {installed}</p>
+  {#if installed}
+    <p class="installed">Installed</p>
+  {/if}
 </button>
 
 <style>
@@ -26,7 +29,7 @@
     display: flex;
     flex-flow: column;
     gap: 0.25rem;
-    background-color: #544d5e;
+    background-color: #28252e;
     color: #fff;
     border: none;
     width: 100%;
@@ -34,6 +37,20 @@
     padding: 0.5rem;
     cursor: pointer;
     font-size: 0.9rem;
+    border-radius: 0.25rem;
+  }
+
+  .item--selected {
+    background-color: #453f4e;
+  }
+
+  .authors {
+    font-size: 0.9rem;
+  }
+
+  .repo {
+    font-size: 0.9rem;
+    color: #ccc;
   }
 
   .name {
@@ -42,5 +59,10 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     font-weight: bold;
+  }
+
+  .installed {
+    color: #aaa;
+    font-style: italic;
   }
 </style>

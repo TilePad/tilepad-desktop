@@ -36,23 +36,32 @@
       {:else if $pluginRegistryQuery.isSuccess && $pluginsQuery.isSuccess}
         <div class="split">
           <div class="plugins">
-            <div>
-              <h1>Community Plugins</h1>
+            <div class="titlebar">
+              <h2>Community Plugins</h2>
 
               <DialogCloseButton buttonLabel={{ text: "Close" }} />
             </div>
 
-            {#each $pluginRegistryQuery.data as item}
-              <PluginsRegistryItem
-                {item}
-                onClick={() => (active = item)}
-                installed={$pluginsQuery.data.find(
-                  (plugin) => plugin.manifest.plugin.id === item.id,
-                ) !== undefined}
-              />
-            {:else}
-              No plugins available
-            {/each}
+            <div class="plugins-list">
+              {#each $pluginRegistryQuery.data as item}
+                <PluginsRegistryItem
+                  {item}
+                  onClick={() => {
+                    if (active !== undefined && active.id === item.id) {
+                      active = undefined;
+                    } else {
+                      active = item;
+                    }
+                  }}
+                  installed={$pluginsQuery.data.find(
+                    (plugin) => plugin.manifest.plugin.id === item.id,
+                  ) !== undefined}
+                  selected={active !== undefined && active.id === item.id}
+                />
+              {:else}
+                No plugins available
+              {/each}
+            </div>
           </div>
 
           <div class="viewer">
@@ -95,7 +104,7 @@
 
     height: 100%;
     overflow: auto;
-    max-width: 30rem;
+    max-width: 20rem;
     flex: auto;
     flex-shrink: 0;
     padding: 1rem;
@@ -106,5 +115,20 @@
     height: 100%;
     overflow: auto;
     flex: auto;
+  }
+
+  .plugins-list {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    flex-direction: column;
+    flex: auto;
+    overflow: auto;
+  }
+
+  .titlebar {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: space-between;
   }
 </style>
