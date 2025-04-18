@@ -117,7 +117,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
             .resource_dir()
             .context("failed to get resources directory")?;
 
-        resources.join("core");
+        resources.join("core")
     };
 
     #[cfg(debug_assertions)]
