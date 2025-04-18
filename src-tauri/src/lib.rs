@@ -5,6 +5,7 @@ use device::Devices;
 use events::DeepLinkContext;
 use icons::Icons;
 use plugin::Plugins;
+use std::path::PathBuf;
 use tauri::{
     App, Manager,
     async_runtime::{block_on, spawn},
@@ -109,12 +110,18 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         .app_data_dir()
         .context("failed to get app data dir")?;
 
-    let resources = app
-        .path()
-        .resource_dir()
-        .context("failed to get resources directory")?;
+    #[cfg(not(debug_assertions))]
+    let core_resources = {
+        let resources = app
+            .path()
+            .resource_dir()
+            .context("failed to get resources directory")?;
 
-    let core_resources = resources.join("core");
+        resources.join("core");
+    };
+
+    #[cfg(debug_assertions)]
+    let core_resources = debug_core_resources_path();
 
     let core_plugins = core_resources.join("plugins");
     let user_plugins = app_data_path.join("plugins");
@@ -230,4 +237,16 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
     });
 
     Ok(())
+}
+
+/// In development we directly use the source path to "core" resources  
+/// because tauri does not automatically update these files unless you
+/// touch some source code in the main project and cause a re-build
+#[cfg(debug_assertions)]
+fn debug_core_resources_path() -> PathBuf {
+    let manifest_dir = std::env::var("CARGO_MANIFEST_DIR")
+        .expect("CARGO_MANIFEST_DIR environment variable missing");
+
+    let manifest_dir = std::path::Path::new(&manifest_dir);
+    manifest_dir.join("../core")
 }
