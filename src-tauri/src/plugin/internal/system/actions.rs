@@ -42,6 +42,22 @@ pub struct SystemMultimediaProperties {
 }
 
 #[derive(Deserialize)]
+pub struct HotkeyProperties {
+    keys: Option<Keys>,
+}
+
+#[derive(Deserialize)]
+pub struct Keys {
+    modifiers: Vec<HotKey>,
+    keys: Vec<HotKey>,
+}
+
+#[derive(Deserialize)]
+pub struct HotKey {
+    code: u32,
+}
+
+#[derive(Deserialize)]
 pub enum MultimediaAction {
     PlayPause,
     Play,
@@ -146,6 +162,32 @@ pub async fn handle(
                 MultimediaAction::Mute => {
                     enigo.key(Key::VolumeMute, enigo::Direction::Click);
                 }
+            }
+        }
+        "hotkey" => {
+            let data: HotkeyProperties =
+                serde_json::from_value(serde_json::Value::Object(properties))?;
+
+            let keys = match data.keys {
+                Some(value) => value,
+                None => return Ok(()),
+            };
+
+            let mut enigo = Enigo::new(&enigo::Settings::default()).unwrap();
+
+            for key in &keys.modifiers {
+                let key = Key::Other(key.code);
+                enigo.key(key, enigo::Direction::Press);
+            }
+
+            for key in keys.keys {
+                let key = Key::Other(key.code);
+                enigo.key(key, enigo::Direction::Click);
+            }
+
+            for key in keys.modifiers {
+                let key = Key::Other(key.code);
+                enigo.key(key, enigo::Direction::Release);
             }
         }
         action_id => {

@@ -45,3 +45,9 @@ label = "Multimedia"
 icon = "images/multimedia/play-pause.svg"
 description = "Perform a multimedia action"
 inspector = "ui/multimedia.html"
+
+[actions.hotkey]
+label = "Hotkey"
+icon = "images/hotkey.svg"
+description = "Perform a actions using a virtual keyboard"
+inspector = "ui/hotkey.html"
