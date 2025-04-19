@@ -8,7 +8,7 @@ use axum::Extension;
 use tauri::AppHandle;
 use tower_http::cors::CorsLayer;
 
-use crate::{database::DbPool, device::Devices, icons::Icons, plugin::Plugins};
+use crate::{database::DbPool, device::Devices, icons::Icons, plugin::Plugins, tile::Tiles};
 
 pub mod models;
 pub mod routes;
@@ -21,6 +21,7 @@ pub async fn start_http_server(
     app_handle: AppHandle,
     plugins: Arc<Plugins>,
     icons: Arc<Icons>,
+    tiles: Arc<Tiles>,
 ) -> anyhow::Result<()> {
     // build our application with a single route
     let app = routes::router()
@@ -29,6 +30,7 @@ pub async fn start_http_server(
         .layer(Extension(app_handle))
         .layer(Extension(plugins))
         .layer(Extension(icons))
+        .layer(Extension(tiles))
         .layer(CorsLayer::very_permissive())
         .into_make_service_with_connect_info::<SocketAddr>();
 

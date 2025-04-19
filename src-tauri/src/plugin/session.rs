@@ -7,7 +7,9 @@ use std::{
 };
 
 use crate::{
+    database::entity::tile::UpdateKind,
     events::{AppEvent, PluginAppEvent},
+    tile::Tiles,
     utils::ws::{WebSocketFuture, WsRx, WsTx},
 };
 use anyhow::anyhow;
@@ -38,6 +40,8 @@ pub struct PluginSession {
     tx: WsTx<ServerPluginMessage>,
     /// Access to the plugins registry the session is apart of
     plugins: Arc<Plugins>,
+    /// Access to work with tiles
+    tiles: Arc<Tiles>,
 }
 
 #[derive(Default)]
@@ -47,7 +51,7 @@ struct PluginSessionState {
 }
 
 impl PluginSession {
-    pub fn start(plugins: Arc<Plugins>, socket: WebSocket) {
+    pub fn start(plugins: Arc<Plugins>, tiles: Arc<Tiles>, socket: WebSocket) {
         let id = Uuid::new_v4();
 
         // Create and spawn a future for the websocket
@@ -64,6 +68,7 @@ impl PluginSession {
             id,
             state: Default::default(),
             plugins,
+            tiles,
             tx: ws_tx,
         });
 
@@ -174,7 +179,11 @@ impl PluginSession {
             }
 
             ClientPluginMessage::GetTileProperties { tile_id } => {
-                let properties = match self.plugins.get_tile_properties(plugin_id, tile_id).await {
+                let properties = match self
+                    .tiles
+                    .get_tile_properties(tile_id, Some(plugin_id))
+                    .await
+                {
                     Ok(value) => value,
                     Err(cause) => {
                         tracing::error!(?cause, "failed to get tile properties");
@@ -194,11 +203,31 @@ impl PluginSession {
                 partial,
             } => {
                 if let Err(cause) = self
-                    .plugins
-                    .set_tile_properties(plugin_id, tile_id, properties, partial)
+                    .tiles
+                    .update_tile_properties(tile_id, Some(plugin_id), properties, partial)
                     .await
                 {
                     tracing::error!(?cause, "failed to save tile properties");
+                }
+            }
+
+            ClientPluginMessage::SetTileIcon { tile_id, icon } => {
+                if let Err(cause) = self
+                    .tiles
+                    .update_tile_icon(tile_id, Some(plugin_id), icon, UpdateKind::Program)
+                    .await
+                {
+                    tracing::error!(?cause, "failed to save tile icon");
+                }
+            }
+
+            ClientPluginMessage::SetTileLabel { tile_id, label } => {
+                if let Err(cause) = self
+                    .tiles
+                    .update_tile_label(tile_id, Some(plugin_id), label, UpdateKind::Program)
+                    .await
+                {
+                    tracing::error!(?cause, "failed to save tile label");
                 }
             }
 

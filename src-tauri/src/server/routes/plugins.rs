@@ -14,6 +14,7 @@ use tokio::join;
 use crate::{
     plugin::{Plugins, manifest::PluginId, session::PluginSession},
     server::models::error::DynHttpError,
+    tile::Tiles,
 };
 
 /// GET /plugins/ws
@@ -21,6 +22,7 @@ use crate::{
 /// Accept a new plugin websocket connection upgrade
 pub async fn ws(
     Extension(plugins): Extension<Arc<Plugins>>,
+    Extension(tiles): Extension<Arc<Tiles>>,
     Extension(connect_info): Extension<ConnectInfo<SocketAddr>>,
     ws: WebSocketUpgrade,
 ) -> Result<Response, DynHttpError> {
@@ -32,12 +34,12 @@ pub async fn ws(
 
     tracing::debug!(?connect_info, "plugin session starting");
 
-    Ok(ws.on_upgrade(move |socket| handle_plugin_socket(plugins, socket)))
+    Ok(ws.on_upgrade(move |socket| handle_plugin_socket(plugins, tiles, socket)))
 }
 
 /// Handle the connection of a new plugin socket
-pub async fn handle_plugin_socket(plugins: Arc<Plugins>, socket: WebSocket) {
-    PluginSession::start(plugins, socket);
+pub async fn handle_plugin_socket(plugins: Arc<Plugins>, tiles: Arc<Tiles>, socket: WebSocket) {
+    PluginSession::start(plugins, tiles, socket);
 }
 
 /// In release mode bake in the inspector script

@@ -38,6 +38,7 @@ use crate::{
         AppEvent, AppEventSender, DeepLinkContext, InspectorContext, PluginAppEvent,
         TileInteractionContext,
     },
+    icons::Icons,
 };
 
 pub mod action;
@@ -357,43 +358,6 @@ impl Plugins {
                 context: ctx,
                 message,
             }));
-    }
-
-    pub async fn get_plugin_tile(
-        &self,
-        plugin_id: PluginId,
-        tile_id: TileId,
-    ) -> anyhow::Result<TileModel> {
-        let tile = TileModel::get_by_id(&self.db, tile_id)
-            .await?
-            .context("tile not found")?;
-
-        if tile.config.plugin_id != plugin_id {
-            return Err(anyhow::anyhow!("tile is not apart of the same plugin"));
-        }
-
-        Ok(tile)
-    }
-
-    pub async fn get_tile_properties(
-        &self,
-        plugin_id: PluginId,
-        tile_id: TileId,
-    ) -> anyhow::Result<JsonObject> {
-        let tile = self.get_plugin_tile(plugin_id, tile_id).await?;
-        Ok(tile.properties)
-    }
-
-    pub async fn set_tile_properties(
-        &self,
-        plugin_id: PluginId,
-        tile_id: TileId,
-        properties: JsonObject,
-        partial: bool,
-    ) -> anyhow::Result<()> {
-        let tile = self.get_plugin_tile(plugin_id, tile_id).await?;
-        tile.update_properties(&self.db, properties, partial).await;
-        Ok(())
     }
 
     /// Handle setting the plugin properties

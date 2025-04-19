@@ -6,7 +6,7 @@ use crate::{
         JsonObject,
         entity::{
             folder::FolderModel,
-            tile::{TileId, TileModel},
+            tile::{TileIcon, TileId, TileLabel, TileModel},
         },
     },
     events::{DeepLinkContext, InspectorContext, TileInteractionContext},
@@ -60,6 +60,12 @@ pub enum ClientPluginMessage {
         #[serde(default = "default_partial_value")]
         partial: bool,
     },
+
+    /// Set the current icon for a tile
+    SetTileIcon { tile_id: TileId, icon: TileIcon },
+
+    /// Set the current label for a tile
+    SetTileLabel { tile_id: TileId, label: TileLabel },
 }
 
 fn default_partial_value() -> bool {

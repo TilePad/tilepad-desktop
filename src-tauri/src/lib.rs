@@ -11,6 +11,7 @@ use tauri::{
     async_runtime::{block_on, spawn},
 };
 use tauri_plugin_deep_link::DeepLinkExt;
+use tile::Tiles;
 use tilepad_manifest::plugin::PluginId;
 use tokio::sync::mpsc;
 use tracing_subscriber::EnvFilter;
@@ -23,6 +24,7 @@ mod icons;
 #[allow(unused)]
 mod plugin;
 mod server;
+mod tile;
 mod utils;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -136,6 +138,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         .context("failed to load database")?;
 
     let (app_event_tx, app_event_rx) = mpsc::unbounded_channel();
+    let icons = Arc::new(Icons::new(app_event_tx.clone(), user_icons, uploaded_icons));
     let plugins = Arc::new(Plugins::new(
         app_event_tx.clone(),
         db.clone(),
@@ -148,13 +151,14 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         db.clone(),
         plugins.clone(),
     ));
-    let icons = Arc::new(Icons::new(app_event_tx.clone(), user_icons, uploaded_icons));
+    let tiles = Arc::new(Tiles::new(db.clone(), icons.clone(), devices.clone()));
 
     app.manage(app_event_tx.clone());
     app.manage(db.clone());
     app.manage(devices.clone());
     app.manage(plugins.clone());
     app.manage(icons.clone());
+    app.manage(tiles.clone());
 
     tracing::debug!("starting event processor");
 
@@ -188,6 +192,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         app_handle.clone(),
         plugins.clone(),
         icons.clone(),
+        tiles.clone(),
     ));
 
     // Handle deep links (tilepad://deep-link/com.tilepad.system.system.tilePlugin#code=1)
