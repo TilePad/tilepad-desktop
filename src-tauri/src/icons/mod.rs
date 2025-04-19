@@ -58,6 +58,7 @@ impl Icons {
     }
 
     /// Get the path to the user uploaded icons
+    #[allow(unused)]
     pub fn uploaded_path(&self) -> PathBuf {
         self.uploaded_path.clone()
     }
