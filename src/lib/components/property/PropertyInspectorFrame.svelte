@@ -6,12 +6,14 @@
     encodeInspectorContext,
   } from "$lib/api/types/plugin";
 
+  import type { PropertyInspectorMessage } from "./propertyInspectorMessage";
+
   type Props = {
     ctx: InspectorContext;
     inspector: string;
     onFrameEvent: (
       ctx: InspectorContext,
-      event: MessageEvent,
+      event: PropertyInspectorMessage,
       send: (data: object) => void,
     ) => void;
     onFrameMount: (ctx: InspectorContext, send: (data: object) => void) => void;
@@ -37,7 +39,7 @@
 
   function onMessage(event: MessageEvent) {
     if (!iframe || event.source !== iframe.contentWindow) return;
-    onFrameEvent(ctx, event, send);
+    onFrameEvent(ctx, event.data, send);
   }
 
   $effect(() => {

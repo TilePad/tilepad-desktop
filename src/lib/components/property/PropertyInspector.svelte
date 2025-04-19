@@ -1,58 +1,62 @@
 <script lang="ts">
   import type { TileIcon, TileLabel } from "$lib/api/types/tiles";
 
+  import { Mutex } from "$lib/utils/mutex";
+  import { getTile, createUpdateTileMutation } from "$lib/api/tiles";
   import {
     type InspectorContext,
     isInspectorContextEqual,
   } from "$lib/api/types/plugin";
+  import {
+    sendPluginMessage,
+    getPluginProperties,
+    setPluginProperties,
+  } from "$lib/api/plugins";
+
+  import type { PropertyInspectorMessage } from "./propertyInspectorMessage";
 
   import PluginMessageListener from "./PluginMessageListener.svelte";
   import PropertyInspectorFrame from "./PropertyInspectorFrame.svelte";
 
   type Props = {
     ctx: InspectorContext;
-    properties: object;
-
     inspector: string;
-
-    onSendPluginMessage: (ctx: InspectorContext, message: string) => void;
-    onSetProperties: (properties: Record<string, unknown>) => void;
-    onSetIcon: (icon: TileIcon) => void;
-    onSetLabel: (label: TileLabel) => void;
-    onGetPluginProperties: (
-      ctx: InspectorContext,
-      callback: (properties: object) => void,
-    ) => void;
-    onSetPluginProperties: (
-      ctx: InspectorContext,
-      properties: object,
-      partial: boolean,
-    ) => void;
   };
 
-  const {
-    ctx,
-    inspector,
-    properties,
-    onSendPluginMessage,
-    onSetProperties,
-    onGetPluginProperties,
-    onSetPluginProperties,
-    onSetIcon,
-    onSetLabel,
-  }: Props = $props();
+  const { ctx, inspector }: Props = $props();
 
   type CurrentFrameData = {
     ctx: InspectorContext;
     send: (data: object) => void;
   };
 
+  const updateTile = createUpdateTileMutation();
+
+  /**
+   * Mutex to ensure only one event is updating the tile state at a time
+   * to ensure no data races and that the data in the updates is always
+   * the latest
+   */
+  const updateMutex = new Mutex();
+
   let currentFrame: CurrentFrameData | undefined;
 
+  /**
+   * Handle the current frame mounting
+   *
+   * @param ctx
+   * @param send
+   */
   function onFrameMount(ctx: InspectorContext, send: (data: object) => void) {
     currentFrame = { ctx, send };
   }
 
+  /**
+   * Handle a message from the plugin to pass onto the inspector
+   *
+   * @param ctx
+   * @param message
+   */
   function onMessage(ctx: InspectorContext, message: object) {
     if (currentFrame && isInspectorContextEqual(ctx, currentFrame.ctx)) {
       currentFrame.send({
@@ -63,70 +67,192 @@
     }
   }
 
-  function onFrameEvent(
+  /**
+   * Handle a message from the inspector to pass onto the plugin
+   *
+   * @param ctx
+   * @param message
+   */
+  function onSendToPlugin(ctx: InspectorContext, message: object) {
+    sendPluginMessage(ctx, message);
+  }
+
+  async function onGetTile(
     ctx: InspectorContext,
-    event: MessageEvent,
     send: (data: object) => void,
   ) {
-    const data = event.data;
-    const type = data.type;
+    const currentTile = await getTile(ctx.tile_id);
 
-    switch (type) {
+    // No tile active
+    if (!currentTile) {
+      return;
+    }
+
+    send({
+      type: "TILE",
+      tile: {
+        profileId: ctx.profile_id,
+        folderId: ctx.folder_id,
+        pluginId: ctx.plugin_id,
+        tileId: ctx.tile_id,
+        actionId: ctx.action_id,
+        properties: currentTile.properties,
+      },
+    });
+  }
+
+  async function onGetProperties(
+    ctx: InspectorContext,
+    send: (data: object) => void,
+  ) {
+    const currentTile = await getTile(ctx.tile_id);
+
+    // No tile active
+    if (!currentTile) {
+      return;
+    }
+
+    send({
+      type: "PROPERTIES",
+      properties: currentTile.properties,
+    });
+  }
+
+  function onSetProperties(ctx: InspectorContext, properties: object) {
+    updateMutex.runExclusive(async () => {
+      const currentTile = await getTile(ctx.tile_id);
+
+      // No tile active
+      if (!currentTile) {
+        return;
+      }
+
+      await $updateTile.mutateAsync({
+        tileId: ctx.tile_id,
+        update: {
+          properties: {
+            ...currentTile.properties,
+            ...properties,
+          },
+        },
+      });
+    });
+  }
+
+  function onSetLabel(ctx: InspectorContext, label: TileLabel) {
+    updateMutex.runExclusive(async () => {
+      const currentTile = await getTile(ctx.tile_id);
+
+      // No tile active
+      if (!currentTile) {
+        return;
+      }
+
+      // User already has a label override
+      if (currentTile.config.user_flags.label) {
+        return;
+      }
+
+      await $updateTile.mutateAsync({
+        tileId: currentTile.id,
+        update: {
+          config: {
+            ...currentTile.config,
+            label,
+          },
+        },
+      });
+    });
+  }
+
+  function onSetIcon(ctx: InspectorContext, icon: TileIcon) {
+    updateMutex.runExclusive(async () => {
+      const currentTile = await getTile(ctx.tile_id);
+
+      // No tile active
+      if (!currentTile) {
+        return;
+      }
+
+      // User already has an icon override
+      if (currentTile.config.user_flags.icon) {
+        return;
+      }
+
+      await $updateTile.mutateAsync({
+        tileId: currentTile.id,
+        update: {
+          config: {
+            ...currentTile.config,
+            icon,
+          },
+        },
+      });
+    });
+  }
+
+  async function onGetPluginProperties(
+    ctx: InspectorContext,
+    send: (data: object) => void,
+  ) {
+    const properties = await getPluginProperties(ctx.plugin_id);
+    send({
+      type: "PLUGIN_PROPERTIES",
+      properties,
+    });
+  }
+
+  async function onSetPluginProperties(
+    ctx: InspectorContext,
+    properties: object,
+    partial: boolean = true,
+  ) {
+    await setPluginProperties(ctx.plugin_id, properties, partial);
+  }
+
+  function onFrameEvent(
+    ctx: InspectorContext,
+    event: PropertyInspectorMessage,
+    send: (data: object) => void,
+  ) {
+    switch (event.type) {
       case "SEND_TO_PLUGIN": {
-        onSendPluginMessage(ctx, data.message);
+        onSendToPlugin(ctx, event.message);
         break;
       }
 
       case "GET_TILE": {
-        send({
-          type: "TILE",
-          tile: {
-            profileId: ctx.profile_id,
-            folderId: ctx.folder_id,
-            pluginId: ctx.plugin_id,
-            tileId: ctx.tile_id,
-            actionId: ctx.action_id,
-            properties,
-          },
-        });
+        onGetTile(ctx, send);
         break;
       }
 
       case "GET_PROPERTIES": {
-        send({
-          type: "PROPERTIES",
-          properties,
-        });
+        onGetProperties(ctx, send);
         break;
       }
 
       case "SET_PROPERTIES": {
-        onSetProperties(data.properties);
+        onSetProperties(ctx, event.properties);
         break;
       }
 
       case "GET_PLUGIN_PROPERTIES": {
-        onGetPluginProperties(ctx, (properties) => {
-          send({
-            type: "PLUGIN_PROPERTIES",
-            properties,
-          });
-        });
+        onGetPluginProperties(ctx, send);
         break;
       }
 
       case "SET_PLUGIN_PROPERTIES": {
-        onSetPluginProperties(ctx, data.properties, data.partial);
+        onSetPluginProperties(ctx, event.properties, event.partial);
         break;
       }
 
       case "SET_LABEL": {
-        onSetLabel(data.label);
+        onSetLabel(ctx, event.label);
         break;
       }
 
       case "SET_ICON": {
-        onSetIcon(data.icon);
+        onSetIcon(ctx, event.icon);
         break;
       }
     }

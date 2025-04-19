@@ -1,24 +1,12 @@
 <script lang="ts">
-  import type { InspectorContext } from "$lib/api/types/plugin";
-  import type { TileId, TileIcon, TileLabel } from "$lib/api/types/tiles";
+  import type { TileId } from "$lib/api/types/tiles";
 
   import { watch } from "runed";
   import { toast } from "svelte-sonner";
-  import { Mutex } from "$lib/utils/mutex";
   import { createActionQuery } from "$lib/api/actions";
   import { getErrorMessage, toastErrorMessage } from "$lib/api/utils/error";
+  import { createTileQuery, createDeleteTileMutation } from "$lib/api/tiles";
   import SolarTrashBinTrashBoldDuotone from "~icons/solar/trash-bin-trash-bold-duotone";
-  import {
-    sendPluginMessage,
-    getPluginProperties,
-    setPluginProperties,
-  } from "$lib/api/plugins";
-  import {
-    getTile,
-    createTileQuery,
-    createDeleteTileMutation,
-    createUpdateTileMutation,
-  } from "$lib/api/tiles";
 
   import Button from "../input/Button.svelte";
   import TileNameEditor from "./TileNameEditor.svelte";
@@ -41,7 +29,6 @@
   const currentProfile = $derived.by(profile);
 
   const deleteTile = $derived(createDeleteTileMutation(currentFolder.id));
-  const updateTile = createUpdateTileMutation();
 
   const tileQuery = createTileQuery(
     () => currentFolder.id,
@@ -55,8 +42,6 @@
     () => tileConfig?.plugin_id ?? null,
     () => tileConfig?.action_id ?? null,
   );
-
-  const updateMutex = new Mutex();
 
   watch(
     () => $tileQuery.data,
@@ -77,120 +62,6 @@
     });
 
     onClose();
-  }
-
-  async function onSetProperties(properties: Record<string, unknown>) {
-    const unlock = await updateMutex.lock();
-
-    try {
-      // No tile active
-      if (!tile) {
-        return;
-      }
-
-      const currentTile = await getTile(tile.id);
-
-      // No tile active
-      if (!currentTile) {
-        return;
-      }
-
-      await $updateTile.mutateAsync({
-        tileId: tile.id,
-        update: {
-          properties: {
-            ...currentTile.properties,
-            ...properties,
-          },
-        },
-      });
-    } finally {
-      unlock();
-    }
-  }
-  async function onSetIcon(icon: TileIcon) {
-    const unlock = await updateMutex.lock();
-
-    try {
-      // No tile active
-      if (!tile) {
-        return;
-      }
-
-      const currentTile = await getTile(tile.id);
-
-      // No tile active
-      if (!currentTile) {
-        return;
-      }
-      // User already has an icon override
-      if (tile.config.user_flags.icon) {
-        return;
-      }
-
-      await $updateTile.mutateAsync({
-        tileId: currentTile.id,
-        update: {
-          config: {
-            ...currentTile.config,
-            icon,
-          },
-        },
-      });
-    } finally {
-      unlock();
-    }
-  }
-
-  async function onSetLabel(label: TileLabel) {
-    const unlock = await updateMutex.lock();
-
-    try {
-      // No tile active
-      if (!tile) {
-        return;
-      }
-
-      const currentTile = await getTile(tile.id);
-
-      // No tile active
-      if (!currentTile) {
-        return;
-      }
-
-      // User already has a label override
-      if (currentTile.config.user_flags.label) {
-        return;
-      }
-
-      await $updateTile.mutateAsync({
-        tileId: currentTile.id,
-        update: {
-          config: {
-            ...currentTile.config,
-            label,
-          },
-        },
-      });
-    } finally {
-      unlock();
-    }
-  }
-
-  async function onGetPluginProperties(
-    ctx: InspectorContext,
-    callback: (properties: object) => void,
-  ) {
-    const properties = await getPluginProperties(ctx.plugin_id);
-    callback(properties);
-  }
-
-  async function onSetPluginProperties(
-    ctx: InspectorContext,
-    properties: object,
-    partial: boolean = true,
-  ) {
-    await setPluginProperties(ctx.plugin_id, properties, partial);
   }
 </script>
 
@@ -223,17 +94,7 @@
 
       {#if action.inspector !== null}
         <div class="right">
-          <PropertyInspector
-            properties={tile.properties}
-            {ctx}
-            inspector={action.inspector}
-            {onSetProperties}
-            {onSetIcon}
-            {onSetLabel}
-            {onGetPluginProperties}
-            {onSetPluginProperties}
-            onSendPluginMessage={sendPluginMessage}
-          />
+          <PropertyInspector {ctx} inspector={action.inspector} />
         </div>
       {/if}
     </div>
