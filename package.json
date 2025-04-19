@@ -11,7 +11,9 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "tauri": "tauri",
-    "format": "prettier -w src"
+    "format": "prettier -w src",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix"
   },
   "license": "MIT",
   "dependencies": {
