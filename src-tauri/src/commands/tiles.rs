@@ -52,7 +52,7 @@ pub async fn tiles_create_tile(
 /// Update a specific tile properties
 #[tauri::command]
 pub async fn tiles_update_tile_properties(
-    tiles: State<'_, Tiles>,
+    tiles: State<'_, Arc<Tiles>>,
     tile_id: TileId,
     properties: JsonObject,
     partial: bool,
@@ -66,7 +66,7 @@ pub async fn tiles_update_tile_properties(
 /// Update a specific tile label
 #[tauri::command]
 pub async fn tiles_update_tile_label(
-    tiles: State<'_, Tiles>,
+    tiles: State<'_, Arc<Tiles>>,
     tile_id: TileId,
     label: TileLabel,
     kind: UpdateKind,
@@ -79,7 +79,7 @@ pub async fn tiles_update_tile_label(
 /// Update a specific tile label
 #[tauri::command]
 pub async fn tiles_update_tile_icon(
-    tiles: State<'_, Tiles>,
+    tiles: State<'_, Arc<Tiles>>,
     tile_id: TileId,
     icon: TileIcon,
     kind: UpdateKind,
