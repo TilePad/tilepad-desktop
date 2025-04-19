@@ -1,3 +1,17 @@
 {
-  "words": ["tauri"]
+  "words": [
+    "arboard",
+    "cdylib",
+    "chrono",
+    "enigo",
+    "gethostname",
+    "reqwest",
+    "rlib",
+    "rustls",
+    "serde",
+    "sqlx",
+    "staticlib",
+    "sysinfo",
+    "tauri"
+  ]
 }
