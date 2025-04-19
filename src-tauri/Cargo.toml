@@ -67,14 +67,18 @@ local-ip-address = "0.6.3"
 gethostname = "1"
 
 sysinfo = "0.34"
+
+# Virtual keyboard for build in actions
 enigo = "0.3"
+
+# Clipboard access for built in actions
+arboard = "3.5.0"
 
 # Manifest definitions
 tilepad-manifest = { version = "0.1.0", path = "../../tilepad-manifest" }
 tauri-plugin-deep-link = "2"
 rfd = { version = "0.15.3", features = ["tokio"] }
 tauri-plugin-http = "2"
-arboard = "3.5.0"
 
 [dependencies.sqlx]
 version = "0.8.2"
