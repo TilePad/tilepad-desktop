@@ -7,14 +7,13 @@ use std::{
     task::Poll,
 };
 
-use futures::channel::oneshot;
 use garde::rules::AsStr;
 use serde::{Serialize, Serializer};
 use tokio::{
     io::{AsyncBufReadExt, BufReader, Lines},
     process::{Child, ChildStderr, ChildStdout, Command},
     select,
-    sync::mpsc,
+    sync::{mpsc, oneshot},
     task::AbortHandle,
 };
 
