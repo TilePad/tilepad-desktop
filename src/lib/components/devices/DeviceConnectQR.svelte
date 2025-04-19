@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { getConnectionInfo } from "$lib/api/server";
   import type { ServerConnectionInfo } from "$lib/api/types/server";
+
   import QRCode from "@castlenine/svelte-qrcode";
+  import { getConnectionInfo } from "$lib/api/server";
 
   function encodeInterfaces(info: ServerConnectionInfo) {
     return {

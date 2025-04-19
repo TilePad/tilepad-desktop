@@ -1,9 +1,11 @@
 <!-- Card for a device that is requesting to connect -->
 <script lang="ts">
-  import { approveDeviceRequest, declineDeviceRequest } from "$lib/api/devices";
   import type { DeviceRequest } from "$lib/api/types/devices";
-  import { toastErrorMessage } from "$lib/api/utils/error";
+
   import { toast } from "svelte-sonner";
+  import { toastErrorMessage } from "$lib/api/utils/error";
+  import { approveDeviceRequest, declineDeviceRequest } from "$lib/api/devices";
+
   import Button from "../input/Button.svelte";
 
   type Props = {

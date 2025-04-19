@@ -8,7 +8,6 @@ import type {
   ActionWithCategory,
 } from "./types/actions";
 
-import { queryClient } from "./client";
 import { runeStore } from "./utils/svelte.svelte";
 
 export const actionsKeys = {
@@ -63,10 +62,3 @@ export function createActionQuery(
 }
 
 // [MUTATORS] ------------------------------------------------------
-
-function invalidateActionsList() {
-  queryClient.invalidateQueries({
-    queryKey: actionsKeys.list,
-    exact: false,
-  });
-}

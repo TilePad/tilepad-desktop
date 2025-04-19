@@ -8,7 +8,6 @@ import type {
   TileModel,
   TileLabel,
   CreateTile,
-  UpdateTile,
   UpdateKind,
 } from "./types/tiles";
 
