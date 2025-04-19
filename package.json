@@ -10,7 +10,8 @@
     "build:inspector": "cd inspector && npm run build",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "format": "prettier -w src"
   },
   "license": "MIT",
   "dependencies": {

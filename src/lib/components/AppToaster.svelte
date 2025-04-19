@@ -298,20 +298,20 @@
   }
 
   :global(
-      :where(
-          [data-sonner-toast][data-y-position="top"][data-swiping="true"]
-        )::before
-    ) {
+    :where(
+        [data-sonner-toast][data-y-position="top"][data-swiping="true"]
+      )::before
+  ) {
     /* y 50% needed to distribute height additional height evenly */
     bottom: 50%;
     transform: scaleY(3) translateY(50%);
   }
 
   :global(
-      :where(
-          [data-sonner-toast][data-y-position="bottom"][data-swiping="true"]
-        )::before
-    ) {
+    :where(
+        [data-sonner-toast][data-y-position="bottom"][data-swiping="true"]
+      )::before
+  ) {
     /* y -50% needed to distribute height additional height evenly */
     top: 50%;
     transform: scaleY(3) translateY(-50%);
@@ -319,10 +319,10 @@
 
   /* Leave a ghost div to avoid setting hover to false when transitioning out */
   :global(
-      :where(
-          [data-sonner-toast][data-swiping="false"][data-removed="true"]
-        )::before
-    ) {
+    :where(
+        [data-sonner-toast][data-swiping="false"][data-removed="true"]
+      )::before
+  ) {
     content: "";
     position: absolute;
     inset: 0;
@@ -345,8 +345,8 @@
   }
 
   :global(
-      :where([data-sonner-toast][data-expanded="false"][data-front="false"])
-    ) {
+    :where([data-sonner-toast][data-expanded="false"][data-front="false"])
+  ) {
     --scale: var(--toasts-before) * 0.05 + 1;
     --y: translateY(calc(var(--lift-amount) * var(--toasts-before)))
       scale(calc(-1 * var(--scale)));
@@ -359,8 +359,8 @@
 
   :global(
       :where(
-          [data-sonner-toast][data-expanded="false"][data-front="false"][data-styled="true"]
-        )
+        [data-sonner-toast][data-expanded="false"][data-front="false"][data-styled="true"]
+      )
     )
     > :global(*) {
     opacity: 0;
@@ -372,35 +372,35 @@
   }
 
   :global(
-      :where([data-sonner-toast][data-mounted="true"][data-expanded="true"])
-    ) {
+    :where([data-sonner-toast][data-mounted="true"][data-expanded="true"])
+  ) {
     --y: translateY(calc(var(--lift) * var(--offset)));
     height: var(--initial-height);
   }
 
   :global(
-      :where(
-          [data-sonner-toast][data-removed="true"][data-front="true"][data-swipe-out="false"]
-        )
-    ) {
+    :where(
+      [data-sonner-toast][data-removed="true"][data-front="true"][data-swipe-out="false"]
+    )
+  ) {
     --y: translateY(calc(var(--lift) * -100%));
     opacity: 0;
   }
 
   :global(
-      :where(
-          [data-sonner-toast][data-removed="true"][data-front="false"][data-swipe-out="false"][data-expanded="true"]
-        )
-    ) {
+    :where(
+      [data-sonner-toast][data-removed="true"][data-front="false"][data-swipe-out="false"][data-expanded="true"]
+    )
+  ) {
     --y: translateY(calc(var(--lift) * var(--offset) + var(--lift) * -100%));
     opacity: 0;
   }
 
   :global(
-      :where(
-          [data-sonner-toast][data-removed="true"][data-front="false"][data-swipe-out="false"][data-expanded="false"]
-        )
-    ) {
+    :where(
+      [data-sonner-toast][data-removed="true"][data-front="false"][data-swipe-out="false"][data-expanded="false"]
+    )
+  ) {
     --y: translateY(40%);
     opacity: 0;
     transition:
@@ -410,10 +410,8 @@
 
   /* Bump up the height to make sure hover state doesn't get set to false */
   :global(
-      :where(
-          [data-sonner-toast][data-removed="true"][data-front="false"]
-        )::before
-    ) {
+    :where([data-sonner-toast][data-removed="true"][data-front="false"])::before
+  ) {
     height: calc(var(--initial-height) + 20%);
   }
 
@@ -503,18 +501,18 @@
   }
 
   :global(
-      [data-sonner-toaster][data-theme="light"]
-        [data-sonner-toast][data-invert="true"]
-    ) {
+    [data-sonner-toaster][data-theme="light"]
+      [data-sonner-toast][data-invert="true"]
+  ) {
     --normal-bg: #000;
     --normal-border: hsl(0, 0%, 20%);
     --normal-text: var(--gray1);
   }
 
   :global(
-      [data-sonner-toaster][data-theme="dark"]
-        [data-sonner-toast][data-invert="true"]
-    ) {
+    [data-sonner-toaster][data-theme="dark"]
+      [data-sonner-toast][data-invert="true"]
+  ) {
     --normal-bg: #fff;
     --normal-border: var(--gray3);
     --normal-text: var(--gray12);
@@ -550,20 +548,20 @@
   }
 
   :global(
-      [data-theme="dark"]
-        [data-sonner-toast][data-type="default"]
-        [data-close-button]
-    ) {
+    [data-theme="dark"]
+      [data-sonner-toast][data-type="default"]
+      [data-close-button]
+  ) {
     background: var(--normal-bg);
     border-color: var(--normal-border);
     color: var(--normal-text);
   }
 
   :global(
-      [data-rich-colors="true"]
-        [data-sonner-toast][data-type="success"]
-        [data-close-button]
-    ) {
+    [data-rich-colors="true"]
+      [data-sonner-toast][data-type="success"]
+      [data-close-button]
+  ) {
     background: var(--success-bg);
     border-color: var(--success-border);
     color: var(--success-text);
@@ -577,10 +575,10 @@
   }
 
   :global(
-      [data-rich-colors="true"]
-        [data-sonner-toast][data-type="info"]
-        [data-close-button]
-    ) {
+    [data-rich-colors="true"]
+      [data-sonner-toast][data-type="info"]
+      [data-close-button]
+  ) {
     background: var(--info-bg);
     border-color: var(--info-border);
     color: var(--info-text);
@@ -594,10 +592,10 @@
   }
 
   :global(
-      [data-rich-colors="true"]
-        [data-sonner-toast][data-type="warning"]
-        [data-close-button]
-    ) {
+    [data-rich-colors="true"]
+      [data-sonner-toast][data-type="warning"]
+      [data-close-button]
+  ) {
     background: var(--warning-bg);
     border-color: var(--warning-border);
     color: var(--warning-text);
@@ -611,10 +609,10 @@
   }
 
   :global(
-      [data-rich-colors="true"]
-        [data-sonner-toast][data-type="error"]
-        [data-close-button]
-    ) {
+    [data-rich-colors="true"]
+      [data-sonner-toast][data-type="error"]
+      [data-close-button]
+  ) {
     background: var(--error-bg);
     border-color: var(--error-border);
     color: var(--error-text);
