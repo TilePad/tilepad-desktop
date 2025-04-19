@@ -1,7 +1,7 @@
 <script lang="ts">
   import { watch, useDebounce } from "runed";
   import ColorPicker from "svelte-awesome-color-picker";
-  import { createUpdateTileMutation } from "$lib/api/tiles";
+  import { createUpdateTileLabelMutation } from "$lib/api/tiles";
   import SolarTextBoldDuotone from "~icons/solar/text-bold-duotone";
   import SolarAlignTopBoldDuotone from "~icons/solar/align-top-bold-duotone";
   import SolarTextBoldBoldDuotone from "~icons/solar/text-bold-bold-duotone";
@@ -11,6 +11,7 @@
   import SolarAlignVerticalSpacingBoldDuotone from "~icons/solar/align-vertical-spacing-bold-duotone";
   import {
     LabelAlign,
+    UpdateKind,
     type TileId,
     type TileLabel,
     type TileConfig,
@@ -28,7 +29,7 @@
 
   const { tileId, config }: Props = $props();
 
-  const updateTile = createUpdateTileMutation();
+  const updateTileLabel = createUpdateTileLabelMutation();
 
   // Last persisted update
   let lastUpdate: TileLabel = $state(config.label);
@@ -37,40 +38,17 @@
   const updateLabel = useDebounce((label: TileLabel) => {
     lastUpdate = label;
 
-    $updateTile.mutate({
+    $updateTileLabel.mutate({
       tileId,
-      update: {
-        config: {
-          ...config,
-          label,
-        },
-      },
-    });
-  }, 150);
-
-  const updateLabelText = useDebounce((labelValue: string) => {
-    lastUpdate = label;
-
-    $updateTile.mutate({
-      tileId,
-      update: {
-        config: {
-          ...config,
-          label: { ...config.label, label: labelValue },
-          user_flags: {
-            ...config.user_flags,
-            // Label is only dirt if the user has provided a value
-            label: labelValue.trim().length > 0,
-          },
-        },
-      },
+      label,
+      kind: UpdateKind.User,
     });
   }, 150);
 
   const onChangeTileName = (event: Event) => {
     const value = (event.target as HTMLInputElement).value;
     label = { ...label, label: value };
-    updateLabelText(value);
+    updateLabel(label);
   };
 
   const onChangeFontSize = (event: Event) => {

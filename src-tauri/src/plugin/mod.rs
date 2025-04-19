@@ -30,7 +30,7 @@ use crate::{
         DbPool, JsonObject,
         entity::{
             plugin_properties::PluginPropertiesModel,
-            tile::{TileId, TileModel, UpdateTile},
+            tile::{TileId, TileModel},
         },
     },
     device::Devices,
@@ -392,30 +392,7 @@ impl Plugins {
         partial: bool,
     ) -> anyhow::Result<()> {
         let tile = self.get_plugin_tile(plugin_id, tile_id).await?;
-
-        let properties = if partial {
-            let mut existing_properties = tile.properties.clone();
-            // Merge the new properties onto the old
-            for (key, value) in properties {
-                existing_properties.insert(key, value);
-            }
-            existing_properties
-        } else {
-            properties
-        };
-
-        tile.update(
-            &self.db,
-            UpdateTile {
-                config: None,
-                properties: Some(properties),
-                folder_id: None,
-                row: None,
-                column: None,
-            },
-        )
-        .await?;
-
+        tile.update_properties(&self.db, properties, partial).await;
         Ok(())
     }
 

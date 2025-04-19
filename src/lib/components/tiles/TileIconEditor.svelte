@@ -1,8 +1,9 @@
 <script lang="ts">
   import type { ActionWithCategory } from "$lib/api/types/actions";
 
-  import { createUpdateTileMutation } from "$lib/api/tiles";
+  import { createUpdateTileIconMutation } from "$lib/api/tiles";
   import {
+    UpdateKind,
     type TileId,
     TileIconType,
     type TileConfig,
@@ -21,44 +22,30 @@
 
   const { tileId, action, config }: Props = $props();
 
-  const updateTile = createUpdateTileMutation();
+  const updateTileIcon = createUpdateTileIconMutation();
 
   const onClickIconPackIcon = (icon: ITileIcon) => {
-    $updateTile.mutate({
+    $updateTileIcon.mutate({
       tileId,
-      update: {
-        config: {
-          ...config,
-          icon,
-          user_flags: {
-            ...config.user_flags,
-            icon: true,
-          },
-        },
-      },
+      icon,
+      kind: UpdateKind.User,
     });
   };
 
   const onResetDefault = () => {
-    $updateTile.mutate({
+    const defaultIcon: ITileIcon =
+      !action || action.icon === null
+        ? { type: TileIconType.None }
+        : {
+            type: TileIconType.PluginIcon,
+            plugin_id: action.plugin_id,
+            icon: action.icon,
+          };
+
+    $updateTileIcon.mutate({
       tileId,
-      update: {
-        config: {
-          ...config,
-          icon:
-            !action || action.icon === null
-              ? { type: TileIconType.None }
-              : {
-                  type: TileIconType.PluginIcon,
-                  plugin_id: action.plugin_id,
-                  icon: action.icon,
-                },
-          user_flags: {
-            ...config.user_flags,
-            icon: false,
-          },
-        },
-      },
+      icon: defaultIcon,
+      kind: UpdateKind.Reset,
     });
   };
 

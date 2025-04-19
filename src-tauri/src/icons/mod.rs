@@ -12,6 +12,7 @@ use tilepad_manifest::icons::{Icon, IconPackId, Manifest as IconPackManifest};
 use uuid::Uuid;
 
 use crate::{
+    database::entity::tile::TileIcon,
     events::{AppEvent, AppEventSender, IconPackAppEvent},
     utils::file::file_extension,
 };
@@ -129,7 +130,7 @@ impl Icons {
     /// Uploads a user generated icon to a randomly generated file path
     /// with the collection. Returns the name of the generated file
     pub async fn upload_user_icon(&self, name: String, data: Vec<u8>) -> anyhow::Result<String> {
-        let uploaded_icons = self.uploaded_path();
+        let uploaded_icons = &self.uploaded_path;
         if !uploaded_icons.exists() {
             tokio::fs::create_dir_all(&uploaded_icons).await?;
         }
@@ -146,5 +147,20 @@ impl Icons {
             .context("save file")?;
 
         Ok(file_name)
+    }
+
+    // Handle change in icon when using an uploaded icon (Remove the old file)
+    pub async fn handle_tile_change_icon(&self, previous_icon: &TileIcon) -> anyhow::Result<()> {
+        let path = match previous_icon {
+            TileIcon::Uploaded { path } => path,
+            _ => return Ok(()),
+        };
+
+        let file_path = self.uploaded_path.join(path);
+        if file_path.exists() {
+            tokio::fs::remove_file(file_path).await?;
+        }
+
+        Ok(())
     }
 }

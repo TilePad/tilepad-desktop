@@ -137,12 +137,15 @@ pub struct CreateTile {
 }
 
 #[derive(Deserialize)]
-pub struct UpdateTile {
-    pub config: Option<TileConfig>,
-    pub properties: Option<JsonObject>,
-    pub folder_id: Option<FolderId>,
-    pub row: Option<u32>,
-    pub column: Option<u32>,
+pub enum UpdateKind {
+    /// Resetting to default value
+    Reset,
+
+    /// User requested the change
+    User,
+
+    /// Change was made by the plugin or an inspector
+    Program,
 }
 
 impl TileModel {
@@ -186,32 +189,105 @@ impl TileModel {
         Ok(model)
     }
 
-    pub async fn update(mut self, db: &DbPool, update: UpdateTile) -> anyhow::Result<TileModel> {
+    /// Update the properties for the tile
+    pub async fn update_properties(
+        mut self,
+        db: &DbPool,
+        properties: JsonObject,
+        partial: bool,
+    ) -> anyhow::Result<TileModel> {
+        let properties = if partial {
+            let mut existing_properties = self.properties.clone();
+            // Merge the new properties onto the old
+            for (key, value) in properties {
+                existing_properties.insert(key, value);
+            }
+            existing_properties
+        } else {
+            properties
+        };
+
         sql_exec(
             db,
             Query::update()
                 .table(TilesTable)
                 .and_where(Expr::col(TilesColumn::Id).eq(self.id))
-                .cond_value_json(TilesColumn::Config, update.config.as_ref())?
-                .cond_value(
-                    TilesColumn::Properties,
-                    update
-                        .properties
-                        .as_ref()
-                        .map(|value| serde_json::Value::Object(value.clone())),
-                )
-                .cond_value(TilesColumn::FolderId, update.folder_id)
-                .cond_value(TilesColumn::Column, update.column)
-                .cond_value(TilesColumn::Row, update.row),
+                .value_json(TilesColumn::Properties, &properties)?,
         )
         .await?;
 
-        self.config = update.config.unwrap_or(self.config);
-        self.properties = update.properties.unwrap_or(self.properties);
-        self.folder_id = update.folder_id.unwrap_or(self.folder_id);
-        self.column = update.column.unwrap_or(self.column);
-        self.row = update.row.unwrap_or(self.row);
+        self.properties = properties;
+        Ok(self)
+    }
 
+    /// Update the label portion of the config
+    pub async fn update_label(
+        mut self,
+        db: &DbPool,
+        label: TileLabel,
+        kind: UpdateKind,
+    ) -> anyhow::Result<TileModel> {
+        // Label update is ignored if the user has already set a label and
+        // the update is from plugin / inspector
+        if matches!(kind, UpdateKind::Program) && self.config.user_flags.label {
+            return Ok(self);
+        }
+
+        let mut new_config = self.config.clone();
+        new_config.label = label;
+
+        // User label is only dirty if its not empty
+        new_config.user_flags.label = match kind {
+            // Label is now considered untouched
+            UpdateKind::Reset => false,
+
+            // Only touched if the label is non empty
+            UpdateKind::User => !new_config.label.label.is_empty(),
+
+            // Not touched by user, was made by the plugin / inspector
+            UpdateKind::Program => false,
+        };
+
+        sql_exec(
+            db,
+            Query::update()
+                .table(TilesTable)
+                .and_where(Expr::col(TilesColumn::Id).eq(self.id))
+                .value_json(TilesColumn::Config, &new_config)?,
+        )
+        .await?;
+
+        self.config = new_config;
+        Ok(self)
+    }
+
+    /// Update the icon portion of the config
+    pub async fn update_icon(
+        mut self,
+        db: &DbPool,
+        icon: TileIcon,
+        kind: UpdateKind,
+    ) -> anyhow::Result<TileModel> {
+        // Icon update is ignored if the user has already set a icon and
+        // the update is from plugin / inspector
+        if matches!(kind, UpdateKind::Program) && self.config.user_flags.icon {
+            return Ok(self);
+        }
+
+        let mut new_config = self.config.clone();
+        new_config.icon = icon;
+        new_config.user_flags.icon = matches!(kind, UpdateKind::User);
+
+        sql_exec(
+            db,
+            Query::update()
+                .table(TilesTable)
+                .and_where(Expr::col(TilesColumn::Id).eq(self.id))
+                .value_json(TilesColumn::Config, &new_config)?,
+        )
+        .await?;
+
+        self.config = new_config;
         Ok(self)
     }
 

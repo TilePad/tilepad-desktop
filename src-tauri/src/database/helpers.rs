@@ -93,6 +93,11 @@ pub trait UpdateStatementExt {
     where
         C: IntoIden,
         T: Serialize;
+
+    fn value_json<C, T>(&mut self, column: C, value: T) -> anyhow::Result<&mut Self>
+    where
+        C: IntoIden,
+        T: Serialize;
 }
 
 impl UpdateStatementExt for UpdateStatement {
@@ -118,6 +123,16 @@ impl UpdateStatementExt for UpdateStatement {
             self.value(column, value);
         }
 
+        Ok(self)
+    }
+
+    fn value_json<C, T>(&mut self, column: C, value: T) -> anyhow::Result<&mut Self>
+    where
+        C: IntoIden,
+        T: Serialize,
+    {
+        let value = serde_json::to_value(&value)?;
+        self.value(column, value);
         Ok(self)
     }
 }

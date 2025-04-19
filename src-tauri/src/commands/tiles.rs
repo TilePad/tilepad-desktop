@@ -1,18 +1,19 @@
 use std::sync::Arc;
 
 use anyhow::Context;
-use tauri::{AppHandle, Manager, State};
+use tauri::State;
 
 use crate::{
     commands::CmdResult,
     database::{
-        DbPool,
+        DbPool, JsonObject,
         entity::{
             folder::FolderId,
-            tile::{CreateTile, TileIcon, TileId, TileModel, UpdateTile},
+            tile::{CreateTile, TileIcon, TileId, TileLabel, TileModel, UpdateKind},
         },
     },
     device::Devices,
+    icons::Icons,
 };
 
 /// Get a list of all tiles for a folder
@@ -57,54 +58,63 @@ pub async fn tiles_create_tile(
     Ok(tile)
 }
 
-/// Update a specific tile
+/// Update a specific tile properties
 #[tauri::command]
-pub async fn tiles_update_tile(
-    app: AppHandle,
+pub async fn tiles_update_tile_properties(
     db: State<'_, DbPool>,
     devices: State<'_, Arc<Devices>>,
-
     tile_id: TileId,
-    update: UpdateTile,
+    properties: JsonObject,
+    partial: bool,
+) -> CmdResult<TileModel> {
+    let db = db.inner();
+    let tile = TileModel::get_by_id(db, tile_id)
+        .await?
+        .context("tile not found")?;
+    let tile = tile.update_properties(db, properties, partial).await?;
+
+    devices.background_update_folder(tile.folder_id);
+    Ok(tile)
+}
+
+/// Update a specific tile label
+#[tauri::command]
+pub async fn tiles_update_tile_label(
+    db: State<'_, DbPool>,
+    devices: State<'_, Arc<Devices>>,
+    tile_id: TileId,
+    label: TileLabel,
+    kind: UpdateKind,
+) -> CmdResult<TileModel> {
+    let db = db.inner();
+    let tile = TileModel::get_by_id(db, tile_id)
+        .await?
+        .context("tile not found")?;
+    let tile = tile.update_label(db, label, kind).await?;
+    devices.background_update_folder(tile.folder_id);
+    Ok(tile)
+}
+
+/// Update a specific tile label
+#[tauri::command]
+pub async fn tiles_update_tile_icon(
+    db: State<'_, DbPool>,
+    devices: State<'_, Arc<Devices>>,
+    icons: State<'_, Arc<Icons>>,
+    tile_id: TileId,
+    icon: TileIcon,
+    kind: UpdateKind,
 ) -> CmdResult<TileModel> {
     let db = db.inner();
     let tile = TileModel::get_by_id(db, tile_id)
         .await?
         .context("tile not found")?;
 
-    let previous_icon = &tile.config.icon;
-
     // Handle change in icon when using an uploaded icon (Remove the old file)
-    if update
-        .config
-        .as_ref()
-        .is_some_and(|config| previous_icon.ne(&config.icon))
-    {
-        if let TileIcon::Uploaded { path } = previous_icon {
-            let app_data_path = app
-                .path()
-                .app_data_dir()
-                .context("failed to get app data dir")?;
-            let uploaded_icons = app_data_path.join("uploaded_icons");
-            let file_path = uploaded_icons.join(path);
-            if file_path.exists() {
-                tokio::fs::remove_file(file_path).await?;
-            }
-        }
-    }
+    icons.handle_tile_change_icon(&tile.config.icon).await?;
 
-    let tile = tile.update(db, update).await?;
-
-    tokio::spawn({
-        let folder_id = tile.folder_id;
-        let devices = devices.inner().clone();
-
-        async move {
-            let devices = devices;
-            _ = devices.update_devices_tiles(folder_id).await;
-        }
-    });
-
+    let tile = tile.update_icon(db, icon, kind).await?;
+    devices.background_update_folder(tile.folder_id);
     Ok(tile)
 }
 

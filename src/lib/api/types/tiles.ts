@@ -6,6 +6,12 @@ import type { IconPackId } from "./icons";
 
 export type TileId = Uuid;
 
+export enum UpdateKind {
+  Reset = "Reset",
+  User = "User",
+  Program = "Program",
+}
+
 export interface TileModel {
   id: TileId;
   config: TileConfig;

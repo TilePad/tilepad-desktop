@@ -2,7 +2,15 @@ import { invoke } from "@tauri-apps/api/core";
 import { createQuery, createMutation } from "@tanstack/svelte-query";
 
 import type { FolderId } from "./types/folders";
-import type { TileId, TileModel, CreateTile, UpdateTile } from "./types/tiles";
+import type {
+  TileId,
+  TileIcon,
+  TileModel,
+  TileLabel,
+  CreateTile,
+  UpdateTile,
+  UpdateKind,
+} from "./types/tiles";
 
 import { queryClient } from "./client";
 import { runeStore } from "./utils/svelte.svelte";
@@ -34,10 +42,31 @@ function createTile(create: CreateTile) {
   });
 }
 
-function updateTile(tileId: TileId, update: UpdateTile) {
-  return invoke<TileModel>("tiles_update_tile", {
+function updateTileProperties(
+  tileId: TileId,
+  properties: object,
+  partial: boolean,
+) {
+  return invoke<TileModel>("tiles_update_tile_properties", {
     tileId,
-    update,
+    properties,
+    partial,
+  });
+}
+
+function updateTileLabel(tileId: TileId, label: TileLabel, kind: UpdateKind) {
+  return invoke<TileModel>("tiles_update_tile_label", {
+    tileId,
+    label,
+    kind,
+  });
+}
+
+function updateTileIcon(tileId: TileId, icon: TileIcon, kind: UpdateKind) {
+  return invoke<TileModel>("tiles_update_tile_icon", {
+    tileId,
+    icon,
+    kind,
   });
 }
 
@@ -90,10 +119,62 @@ export function createCreateTileMutation() {
   });
 }
 
-export function createUpdateTileMutation() {
+export function createUpdateTilePropertiesMutation() {
   return createMutation({
-    mutationFn: ({ tileId, update }: { tileId: TileId; update: UpdateTile }) =>
-      updateTile(tileId, update),
+    scope: { id: "tile" },
+    mutationFn: ({
+      tileId,
+      properties,
+      partial,
+    }: {
+      tileId: TileId;
+      properties: object;
+      partial: boolean;
+    }) => updateTileProperties(tileId, properties, partial),
+    onSuccess: (tile) => {
+      invalidateTilesList(tile.folder_id);
+      queryClient.setQueryData(
+        tilesKeys.specific(tile.folder_id, tile.id),
+        tile,
+      );
+    },
+  });
+}
+
+export function createUpdateTileLabelMutation() {
+  return createMutation({
+    scope: { id: "tile" },
+    mutationFn: ({
+      tileId,
+      label,
+      kind,
+    }: {
+      tileId: TileId;
+      label: TileLabel;
+      kind: UpdateKind;
+    }) => updateTileLabel(tileId, label, kind),
+    onSuccess: (tile) => {
+      invalidateTilesList(tile.folder_id);
+      queryClient.setQueryData(
+        tilesKeys.specific(tile.folder_id, tile.id),
+        tile,
+      );
+    },
+  });
+}
+
+export function createUpdateTileIconMutation() {
+  return createMutation({
+    scope: { id: "tile" },
+    mutationFn: ({
+      tileId,
+      icon,
+      kind,
+    }: {
+      tileId: TileId;
+      icon: TileIcon;
+      kind: UpdateKind;
+    }) => updateTileIcon(tileId, icon, kind),
     onSuccess: (tile) => {
       invalidateTilesList(tile.folder_id);
       queryClient.setQueryData(

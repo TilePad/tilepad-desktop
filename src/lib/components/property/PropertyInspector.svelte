@@ -1,8 +1,10 @@
 <script lang="ts">
-  import type { TileIcon, TileLabel } from "$lib/api/types/tiles";
-
   import { Mutex } from "$lib/utils/mutex";
-  import { getTile, createUpdateTileMutation } from "$lib/api/tiles";
+  import {
+    UpdateKind,
+    type TileIcon,
+    type TileLabel,
+  } from "$lib/api/types/tiles";
   import {
     type InspectorContext,
     isInspectorContextEqual,
@@ -12,6 +14,12 @@
     getPluginProperties,
     setPluginProperties,
   } from "$lib/api/plugins";
+  import {
+    getTile,
+    createUpdateTileIconMutation,
+    createUpdateTileLabelMutation,
+    createUpdateTilePropertiesMutation,
+  } from "$lib/api/tiles";
 
   import type { PropertyInspectorMessage } from "./propertyInspectorMessage";
 
@@ -30,7 +38,9 @@
     send: (data: object) => void;
   };
 
-  const updateTile = createUpdateTileMutation();
+  const updateTileProperties = createUpdateTilePropertiesMutation();
+  const updateTileLabel = createUpdateTileLabelMutation();
+  const updateTileIcon = createUpdateTileIconMutation();
 
   /**
    * Mutex to ensure only one event is updating the tile state at a time
@@ -127,14 +137,10 @@
         return;
       }
 
-      await $updateTile.mutateAsync({
+      await $updateTileProperties.mutateAsync({
         tileId: ctx.tile_id,
-        update: {
-          properties: {
-            ...currentTile.properties,
-            ...properties,
-          },
-        },
+        properties,
+        partial: true,
       });
     });
   }
@@ -153,14 +159,10 @@
         return;
       }
 
-      await $updateTile.mutateAsync({
+      await $updateTileLabel.mutateAsync({
         tileId: currentTile.id,
-        update: {
-          config: {
-            ...currentTile.config,
-            label,
-          },
-        },
+        label,
+        kind: UpdateKind.Program,
       });
     });
   }
@@ -179,14 +181,10 @@
         return;
       }
 
-      await $updateTile.mutateAsync({
+      await $updateTileIcon.mutateAsync({
         tileId: currentTile.id,
-        update: {
-          config: {
-            ...currentTile.config,
-            icon,
-          },
-        },
+        icon,
+        kind: UpdateKind.Program,
       });
     });
   }
