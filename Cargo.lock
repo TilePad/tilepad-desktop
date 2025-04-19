@@ -5644,7 +5644,6 @@ dependencies = [
  "serde",
  "serde_json",
  "sqlx",
- "strum 0.26.3",
  "sysinfo",
  "tauri",
  "tauri-build",
