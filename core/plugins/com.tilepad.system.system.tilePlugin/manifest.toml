@@ -51,3 +51,9 @@ label = "Hotkey"
 icon = "images/hotkey.svg"
 description = "Perform a actions using a virtual keyboard"
 inspector = "ui/hotkey.html"
+
+[actions.clipboard]
+label = "Clipboard"
+icon = "images/clipboard.svg"
+description = "Copy text to the clipboard"
+inspector = "ui/clipboard.html"

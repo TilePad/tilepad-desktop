@@ -74,6 +74,7 @@ tilepad-manifest = { version = "0.1.0", path = "../../tilepad-manifest" }
 tauri-plugin-deep-link = "2"
 rfd = { version = "0.15.3", features = ["tokio"] }
 tauri-plugin-http = "2"
+arboard = "3.5.0"
 
 [dependencies.sqlx]
 version = "0.8.2"

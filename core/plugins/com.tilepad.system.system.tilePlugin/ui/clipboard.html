@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+
+    <div class="tile-item">
+        <label class="tile-label" for="text">Text</label>
+        <input type="url" class="tile-input" name="text" id="text">
+        <p class="tile-description">Text to copy to the clipboard</p>
+    </div>
+
+</body>
+
+<script>
+    const text = document.getElementById("text");
+    text.setAttribute('disabled', 'true')
+
+    // Request the current properties
+    tilepad.tile.getProperties()
+        // Handle properties received
+        .then((properties) => {
+            text.removeAttribute('disabled');
+            text.value = properties.text ?? '';
+        })
+
+    text.onchange = (event) => {
+        const value = event.target.value;
+        tilepad.tile.setProperty("text", value);
+    };
+</script>
+
+</html>

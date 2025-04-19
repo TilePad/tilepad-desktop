@@ -1,5 +1,6 @@
 use std::{path::Path, sync::Arc};
 
+use arboard::Clipboard;
 use enigo::{Enigo, Key, Keyboard};
 use serde::Deserialize;
 use sysinfo::{ProcessRefreshKind, ProcessesToUpdate, RefreshKind, System, UpdateKind};
@@ -67,6 +68,11 @@ pub enum MultimediaAction {
     VolumeUp,
     VolumeDown,
     Mute,
+}
+
+#[derive(Deserialize)]
+pub struct ClipboardProperties {
+    text: Option<String>,
 }
 
 pub async fn handle(
@@ -188,6 +194,14 @@ pub async fn handle(
             for key in keys.modifiers {
                 let key = Key::Other(key.code);
                 enigo.key(key, enigo::Direction::Release);
+            }
+        }
+        "clipboard" => {
+            let data: ClipboardProperties =
+                serde_json::from_value(serde_json::Value::Object(properties))?;
+            if let Some(text) = data.text {
+                let mut clipboard = Clipboard::new()?;
+                clipboard.set_text(text)?;
             }
         }
         action_id => {
