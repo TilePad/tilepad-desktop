@@ -32,7 +32,6 @@ pub fn run() {
     use commands::{actions, devices, folders, icons, plugins, profiles, server, tiles};
 
     tauri::Builder::default()
-        .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_single_instance::init(|_app, _argv, _cwd| {}))
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_opener::init())
