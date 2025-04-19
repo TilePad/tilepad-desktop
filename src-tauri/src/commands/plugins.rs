@@ -14,7 +14,7 @@ use crate::{
 use tilepad_manifest::plugin::Manifest as PluginManifest;
 
 use anyhow::Context;
-use tauri::State;
+use tauri::{State, ipc::InvokeResponseBody};
 
 #[tauri::command]
 pub async fn plugins_install_plugin_manual(
@@ -183,4 +183,18 @@ pub async fn plugins_reload_plugin(
 pub fn plugins_parse_manifest(manifest: String) -> CmdResult<PluginManifest> {
     let manifest: PluginManifest = PluginManifest::parse(&manifest)?;
     Ok(manifest)
+}
+
+#[tauri::command]
+pub async fn plugins_download_bundle(
+    repo: String,
+    version: String,
+) -> CmdResult<tauri::ipc::Response> {
+    let url = format!("https://github.com/{repo}/releases/download/{version}/plugin.tilepadPlugin");
+    let response = reqwest::get(url).await?;
+    let response = response.error_for_status()?;
+    let bytes = response.bytes().await?;
+    Ok(tauri::ipc::Response::new(InvokeResponseBody::Raw(
+        bytes.to_vec(),
+    )))
 }

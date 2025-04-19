@@ -1,5 +1,4 @@
 import { invoke } from "@tauri-apps/api/core";
-import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
 import { createQuery, createMutation } from "@tanstack/svelte-query";
 
 import type { PluginManifest } from "./types/plugin";
@@ -51,15 +50,10 @@ async function getPluginBundle(
   repo: string,
   version: string,
 ): Promise<ArrayBuffer> {
-  const bundleURL = `https://github.com/${repo}/releases/download/${version}/plugin.tilepadPlugin`;
-  // Download the manifest
-  const bundleResponse = await tauriFetch(bundleURL);
-  if (!bundleResponse.ok) {
-    throw new Error("error fetching bundle file");
-  }
-
-  const bundleBlob = await bundleResponse.arrayBuffer();
-  return bundleBlob;
+  return await invoke<ArrayBuffer>("plugins_download_bundle", {
+    repo,
+    version,
+  });
 }
 
 async function getPluginReadme(repo: string) {

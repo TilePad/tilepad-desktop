@@ -79,6 +79,7 @@ pub fn run() {
             plugins::plugins_install_plugin_manual,
             plugins::plugins_uninstall_plugin,
             plugins::plugins_parse_manifest,
+            plugins::plugins_download_bundle,
             icons::icons_get_icon_packs,
             icons::icons_install_icon_pack,
             icons::icons_uninstall_icon_pack,
