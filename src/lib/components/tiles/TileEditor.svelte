@@ -56,7 +56,6 @@
     () => tileConfig?.action_id ?? null,
   );
 
-  const action = $derived($actionQuery.data);
   const updateMutex = new Mutex();
 
   watch(
@@ -193,12 +192,19 @@
   ) {
     await setPluginProperties(ctx.plugin_id, properties, partial);
   }
-
-  $inspect(tile);
 </script>
 
 <div class="editor">
-  {#if $tileQuery.isSuccess && $actionQuery.isSuccess && tile && action}
+  {#if $tileQuery.isSuccess && $actionQuery.isSuccess && tile}
+    {@const action = $actionQuery.data}
+    {@const ctx = Object.freeze({
+      profile_id: currentProfile.id,
+      folder_id: currentFolder.id,
+      plugin_id: action.plugin_id,
+      action_id: action.action_id,
+      tile_id: tile.id,
+    })}
+
     <div class="titlebar">
       <p class="titlebar__name">
         <b>{action.category_label}</b>: {action.label}
@@ -219,13 +225,7 @@
         <div class="right">
           <PropertyInspector
             properties={tile.properties}
-            ctx={{
-              profile_id: currentProfile.id,
-              folder_id: currentFolder.id,
-              plugin_id: action.plugin_id,
-              action_id: action.action_id,
-              tile_id: tile.id,
-            }}
+            {ctx}
             inspector={action.inspector}
             {onSetProperties}
             {onSetIcon}

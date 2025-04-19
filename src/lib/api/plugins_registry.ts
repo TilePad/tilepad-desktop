@@ -52,7 +52,6 @@ async function getPluginBundle(
   version: string,
 ): Promise<ArrayBuffer> {
   const bundleURL = `https://github.com/${repo}/releases/download/${version}/plugin.tilepadPlugin`;
-  console.log(bundleURL);
   // Download the manifest
   const bundleResponse = await tauriFetch(bundleURL);
   if (!bundleResponse.ok) {

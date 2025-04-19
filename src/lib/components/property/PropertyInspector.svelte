@@ -1,16 +1,13 @@
 <script lang="ts">
   import type { TileIcon, TileLabel } from "$lib/api/types/tiles";
 
-  import { watch } from "runed";
-  import { onMount, onDestroy } from "svelte";
-  import { listen } from "@tauri-apps/api/event";
-  import { getPluginAssetPath } from "$lib/api/utils/url";
-  import { openPluginInspector, closePluginInspector } from "$lib/api/plugins";
   import {
     type InspectorContext,
-    encodeInspectorContext,
     isInspectorContextEqual,
   } from "$lib/api/types/plugin";
+
+  import PluginMessageListener from "./PluginMessageListener.svelte";
+  import PropertyInspectorFrame from "./PropertyInspectorFrame.svelte";
 
   type Props = {
     ctx: InspectorContext;
@@ -45,13 +42,32 @@
     onSetLabel,
   }: Props = $props();
 
-  let iframe: HTMLIFrameElement | undefined = $state(undefined);
-  let currentCtx: InspectorContext | null = null;
+  type CurrentFrameData = {
+    ctx: InspectorContext;
+    send: (data: object) => void;
+  };
 
-  function onFrameEvent(event: MessageEvent) {
-    if (!iframe) return;
-    if (event.source !== iframe.contentWindow) return;
+  let currentFrame: CurrentFrameData | undefined;
 
+  function onFrameMount(ctx: InspectorContext, send: (data: object) => void) {
+    currentFrame = { ctx, send };
+  }
+
+  function onMessage(ctx: InspectorContext, message: object) {
+    if (currentFrame && isInspectorContextEqual(ctx, currentFrame.ctx)) {
+      currentFrame.send({
+        type: "PLUGIN_MESSAGE",
+        context: ctx,
+        message,
+      });
+    }
+  }
+
+  function onFrameEvent(
+    ctx: InspectorContext,
+    event: MessageEvent,
+    send: (data: object) => void,
+  ) {
     const data = event.data;
     const type = data.type;
 
@@ -62,7 +78,7 @@
       }
 
       case "GET_TILE": {
-        sendFrameEvent({
+        send({
           type: "TILE",
           tile: {
             profileId: ctx.profile_id,
@@ -77,7 +93,7 @@
       }
 
       case "GET_PROPERTIES": {
-        sendFrameEvent({
+        send({
           type: "PROPERTIES",
           properties,
         });
@@ -91,7 +107,7 @@
 
       case "GET_PLUGIN_PROPERTIES": {
         onGetPluginProperties(ctx, (properties) => {
-          sendFrameEvent({
+          send({
             type: "PLUGIN_PROPERTIES",
             properties,
           });
@@ -115,82 +131,8 @@
       }
     }
   }
-
-  function sendFrameEvent(data: object) {
-    if (!iframe) return;
-    if (!iframe.contentWindow) return;
-    iframe.contentWindow.postMessage(data, "*");
-  }
-
-  let removeEventListener: (() => void) | undefined;
-
-  onMount(async () => {
-    type Payload = {
-      context: InspectorContext;
-      message: unknown;
-    };
-
-    removeEventListener = await listen<Payload>(
-      "plugin:recv_plugin_message",
-      (event) => {
-        const { context, message } = event.payload;
-
-        if (!isInspectorContextEqual(context, ctx)) return;
-
-        sendFrameEvent({
-          type: "PLUGIN_MESSAGE",
-          context,
-          message,
-        });
-      },
-    );
-  });
-
-  onDestroy(() => {
-    if (removeEventListener) removeEventListener();
-    removeEventListener = undefined;
-
-    if (currentCtx !== null) {
-      closePluginInspector(currentCtx);
-      currentCtx = null;
-    }
-  });
-
-  watch(
-    () => ctx,
-    (ctx) => {
-      // Context has not changed
-      if (currentCtx !== null && isInspectorContextEqual(ctx, currentCtx)) {
-        return;
-      }
-
-      // Notify the previous inspector of closing
-      if (currentCtx !== null) {
-        closePluginInspector(currentCtx);
-        currentCtx = null;
-      }
-
-      openPluginInspector(ctx);
-      currentCtx = ctx;
-    },
-  );
 </script>
 
-<svelte:window onmessage={onFrameEvent} />
-
-{#key encodeInspectorContext(ctx)}
-  <iframe
-    class="frame"
-    bind:this={iframe}
-    title="Inspector"
-    src={getPluginAssetPath(ctx.plugin_id, inspector)}
-  ></iframe>
-{/key}
-
-<style>
-  .frame {
-    border: none;
-    width: 100%;
-    height: 100%;
-  }
-</style>
+<PluginMessageListener {onMessage}>
+  <PropertyInspectorFrame {onFrameEvent} {onFrameMount} {ctx} {inspector} />
+</PluginMessageListener>

@@ -3,7 +3,6 @@ import { createQuery } from "@tanstack/svelte-query";
 
 import type { PluginId } from "./types/plugin";
 import type {
-  Action,
   ActionId,
   ActionCategory,
   ActionWithCategory,
@@ -11,7 +10,6 @@ import type {
 
 import { queryClient } from "./client";
 import { runeStore } from "./utils/svelte.svelte";
-import { getPluginAssetPath } from "./utils/url";
 
 export const actionsKeys = {
   root: ["actions"],
