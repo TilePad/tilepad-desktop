@@ -372,13 +372,13 @@ impl Devices {
     pub fn background_update_folder(self: &Arc<Self>, folder_id: FolderId) {
         let devices = self.clone();
         tokio::spawn(async move {
-            _ = devices.update_devices_tiles(folder_id).await;
+            _ = devices.update_folder_devices(folder_id).await;
         });
     }
 
     /// Updates the tiles on all devices that are using the
     /// provided `folder_id` folder
-    pub async fn update_devices_tiles(&self, folder_id: FolderId) -> anyhow::Result<()> {
+    pub async fn update_folder_devices(&self, folder_id: FolderId) -> anyhow::Result<()> {
         let db = &self.db;
         let devices = DeviceModel::all_by_folder(db, folder_id).await?;
 

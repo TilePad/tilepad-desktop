@@ -59,15 +59,7 @@ pub async fn folders_update_folder(
         .context("unknown folder")?;
     let folder = folder.update(&db, update).await?;
 
-    tokio::spawn({
-        let folder_id = folder.id;
-        let devices = devices.inner().clone();
-
-        async move {
-            let devices = devices;
-            _ = devices.update_devices_tiles(folder_id).await;
-        }
-    });
+    devices.background_update_folder(folder.id);
 
     Ok(folder)
 }
@@ -110,7 +102,7 @@ pub async fn folders_delete_folder(
     }
 
     // Update the actual device sessions
-    devices.update_devices_tiles(default_folder.id).await?;
+    devices.update_folder_devices(default_folder.id).await?;
 
     // Delete the folder itself
     FolderModel::delete(db, folder_id).await?;

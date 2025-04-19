@@ -93,7 +93,7 @@ pub async fn profiles_delete_profile(
     }
 
     // Update the actual device sessions
-    devices.update_devices_tiles(default_folder.id).await?;
+    devices.update_folder_devices(default_folder.id).await?;
 
     // Delete the profile itself
     ProfileModel::delete(db, profile_id).await?;
