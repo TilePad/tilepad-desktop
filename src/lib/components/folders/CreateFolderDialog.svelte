@@ -2,7 +2,7 @@
   import { toast } from "svelte-sonner";
   import { createFolder } from "$lib/api/folders";
   import { toastErrorMessage } from "$lib/api/utils/error";
-  import SolarAddSquareBold from "~icons/solar/add-square-bold";
+  import SolarAddFolderBold from "~icons/solar/add-folder-bold";
 
   import type { DialogProps } from "../dialog/Dialog.svelte";
 
@@ -11,7 +11,6 @@
   import { getFolderContext } from "./FolderProvider.svelte";
   import DialogCloseButton from "../dialog/DialogCloseButton.svelte";
   import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
-
   type Props = DialogProps & {
     order: number;
   };
@@ -60,9 +59,8 @@
 
 <Dialog bind:open>
   {#snippet button({ props })}
-    <button type="button" {...props} class="btn">
-      <SolarAddSquareBold />
-      Create Folder
+    <button type="button" {...props} class="button">
+      <SolarAddFolderBold />
     </button>
   {/snippet}
   {#snippet children()}
@@ -118,10 +116,10 @@
     gap: 0.5rem;
   }
 
-  .btn {
-    padding: 0.5rem;
-    background-color: #544d5e;
+  .button {
+    padding: 0rem 0.5rem;
     border: none;
+    background-color: #141316;
     color: #fff;
     align-items: center;
     display: flex;
@@ -129,17 +127,7 @@
     cursor: pointer;
     font-size: 1em;
     text-decoration: none;
-  }
 
-  .btn:hover {
-    background-color: #675d75;
-  }
-
-  .btn:disabled,
-  .btn:disabled:hover {
-    background-color: #222;
-    border: 1px solid #333;
-    cursor: not-allowed;
-    color: #777;
+    justify-content: space-between;
   }
 </style>

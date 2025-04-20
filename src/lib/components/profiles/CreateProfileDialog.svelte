@@ -2,6 +2,7 @@
   import { toast } from "svelte-sonner";
   import { createProfile } from "$lib/api/profiles";
   import { toastErrorMessage } from "$lib/api/utils/error";
+  import SolarUserPlusBold from "~icons/solar/user-plus-bold";
 
   import type { DialogProps } from "../dialog/Dialog.svelte";
 
@@ -34,6 +35,12 @@
 </script>
 
 <Dialog {...restProps}>
+  {#snippet button({ props })}
+    <button {...props} class="button">
+      <SolarUserPlusBold width="1.5rem" height="1.5rem" />
+    </button>
+  {/snippet}
+
   {#snippet children()}
     <form onsubmit={onCreate}>
       <div class="content">
@@ -88,5 +95,20 @@
     align-items: center;
     display: flex;
     gap: 0.5rem;
+  }
+
+  .button {
+    padding: 0rem 0.5rem;
+    border: none;
+    background-color: #141316;
+    color: #fff;
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 1em;
+    text-decoration: none;
+
+    justify-content: space-between;
   }
 </style>

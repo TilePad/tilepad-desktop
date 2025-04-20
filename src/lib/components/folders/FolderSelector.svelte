@@ -55,6 +55,7 @@
           {/if}
         </button>
 
+        <CreateFolderDialog order={folders.length} />
         <FolderSelectorSettings folder={currentFolder} />
       </div>
     {/snippet}
@@ -84,8 +85,6 @@
                   {/snippet}
                 </Select.Item>
               {/each}
-
-              <CreateFolderDialog order={folders.length} />
             </div>
           {/if}
         </div>

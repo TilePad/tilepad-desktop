@@ -8,11 +8,9 @@
   import SolarAltArrowDownBold from "~icons/solar/alt-arrow-down-bold";
   import SolarUsersGroupRoundedBoldDuotone from "~icons/solar/users-group-rounded-bold-duotone";
 
-  import Button from "../input/Button.svelte";
   import { getProfileContext } from "./ProfilesProvider.svelte";
   import CreateProfileDialog from "./CreateProfileDialog.svelte";
   import ProfileSelectorSettings from "./ProfileSelectorSettings.svelte";
-
   const profilesQuery = createProfilesQuery();
   const profiles = $derived($profilesQuery.data ?? []);
 
@@ -47,6 +45,7 @@
           {/if}
         </button>
 
+        <CreateProfileDialog order={profiles.length} />
         <ProfileSelectorSettings profile={currentProfile} />
       </div>
     {/snippet}
@@ -76,12 +75,6 @@
                   {/snippet}
                 </Select.Item>
               {/each}
-
-              <CreateProfileDialog order={profiles.length}>
-                {#snippet button({ props })}
-                  <Button {...props}>Create Profile</Button>
-                {/snippet}
-              </CreateProfileDialog>
             </div>
           {/if}
         </div>
