@@ -110,7 +110,8 @@
     cursor: pointer;
     font-size: 1em;
     text-decoration: none;
-
+    border-top-right-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
     justify-content: space-between;
   }
 </style>

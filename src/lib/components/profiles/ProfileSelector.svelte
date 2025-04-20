@@ -45,8 +45,8 @@
           {/if}
         </button>
 
-        <CreateProfileDialog order={profiles.length} />
         <ProfileSelectorSettings profile={currentProfile} />
+        <CreateProfileDialog order={profiles.length} />
       </div>
     {/snippet}
   </Select.Trigger>

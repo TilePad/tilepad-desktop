@@ -93,8 +93,7 @@
     border: none;
     background-color: #141316;
     color: #fff;
-    border-top-right-radius: 0.25rem;
-    border-bottom-right-radius: 0.25rem;
+
     align-items: center;
     display: flex;
     gap: 0.5rem;
