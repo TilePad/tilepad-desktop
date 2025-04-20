@@ -62,7 +62,7 @@
   </Select.Trigger>
 
   <Select.Portal>
-    <Select.Content sideOffset={8} forceMount>
+    <Select.Content sideOffset={8} align="start">
       {#snippet child({ props, open, wrapperProps })}
         <div {...wrapperProps} class="content-wrapper">
           {#if open}
@@ -101,7 +101,7 @@
     max-height: 40vh;
     min-width: 20rem;
     overflow: auto;
-    box-shadow: 2px 10px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 2px 10px 20px rgba(0, 0, 0, 0.5);
   }
 
   .form-input {

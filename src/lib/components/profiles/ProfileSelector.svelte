@@ -52,7 +52,7 @@
   </Select.Trigger>
 
   <Select.Portal>
-    <Select.Content sideOffset={8} forceMount>
+    <Select.Content sideOffset={8} forceMount align="start">
       {#snippet child({ props, open, wrapperProps })}
         <div {...wrapperProps} class="content-wrapper">
           {#if open}
