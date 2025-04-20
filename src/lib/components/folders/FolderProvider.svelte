@@ -67,6 +67,14 @@
       // Profiles are loaded yet ignore
       if (folders === undefined) return;
 
+      // Check if the current folder is a valid profile to use
+      if (folders.length > 0 && folderId !== undefined) {
+        const currentFolder = folders.find((folder) => folder.id === folderId);
+        if (currentFolder !== undefined) {
+          return;
+        }
+      }
+
       // Try and set the profile to the default
       if (folders.length > 0) {
         const defaultFolder = getDefaultFolder(folders);
