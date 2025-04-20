@@ -58,6 +58,16 @@
       // Profiles are loaded yet ignore
       if (profiles === undefined) return;
 
+      // Check if the current profile is a valid profile to use
+      if (profiles.length > 0 && profileId !== undefined) {
+        const currentProfile = profiles.find(
+          (profile) => profile.id === profileId,
+        );
+        if (currentProfile !== undefined) {
+          return;
+        }
+      }
+
       // Try and set the profile to the default
       if (profiles.length > 0) {
         const defaultProfile = getDefaultProfile(profiles);
@@ -95,7 +105,7 @@
     Failed to load profiles {getErrorMessage($profilesQuery.error)}
   {:else if $profilesQuery.isSuccess}
     <!-- Query the current folder -->
-    {#if $profileQuery.isLoading}
+    {#if $profileQuery.isLoading || $profileQuery.isRefetching}
       Loading profile...
     {:else if $profileQuery.isError}
       Failed to load profile {getErrorMessage($profileQuery.error)}
