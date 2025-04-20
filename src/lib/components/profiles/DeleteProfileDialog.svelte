@@ -36,7 +36,7 @@
 
 <Dialog bind:open>
   {#snippet button({ props })}
-    <Button variant="error" {...props}>Delete</Button>
+    <Button variant="error" {...props}>Delete Profile</Button>
   {/snippet}
 
   {#snippet children()}

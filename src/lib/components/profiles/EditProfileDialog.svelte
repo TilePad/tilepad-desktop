@@ -53,7 +53,7 @@
 
 <Dialog bind:open>
   {#snippet button({ props })}
-    <Button {...props}>Edit</Button>
+    <Button {...props}>Edit Profile</Button>
   {/snippet}
 
   {#snippet children()}
