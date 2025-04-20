@@ -6,13 +6,15 @@
   import { createTilesQuery } from "$lib/api/tiles";
   import { getErrorMessage } from "$lib/api/utils/error";
   import TileGrid from "$lib/components/tiles/TileGrid.svelte";
+  import SolarAltArrowRightLinear from "~icons/solar/alt-arrow-right-linear";
 
   import Aside from "../Aside.svelte";
   import EmptyTile from "../tiles/EmptyTile.svelte";
   import FilledTile from "../tiles/FilledTile.svelte";
   import TileEditor from "../tiles/TileEditor.svelte";
+  import FolderSelector from "./FolderSelector.svelte";
   import { getFolderContext } from "./FolderProvider.svelte";
-  import FolderConfigEditor from "./FolderConfigEditor.svelte";
+  import ProfileSelector from "../profiles/ProfileSelector.svelte";
   import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
 
   const { profile } = getProfileContext();
@@ -57,8 +59,17 @@
       </Aside>
     </div>
   {:else if $tilesQuery.isSuccess}
-    <FolderConfigEditor />
+    <div class="header">
+      <div>
+        <ProfileSelector />
+      </div>
 
+      <SolarAltArrowRightLinear />
+
+      <div>
+        <FolderSelector />
+      </div>
+    </div>
     <div class="content">
       <TileGrid
         rows={currentFolder.config.rows}
@@ -98,6 +109,17 @@
     height: 100%;
 
     overflow: hidden;
+  }
+
+  .header {
+    padding: 0.5rem;
+    border-bottom: 1px solid #333;
+    overflow: hidden;
+    background-color: #29262e;
+
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
   }
 
   .content {
