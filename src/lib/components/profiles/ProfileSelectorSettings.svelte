@@ -4,6 +4,7 @@
   import SolarSettingsBold from "~icons/solar/settings-bold";
 
   import PopoverButton from "../popover/PopoverButton.svelte";
+  import DeleteProfileDialog from "./DeleteProfileDialog.svelte";
 
   type Props = {
     profile: ProfileModel;
@@ -18,7 +19,9 @@
       <SolarSettingsBold width="1.25rem" height="1.25rem" />
     </button>
   {/snippet}
-  {#snippet content()}{/snippet}
+  {#snippet content()}
+    <DeleteProfileDialog {profile} />
+  {/snippet}
 </PopoverButton>
 
 <style>
