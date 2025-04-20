@@ -71,35 +71,33 @@
     {/snippet}
   </Popover.Trigger>
   <Popover.Portal>
-    <Popover.Content sideOffset={8} {...contentProps}>
+    <Popover.Content sideOffset={8} {...contentProps} forceMount>
       {#snippet child({ props, wrapperProps, open })}
-        <div {...wrapperProps} class="wrapper">
-          {#if open}
-            <div
-              {...props}
-              transition:scale={{ duration: 200 }}
-              class="content"
-            >
-              {@render content?.()}
-            </div>
-          {/if}
+        {#if open}
+          <div {...wrapperProps} class="wrapper">
+            <div transition:scale={{ duration: 100 }}>
+              <div {...props} class="content">
+                {@render content?.()}
+              </div>
 
-          <Popover.Arrow>
-            {#snippet child({ props })}
-              <span {...props} class="arrow">
-                <svg
-                  height={12}
-                  width={24}
-                  viewBox="0 0 30 10"
-                  preserveAspectRatio="none"
-                  data-arrow=""
-                >
-                  <polygon points="0,0 30,0 15,10" fill="#453f4d" />
-                </svg>
-              </span>
-            {/snippet}
-          </Popover.Arrow>
-        </div>
+              <Popover.Arrow>
+                {#snippet child({ props })}
+                  <span {...props} class="arrow">
+                    <svg
+                      height={12}
+                      width={24}
+                      viewBox="0 0 30 10"
+                      preserveAspectRatio="none"
+                      data-arrow=""
+                    >
+                      <polygon points="0,0 30,0 15,10" fill="#453f4d" />
+                    </svg>
+                  </span>
+                {/snippet}
+              </Popover.Arrow>
+            </div>
+          </div>
+        {/if}
       {/snippet}
     </Popover.Content>
   </Popover.Portal>
