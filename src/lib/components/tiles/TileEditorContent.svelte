@@ -137,7 +137,9 @@
     </div>
   </div>
 {:else if $tileQuery.isSuccess}
-  Tile not found
+  <Aside severity="error" title="Tile not found" style="margin: 1rem;">
+    Tile could not be found
+  </Aside>
 {:else if $tileQuery.isLoading}
   <div class="skeleton-list" style="padding: 1rem;">
     <div class="skeleton" style="width: 120px; height: 120px"></div>
