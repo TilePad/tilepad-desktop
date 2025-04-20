@@ -23,7 +23,7 @@
       </div>
 
       <div class="plugins">
-        {#each $pluginsQuery.data as plugin}
+        {#each $pluginsQuery.data as plugin (plugin.manifest.plugin.id)}
           {#if !plugin.manifest.plugin.internal || import.meta.env.DEV}
             <PluginCard {plugin} />
           {/if}
