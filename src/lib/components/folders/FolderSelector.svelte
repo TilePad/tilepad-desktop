@@ -2,19 +2,22 @@
   import type { ProfileModel } from "$lib/api/types/profiles";
 
   import { Select } from "bits-ui";
-  import { createProfilesQuery } from "$lib/api/profiles";
+  import { createFoldersQuery } from "$lib/api/folders";
   import SolarAltArrowUpBold from "~icons/solar/alt-arrow-up-bold";
   import SolarAltArrowDownBold from "~icons/solar/alt-arrow-down-bold";
 
-  import Button from "../input/Button.svelte";
-  import { getProfileContext } from "./ProfilesProvider.svelte";
-  import CreateProfileDialog from "./CreateProfileDialog.svelte";
+  import { getFolderContext } from "./FolderProvider.svelte";
+  import CreateFolderDialog from "./CreateFolderDialog.svelte";
+  import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
 
-  const profilesQuery = createProfilesQuery();
-  const profiles = $derived($profilesQuery.data ?? []);
+  const { profile } = getProfileContext();
+  const { folder, setFolderId } = getFolderContext();
 
-  const { profile, setProfileId } = getProfileContext();
   const currentProfile = $derived.by(profile);
+  const currentFolder = $derived.by(folder);
+
+  const foldersQuery = createFoldersQuery(() => currentProfile.id);
+  const folders = $derived($foldersQuery.data ?? []);
 
   let open = $state(false);
 </script>
@@ -27,13 +30,18 @@
   allowDeselect={false}
   type="single"
   onOpenChange={(value) => (open = value)}
-  value={currentProfile.id}
-  onValueChange={(value) => setProfileId(value)}
+  value={currentFolder?.id}
+  onValueChange={(value) => setFolderId(value)}
 >
   <Select.Trigger>
     {#snippet child({ props })}
       <button class="trigger" {...props}>
-        {currentProfile.name}
+        {#if currentFolder}
+          {currentFolder.name}
+        {:else}
+          Choose a folder
+        {/if}
+
         {#if open}
           <SolarAltArrowUpBold />
         {:else}
@@ -49,7 +57,7 @@
         <div {...wrapperProps} class="content-wrapper">
           {#if open}
             <div {...props} class="content">
-              {#each profiles as value}
+              {#each folders as value}
                 <Select.Item value={value.id} label={value.name}>
                   {#snippet child({ props, selected, highlighted })}
                     <div
@@ -64,11 +72,7 @@
                 </Select.Item>
               {/each}
 
-              <CreateProfileDialog order={profiles.length}>
-                {#snippet button({ props })}
-                  <Button {...props}>Create Profile</Button>
-                {/snippet}
-              </CreateProfileDialog>
+              <CreateFolderDialog order={folders.length} />
             </div>
           {/if}
         </div>

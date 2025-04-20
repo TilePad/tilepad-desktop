@@ -5,10 +5,17 @@
   import { useDebounce } from "runed";
   import { queryClient } from "$lib/api/client";
   import { foldersKeys, updateFolder } from "$lib/api/folders";
+  import SolarFolder2BoldDuotone from "~icons/solar/folder-2-bold-duotone";
   import SolarSettingsBoldDuotone from "~icons/solar/settings-bold-duotone";
+  import SolarUsersGroupRoundedBoldDuotone from "~icons/solar/users-group-rounded-bold-duotone";
 
+  import FolderSelector from "./FolderSelector.svelte";
   import NumberInput from "../input/NumberInput.svelte";
+  import EditFolderDialog from "./EditFolderDialog.svelte";
   import PopoverButton from "../popover/PopoverButton.svelte";
+  import DeleteFolderDialog from "./DeleteFolderDialog.svelte";
+  import ProfileSelector from "../profiles/ProfileSelector.svelte";
+
   type Props = {
     folder: FolderModel;
   };
@@ -53,6 +60,17 @@
 </script>
 
 <div class="current">
+  <SolarUsersGroupRoundedBoldDuotone />
+  <div>
+    <ProfileSelector />
+  </div>
+
+  <SolarFolder2BoldDuotone />
+
+  <div>
+    <FolderSelector />
+  </div>
+
   <PopoverButton>
     {#snippet children()}<SolarSettingsBoldDuotone />{/snippet}
 
@@ -77,10 +95,11 @@
           }}
         />
       </div>
+
+      <EditFolderDialog {folder} />
+      <DeleteFolderDialog {folder} />
     {/snippet}
   </PopoverButton>
-
-  {folder.name}
 </div>
 
 <style>
