@@ -58,10 +58,10 @@
 </script>
 
 <div class="tile" style="--font-size-adjustment: {sizeAdjust};">
-  <IconSelector onSelectIcon={onClickIconPackIcon} {onResetDefault} />
   <TileIcon icon={config.icon} />
   <TileLabelElm label={config.label} />
 </div>
+<IconSelector onSelectIcon={onClickIconPackIcon} {onResetDefault} />
 
 <style>
   .tile {

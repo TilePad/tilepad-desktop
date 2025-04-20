@@ -99,7 +99,11 @@
 </script>
 
 <div class="layout">
-  <TextInput value={label.label} oninput={onChangeTileName} />
+  <TextInput
+    value={label.label}
+    placeholder="My Action"
+    oninput={onChangeTileName}
+  />
 
   <PopoverButton>
     {#snippet children()}
