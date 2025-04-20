@@ -51,7 +51,7 @@
   .header {
     display: flex;
     align-items: center;
-    background-color: #3d3844;
+    background-color: #1f1e22;
     border: none;
     width: 100%;
     padding: 0.5rem;

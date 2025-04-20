@@ -6,6 +6,7 @@
   type Props = {
     action: Action;
   };
+
   const { action }: Props = $props();
 </script>
 
@@ -39,11 +40,13 @@
     align-items: center;
 
     gap: 0.5rem;
-    background-color: #1a181d;
+    padding-left: 1rem;
+    background-color: #28262c;
   }
 
   .icon {
-    max-width: 1.5rem;
+    width: 1.5rem;
+    max-height: 1.5rem;
   }
 
   .action__text {

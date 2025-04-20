@@ -121,7 +121,7 @@
   .sidebar {
     position: relative;
     flex-shrink: 0;
-    background-color: #29262e;
+    background-color: #131316;
     height: 100%;
     border-left: 1px solid #333;
     display: flex;
