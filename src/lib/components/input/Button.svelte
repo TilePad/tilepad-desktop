@@ -3,7 +3,10 @@
     variant?: "default" | "warning" | "error";
     transparent?: boolean;
     children?: Snippet;
+    size?: ButtonSize;
   } & HTMLButtonAttributes;
+
+  export type ButtonSize = "default" | "small";
 </script>
 
 <script lang="ts">
@@ -13,6 +16,7 @@
   const {
     variant = "default",
     transparent,
+    size = "default",
     children,
     ...props
   }: ButtonProps = $props();
@@ -23,6 +27,7 @@
   {...props}
   class="btn {props.class}"
   class:btn--transparent={transparent}
+  data-size={size}
   data-variant={variant}
 >
   {@render children?.()}
@@ -41,6 +46,11 @@
     cursor: pointer;
     font-size: 1em;
     text-decoration: none;
+  }
+
+  .btn[data-size="small"] {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.9rem;
   }
 
   .btn[data-variant="warning"] {

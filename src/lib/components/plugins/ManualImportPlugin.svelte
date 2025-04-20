@@ -2,6 +2,7 @@
   import { toast } from "svelte-sonner";
   import { installPlugin } from "$lib/api/plugins";
   import { toastErrorMessage } from "$lib/api/utils/error";
+  import SolarImportBoldDuotone from "~icons/solar/import-bold-duotone";
 
   import Button from "../input/Button.svelte";
 
@@ -32,6 +33,8 @@
     inputElm?.click();
   }}
 >
+  <SolarImportBoldDuotone width="1.5rem" height="1.5rem" />
+
   Import Plugin
 </Button>
 

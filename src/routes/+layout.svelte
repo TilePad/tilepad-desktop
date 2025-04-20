@@ -25,7 +25,7 @@
   </div>
 
   <AppToaster />
-  <SvelteQueryDevtools buttonPosition="bottom-left" position="left" />
+  <SvelteQueryDevtools buttonPosition="bottom-left" position="bottom" />
 </QueryClientProvider>
 
 <style>

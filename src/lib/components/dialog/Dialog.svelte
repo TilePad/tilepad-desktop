@@ -38,7 +38,7 @@
       {:else if buttonLabel}
         <Button {...props} type="button">
           {#if buttonLabel.icon}
-            <buttonLabel.icon />
+            <buttonLabel.icon width="1.5rem" height="1.5rem" />
           {/if}
 
           {buttonLabel.text}
