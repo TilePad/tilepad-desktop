@@ -53,8 +53,6 @@
 </script>
 
 <div class="current">
-  {folder.name}
-
   <PopoverButton>
     {#snippet children()}<SolarSettingsBoldDuotone />{/snippet}
 
@@ -81,6 +79,8 @@
       </div>
     {/snippet}
   </PopoverButton>
+
+  {folder.name}
 </div>
 
 <style>
@@ -93,6 +93,5 @@
     display: flex;
     gap: 0.5rem;
     align-items: center;
-    justify-content: space-between;
   }
 </style>

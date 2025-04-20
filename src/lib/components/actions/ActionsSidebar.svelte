@@ -5,16 +5,24 @@
   import { createActionsQuery } from "$lib/api/actions";
   import { getErrorMessage } from "$lib/api/utils/error";
   import { persistedState } from "$lib/utils/localStorage.svelte";
+  import SolarAltArrowLeftOutline from "~icons/solar/alt-arrow-left-outline";
+  import SolarAltArrowRightOutline from "~icons/solar/alt-arrow-right-outline";
 
   import ActionsSidebarCategory from "./ActionCategory.svelte";
 
-  type ExpandedCategories = Partial<Record<PluginId, boolean>>;
+  type ActionSidebarState = {
+    expanded?: boolean;
+    expandedCategories?: Partial<Record<PluginId, boolean>>;
+  };
 
   const actionsQuery = createActionsQuery();
-  const expandedCategories = persistedState<ExpandedCategories>(
-    "actionsExpandedCategories",
-    {},
+
+  const actionSidebarState = persistedState<ActionSidebarState>(
+    "actionSidebarState",
+    { expanded: true, expandedCategories: {} },
   );
+
+  const sidebarExpanded = $derived(actionSidebarState.current.expanded ?? true);
 
   let search = $state("");
 
@@ -47,25 +55,47 @@
   }
 
   function isCategoryExpanded(pluginId: PluginId): boolean {
-    return expandedCategories.current[pluginId] ?? true;
+    const expandedCategories = actionSidebarState.current.expandedCategories;
+    if (!expandedCategories) return true;
+
+    return expandedCategories[pluginId] ?? true;
   }
 
   function onToggleCategoryExpanded(pluginId: PluginId) {
-    expandedCategories.current = {
-      ...expandedCategories.current,
-      [pluginId]: !isCategoryExpanded(pluginId),
+    actionSidebarState.current = {
+      ...actionSidebarState.current,
+      expandedCategories: {
+        ...actionSidebarState.current.expandedCategories,
+        [pluginId]: !isCategoryExpanded(pluginId),
+      },
+    };
+  }
+
+  function onToggleExpanded() {
+    actionSidebarState.current = {
+      ...actionSidebarState.current,
+      expanded: !(actionSidebarState.current.expanded ?? true),
     };
   }
 </script>
 
-<div class="sidebar">
-  <div class="search-wrapper">
-    <input
-      bind:value={search}
-      class="search"
-      type="text"
-      placeholder="Search..."
-    />
+<div class="sidebar" class:sidebar--expanded={sidebarExpanded}>
+  <button class="sidebar-expand" onclick={onToggleExpanded}>
+    {#if sidebarExpanded}
+      <SolarAltArrowRightOutline />
+    {:else}
+      <SolarAltArrowLeftOutline />
+    {/if}
+  </button>
+  <div class="sidebar-header">
+    <div class="search-wrapper">
+      <input
+        bind:value={search}
+        class="search"
+        type="text"
+        placeholder="Search..."
+      />
+    </div>
   </div>
 
   <div class="content">
@@ -89,14 +119,43 @@
 
 <style>
   .sidebar {
+    position: relative;
     flex-shrink: 0;
-    width: 15rem;
     background-color: #29262e;
     height: 100%;
     border-left: 1px solid #333;
-    overflow: hidden;
     display: flex;
     flex-flow: column;
+    width: 1rem;
+    transition: 0.25s ease width;
+  }
+
+  .sidebar-header {
+    background-color: #1a191d;
+  }
+
+  .sidebar-expand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    position: absolute;
+    left: -2rem;
+    top: 0rem;
+    z-index: 500;
+    width: 2rem;
+    height: 2rem;
+    background-color: #1a191d;
+    border-bottom-left-radius: 0.25rem;
+    border: none;
+
+    border-left: 1px solid #333;
+    border-bottom: 1px solid #333;
+    cursor: pointer;
+  }
+
+  .sidebar--expanded {
+    width: 15rem;
   }
 
   .search {
@@ -122,5 +181,6 @@
   .content {
     overflow-x: hidden;
     overflow-y: auto;
+    width: 15rem;
   }
 </style>
