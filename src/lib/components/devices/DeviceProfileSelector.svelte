@@ -2,6 +2,7 @@
   import type { ProfileModel } from "$lib/api/types/profiles";
 
   import { Select } from "bits-ui";
+  import { slide } from "svelte/transition";
   import { createProfilesQuery } from "$lib/api/profiles";
   import SolarAltArrowUpBold from "~icons/solar/alt-arrow-up-bold";
   import SolarAltArrowDownBold from "~icons/solar/alt-arrow-down-bold";
@@ -53,11 +54,15 @@
   </Select.Trigger>
 
   <Select.Portal>
-    <Select.Content sideOffset={8}>
+    <Select.Content sideOffset={8} forceMount>
       {#snippet child({ props, open, wrapperProps })}
         <div {...wrapperProps} class="content-wrapper">
           {#if open}
-            <div {...props} class="content">
+            <div
+              {...props}
+              class="content"
+              transition:slide={{ duration: 100 }}
+            >
               {#each profiles as value}
                 <Select.Item value={value.id} label={value.name}>
                   {#snippet child({ props, selected, highlighted })}
