@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { ActionCategory } from "$lib/api/types/actions";
 
+  import { slide } from "svelte/transition";
   import { getPluginAssetPath } from "$lib/api/utils/url";
   import SolarAltArrowDownOutline from "~icons/solar/alt-arrow-down-outline";
   import SolarAltArrowRightOutline from "~icons/solar/alt-arrow-right-outline";
@@ -36,7 +37,11 @@
   </button>
 
   {#if expanded}
-    <div class="content">
+    <div
+      class="content"
+      style="height: {40 * category.actions.length}px;"
+      transition:slide={{ axis: "y", duration: 200 }}
+    >
       <ActionsSidebarList actions={category.actions} />
     </div>
   {/if}

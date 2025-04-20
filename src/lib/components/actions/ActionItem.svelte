@@ -31,9 +31,13 @@
 
   .action {
     width: 15rem;
+    height: 40px;
+
     padding: 0.5rem;
     display: flex;
     flex-flow: row;
+    align-items: center;
+
     gap: 0.5rem;
     background-color: #1a181d;
   }
