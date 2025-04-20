@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Snippet, Component } from "svelte";
 
-  import { fade, scale } from "svelte/transition";
+  import { fly, fade } from "svelte/transition";
   import { Dialog, type WithoutChild } from "bits-ui";
 
   import Button from "../input/Button.svelte";
@@ -47,20 +47,26 @@
     {/snippet}
   </Dialog.Trigger>
 
-  {#if open}
-    <Dialog.Portal>
-      <Dialog.Overlay>
-        {#snippet child({ props })}
+  <Dialog.Portal>
+    <Dialog.Overlay forceMount>
+      {#snippet child({ props, open })}
+        {#if open}
           <div
             {...props}
             class="overlay"
-            transition:fade={{ duration: 150 }}
+            transition:fade={{ duration: 250 }}
           ></div>
-        {/snippet}
-      </Dialog.Overlay>
-      <Dialog.Content {...contentProps}>
-        {#snippet child({ props })}
-          <div {...props} class="content" transition:scale={{}}>
+        {/if}
+      {/snippet}
+    </Dialog.Overlay>
+    <Dialog.Content {...contentProps} forceMount>
+      {#snippet child({ props, open })}
+        {#if open}
+          <div
+            {...props}
+            class="content"
+            transition:fly={{ y: 15, duration: 150 }}
+          >
             {#if title}
               <Dialog.Title>
                 {#snippet child({ props })}
@@ -72,7 +78,9 @@
             {#if description}
               <Dialog.Description>
                 {#snippet child({ props })}
-                  <p {...props} class="description">{@render description()}</p>
+                  <p {...props} class="description">
+                    {@render description()}
+                  </p>
                 {/snippet}
               </Dialog.Description>
             {/if}
@@ -85,10 +93,10 @@
               </div>
             {/if}
           </div>
-        {/snippet}
-      </Dialog.Content>
-    </Dialog.Portal>
-  {/if}
+        {/if}
+      {/snippet}
+    </Dialog.Content>
+  </Dialog.Portal>
 </Dialog.Root>
 
 <style>
@@ -100,7 +108,6 @@
     height: 100vh;
     background-color: #f4f6f8;
     background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(2px);
     z-index: 49;
   }
 
@@ -113,18 +120,18 @@
     top: 50%;
     transform: translate(-50%, -50%);
 
-    background-color: #18161b;
-    border: 1px solid #222;
+    background-color: #211e25;
+    border: 1px solid #333;
     border-radius: 0.25rem;
 
     z-index: 50;
   }
 
   .title {
-    background-color: #222;
+    background-color: #18161b;
     padding: 1rem;
     border-bottom: 1px solid #222;
-    color: #999;
+    color: #fff;
     font-size: 1rem;
   }
 
