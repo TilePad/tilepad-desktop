@@ -48,7 +48,10 @@
 
   <div class="plugin__actions">
     <Button onclick={handleReload}>Reload</Button>
-    <Button onclick={handleUninstall}>Uninstall</Button>
+
+    {#if !plugin.manifest.plugin.internal}
+      <Button onclick={handleUninstall}>Uninstall</Button>
+    {/if}
   </div>
 </div>
 
