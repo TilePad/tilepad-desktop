@@ -57,7 +57,7 @@
       </Aside>
     </div>
   {:else if $tilesQuery.isSuccess}
-    <FolderConfigEditor folder={currentFolder} />
+    <FolderConfigEditor />
 
     <div class="content">
       <TileGrid

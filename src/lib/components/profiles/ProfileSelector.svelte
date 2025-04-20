@@ -6,10 +6,12 @@
   import { createProfilesQuery } from "$lib/api/profiles";
   import SolarAltArrowUpBold from "~icons/solar/alt-arrow-up-bold";
   import SolarAltArrowDownBold from "~icons/solar/alt-arrow-down-bold";
+  import SolarUsersGroupRoundedBoldDuotone from "~icons/solar/users-group-rounded-bold-duotone";
 
   import Button from "../input/Button.svelte";
   import { getProfileContext } from "./ProfilesProvider.svelte";
   import CreateProfileDialog from "./CreateProfileDialog.svelte";
+  import ProfileSelectorSettings from "./ProfileSelectorSettings.svelte";
 
   const profilesQuery = createProfilesQuery();
   const profiles = $derived($profilesQuery.data ?? []);
@@ -33,14 +35,20 @@
 >
   <Select.Trigger>
     {#snippet child({ props })}
-      <button class="trigger" {...props}>
-        {currentProfile.name}
-        {#if open}
-          <SolarAltArrowUpBold />
-        {:else}
-          <SolarAltArrowDownBold />
-        {/if}
-      </button>
+      <div class="trigger-wrapper">
+        <button class="trigger" {...props}>
+          <SolarUsersGroupRoundedBoldDuotone />
+
+          {currentProfile.name}
+          {#if open}
+            <SolarAltArrowUpBold />
+          {:else}
+            <SolarAltArrowDownBold />
+          {/if}
+        </button>
+
+        <ProfileSelectorSettings profile={currentProfile} />
+      </div>
     {/snippet}
   </Select.Trigger>
 
@@ -130,7 +138,10 @@
     cursor: pointer;
     font-size: 1em;
     text-decoration: none;
-    width: 100%;
     justify-content: space-between;
+  }
+
+  .trigger-wrapper {
+    display: flex;
   }
 </style>

@@ -6,9 +6,11 @@
   import { createFoldersQuery } from "$lib/api/folders";
   import SolarAltArrowUpBold from "~icons/solar/alt-arrow-up-bold";
   import SolarAltArrowDownBold from "~icons/solar/alt-arrow-down-bold";
+  import SolarFolder2BoldDuotone from "~icons/solar/folder-2-bold-duotone";
 
   import { getFolderContext } from "./FolderProvider.svelte";
   import CreateFolderDialog from "./CreateFolderDialog.svelte";
+  import FolderSelectorSettings from "./FolderSelectorSettings.svelte";
   import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
 
   const { profile } = getProfileContext();
@@ -36,19 +38,25 @@
 >
   <Select.Trigger>
     {#snippet child({ props })}
-      <button class="trigger" {...props}>
-        {#if currentFolder}
-          {currentFolder.name}
-        {:else}
-          Choose a folder
-        {/if}
+      <div class="trigger-wrapper">
+        <button class="trigger" {...props}>
+          <SolarFolder2BoldDuotone />
 
-        {#if open}
-          <SolarAltArrowUpBold />
-        {:else}
-          <SolarAltArrowDownBold />
-        {/if}
-      </button>
+          {#if currentFolder}
+            {currentFolder.name}
+          {:else}
+            Choose a folder
+          {/if}
+
+          {#if open}
+            <SolarAltArrowUpBold />
+          {:else}
+            <SolarAltArrowDownBold />
+          {/if}
+        </button>
+
+        <FolderSelectorSettings folder={currentFolder} />
+      </div>
     {/snippet}
   </Select.Trigger>
 
@@ -134,7 +142,10 @@
     cursor: pointer;
     font-size: 1em;
     text-decoration: none;
-    width: 100%;
     justify-content: space-between;
+  }
+
+  .trigger-wrapper {
+    display: flex;
   }
 </style>
