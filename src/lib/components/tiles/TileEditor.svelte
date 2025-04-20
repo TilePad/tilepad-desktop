@@ -4,7 +4,7 @@
   import { Dialog } from "bits-ui";
   import { fade, slide } from "svelte/transition";
 
-  import TileEditorDialog from "./TileEditorDialog.svelte";
+  import TileEditorContent from "./TileEditorContent.svelte";
 
   type Props = {
     tileId: TileId | null;
@@ -38,10 +38,10 @@
           <div
             {...props}
             class="content"
-            transition:slide={{ axis: "x", duration: 250 }}
+            transition:slide={{ axis: "x", duration: 150 }}
           >
             <div class="content-inner">
-              <TileEditorDialog {tileId} {onClose} />
+              <TileEditorContent {tileId} {onClose} />
             </div>
           </div>
         {/if}

@@ -28,7 +28,7 @@ function getActions() {
 }
 
 function getAction(pluginId: PluginId, actionId: ActionId) {
-  return invoke<ActionWithCategory>("actions_get_action", {
+  return invoke<ActionWithCategory | null>("actions_get_action", {
     pluginId,
     actionId,
   });

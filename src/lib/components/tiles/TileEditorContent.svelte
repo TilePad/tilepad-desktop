@@ -74,9 +74,9 @@
 
   <div class="header">
     <div>
-      {#if $actionQuery.isSuccess}
+      {#if $actionQuery.isSuccess && $actionQuery.data}
         {@const action = $actionQuery.data}
-        {#if $actionQuery.data.inspector !== null}
+        {#if action.inspector !== null}
           <p class="titlebar__name">
             <b>{action.category_label}</b>: {action.label}
           </p>
@@ -96,20 +96,27 @@
     <div class="tile-area">
       <TileIconEditor
         config={tile.config}
-        action={$actionQuery.data}
+        action={$actionQuery.data ?? undefined}
         tileId={tile.id}
       />
       <TileNameEditor config={tile.config} tileId={tile.id} />
     </div>
 
     <div class="action-area">
-      {#if $actionQuery.isSuccess}
+      {#if $actionQuery.isSuccess && $actionQuery.data}
         {@const action = $actionQuery.data}
         {#if action.inspector !== null}
           <div class="inspector">
             <PropertyInspector {ctx} inspector={action.inspector} />
           </div>
         {/if}
+      {:else if $actionQuery.isSuccess && $actionQuery.data === null}
+        <Aside severity="error" title="Action not found" style="margin: 1rem;">
+          Action <b>{tileConfig.plugin_id}.{tileConfig.action_id}</b> not found.
+          <br />
+          <br />
+          Ensure you have the plugin for this action <b>installed</b>
+        </Aside>
       {:else if $actionQuery.isLoading}
         <div class="skeleton-list" style="padding: 1rem;">
           <div class="skeleton" style="width: 80%; height: 1rem"></div>
