@@ -3,6 +3,7 @@
 
   import SolarSettingsBold from "~icons/solar/settings-bold";
 
+  import EditProfileDialog from "./EditProfileDialog.svelte";
   import PopoverButton from "../popover/PopoverButton.svelte";
   import DeleteProfileDialog from "./DeleteProfileDialog.svelte";
 
@@ -20,6 +21,7 @@
     </button>
   {/snippet}
   {#snippet content()}
+    <EditProfileDialog {profile} />
     <DeleteProfileDialog {profile} />
   {/snippet}
 </PopoverButton>
