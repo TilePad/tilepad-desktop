@@ -26,20 +26,30 @@
 </script>
 
 <div class="card">
-  <span class="version">{manifest.icons.version}</span>
+  <div class="top">
+    <span class="version">{manifest.icons.version}</span>
+
+    <div class="actions">
+      <Button size="small" onclick={handleUninstall}>Uninstall</Button>
+    </div>
+  </div>
 
   <h2 class="name">
     {manifest.icons.name}
   </h2>
 
   <p class="description">{manifest.icons.description}</p>
-
-  <div class="actions">
-    <Button onclick={handleUninstall}>Uninstall</Button>
-  </div>
 </div>
 
 <style>
+  .top {
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
   .card {
     display: flex;
     flex-flow: column;

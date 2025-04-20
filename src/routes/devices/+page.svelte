@@ -4,7 +4,6 @@
   import DeviceCard from "$lib/components/devices/DeviceCard.svelte";
   import { devicesQuery, connectedDevicesQuery } from "$lib/api/devices";
   import ConnectInfo from "$lib/components/devices/DeviceConnectQR.svelte";
-  import { range } from "$lib/api/utils/svelte.svelte";
 
   const devices = devicesQuery();
   const connectedDevices = connectedDevicesQuery();
