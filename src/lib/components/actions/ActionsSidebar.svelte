@@ -1,12 +1,20 @@
 <script lang="ts">
+  import type { PluginId } from "$lib/api/types/plugin";
   import type { ActionCategory } from "$lib/api/types/actions";
 
   import { createActionsQuery } from "$lib/api/actions";
   import { getErrorMessage } from "$lib/api/utils/error";
+  import { persistedState } from "$lib/utils/localStorage.svelte";
 
   import ActionsSidebarCategory from "./ActionCategory.svelte";
 
+  type ExpandedCategories = Partial<Record<PluginId, boolean>>;
+
   const actionsQuery = createActionsQuery();
+  const expandedCategories = persistedState<ExpandedCategories>(
+    "actionsExpandedCategories",
+    {},
+  );
 
   let search = $state("");
 
@@ -37,6 +45,17 @@
       })
       .filter((pack) => pack.actions.length > 0);
   }
+
+  function isCategoryExpanded(pluginId: PluginId): boolean {
+    return expandedCategories.current[pluginId] ?? true;
+  }
+
+  function onToggleCategoryExpanded(pluginId: PluginId) {
+    expandedCategories.current = {
+      ...expandedCategories.current,
+      [pluginId]: !isCategoryExpanded(pluginId),
+    };
+  }
 </script>
 
 <div class="sidebar">
@@ -56,7 +75,11 @@
       Failed to load actions: {getErrorMessage($actionsQuery.error)}
     {:else if $actionsQuery.isSuccess}
       {#each filteredCategories as category}
-        <ActionsSidebarCategory {category} />
+        <ActionsSidebarCategory
+          {category}
+          expanded={isCategoryExpanded(category.plugin_id)}
+          onToggleExpanded={() => onToggleCategoryExpanded(category.plugin_id)}
+        />
       {:else}
         <p class="none">No results found...</p>
       {/each}

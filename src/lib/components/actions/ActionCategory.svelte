@@ -9,17 +9,15 @@
 
   type Props = {
     category: ActionCategory;
+    expanded: boolean;
+    onToggleExpanded: VoidFunction;
   };
 
-  const { category }: Props = $props();
-
-  let expanded = $state(true);
-
-  const onToggleCollapsed = () => (expanded = !expanded);
+  const { category, expanded, onToggleExpanded }: Props = $props();
 </script>
 
 <div class="section">
-  <button class="header" onclick={onToggleCollapsed}>
+  <button class="header" onclick={onToggleExpanded}>
     {#if expanded}
       <SolarAltArrowDownOutline />
     {:else}
