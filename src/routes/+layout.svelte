@@ -6,6 +6,7 @@
   import { QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import FolderProvider from "$lib/components/folders/FolderProvider.svelte";
+  import DeviceRequests from "$lib/components/devices/DeviceRequests.svelte";
   import ProfilesProvider from "$lib/components/profiles/ProfilesProvider.svelte";
 
   let { children } = $props();
@@ -19,6 +20,8 @@
       <ProfilesProvider>
         <FolderProvider>
           {@render children()}
+
+          <DeviceRequests />
         </FolderProvider>
       </ProfilesProvider>
     </main>

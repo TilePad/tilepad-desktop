@@ -36,14 +36,17 @@
 </script>
 
 <div class="device">
-  <h2 class="device__name">
+  <h2>Device Approval Request</h2>
+  <p>Pending request for device approval</p>
+
+  <h3 class="device__name">
     {request.device_name}
-  </h2>
-  <span class="device__id">{request.socket_addr}</span>
+  </h3>
+  <span class="device__id">Address: {request.socket_addr}</span>
 
   <div class="actions">
-    <Button onclick={handleApprove}>Approve</Button>
     <Button variant="error" onclick={handleDecline}>Decline</Button>
+    <Button onclick={handleApprove}>Approve</Button>
   </div>
 </div>
 
@@ -56,12 +59,20 @@
 
     padding: 1rem;
     border-radius: 0.5rem;
-    background-color: #2f2c36;
+    overflow: hidden;
+    width: 100%;
   }
 
   .actions {
     display: flex;
     gap: 1rem;
+    margin-top: 0.5rem;
+    flex: auto;
+    width: 100%;
+  }
+
+  .actions > :global(*) {
+    flex: auto;
   }
 
   .device__id {

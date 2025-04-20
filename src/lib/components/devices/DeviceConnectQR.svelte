@@ -20,6 +20,11 @@
       <QRCode size={250} data={JSON.stringify(encodeInterfaces(connectInfo))} />
     </div>
 
+    <div class="port">
+      <b>Port</b>
+      {connectInfo.port}
+    </div>
+
     <ul class="interfaces">
       {#each connectInfo.interfaces as int}
         <li class="interface">
@@ -28,11 +33,6 @@
         </li>
       {/each}
     </ul>
-
-    <div class="port">
-      <b>Port</b>
-      {connectInfo.port}
-    </div>
   {/await}
 </div>
 
@@ -48,15 +48,16 @@
     justify-content: flex-end;
     align-items: center;
     max-width: 250px;
+    overflow: hidden;
+    height: 100%;
   }
 
   .interfaces {
     margin-left: 0;
     padding-inline-start: 0;
-    max-height: 200px;
+    flex: auto;
     overflow: auto;
     width: 100%;
-    border: 2px solid #443c55;
   }
 
   .interface {
@@ -65,12 +66,6 @@
     flex-flow: column;
     background-color: #2e2938;
     padding: 0.5rem;
-  }
-
-  .interface__name {
-  }
-
-  .interface__addr {
   }
 
   .port {

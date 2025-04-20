@@ -71,7 +71,7 @@
     setFolderId={onChangeFolder}
   />
 
-  <Button variant="error" onclick={handleRevoke}>
+  <Button variant="error" onclick={handleRevoke} style="margin-top: 0.5rem">
     <SolarTrashBin2BoldDuotone /> Revoke
   </Button>
 </div>

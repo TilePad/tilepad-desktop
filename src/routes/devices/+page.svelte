@@ -1,16 +1,13 @@
 <script lang="ts">
+  import Aside from "$lib/components/Aside.svelte";
+  import { getErrorMessage } from "$lib/api/utils/error";
   import DeviceCard from "$lib/components/devices/DeviceCard.svelte";
+  import { devicesQuery, connectedDevicesQuery } from "$lib/api/devices";
   import ConnectInfo from "$lib/components/devices/DeviceConnectQR.svelte";
-  import DeviceRequestCard from "$lib/components/devices/DeviceRequestCard.svelte";
-  import {
-    devicesQuery,
-    deviceRequestsQuery,
-    connectedDevicesQuery,
-  } from "$lib/api/devices";
+  import { range } from "$lib/api/utils/svelte.svelte";
 
   const devices = devicesQuery();
   const connectedDevices = connectedDevicesQuery();
-  const requests = deviceRequestsQuery();
 
   const connectedDeviceIds = $derived.by(() => {
     const data = $connectedDevices.data;
@@ -26,12 +23,21 @@
 <div class="layout">
   <div class="layout__devices">
     {#if $devices.isLoading}
-      Loading devices...
+      <div class="skeleton-list">
+        <div class="skeleton" style="width: 80%; height: 1rem"></div>
+        <div class="skeleton" style="width: 70%; height: 1rem"></div>
+        <div class="skeleton" style="width: 30%; height: 1rem"></div>
+      </div>
     {:else if $devices.isError}
-      Failed to load devices {$requests.error}
+      <Aside severity="error" style="width: 100%">
+        Failed to load devices: {getErrorMessage($devices.error)}
+      </Aside>
     {:else if $devices.isSuccess && $devices.data.length > 0}
-      <div class="section">
+      <div class="header">
         <h2>Devices</h2>
+      </div>
+
+      <div class="devices-wrapper">
         <div class="devices">
           {#each $devices.data as device}
             {@const connected = isDeviceConnected(device.id)}
@@ -40,21 +46,8 @@
         </div>
       </div>
     {/if}
-    {#if $requests.isLoading}
-      Loading requests...
-    {:else if $requests.isError}
-      Failed to load device requests {$requests.error}
-    {:else if $requests.isSuccess && $requests.data.length > 0}
-      <div class="section">
-        <h2>Requests</h2>
-        <div class="devices">
-          {#each $requests.data as request}
-            <DeviceRequestCard {request} />
-          {/each}
-        </div>
-      </div>
-    {/if}
   </div>
+
   <div class="layout__connect">
     <ConnectInfo />
   </div>
@@ -66,20 +59,23 @@
     height: 100%;
   }
 
+  .header {
+    display: flex;
+    flex-flow: row;
+    flex-shrink: 0;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+    border-bottom: 1px solid #333;
+    background-color: #29262e;
+  }
+
   .layout__devices {
     flex: auto;
 
     display: flex;
     flex-flow: column;
-    gap: 0.5rem;
-
-    padding: 1rem;
-  }
-
-  .section {
-    display: flex;
-    flex-flow: column;
-    gap: 0.5rem;
   }
 
   .layout__connect {
@@ -89,10 +85,16 @@
     border-left: 2px solid #393444;
   }
 
+  .devices-wrapper {
+    flex: auto;
+    overflow: auto;
+  }
+
   .devices {
     width: 100%;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
+    padding: 1rem;
   }
 </style>
