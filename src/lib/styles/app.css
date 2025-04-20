@@ -24,6 +24,12 @@ body {
   gap: 1rem;
 }
 
+.skeleton-row {
+  display: flex;
+  flex-flow: row;
+  gap: 1rem;
+}
+
 @keyframes shimmer {
   0% {
     background-position: -200% 0;

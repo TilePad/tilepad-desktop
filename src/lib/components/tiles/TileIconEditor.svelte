@@ -74,8 +74,8 @@
     align-items: center;
     font-weight: bold;
     text-align: center;
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
     color: #ccc;
     font-size: 1.5rem;
   }

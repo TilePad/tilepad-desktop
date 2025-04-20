@@ -184,10 +184,11 @@ export function createUpdateTileIconMutation() {
   });
 }
 
-export function createDeleteTileMutation(folderId: FolderId) {
+export function createDeleteTileMutation() {
   return createMutation({
-    mutationFn: ({ tileId }: { tileId: TileId }) => deleteTile(tileId),
-    onSuccess: (_, { tileId }) => {
+    mutationFn: ({ tileId }: { tileId: TileId; folderId: FolderId }) =>
+      deleteTile(tileId),
+    onSuccess: (_, { tileId, folderId }) => {
       invalidateTilesList(folderId);
       queryClient.removeQueries({
         queryKey: tilesKeys.specific(folderId, tileId),

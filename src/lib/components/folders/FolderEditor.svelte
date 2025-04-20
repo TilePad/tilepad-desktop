@@ -85,9 +85,7 @@
     </div>
 
     <!-- Bottom segment that pops up to edit a tile -->
-    {#if activeTileId !== null}
-      <TileEditor tileId={activeTileId} onClose={() => (activeTileId = null)} />
-    {/if}
+    <TileEditor tileId={activeTileId} onClose={() => (activeTileId = null)} />
   {/if}
 </div>
 

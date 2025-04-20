@@ -142,7 +142,7 @@
     position: absolute;
     left: -2rem;
     top: 0rem;
-    z-index: 500;
+    z-index: 20;
     width: 2rem;
     height: 2rem;
     background-color: #1a191d;
