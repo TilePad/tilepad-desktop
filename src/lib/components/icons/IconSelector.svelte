@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { watch } from "runed";
   import { TileIconType, type TileIcon } from "$lib/api/types/tiles";
   import SolarGalleryEditBoldDuotone from "~icons/solar/gallery-edit-bold-duotone";
 
@@ -15,6 +16,14 @@
   const { onSelectIcon, onResetDefault }: Props = $props();
 
   let open = $state(false);
+  let pickPack: boolean = $state(false);
+
+  watch(
+    () => open,
+    (open) => {
+      if (!open) pickPack = false;
+    },
+  );
 </script>
 
 <PopoverButton rootProps={{ open, onOpenChange: (value) => (open = value) }}>
@@ -25,7 +34,7 @@
   {/snippet}
 
   {#snippet content()}
-    <div class="content">
+    {#if pickPack}
       <IconPackSelector
         onClickIcon={(packId, icon) => {
           onSelectIcon({
@@ -36,22 +45,29 @@
           open = false;
         }}
       />
-      <IconFilePicker
-        onSelectIcon={(icon) => {
-          onSelectIcon(icon);
-          open = false;
-        }}
-      />
-      <Button
-        type="button"
-        onclick={() => {
-          onResetDefault();
-          open = false;
-        }}
-        style="width: 100%"
-      >
-        Reset to default
-      </Button>
-    </div>
+    {:else}
+      <div class="content">
+        <Button style="width: 100%;" onclick={() => (pickPack = true)}>
+          Icon Pack Icon
+        </Button>
+
+        <IconFilePicker
+          onSelectIcon={(icon) => {
+            onSelectIcon(icon);
+            open = false;
+          }}
+        />
+        <Button
+          type="button"
+          onclick={() => {
+            onResetDefault();
+            open = false;
+          }}
+          style="width: 100%"
+        >
+          Reset to default
+        </Button>
+      </div>
+    {/if}
   {/snippet}
 </PopoverButton>

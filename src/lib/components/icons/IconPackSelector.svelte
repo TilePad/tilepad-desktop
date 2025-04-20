@@ -6,7 +6,6 @@
 
   import TextInput from "../input/TextInput.svelte";
   import IconPackCategory from "./IconPackCategory.svelte";
-  import PopoverButton from "../popover/PopoverButton.svelte";
 
   type Props = { onClickIcon: (packId: IconPackId, icon: Icon) => void };
 
@@ -43,37 +42,31 @@
   }
 </script>
 
-<PopoverButton triggerProps={{ style: "width: 100%" }}>
-  Icon Pack Icon
+<div class="content">
+  {#if $iconPacksQuery.isLoading}
+    <p>Loading...</p>
+  {:else if $iconPacksQuery.isError}
+    <p>
+      Failed to load icon packs: {getErrorMessage($iconPacksQuery.error)}
+    </p>
+  {:else if $iconPacksQuery.isSuccess}
+    <TextInput
+      fullWidth
+      placeholder="Search"
+      bind:value={search}
+      style="margin-bottom: 8px"
+    />
 
-  {#snippet content()}
-    <div class="content">
-      {#if $iconPacksQuery.isLoading}
-        <p>Loading...</p>
-      {:else if $iconPacksQuery.isError}
-        <p>
-          Failed to load icon packs: {getErrorMessage($iconPacksQuery.error)}
-        </p>
-      {:else if $iconPacksQuery.isSuccess}
-        <TextInput
-          fullWidth
-          placeholder="Search"
-          bind:value={search}
-          style="margin-bottom: 8px"
+    <div class="categories">
+      {#each filteredPacks as pack}
+        <IconPackCategory
+          onClickIcon={(icon) => onClickIcon(pack.manifest.icons.id, icon)}
+          {pack}
         />
-
-        <div class="categories">
-          {#each filteredPacks as pack}
-            <IconPackCategory
-              onClickIcon={(icon) => onClickIcon(pack.manifest.icons.id, icon)}
-              {pack}
-            />
-          {/each}
-        </div>
-      {/if}
+      {/each}
     </div>
-  {/snippet}
-</PopoverButton>
+  {/if}
+</div>
 
 <style>
   .content {
