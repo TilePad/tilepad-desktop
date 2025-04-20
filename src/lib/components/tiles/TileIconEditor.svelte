@@ -48,16 +48,9 @@
       kind: UpdateKind.Reset,
     });
   };
-
-  const desiredWidth = 120;
-  const tileWidth = 100;
-  const sizeAdjust = $derived.by(() => {
-    const ratio = (tileWidth - desiredWidth) / desiredWidth;
-    return 1 - Math.max(0.0, -ratio);
-  });
 </script>
 
-<div class="tile" style="--font-size-adjustment: {sizeAdjust};">
+<div class="tile" style="--font-size-adjustment: 1;">
   <TileIcon icon={config.icon} />
   <TileLabelElm label={config.label} />
 </div>
@@ -66,7 +59,7 @@
 <style>
   .tile {
     position: relative;
-    background-color: #242129;
+    background-color: #151318;
     border: 2px solid #715c8f;
     border-radius: 5px;
     display: flex;
