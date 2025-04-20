@@ -1,10 +1,11 @@
-use std::{path::Path, sync::Arc};
+use std::{path::Path, sync::Arc, time::Duration};
 
 use arboard::Clipboard;
 use enigo::{Enigo, Key, Keyboard};
 use serde::Deserialize;
 use sysinfo::{ProcessRefreshKind, ProcessesToUpdate, RefreshKind, System, UpdateKind};
 use tauri_plugin_opener::{open_path, open_url};
+use tokio::time::sleep;
 
 use crate::{
     database::{DbPool, JsonObject, entity::tile::TileModel},
@@ -127,9 +128,36 @@ pub async fn handle(
             let data: SystemTextProperties =
                 serde_json::from_value(serde_json::Value::Object(properties))?;
             if let Some(text) = data.text {
-                let mut enigo = Enigo::new(&enigo::Settings::default()).unwrap();
-                // Enter text
-                enigo.text(&text);
+                let mut enigo = Enigo::new(&enigo::Settings::default())?;
+
+                let mut current_text = String::new();
+
+                for char in text.chars() {
+                    match char {
+                        '\n' => {
+                            // Send the current buffered text
+                            if !current_text.is_empty() {
+                                enigo.text(&current_text)?;
+                                current_text.clear();
+                            }
+
+                            // Enter new line
+                            enigo.key(Key::Return, enigo::Direction::Click)?;
+                        }
+                        char => {
+                            current_text.push(char);
+                        }
+                    }
+
+                    // Reached enough characters to send
+                    if !current_text.is_empty() {
+                        enigo.text(&current_text)?;
+                        current_text.clear();
+                    }
+
+                    // Sleep between sends
+                    sleep(Duration::from_millis(2)).await;
+                }
             }
         }
         "multimedia" => {
@@ -141,7 +169,7 @@ pub async fn handle(
                 None => return Ok(()),
             };
 
-            let mut enigo = Enigo::new(&enigo::Settings::default()).unwrap();
+            let mut enigo = Enigo::new(&enigo::Settings::default())?;
 
             match action {
                 MultimediaAction::PlayPause => {
@@ -179,7 +207,7 @@ pub async fn handle(
                 None => return Ok(()),
             };
 
-            let mut enigo = Enigo::new(&enigo::Settings::default()).unwrap();
+            let mut enigo = Enigo::new(&enigo::Settings::default())?;
 
             for key in &keys.modifiers {
                 let key = Key::Other(key.code);
