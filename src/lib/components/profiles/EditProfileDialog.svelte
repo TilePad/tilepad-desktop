@@ -56,11 +56,13 @@
     <Button {...props}>Edit Profile</Button>
   {/snippet}
 
+  {#snippet title()}
+    Edit Profile
+  {/snippet}
+
   {#snippet children()}
     <form onsubmit={onSave}>
       <div class="content">
-        <h2>Edit Folder</h2>
-
         <input
           autocomplete="off"
           bind:value={name}
@@ -99,7 +101,6 @@
   }
 
   .input {
-    margin-top: 1rem;
     padding: 0.5rem;
     background-color: #000;
     border: 1px solid #666;

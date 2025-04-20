@@ -63,10 +63,14 @@
       <SolarAddFolderBold />
     </button>
   {/snippet}
+
+  {#snippet title()}
+    Create Folder
+  {/snippet}
+
   {#snippet children()}
     <form onsubmit={onCreate}>
       <div class="content">
-        <h2>Create Folder</h2>
         <input
           autocomplete="off"
           bind:value={name}
@@ -105,7 +109,6 @@
   }
 
   .input {
-    margin-top: 1rem;
     padding: 0.5rem;
     background-color: #000;
     border: 1px solid #666;

@@ -41,10 +41,13 @@
     </button>
   {/snippet}
 
+  {#snippet title()}
+    Create Profile
+  {/snippet}
+
   {#snippet children()}
     <form onsubmit={onCreate}>
       <div class="content">
-        <h2>Create Profile</h2>
         <input
           required
           minlength="1"
@@ -86,7 +89,6 @@
   }
 
   .input {
-    margin-top: 1rem;
     padding: 0.5rem;
     background-color: #000;
     border: 1px solid #666;

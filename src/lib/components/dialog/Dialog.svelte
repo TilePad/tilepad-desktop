@@ -88,7 +88,10 @@
             {@render children?.()}
 
             {#if actions}
-              <div class="actions">
+              <div
+                class="actions"
+                class:actions--no-content={children === undefined}
+              >
                 {@render actions()}
               </div>
             {/if}
@@ -145,5 +148,9 @@
     justify-content: flex-end;
     padding: 1rem;
     gap: 1rem;
+  }
+
+  .actions--no-content {
+    padding-top: 0;
   }
 </style>

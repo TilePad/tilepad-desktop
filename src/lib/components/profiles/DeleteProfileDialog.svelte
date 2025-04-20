@@ -39,38 +39,16 @@
     <Button variant="error" {...props}>Delete Profile</Button>
   {/snippet}
 
-  {#snippet children()}
-    <form onsubmit={onDelete}>
-      <div class="content">
-        <h2>Delete Profile</h2>
+  {#snippet title()}
+    Delete Profile
+  {/snippet}
 
-        <p>Are you sure you want to delete this profile?</p>
-      </div>
+  {#snippet description()}
+    Are you sure you want to delete this profile?
+  {/snippet}
 
-      <div class="actions">
-        <DialogCloseButton buttonLabel={{ text: "Close" }} />
-        <Button type="submit" variant="error">Delete</Button>
-      </div>
-    </form>
+  {#snippet actions()}
+    <DialogCloseButton buttonLabel={{ text: "Close" }} />
+    <Button type="submit" variant="error" onclick={onDelete}>Delete</Button>
   {/snippet}
 </Dialog>
-
-<style>
-  .content {
-    max-width: 100%;
-    width: 30rem;
-    max-height: 90vh;
-    display: flex;
-    flex-flow: column;
-    padding: 1rem;
-    padding-bottom: 0;
-  }
-
-  .actions {
-    display: flex;
-    flex-flow: row;
-    gap: 1rem;
-    padding: 1rem;
-    justify-content: flex-end;
-  }
-</style>
