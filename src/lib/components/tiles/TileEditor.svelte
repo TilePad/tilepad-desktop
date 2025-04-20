@@ -32,7 +32,7 @@
         {/if}
       {/snippet}
     </Dialog.Overlay>
-    <Dialog.Content forceMount>
+    <Dialog.Content trapFocus={false}>
       {#snippet child({ props })}
         {#if tileId}
           <div
