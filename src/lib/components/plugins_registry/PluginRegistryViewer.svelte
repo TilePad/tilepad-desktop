@@ -102,7 +102,7 @@
 
   .readme {
     flex: auto;
-    overflow: auto;
+    overflow: hidden;
   }
 
   .toolbar {

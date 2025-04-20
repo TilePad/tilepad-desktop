@@ -23,12 +23,14 @@
   );
 </script>
 
-<div class="markdown-body">
-  {#await markdownPromise then rendered}
-    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-    {@html DOMPurify.sanitize(rendered)}
-  {/await}
-</div>
+{#key source}
+  <div class="markdown-body">
+    {#await markdownPromise then rendered}
+      <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+      {@html DOMPurify.sanitize(rendered)}
+    {/await}
+  </div>
+{/key}
 
 <style>
   .markdown-body {
