@@ -7,6 +7,7 @@
 
   import type { DialogProps } from "../dialog/Dialog.svelte";
 
+  import Aside from "../Aside.svelte";
   import Dialog from "../dialog/Dialog.svelte";
   import PluginsRegistryItem from "./PluginsRegistryItem.svelte";
   import PluginRegistryViewer from "./PluginRegistryViewer.svelte";
@@ -42,13 +43,23 @@
   {#snippet children()}
     <div class="content">
       {#if $pluginRegistryQuery.isLoading || $pluginsQuery.isLoading}
-        Loading...
+        <div class="skeleton-list" style="padding: 1rem">
+          <div class="skeleton" style="width: 80%; height: 1rem"></div>
+          <div class="skeleton" style="width: 70%; height: 1rem"></div>
+          <div class="skeleton" style="width: 30%; height: 1rem"></div>
+        </div>
       {:else if $pluginRegistryQuery.isError}
-        Failed to load community plugins: {getErrorMessage(
-          $pluginRegistryQuery.error,
-        )}
+        <Aside severity="error" style="margin: 1rem;">
+          Failed to load community plugins: {getErrorMessage(
+            $pluginRegistryQuery.error,
+          )}
+        </Aside>
       {:else if $pluginsQuery.isError}
-        Failed to load installed plugins: {getErrorMessage($pluginsQuery.error)}
+        <Aside severity="error" style="margin: 1rem;">
+          Failed to load installed plugins: {getErrorMessage(
+            $pluginsQuery.error,
+          )}
+        </Aside>
       {:else if $pluginRegistryQuery.isSuccess && $pluginsQuery.isSuccess}
         <div class="split">
           <div class="plugins">
