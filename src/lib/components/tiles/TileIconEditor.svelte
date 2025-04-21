@@ -92,7 +92,7 @@
   );
 </script>
 
-<div class="tile" style="--font-size-adjustment: 1;">
+<div class="tile" style="--tile-size-adjustment: 1;">
   <TileIcon icon={config.icon} {iconOptions} />
   <TileLabelElm label={config.label} />
 </div>

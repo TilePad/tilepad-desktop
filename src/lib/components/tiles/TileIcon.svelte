@@ -17,15 +17,15 @@
 
   const { icon, iconOptions }: Props = $props();
 
+  const style = $derived(
+    `padding: calc(${iconOptions.padding}px * var(--tile-size-adjustment)); background-color: ${iconOptions.background_color}`,
+  );
+
   let error = $state(false);
 
   function onError(event: Event) {
     error = true;
   }
-
-  const style = $derived(
-    `padding: calc(${iconOptions.padding}px * var(--font-size-adjustment)); background-color: ${iconOptions.background_color}`,
-  );
 </script>
 
 {#if icon.type === TileIconType.PluginIcon}

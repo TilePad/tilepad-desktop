@@ -11,7 +11,7 @@
 {#if label.enabled && label.label.length > 0}
   <p
     class="label"
-    style="font-size: calc({label.font_size}pt * var(--font-size-adjustment)); color: {label.color};"
+    style="font-size: calc({label.font_size}pt * var(--tile-size-adjustment)); color: {label.color};"
     data-align={label.align}
     class:label--bold={label.bold}
     class:label--italic={label.italic}
