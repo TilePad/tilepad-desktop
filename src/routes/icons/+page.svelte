@@ -2,8 +2,10 @@
   import Aside from "$lib/components/Aside.svelte";
   import { createIconPacksQuery } from "$lib/api/icons";
   import { getErrorMessage } from "$lib/api/utils/error";
+  import SolarShopBoldDuotone from "~icons/solar/shop-bold-duotone";
   import IconPackCard from "$lib/components/icons/IconPackCard.svelte";
   import ManualImportIconPack from "$lib/components/icons/ManualImportIconPack.svelte";
+  import IconsRegistryDialog from "$lib/components/icons_registry/IconsRegistryDialog.svelte";
 
   const iconPacksQuery = createIconPacksQuery();
 </script>
@@ -22,7 +24,16 @@
   {:else if $iconPacksQuery.isSuccess && $iconPacksQuery.data.length > 0}
     <div class="header">
       <h2>Icon Packs</h2>
-      <ManualImportIconPack />
+
+      <div class="actions">
+        <IconsRegistryDialog
+          buttonLabel={{
+            text: "Community Icon Packs",
+            icon: SolarShopBoldDuotone,
+          }}
+        />
+        <ManualImportIconPack />
+      </div>
     </div>
 
     <div class="plugins-wrapper">
@@ -67,5 +78,10 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
     padding: 1rem;
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.5rem;
   }
 </style>

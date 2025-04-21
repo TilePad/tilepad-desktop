@@ -18,7 +18,10 @@ function getIconPacks() {
 
 export async function installIconPack(file: File) {
   const data = await file.arrayBuffer();
+  await installIconPackBuffer(data);
+}
 
+export async function installIconPackBuffer(data: ArrayBuffer) {
   await invoke<void>("icons_install_icon_pack", {
     data,
   });

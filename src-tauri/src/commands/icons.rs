@@ -8,7 +8,7 @@ use crate::{
 };
 use anyhow::Context;
 use std::sync::Arc;
-use tauri::State;
+use tauri::{State, ipc::InvokeResponseBody};
 use tilepad_manifest::icons::IconPackId;
 
 /// Get a list of all available actions from the icon pack registry
@@ -76,4 +76,19 @@ pub async fn icons_upload_user_icon(
 ) -> CmdResult<String> {
     let file_name = icons.upload_user_icon(name, data).await?;
     Ok(file_name)
+}
+
+#[tauri::command]
+pub async fn icons_download_bundle(
+    repo: String,
+    version: String,
+    file_name: String,
+) -> CmdResult<tauri::ipc::Response> {
+    let url = format!("https://github.com/{repo}/releases/download/{version}/{file_name}");
+    let response = reqwest::get(url).await?;
+    let response = response.error_for_status()?;
+    let bytes = response.bytes().await?;
+    Ok(tauri::ipc::Response::new(InvokeResponseBody::Raw(
+        bytes.to_vec(),
+    )))
 }

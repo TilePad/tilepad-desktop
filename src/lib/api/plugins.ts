@@ -99,15 +99,10 @@ export async function reloadPlugin(pluginId: PluginId) {
 
 export async function installPlugin(file: File) {
   const data = await file.arrayBuffer();
-
-  await invoke<void>("plugins_install_plugin_manual", {
-    data,
-  });
-
-  invalidatePluginsQuery();
+  await installPluginBuffer(data);
 }
 
-export async function installPluginBlob(data: ArrayBuffer) {
+export async function installPluginBuffer(data: ArrayBuffer) {
   await invoke<void>("plugins_install_plugin_manual", {
     data,
   });

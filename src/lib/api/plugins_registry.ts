@@ -5,7 +5,7 @@ import type { PluginManifest } from "./types/plugin";
 import type { PluginRegistryEntry } from "./types/plugins_registry";
 
 import { runeStore } from "./utils/svelte.svelte";
-import { installPluginBlob as installPluginBuffer } from "./plugins";
+import { installPluginBuffer as installPluginBuffer } from "./plugins";
 
 export const pluginRegistryKey = {
   root: ["plugin-registry"],
