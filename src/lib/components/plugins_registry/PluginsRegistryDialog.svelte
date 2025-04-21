@@ -155,6 +155,7 @@
   .titlebar {
     display: flex;
     gap: 0.5rem;
+    align-items: center;
     justify-content: space-between;
   }
 
