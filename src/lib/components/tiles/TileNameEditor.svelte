@@ -16,12 +16,13 @@
     type TileLabel,
     type TileConfig,
   } from "$lib/api/types/tiles";
-
+  import SolarEyeBold from "~icons/solar/eye-bold";
+  import Button from "../input/Button.svelte";
   import TextInput from "../input/TextInput.svelte";
   import NumberInput from "../input/NumberInput.svelte";
   import ToggleButton from "../input/ToggleButton.svelte";
   import PopoverButton from "../popover/PopoverButton.svelte";
-
+  import SolarEyeClosedBold from "~icons/solar/eye-closed-bold";
   type Props = {
     tileId: TileId;
     config: TileConfig;
@@ -105,12 +106,24 @@
     oninput={onChangeTileName}
   />
 
+  <Button onclick={onToggleEnabled}>
+    {#if label.enabled}
+      <SolarEyeBold width="1.5rem" height="1.5rem" />
+    {:else}
+      <SolarEyeClosedBold width="1.5rem" height="1.5rem" />
+    {/if}
+  </Button>
+
   <PopoverButton>
     {#snippet children()}
-      <SolarTextBoldDuotone />
+      <SolarTextBoldDuotone width="1.5rem" height="1.5rem" />
     {/snippet}
     {#snippet content()}
-      <button onclick={onToggleEnabled}>Enabled {label.enabled}</button>
+      <div>
+        Font Size (pt)
+        <NumberInput value={label.font_size} oninput={onChangeFontSize} />
+      </div>
+
       <div class="toggles">
         <div class="toggle-button-list">
           <ToggleButton active={label.bold} onclick={onToggleBold}>
@@ -146,10 +159,6 @@
         </div>
       </div>
 
-      <div>
-        <NumberInput value={label.font_size} oninput={onChangeFontSize} /> pt
-      </div>
-
       <div class="color-picker">
         <ColorPicker
           hex={label.color}
@@ -157,6 +166,7 @@
             if (event.detail.hex) onChangeColor(event.detail.hex);
           }}
           position="responsive"
+          label="Text color"
         />
       </div>
     {/snippet}
