@@ -2,10 +2,12 @@
   import type { FolderModel } from "$lib/api/types/folders";
 
   import { useDebounce } from "runed";
+  import { mergeProps } from "bits-ui";
   import { queryClient } from "$lib/api/client";
   import SolarSettingsBold from "~icons/solar/settings-bold";
   import { foldersKeys, updateFolder } from "$lib/api/folders";
 
+  import Tooltip from "../Tooltip.svelte";
   import NumberInput from "../input/NumberInput.svelte";
   import EditFolderDialog from "./EditFolderDialog.svelte";
   import PopoverButton from "../popover/PopoverButton.svelte";
@@ -54,38 +56,43 @@
   }
 </script>
 
-<PopoverButton>
-  {#snippet button({ props })}
-    <button {...props} class="button">
-      <SolarSettingsBold width="1.25rem" height="1.25rem" />
-    </button>
-  {/snippet}
-  {#snippet content()}
-    <div>
-      <label for="">Rows</label>
-      <NumberInput
-        type="number"
-        value={folder.config.rows}
-        onchange={(event) => {
-          onChangeRows(event.currentTarget.valueAsNumber);
-        }}
-      />
-    </div>
-    <div>
-      <label for="">Columns</label>
-      <NumberInput
-        type="number"
-        value={folder.config.columns}
-        onchange={(event) => {
-          onChangeColumns(event.currentTarget.valueAsNumber);
-        }}
-      />
-    </div>
+<Tooltip title="Folder Settings">
+  {#snippet trigger({ props: triggerProps })}
+    <PopoverButton {triggerProps}>
+      {#snippet button({ props })}
+        <button {...mergeProps(triggerProps, props)} class="button">
+          <SolarSettingsBold width="1.25rem" height="1.25rem" />
+        </button>
+      {/snippet}
 
-    <EditFolderDialog {folder} />
-    <DeleteFolderDialog {folder} />
+      {#snippet content()}
+        <div>
+          <label for="">Rows</label>
+          <NumberInput
+            type="number"
+            value={folder.config.rows}
+            onchange={(event) => {
+              onChangeRows(event.currentTarget.valueAsNumber);
+            }}
+          />
+        </div>
+        <div>
+          <label for="">Columns</label>
+          <NumberInput
+            type="number"
+            value={folder.config.columns}
+            onchange={(event) => {
+              onChangeColumns(event.currentTarget.valueAsNumber);
+            }}
+          />
+        </div>
+
+        <EditFolderDialog {folder} />
+        <DeleteFolderDialog {folder} />
+      {/snippet}
+    </PopoverButton>
   {/snippet}
-</PopoverButton>
+</Tooltip>
 
 <style>
   .button {

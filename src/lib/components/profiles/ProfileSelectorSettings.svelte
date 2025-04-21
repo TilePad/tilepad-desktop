@@ -3,6 +3,7 @@
 
   import SolarSettingsBold from "~icons/solar/settings-bold";
 
+  import Tooltip from "../Tooltip.svelte";
   import EditProfileDialog from "./EditProfileDialog.svelte";
   import PopoverButton from "../popover/PopoverButton.svelte";
   import DeleteProfileDialog from "./DeleteProfileDialog.svelte";
@@ -14,17 +15,21 @@
   const { profile }: Props = $props();
 </script>
 
-<PopoverButton>
-  {#snippet button({ props })}
-    <button {...props} class="button">
-      <SolarSettingsBold width="1.25rem" height="1.25rem" />
-    </button>
+<Tooltip title="Profile Settings">
+  {#snippet trigger({ props: triggerProps })}
+    <PopoverButton {triggerProps}>
+      {#snippet button({ props })}
+        <button {...props} class="button">
+          <SolarSettingsBold width="1.25rem" height="1.25rem" />
+        </button>
+      {/snippet}
+      {#snippet content()}
+        <EditProfileDialog {profile} />
+        <DeleteProfileDialog {profile} />
+      {/snippet}
+    </PopoverButton>
   {/snippet}
-  {#snippet content()}
-    <EditProfileDialog {profile} />
-    <DeleteProfileDialog {profile} />
-  {/snippet}
-</PopoverButton>
+</Tooltip>
 
 <style>
   .button {

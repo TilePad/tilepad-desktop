@@ -14,6 +14,7 @@
     description?: Snippet;
     actions?: Snippet;
     contentProps?: WithoutChild<Dialog.ContentProps>;
+    triggerProps?: WithoutChild<Dialog.TriggerProps>;
     // ...other component props if you wish to pass them
   };
 
@@ -23,6 +24,7 @@
     buttonLabel,
     button,
     contentProps,
+    triggerProps,
     title,
     description,
     actions,
@@ -31,7 +33,7 @@
 </script>
 
 <Dialog.Root bind:open {...restProps}>
-  <Dialog.Trigger>
+  <Dialog.Trigger {...triggerProps}>
     {#snippet child({ props })}
       {#if button}
         {@render button({ props })}

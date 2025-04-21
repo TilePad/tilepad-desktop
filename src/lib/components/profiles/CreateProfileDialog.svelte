@@ -6,6 +6,7 @@
 
   import type { DialogProps } from "../dialog/Dialog.svelte";
 
+  import Tooltip from "../Tooltip.svelte";
   import Dialog from "../dialog/Dialog.svelte";
   import DialogCloseButton from "../dialog/DialogCloseButton.svelte";
 
@@ -34,40 +35,44 @@
   }
 </script>
 
-<Dialog {...restProps}>
-  {#snippet button({ props })}
-    <button {...props} class="button">
-      <SolarUserPlusBold width="1.5rem" height="1.5rem" />
-    </button>
-  {/snippet}
+<Tooltip title="Create Profile">
+  {#snippet trigger({ props: triggerProps })}
+    <Dialog {triggerProps} {...restProps}>
+      {#snippet button({ props })}
+        <button {...props} class="button">
+          <SolarUserPlusBold width="1.5rem" height="1.5rem" />
+        </button>
+      {/snippet}
 
-  {#snippet title()}
-    Create Profile
-  {/snippet}
+      {#snippet title()}
+        Create Profile
+      {/snippet}
 
-  {#snippet children()}
-    <form onsubmit={onCreate}>
-      <div class="content">
-        <input
-          required
-          minlength="1"
-          class="input"
-          bind:value={name}
-          placeholder="Name"
-        />
-      </div>
+      {#snippet children()}
+        <form onsubmit={onCreate}>
+          <div class="content">
+            <input
+              required
+              minlength="1"
+              class="input"
+              bind:value={name}
+              placeholder="Name"
+            />
+          </div>
 
-      <div class="actions">
-        <DialogCloseButton buttonLabel={{ text: "Close" }} />
-        <DialogCloseButton
-          buttonLabel={{ text: "Create" }}
-          onclick={onCreate}
-          type="submit"
-        />
-      </div>
-    </form>
+          <div class="actions">
+            <DialogCloseButton buttonLabel={{ text: "Close" }} />
+            <DialogCloseButton
+              buttonLabel={{ text: "Create" }}
+              onclick={onCreate}
+              type="submit"
+            />
+          </div>
+        </form>
+      {/snippet}
+    </Dialog>
   {/snippet}
-</Dialog>
+</Tooltip>
 
 <style>
   .content {

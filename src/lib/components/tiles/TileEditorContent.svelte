@@ -3,10 +3,11 @@
 
   import { toast } from "svelte-sonner";
   import { createActionQuery } from "$lib/api/actions";
+  import SolarCloseCircleBold from "~icons/solar/close-circle-bold";
   import { getErrorMessage, toastErrorMessage } from "$lib/api/utils/error";
   import { createTileQuery, createDeleteTileMutation } from "$lib/api/tiles";
   import SolarTrashBinTrashBoldDuotone from "~icons/solar/trash-bin-trash-bold-duotone";
-  import SolarCloseCircleBold from "~icons/solar/close-circle-bold";
+
   import Aside from "../Aside.svelte";
   import Button from "../input/Button.svelte";
   import TileIconEditor from "./TileIconEditor.svelte";

@@ -6,9 +6,11 @@
   type Props = Tooltip.RootProps & {
     trigger: Snippet<[{ props: Record<string, unknown> }]>;
     triggerProps?: Tooltip.TriggerProps;
+    title?: string;
   };
 
   let {
+    title,
     open = $bindable(false),
     children,
     onOpenChange,
@@ -20,7 +22,7 @@
 
 <Tooltip.Root
   ignoreNonKeyboardFocus
-  delayDuration={150}
+  delayDuration={250}
   {...restProps}
   bind:open
   {onOpenChange}
@@ -37,6 +39,7 @@
           <div {...wrapperProps}>
             <div transition:fade={{ duration: 100 }}>
               <div {...props} class="content">
+                {title}
                 {@render children?.()}
               </div>
 
@@ -70,7 +73,7 @@
     padding: 0.25rem 0.5rem;
     font-size: 0.9rem;
     background-color: #1a1a1f;
-    box-shadow: 4px 0 10px #000;
+    box-shadow: 0px 4px 8px #00000050;
     border: 1px solid #333;
 
     display: flex;

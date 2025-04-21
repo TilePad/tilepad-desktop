@@ -6,6 +6,7 @@
 
   import type { DialogProps } from "../dialog/Dialog.svelte";
 
+  import Tooltip from "../Tooltip.svelte";
   import Button from "../input/Button.svelte";
   import Dialog from "../dialog/Dialog.svelte";
   import { getFolderContext } from "./FolderProvider.svelte";
@@ -57,37 +58,41 @@
   }
 </script>
 
-<Dialog bind:open>
-  {#snippet button({ props })}
-    <button type="button" {...props} class="button">
-      <SolarAddFolderBold />
-    </button>
-  {/snippet}
+<Tooltip title="Create Folder">
+  {#snippet trigger({ props: triggerProps })}
+    <Dialog {triggerProps} bind:open>
+      {#snippet button({ props })}
+        <button type="button" {...props} class="button">
+          <SolarAddFolderBold />
+        </button>
+      {/snippet}
 
-  {#snippet title()}
-    Create Folder
-  {/snippet}
+      {#snippet title()}
+        Create Folder
+      {/snippet}
 
-  {#snippet children()}
-    <form onsubmit={onCreate}>
-      <div class="content">
-        <input
-          autocomplete="off"
-          bind:value={name}
-          required
-          minlength="1"
-          class="input"
-          placeholder="Name"
-        />
-      </div>
+      {#snippet children()}
+        <form onsubmit={onCreate}>
+          <div class="content">
+            <input
+              autocomplete="off"
+              bind:value={name}
+              required
+              minlength="1"
+              class="input"
+              placeholder="Name"
+            />
+          </div>
 
-      <div class="actions">
-        <DialogCloseButton buttonLabel={{ text: "Close" }} />
-        <Button type="submit">Create</Button>
-      </div>
-    </form>
+          <div class="actions">
+            <DialogCloseButton buttonLabel={{ text: "Close" }} />
+            <Button type="submit">Create</Button>
+          </div>
+        </form>
+      {/snippet}
+    </Dialog>
   {/snippet}
-</Dialog>
+</Tooltip>
 
 <style>
   .content {
