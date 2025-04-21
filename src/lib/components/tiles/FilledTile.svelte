@@ -23,7 +23,7 @@
   aria-roledescription="button"
   onkeydown={() => {}}
 >
-  <TileIcon icon={config.icon} />
+  <TileIcon icon={config.icon} iconOptions={config.icon_options} />
   <TileLabelElm label={config.label} />
 </div>
 

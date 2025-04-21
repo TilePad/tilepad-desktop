@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { TileIconType, type TileIcon } from "$lib/api/types/tiles";
+  import {
+    TileIconType,
+    type TileIcon,
+    type TileIconOptions,
+  } from "$lib/api/types/tiles";
   import {
     getIconAssetPath,
     getPluginAssetPath,
@@ -8,15 +12,20 @@
 
   type Props = {
     icon: TileIcon;
+    iconOptions: TileIconOptions;
   };
 
-  const { icon }: Props = $props();
+  const { icon, iconOptions }: Props = $props();
 
   let error = $state(false);
 
   function onError(event: Event) {
     error = true;
   }
+
+  const style = $derived(
+    `padding: calc(${iconOptions.padding}px * var(--font-size-adjustment)); background-color: ${iconOptions.background_color}`,
+  );
 </script>
 
 {#if icon.type === TileIconType.PluginIcon}
@@ -26,6 +35,7 @@
     src={getPluginAssetPath(icon.plugin_id, icon.icon)}
     alt="Tile Icon"
     onerror={onError}
+    {style}
   />
 {:else if icon.type === TileIconType.IconPack}
   <img
@@ -34,6 +44,7 @@
     src={getIconAssetPath(icon.pack_id, icon.path)}
     alt="Tile Icon"
     onerror={onError}
+    {style}
   />
 {:else if icon.type === TileIconType.Uploaded}
   <img
@@ -42,6 +53,7 @@
     src={getUploadedIconAssetPath(icon.path)}
     alt="Tile Icon"
     onerror={onError}
+    {style}
   />
 {/if}
 

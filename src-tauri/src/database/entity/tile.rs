@@ -36,6 +36,9 @@ pub struct TileConfig {
     /// Icon to use
     #[serde(default)]
     pub icon: TileIcon,
+    /// Icon options to use
+    #[serde(default)]
+    pub icon_options: TileIconOptions,
     /// Label to display on top of the tile
     #[serde(default)]
     pub label: TileLabel,
@@ -52,6 +55,22 @@ pub struct UserFlags {
 
     /// User has modified the label
     pub label: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
+pub struct TileIconOptions {
+    pub padding: u32,
+    pub background_color: String,
+}
+
+impl Default for TileIconOptions {
+    fn default() -> Self {
+        Self {
+            padding: 0,
+            background_color: "#00000000".to_string(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -277,6 +296,28 @@ impl TileModel {
         let mut new_config = self.config.clone();
         new_config.icon = icon;
         new_config.user_flags.icon = matches!(kind, UpdateKind::User);
+
+        sql_exec(
+            db,
+            Query::update()
+                .table(TilesTable)
+                .and_where(Expr::col(TilesColumn::Id).eq(self.id))
+                .value_json(TilesColumn::Config, &new_config)?,
+        )
+        .await?;
+
+        self.config = new_config;
+        Ok(self)
+    }
+
+    /// Update the icon portion of the config
+    pub async fn update_icon_options(
+        mut self,
+        db: &DbPool,
+        icon_options: TileIconOptions,
+    ) -> anyhow::Result<TileModel> {
+        let mut new_config = self.config.clone();
+        new_config.icon_options = icon_options;
 
         sql_exec(
             db,

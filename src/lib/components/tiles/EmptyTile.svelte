@@ -62,6 +62,10 @@
                   plugin_id: action.plugin_id,
                   icon: action.icon,
                 },
+          icon_options: {
+            padding: 0,
+            background_color: "#00000000",
+          },
           user_flags: {
             icon: false,
             label: false,

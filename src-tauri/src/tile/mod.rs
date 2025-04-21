@@ -6,7 +6,7 @@ use tilepad_manifest::plugin::PluginId;
 use crate::{
     database::{
         DbPool, JsonObject,
-        entity::tile::{TileIcon, TileId, TileLabel, TileModel, UpdateKind},
+        entity::tile::{TileIcon, TileIconOptions, TileId, TileLabel, TileModel, UpdateKind},
     },
     device::Devices,
     icons::Icons,
@@ -93,6 +93,28 @@ impl Tiles {
             .await?;
 
         let tile = tile.update_icon(db, icon, kind).await?;
+        self.devices.background_update_folder(tile.folder_id);
+        Ok(tile)
+    }
+
+    /// Update a specific tile icons
+    pub async fn update_tile_icon_options(
+        &self,
+        tile_id: TileId,
+        plugin_id: Option<PluginId>,
+        icon_options: TileIconOptions,
+    ) -> anyhow::Result<TileModel> {
+        let db = &self.db;
+        let tile = TileModel::get_by_id(db, tile_id)
+            .await?
+            .context("tile not found")?;
+
+        anyhow::ensure!(
+            plugin_id.is_none_or(|plugin_id| tile.config.plugin_id == plugin_id),
+            anyhow::anyhow!("tile is not apart of the same plugin")
+        );
+
+        let tile = tile.update_icon_options(db, icon_options).await?;
         self.devices.background_update_folder(tile.folder_id);
         Ok(tile)
     }

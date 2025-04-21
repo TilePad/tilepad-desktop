@@ -9,6 +9,7 @@ import type {
   TileLabel,
   CreateTile,
   UpdateKind,
+  TileIconOptions,
 } from "./types/tiles";
 
 import { queryClient } from "./client";
@@ -66,6 +67,13 @@ function updateTileIcon(tileId: TileId, icon: TileIcon, kind: UpdateKind) {
     tileId,
     icon,
     kind,
+  });
+}
+
+function updateTileIconOptions(tileId: TileId, iconOptions: TileIconOptions) {
+  return invoke<TileModel>("tiles_update_tile_icon_options", {
+    tileId,
+    iconOptions,
   });
 }
 
@@ -174,6 +182,26 @@ export function createUpdateTileIconMutation() {
       icon: TileIcon;
       kind: UpdateKind;
     }) => updateTileIcon(tileId, icon, kind),
+    onSuccess: (tile) => {
+      invalidateTilesList(tile.folder_id);
+      queryClient.setQueryData(
+        tilesKeys.specific(tile.folder_id, tile.id),
+        tile,
+      );
+    },
+  });
+}
+
+export function createUpdateTileIconOptionsMutation() {
+  return createMutation({
+    scope: { id: "tile" },
+    mutationFn: ({
+      tileId,
+      iconOptions,
+    }: {
+      tileId: TileId;
+      iconOptions: TileIconOptions;
+    }) => updateTileIconOptions(tileId, iconOptions),
     onSuccess: (tile) => {
       invalidateTilesList(tile.folder_id);
       queryClient.setQueryData(

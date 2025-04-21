@@ -9,7 +9,9 @@ use crate::{
         DbPool, JsonObject,
         entity::{
             folder::FolderId,
-            tile::{CreateTile, TileIcon, TileId, TileLabel, TileModel, UpdateKind},
+            tile::{
+                CreateTile, TileIcon, TileIconOptions, TileId, TileLabel, TileModel, UpdateKind,
+            },
         },
     },
     device::Devices,
@@ -76,7 +78,7 @@ pub async fn tiles_update_tile_label(
     Ok(tile)
 }
 
-/// Update a specific tile label
+/// Update a specific tile icon
 #[tauri::command]
 pub async fn tiles_update_tile_icon(
     tiles: State<'_, Arc<Tiles>>,
@@ -85,6 +87,19 @@ pub async fn tiles_update_tile_icon(
     kind: UpdateKind,
 ) -> CmdResult<TileModel> {
     let tile = tiles.update_tile_icon(tile_id, None, icon, kind).await?;
+    Ok(tile)
+}
+
+/// Update a specific tile icon options
+#[tauri::command]
+pub async fn tiles_update_tile_icon_options(
+    tiles: State<'_, Arc<Tiles>>,
+    tile_id: TileId,
+    icon_options: TileIconOptions,
+) -> CmdResult<TileModel> {
+    let tile = tiles
+        .update_tile_icon_options(tile_id, None, icon_options)
+        .await?;
     Ok(tile)
 }
 

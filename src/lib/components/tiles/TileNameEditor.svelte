@@ -170,14 +170,6 @@
     gap: 0.5rem;
   }
 
-  .color-picker {
-    --cp-bg-color: #2f2b35;
-    --cp-border-color: #544e5e;
-    --cp-text-color: white;
-    --cp-input-color: #524b5c;
-    --cp-button-hover-color: #777;
-  }
-
   .toggles {
     display: flex;
     flex-flow: column;

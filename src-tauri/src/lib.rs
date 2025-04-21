@@ -64,6 +64,7 @@ pub fn run() {
             tiles::tiles_update_tile_properties,
             tiles::tiles_update_tile_label,
             tiles::tiles_update_tile_icon,
+            tiles::tiles_update_tile_icon_options,
             tiles::tiles_delete_tile,
             plugins::plugins_send_plugin_message,
             plugins::plugins_open_inspector,

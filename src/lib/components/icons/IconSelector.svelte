@@ -1,19 +1,35 @@
 <script lang="ts">
   import { watch } from "runed";
-  import { TileIconType, type TileIcon } from "$lib/api/types/tiles";
+  import ColorPicker from "svelte-awesome-color-picker";
   import SolarGalleryEditBoldDuotone from "~icons/solar/gallery-edit-bold-duotone";
+  import {
+    TileIconType,
+    type TileIcon,
+    type TileIconOptions,
+  } from "$lib/api/types/tiles";
 
   import Button from "../input/Button.svelte";
   import IconFilePicker from "./IconFilePicker.svelte";
+  import NumberInput from "../input/NumberInput.svelte";
   import IconPackSelector from "./IconPackSelector.svelte";
   import PopoverButton from "../popover/PopoverButton.svelte";
 
   type Props = {
+    iconOptions: TileIconOptions;
+    onChangePadding: (padding: number) => void;
+    onChangeBackgroundColor: (color: string) => void;
+
     onSelectIcon: (icon: TileIcon) => void;
     onResetDefault: VoidFunction;
   };
 
-  const { onSelectIcon, onResetDefault }: Props = $props();
+  const {
+    iconOptions,
+    onChangePadding,
+    onChangeBackgroundColor,
+    onSelectIcon,
+    onResetDefault,
+  }: Props = $props();
 
   let open = $state(false);
   let pickPack: boolean = $state(false);
@@ -46,6 +62,26 @@
         }}
       />
     {:else}
+      <div>
+        Padding (px)
+        <NumberInput
+          value={iconOptions.padding}
+          oninput={(event) =>
+            onChangePadding(event.currentTarget.valueAsNumber)}
+        />
+      </div>
+
+      <div class="color-picker">
+        <ColorPicker
+          hex={iconOptions.background_color}
+          on:input={(event) => {
+            if (event.detail.hex) onChangeBackgroundColor(event.detail.hex);
+          }}
+          position="responsive"
+          label="Background color"
+        />
+      </div>
+
       <div class="content">
         <Button style="width: 100%;" onclick={() => (pickPack = true)}>
           Icon Pack Icon

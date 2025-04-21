@@ -1,12 +1,17 @@
 <script lang="ts">
   import type { ActionWithCategory } from "$lib/api/types/actions";
 
-  import { createUpdateTileIconMutation } from "$lib/api/tiles";
+  import { watch, useDebounce } from "runed";
+  import {
+    createUpdateTileIconMutation,
+    createUpdateTileIconOptionsMutation,
+  } from "$lib/api/tiles";
   import {
     UpdateKind,
     type TileId,
     TileIconType,
     type TileConfig,
+    type TileIconOptions,
     type TileIcon as ITileIcon,
   } from "$lib/api/types/tiles";
 
@@ -23,6 +28,10 @@
   const { tileId, action, config }: Props = $props();
 
   const updateTileIcon = createUpdateTileIconMutation();
+  const updateTileIconOptions = createUpdateTileIconOptionsMutation();
+
+  let lastOptionsUpdate: TileIconOptions = $state(config.icon_options);
+  let iconOptions = $state(config.icon_options);
 
   const onClickIconPackIcon = (icon: ITileIcon) => {
     $updateTileIcon.mutate({
@@ -48,13 +57,52 @@
       kind: UpdateKind.Reset,
     });
   };
+
+  const updateIconOptions = useDebounce((iconOptions: TileIconOptions) => {
+    lastOptionsUpdate = iconOptions;
+
+    $updateTileIconOptions.mutate({
+      tileId,
+      iconOptions,
+    });
+  }, 150);
+
+  const onChangePadding = (padding: number) => {
+    iconOptions = { ...iconOptions, padding };
+    updateIconOptions(iconOptions);
+  };
+
+  const onChangeBackgroundColor = (color: string) => {
+    iconOptions = { ...iconOptions, background_color: color };
+    updateIconOptions(iconOptions);
+  };
+
+  // Only update icon options state when remote state is different from the
+  // last debounced saved state (Prevent UI flickering from controlled changes)
+  watch(
+    () => ({ config }),
+    ({ config }) => {
+      if (
+        JSON.stringify(lastOptionsUpdate) ===
+        JSON.stringify(config.icon_options)
+      )
+        return;
+      iconOptions = config.icon_options;
+    },
+  );
 </script>
 
 <div class="tile" style="--font-size-adjustment: 1;">
-  <TileIcon icon={config.icon} />
+  <TileIcon icon={config.icon} {iconOptions} />
   <TileLabelElm label={config.label} />
 </div>
-<IconSelector onSelectIcon={onClickIconPackIcon} {onResetDefault} />
+<IconSelector
+  {iconOptions}
+  onSelectIcon={onClickIconPackIcon}
+  {onChangeBackgroundColor}
+  {onChangePadding}
+  {onResetDefault}
+/>
 
 <style>
   .tile {
