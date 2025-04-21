@@ -8,6 +8,7 @@
     type TileIconOptions,
   } from "$lib/api/types/tiles";
 
+  import Tooltip from "../Tooltip.svelte";
   import Button from "../input/Button.svelte";
   import IconFilePicker from "./IconFilePicker.svelte";
   import NumberInput from "../input/NumberInput.svelte";
@@ -42,68 +43,82 @@
   );
 </script>
 
-<PopoverButton rootProps={{ open, onOpenChange: (value) => (open = value) }}>
-  {#snippet button({ props })}
-    <Button {...props}
-      ><SolarGalleryEditBoldDuotone width="1.65rem" height="1.65rem" /></Button
+<Tooltip>
+  {#snippet trigger({ props })}
+    <PopoverButton
+      triggerProps={props}
+      rootProps={{ open, onOpenChange: (value) => (open = value) }}
     >
-  {/snippet}
-
-  {#snippet content()}
-    {#if pickPack}
-      <IconPackSelector
-        onClickIcon={(packId, icon) => {
-          onSelectIcon({
-            type: TileIconType.IconPack,
-            pack_id: packId,
-            path: icon.path,
-          });
-          open = false;
-        }}
-      />
-    {:else}
-      <div>
-        Padding (px)
-        <NumberInput
-          value={iconOptions.padding}
-          oninput={(event) =>
-            onChangePadding(event.currentTarget.valueAsNumber)}
-        />
-      </div>
-
-      <div class="color-picker">
-        <ColorPicker
-          hex={iconOptions.background_color}
-          on:input={(event) => {
-            if (event.detail.hex) onChangeBackgroundColor(event.detail.hex);
-          }}
-          position="responsive"
-          label="Background color"
-        />
-      </div>
-
-      <div class="content">
-        <Button style="width: 100%;" onclick={() => (pickPack = true)}>
-          Icon Pack Icon
-        </Button>
-
-        <IconFilePicker
-          onSelectIcon={(icon) => {
-            onSelectIcon(icon);
-            open = false;
-          }}
-        />
-        <Button
-          type="button"
-          onclick={() => {
-            onResetDefault();
-            open = false;
-          }}
-          style="width: 100%"
+      {#snippet button({ props })}
+        <Button {...props}
+          ><SolarGalleryEditBoldDuotone
+            width="1.65rem"
+            height="1.65rem"
+          /></Button
         >
-          Reset to default
-        </Button>
-      </div>
-    {/if}
+      {/snippet}
+
+      {#snippet content()}
+        {#if pickPack}
+          <IconPackSelector
+            onClickIcon={(packId, icon) => {
+              onSelectIcon({
+                type: TileIconType.IconPack,
+                pack_id: packId,
+                path: icon.path,
+              });
+              open = false;
+            }}
+          />
+        {:else}
+          <div>
+            Padding (px)
+            <NumberInput
+              value={iconOptions.padding}
+              oninput={(event) =>
+                onChangePadding(event.currentTarget.valueAsNumber)}
+            />
+          </div>
+
+          <div class="color-picker">
+            <ColorPicker
+              hex={iconOptions.background_color}
+              on:input={(event) => {
+                if (event.detail.hex) onChangeBackgroundColor(event.detail.hex);
+              }}
+              position="responsive"
+              label="Background color"
+            />
+          </div>
+
+          <div class="content">
+            <Button style="width: 100%;" onclick={() => (pickPack = true)}>
+              Icon Pack Icon
+            </Button>
+
+            <IconFilePicker
+              onSelectIcon={(icon) => {
+                onSelectIcon(icon);
+                open = false;
+              }}
+            />
+            <Button
+              type="button"
+              onclick={() => {
+                onResetDefault();
+                open = false;
+              }}
+              style="width: 100%"
+            >
+              Reset to default
+            </Button>
+          </div>
+        {/if}
+      {/snippet}
+    </PopoverButton>
   {/snippet}
-</PopoverButton>
+
+  {#snippet children()}
+    Icon Options
+  {/snippet}
+</Tooltip>

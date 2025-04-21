@@ -1,6 +1,8 @@
 <script lang="ts">
   import { watch, useDebounce } from "runed";
+  import SolarEyeBold from "~icons/solar/eye-bold";
   import ColorPicker from "svelte-awesome-color-picker";
+  import SolarEyeClosedBold from "~icons/solar/eye-closed-bold";
   import { createUpdateTileLabelMutation } from "$lib/api/tiles";
   import SolarTextBoldDuotone from "~icons/solar/text-bold-duotone";
   import SolarAlignTopBoldDuotone from "~icons/solar/align-top-bold-duotone";
@@ -16,13 +18,13 @@
     type TileLabel,
     type TileConfig,
   } from "$lib/api/types/tiles";
-  import SolarEyeBold from "~icons/solar/eye-bold";
+
+  import Tooltip from "../Tooltip.svelte";
   import Button from "../input/Button.svelte";
   import TextInput from "../input/TextInput.svelte";
   import NumberInput from "../input/NumberInput.svelte";
   import ToggleButton from "../input/ToggleButton.svelte";
   import PopoverButton from "../popover/PopoverButton.svelte";
-  import SolarEyeClosedBold from "~icons/solar/eye-closed-bold";
   type Props = {
     tileId: TileId;
     config: TileConfig;
@@ -106,71 +108,91 @@
     oninput={onChangeTileName}
   />
 
-  <Button onclick={onToggleEnabled}>
-    {#if label.enabled}
-      <SolarEyeBold width="1.5rem" height="1.5rem" />
-    {:else}
-      <SolarEyeClosedBold width="1.5rem" height="1.5rem" />
-    {/if}
-  </Button>
+  <Tooltip>
+    {#snippet trigger({ props })}
+      <Button {...props} onclick={onToggleEnabled}>
+        {#if label.enabled}
+          <SolarEyeBold width="1.5rem" height="1.5rem" />
+        {:else}
+          <SolarEyeClosedBold width="1.5rem" height="1.5rem" />
+        {/if}
+      </Button>
+    {/snippet}
 
-  <PopoverButton>
     {#snippet children()}
-      <SolarTextBoldDuotone width="1.5rem" height="1.5rem" />
+      Toggle Label Visible
     {/snippet}
-    {#snippet content()}
-      <div>
-        Font Size (pt)
-        <NumberInput value={label.font_size} oninput={onChangeFontSize} />
-      </div>
+  </Tooltip>
 
-      <div class="toggles">
-        <div class="toggle-button-list">
-          <ToggleButton active={label.bold} onclick={onToggleBold}>
-            <SolarTextBoldBoldDuotone />
-          </ToggleButton>
-          <ToggleButton active={label.italic} onclick={onToggleItalic}>
-            <SolarTextItalicBoldDuotone />
-          </ToggleButton>
-          <ToggleButton active={label.underline} onclick={onToggleUnderline}>
-            <SolarTextUnderlineBoldDuotone />
-          </ToggleButton>
-        </div>
+  <Tooltip>
+    {#snippet trigger({ props })}
+      <PopoverButton triggerProps={props}>
+        {#snippet children()}
+          <SolarTextBoldDuotone width="1.5rem" height="1.5rem" />
+        {/snippet}
 
-        <div class="toggle-button-list">
-          <ToggleButton
-            active={label.align === LabelAlign.Bottom}
-            onclick={() => onChangeAlign(LabelAlign.Bottom)}
-          >
-            <SolarAlignBottomBoldDuotone />
-          </ToggleButton>
-          <ToggleButton
-            active={label.align === LabelAlign.Middle}
-            onclick={() => onChangeAlign(LabelAlign.Middle)}
-          >
-            <SolarAlignVerticalSpacingBoldDuotone />
-          </ToggleButton>
-          <ToggleButton
-            active={label.align === LabelAlign.Top}
-            onclick={() => onChangeAlign(LabelAlign.Top)}
-          >
-            <SolarAlignTopBoldDuotone />
-          </ToggleButton>
-        </div>
-      </div>
+        {#snippet content()}
+          <div>
+            Font Size (pt)
+            <NumberInput value={label.font_size} oninput={onChangeFontSize} />
+          </div>
 
-      <div class="color-picker">
-        <ColorPicker
-          hex={label.color}
-          on:input={(event) => {
-            if (event.detail.hex) onChangeColor(event.detail.hex);
-          }}
-          position="responsive"
-          label="Text color"
-        />
-      </div>
+          <div class="toggles">
+            <div class="toggle-button-list">
+              <ToggleButton active={label.bold} onclick={onToggleBold}>
+                <SolarTextBoldBoldDuotone />
+              </ToggleButton>
+              <ToggleButton active={label.italic} onclick={onToggleItalic}>
+                <SolarTextItalicBoldDuotone />
+              </ToggleButton>
+              <ToggleButton
+                active={label.underline}
+                onclick={onToggleUnderline}
+              >
+                <SolarTextUnderlineBoldDuotone />
+              </ToggleButton>
+            </div>
+
+            <div class="toggle-button-list">
+              <ToggleButton
+                active={label.align === LabelAlign.Bottom}
+                onclick={() => onChangeAlign(LabelAlign.Bottom)}
+              >
+                <SolarAlignBottomBoldDuotone />
+              </ToggleButton>
+              <ToggleButton
+                active={label.align === LabelAlign.Middle}
+                onclick={() => onChangeAlign(LabelAlign.Middle)}
+              >
+                <SolarAlignVerticalSpacingBoldDuotone />
+              </ToggleButton>
+              <ToggleButton
+                active={label.align === LabelAlign.Top}
+                onclick={() => onChangeAlign(LabelAlign.Top)}
+              >
+                <SolarAlignTopBoldDuotone />
+              </ToggleButton>
+            </div>
+          </div>
+
+          <div class="color-picker">
+            <ColorPicker
+              hex={label.color}
+              on:input={(event) => {
+                if (event.detail.hex) onChangeColor(event.detail.hex);
+              }}
+              position="responsive"
+              label="Text color"
+            />
+          </div>
+        {/snippet}
+      </PopoverButton>
     {/snippet}
-  </PopoverButton>
+
+    {#snippet children()}
+      Label Options
+    {/snippet}
+  </Tooltip>
 </div>
 
 <style>

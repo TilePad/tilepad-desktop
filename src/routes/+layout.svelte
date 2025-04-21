@@ -1,5 +1,6 @@
 <script lang="ts">
   import "$lib/styles/app.css";
+  import { Tooltip } from "bits-ui";
   import { queryClient } from "$lib/api/client";
   import Header from "$lib/components/layout/Header.svelte";
   import AppToaster from "$lib/components/AppToaster.svelte";
@@ -12,24 +13,26 @@
   let { children } = $props();
 </script>
 
-<QueryClientProvider client={queryClient}>
-  <div class="layout">
-    <Header />
+<Tooltip.Provider>
+  <QueryClientProvider client={queryClient}>
+    <div class="layout">
+      <Header />
 
-    <main class="main">
-      <ProfilesProvider>
-        <FolderProvider>
-          {@render children()}
+      <main class="main">
+        <ProfilesProvider>
+          <FolderProvider>
+            {@render children()}
 
-          <DeviceRequests />
-        </FolderProvider>
-      </ProfilesProvider>
-    </main>
-  </div>
+            <DeviceRequests />
+          </FolderProvider>
+        </ProfilesProvider>
+      </main>
+    </div>
 
-  <AppToaster />
-  <SvelteQueryDevtools buttonPosition="bottom-left" position="bottom" />
-</QueryClientProvider>
+    <AppToaster />
+    <SvelteQueryDevtools buttonPosition="bottom-left" position="bottom" />
+  </QueryClientProvider>
+</Tooltip.Provider>
 
 <style>
   .layout {
