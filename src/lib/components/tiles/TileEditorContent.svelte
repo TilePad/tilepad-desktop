@@ -1,17 +1,16 @@
 <script lang="ts">
   import type { TileId } from "$lib/api/types/tiles";
 
-  import { toast } from "svelte-sonner";
+  import { createTileQuery } from "$lib/api/tiles";
   import { createActionQuery } from "$lib/api/actions";
+  import { getErrorMessage } from "$lib/api/utils/error";
   import SolarCloseCircleBold from "~icons/solar/close-circle-bold";
-  import { getErrorMessage, toastErrorMessage } from "$lib/api/utils/error";
-  import { createTileQuery, createDeleteTileMutation } from "$lib/api/tiles";
-  import SolarTrashBinTrashBoldDuotone from "~icons/solar/trash-bin-trash-bold-duotone";
 
   import Aside from "../Aside.svelte";
   import Button from "../input/Button.svelte";
   import TileIconEditor from "./TileIconEditor.svelte";
   import TileNameEditor from "./TileNameEditor.svelte";
+  import DeleteTileDialog from "./DeleteTileDialog.svelte";
   import { getFolderContext } from "../folders/FolderProvider.svelte";
   import PropertyInspector from "../property/PropertyInspector.svelte";
   import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
@@ -36,29 +35,10 @@
 
   const tile = $derived($tileQuery.data);
 
-  const deleteTile = createDeleteTileMutation();
-
   const actionQuery = createActionQuery(
     () => tile?.config?.plugin_id ?? null,
     () => tile?.config?.action_id ?? null,
   );
-
-  function onRemove() {
-    if (!tile) return;
-
-    const deletePromise = $deleteTile.mutateAsync({
-      tileId: tile.id,
-      folderId: tile.folder_id,
-    });
-
-    toast.promise(deletePromise, {
-      loading: "Deleting tile",
-      success: "Deleted tile",
-      error: toastErrorMessage("Failed to delete tile"),
-    });
-
-    onClose();
-  }
 </script>
 
 {#if $tileQuery.isSuccess && $tileQuery.data}
@@ -86,9 +66,8 @@
     </div>
 
     <div class="header-actions">
-      <Button transparent variant="error" onclick={onRemove}>
-        <SolarTrashBinTrashBoldDuotone width={24} height={24} />
-      </Button>
+      <DeleteTileDialog {tile} {onClose} />
+
       <Button transparent onclick={onClose}>
         <SolarCloseCircleBold width={24} height={24} />
       </Button>
