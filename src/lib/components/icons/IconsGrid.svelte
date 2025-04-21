@@ -46,19 +46,21 @@
           <!-- Compute column offset -->
           {@const columnOffset = col * columnWidth}
 
-          <button
-            class="item"
-            style="position:absolute;top:0px;left:{columnOffset}%;width:{columnWidth}%;height:{itemHeight}px;transform:translateY({rowOffset}px)"
-            onclick={() => onClickIcon(icon)}
-          >
-            <img
-              src={getIconAssetPath(pack.manifest.icons.id, icon.path)}
-              alt={icon.name}
-              width="64px"
-              height="64px"
-              loading="lazy"
-            />
-          </button>
+          {#key icon.path}
+            <button
+              class="item"
+              style="position:absolute;top:0px;left:{columnOffset}%;width:{columnWidth}%;height:{itemHeight}px;transform:translateY({rowOffset}px)"
+              onclick={() => onClickIcon(icon)}
+            >
+              <img
+                src={getIconAssetPath(pack.manifest.icons.id, icon.path)}
+                alt={icon.name}
+                width="64px"
+                height="64px"
+                loading="lazy"
+              />
+            </button>
+          {/key}
         {/if}
       {/each}
     {/each}
@@ -78,5 +80,8 @@
 
   .item {
     will-change: transform;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
   }
 </style>
