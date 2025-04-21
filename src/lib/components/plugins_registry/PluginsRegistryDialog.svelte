@@ -20,6 +20,22 @@
   const pluginsQuery = createPluginsQuery();
 
   let active: PluginRegistryEntry | undefined = $state(undefined);
+  let search = $state("");
+
+  const filteredRegistry = $derived(
+    filterIconPacks($pluginRegistryQuery.data ?? [], search),
+  );
+
+  function filterIconPacks(packs: PluginRegistryEntry[], query: string) {
+    query = query.toLowerCase();
+
+    if (query.length < 1) return packs;
+
+    return packs.filter((entry) => {
+      const name = entry.name.toLowerCase();
+      return name === query || name.includes(query);
+    });
+  }
 </script>
 
 <Dialog {...restProps}>
@@ -37,13 +53,23 @@
         <div class="split">
           <div class="plugins">
             <div class="titlebar">
-              <h2>Community Plugins</h2>
+              <div class="titlebar__text">
+                <h2>Community Plugins</h2>
+                <p class="total">{filteredRegistry.length} Plugins</p>
+              </div>
 
               <DialogCloseButton buttonLabel={{ text: "Close" }} />
             </div>
 
+            <input
+              bind:value={search}
+              class="search"
+              type="text"
+              placeholder="Search..."
+            />
+
             <div class="plugins-list">
-              {#each $pluginRegistryQuery.data as item}
+              {#each filteredRegistry as item}
                 <PluginsRegistryItem
                   {item}
                   onClick={() => {
@@ -130,5 +156,21 @@
     display: flex;
     gap: 0.5rem;
     justify-content: space-between;
+  }
+
+  .total {
+    font-size: 0.8rem;
+  }
+
+  .search {
+    padding: 0.5rem;
+    background-color: #1f1d22;
+    border: 1px solid #666;
+    color: #fff;
+    border-radius: 0.25rem;
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
   }
 </style>

@@ -57,7 +57,7 @@
             <div class="titlebar">
               <div class="titlebar__text">
                 <h2>Community Icons</h2>
-                <p class="total">{$iconRegistryQuery.data.length} Icon Packs</p>
+                <p class="total">{filteredRegistry.length} Icon Packs</p>
               </div>
 
               <DialogCloseButton buttonLabel={{ text: "Close" }} />
