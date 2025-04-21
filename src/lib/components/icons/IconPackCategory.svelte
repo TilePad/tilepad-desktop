@@ -46,12 +46,12 @@
 <style>
   .content {
     height: 15rem;
-    width: 30rem;
+    width: 100%;
     overflow: hidden;
   }
 
   .header {
-    width: 30rem;
+    width: 100%;
     display: flex;
     align-items: center;
     background-color: #3d3844;

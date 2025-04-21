@@ -74,7 +74,7 @@
   }
 
   .categories {
-    max-height: 30rem;
+    max-height: 70vh;
     overflow-y: auto;
     overflow-x: hidden;
   }
