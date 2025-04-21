@@ -3,6 +3,7 @@
   import type { HTMLButtonAttributes } from "svelte/elements";
 
   import { scale } from "svelte/transition";
+  import { iframeBlocker } from "$lib/utils/iframeBlocker.svelte";
   import {
     Popover,
     type PopoverRootProps,
@@ -33,9 +34,13 @@
     contentProps,
     ...buttonProps
   }: Props = $props();
+
+  let open = $state(false);
+
+  iframeBlocker(() => open);
 </script>
 
-<Popover.Root {...rootProps}>
+<Popover.Root bind:open {...rootProps}>
   <Popover.Trigger {...triggerProps}>
     {#snippet child({ props })}
       {#if button}
