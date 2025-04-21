@@ -20,6 +20,22 @@
   const iconPacksQuery = createIconPacksQuery();
 
   let active: IconRegistryEntry | undefined = $state(undefined);
+  let search = $state("");
+
+  const filteredRegistry = $derived(
+    filterIconPacks($iconRegistryQuery.data ?? [], search),
+  );
+
+  function filterIconPacks(packs: IconRegistryEntry[], query: string) {
+    query = query.toLowerCase();
+
+    if (query.length < 1) return packs;
+
+    return packs.filter((entry) => {
+      const name = entry.name.toLowerCase();
+      return name === query || name.includes(query);
+    });
+  }
 </script>
 
 <Dialog {...restProps}>
@@ -47,8 +63,15 @@
               <DialogCloseButton buttonLabel={{ text: "Close" }} />
             </div>
 
+            <input
+              bind:value={search}
+              class="search"
+              type="text"
+              placeholder="Search..."
+            />
+
             <div class="plugins-list">
-              {#each $iconRegistryQuery.data as item}
+              {#each filteredRegistry as item}
                 <IconsRegistryItem
                   {item}
                   onClick={() => {
@@ -136,7 +159,20 @@
     gap: 0.5rem;
     justify-content: space-between;
   }
+
   .total {
     font-size: 0.8rem;
+  }
+
+  .search {
+    padding: 0.5rem;
+    background-color: #1f1d22;
+    border: 1px solid #666;
+    color: #fff;
+    border-radius: 0.25rem;
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
   }
 </style>
