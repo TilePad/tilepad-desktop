@@ -28,6 +28,14 @@
       href="/settings"
       title="Settings"
     />
+
+    {#if import.meta.env.DEV}
+      <NavButton
+        icon={SolarSettingsBoldDuotone}
+        href="/dev-fields"
+        title="Form Fields Preview"
+      />
+    {/if}
   </nav>
 </header>
 
