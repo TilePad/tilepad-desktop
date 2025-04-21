@@ -55,6 +55,8 @@
     onerror={onError}
     {style}
   />
+{:else}
+  <div class="tile__icon" {style}></div>
 {/if}
 
 <style>
