@@ -6,7 +6,7 @@
   import { getErrorMessage, toastErrorMessage } from "$lib/api/utils/error";
   import { createTileQuery, createDeleteTileMutation } from "$lib/api/tiles";
   import SolarTrashBinTrashBoldDuotone from "~icons/solar/trash-bin-trash-bold-duotone";
-
+  import SolarCloseCircleBold from "~icons/solar/close-circle-bold";
   import Aside from "../Aside.svelte";
   import Button from "../input/Button.svelte";
   import TileIconEditor from "./TileIconEditor.svelte";
@@ -88,7 +88,9 @@
       <Button transparent variant="error" onclick={onRemove}>
         <SolarTrashBinTrashBoldDuotone width={24} height={24} />
       </Button>
-      <Button transparent onclick={onClose}>X</Button>
+      <Button transparent onclick={onClose}>
+        <SolarCloseCircleBold width={24} height={24} />
+      </Button>
     </div>
   </div>
 
