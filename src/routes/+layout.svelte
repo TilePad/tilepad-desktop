@@ -8,6 +8,7 @@
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import FolderProvider from "$lib/components/folders/FolderProvider.svelte";
   import DeviceRequests from "$lib/components/devices/DeviceRequests.svelte";
+  import UpdateNotification from "$lib/components/UpdateNotification.svelte";
   import ProfilesProvider from "$lib/components/profiles/ProfilesProvider.svelte";
 
   let { children } = $props();
@@ -30,6 +31,8 @@
     </div>
 
     <AppToaster />
+    <UpdateNotification />
+
     <SvelteQueryDevtools buttonPosition="bottom-left" position="bottom" />
   </QueryClientProvider>
 </Tooltip.Provider>
