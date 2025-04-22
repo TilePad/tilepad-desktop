@@ -31,7 +31,7 @@
       <Aside severity="error" style="width: 100%">
         Failed to load devices: {getErrorMessage($devices.error)}
       </Aside>
-    {:else if $devices.isSuccess && $devices.data.length > 0}
+    {:else if $devices.isSuccess}
       <div class="header">
         <h2>Devices</h2>
       </div>
@@ -41,6 +41,8 @@
           {#each $devices.data as device}
             {@const connected = isDeviceConnected(device.id)}
             <DeviceCard {device} {connected} />
+          {:else}
+            No devices connected...
           {/each}
         </div>
       </div>
