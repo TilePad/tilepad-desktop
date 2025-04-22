@@ -98,9 +98,9 @@ arboard = "3.5.0"
 # File dialogs for file picker prompts
 rfd = { version = "0.15.3", features = ["tokio"] }
 
-# Manifest definitions
-tilepad-manifest = { version = "0.1.0", path = "../../tilepad-manifest" }
+tilepad-manifest = { version = "0.1.0" }
 
+# Manifest definitions
 # Database dependencies
 [dependencies.sqlx]
 version = "0.8.2"
