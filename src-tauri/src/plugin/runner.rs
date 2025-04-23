@@ -147,9 +147,9 @@ pub fn spawn_node_task(
     let entry_path = entry_path.to_string_lossy();
 
     #[cfg(windows)]
-    let exe_path = node_path.join("node.exe");
+    let exe_path: PathBuf = node_path.join("node.exe");
     #[cfg(not(windows))]
-    let exe_path = todo!("node not supported on this platform");
+    let exe_path: PathBuf = node_path.join("node");
 
     // Exe does not exist
     if !exe_path.exists() {
