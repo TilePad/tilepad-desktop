@@ -166,10 +166,22 @@ pub async fn handle(context: TileInteractionContext, properties: JsonObject) -> 
                     enigo.key(Key::MediaPlayPause, enigo::Direction::Click)?;
                 }
                 MultimediaAction::Play => {
+                    // Actual play button only supported on windows
+                    #[cfg(windows)]
                     enigo.key(Key::Play, enigo::Direction::Click)?;
+
+                    // Non windows targets fall back to the play pause key
+                    #[cfg(not(windows))]
+                    enigo.key(Key::MediaPlayPause, enigo::Direction::Click)?;
                 }
                 MultimediaAction::Pause => {
+                    // Pause button only supported on windows and linux
+                    #[cfg(any(target_os = "windows", all(unix, not(target_os = "macos"))))]
                     enigo.key(Key::Pause, enigo::Direction::Click)?;
+
+                    // Mac falls back to the play pause toggle
+                    #[cfg(target_os = "macos")]
+                    enigo.key(Key::MediaPlayPause, enigo::Direction::Click)?;
                 }
                 MultimediaAction::NextTrack => {
                     enigo.key(Key::MediaNextTrack, enigo::Direction::Click)?;
