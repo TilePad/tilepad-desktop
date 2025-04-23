@@ -21,7 +21,6 @@ mod database;
 mod device;
 mod events;
 mod icons;
-#[allow(unused)]
 mod plugin;
 mod server;
 mod tile;

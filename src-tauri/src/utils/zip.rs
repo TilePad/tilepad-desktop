@@ -19,7 +19,6 @@ where
 }
 
 /// Extracts the provided zip file reader to the provided `out_dir`
-#[allow(unused)]
 pub async fn extract_zip<R>(mut zip: ZipFileReader<R>, out_dir: &Path) -> anyhow::Result<()>
 where
     R: AsyncBufRead + AsyncSeek + Unpin,
@@ -116,7 +115,6 @@ where
 }
 
 /// Returns a relative path without reserved names, redundant separators, ".", or "..".
-#[allow(unused)]
 fn sanitize_file_path(path: &str) -> PathBuf {
     // Replaces backwards slashes
     path.replace('\\', "/")
