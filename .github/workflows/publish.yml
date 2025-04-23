@@ -31,7 +31,10 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
+
+      - name: update npm
+        run: npm install -g npm@11
 
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -51,7 +54,7 @@ jobs:
         run: npm install
 
       - name: Install Tauri cli
-        run: npm install --save-dev @tauri-apps/cli
+        run: npm install --save-dev @tauri-apps/cli, Cannot find module @rollup
 
       - name: install inspector dependencies
         run: npm install
