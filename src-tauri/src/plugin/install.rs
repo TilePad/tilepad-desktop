@@ -4,7 +4,7 @@ use std::{
     path::{Path, PathBuf},
     str::FromStr,
 };
-use tilepad_manifest::plugin::{Arch, Manifest as PluginManifest, ManifestBin};
+use tilepad_manifest::plugin::{Arch, Manifest as PluginManifest, ManifestBin, OperatingSystem};
 use tokio::{
     fs::{create_dir_all, remove_dir_all, remove_file},
     io::BufReader,
@@ -152,8 +152,9 @@ pub async fn install_plugin_requirements(
             .context("creating output directory")?;
     }
 
+    let os = OperatingSystem::default();
     let arch = Arch::default();
-    download_node(&client, output_path, matching.version, arch)
+    download_node(&client, output_path, matching.version, os, arch)
         .await
         .context("downloading node runtime")?;
 

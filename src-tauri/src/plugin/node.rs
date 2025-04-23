@@ -6,6 +6,7 @@ use async_zip::tokio::read::seek::ZipFileReader;
 use serde::Deserialize;
 use std::path::Path;
 use tempfile::{env::temp_dir, tempfile};
+use tilepad_manifest::plugin::OperatingSystem;
 use tokio::{
     fs::create_dir_all,
     io::{AsyncWriteExt, BufReader},
@@ -36,21 +37,27 @@ pub async fn get_node_versions(client: &reqwest::Client) -> anyhow::Result<Vec<N
 /// Get a node download URL for the windows platform
 ///
 /// https://nodejs.org/dist/v22.13.1/node-v22.13.1-win-x64.zip
-#[cfg(windows)]
-fn node_download_url(version: &str, arch: Arch) -> String {
-    format!(
-        "{base_url}/v{version}/node-v{version}-win-{arch}.zip",
-        base_url = NODE_DIST_BASE_URL,
-        version = version,
-        arch = arch
-    )
-}
-
-/// https://nodejs.org/dist/v22.13.1/node-v22.13.1-linux-x64.tar.xz
-/// https://nodejs.org/dist/v22.13.1/node-v22.13.1-darwin-x64.tar.gz
-#[cfg(not(windows))]
-fn node_download_url(version: &str, arch: Arch) -> String {
-    todo!("platform unsupported")
+fn node_download_url(version: &str, os: OperatingSystem, arch: Arch) -> String {
+    match os {
+        OperatingSystem::Windows => format!(
+            "{base_url}/v{version}/node-v{version}-win-{arch}.zip",
+            base_url = NODE_DIST_BASE_URL,
+            version = version,
+            arch = arch
+        ),
+        OperatingSystem::MacOs => format!(
+            "{base_url}/v{version}/node-v{version}-darwin-{arch}.zip",
+            base_url = NODE_DIST_BASE_URL,
+            version = version,
+            arch = arch
+        ),
+        OperatingSystem::Linux => format!(
+            "{base_url}/v{version}/node-v{version}-linux-{arch}.zip",
+            base_url = NODE_DIST_BASE_URL,
+            version = version,
+            arch = arch
+        ),
+    }
 }
 
 /// Downloads the requested node version
@@ -58,6 +65,7 @@ pub async fn download_node<P: AsRef<Path>>(
     client: &reqwest::Client,
     path: P,
     version: node_semver::Version,
+    os: OperatingSystem,
     arch: Arch,
 ) -> anyhow::Result<()> {
     let path = path.as_ref();
@@ -69,7 +77,7 @@ pub async fn download_node<P: AsRef<Path>>(
     }
 
     let version = version.to_string();
-    let url = node_download_url(&version, arch);
+    let url = node_download_url(&version, os, arch);
 
     let res = client
         .get(url)
@@ -129,6 +137,7 @@ mod test {
     use std::path::Path;
 
     use node_semver::Version;
+    use tilepad_manifest::plugin::OperatingSystem;
 
     use crate::plugin::{manifest::Arch, node::download_node};
 
@@ -136,8 +145,14 @@ mod test {
     async fn test_download_latest() {
         let client = reqwest::Client::new();
         let path = Path::new("runtimes/22.13.1");
-        download_node(&client, path, Version::new(22, 13, 1), Arch::default())
-            .await
-            .unwrap();
+        download_node(
+            &client,
+            path,
+            Version::new(22, 13, 1),
+            OperatingSystem::default(),
+            Arch::default(),
+        )
+        .await
+        .unwrap();
     }
 }
