@@ -50,7 +50,9 @@ jobs:
       - name: install frontend dependencies
         run: npm install
 
-      - name: Install Tauri cli
+      # These deps have some platform specific components which causes CI to fail due to
+      # the package-lock.json having different locked platform specific installs
+      - name: install problematic dependencies
         run: npm install --save-dev @tauri-apps/cli rollup
 
       - name: install inspector dependencies
