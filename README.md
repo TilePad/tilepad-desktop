@@ -45,3 +45,7 @@ There is a community icon packs registry available where you can directly downlo
 The community icon packs registry has a large number of automatically generated packs from [Tilepad Iconify Icon Packs](https://github.com/TilePad/tilepad-iconify-icon-packs) which contains all the icon packs present on [Iconify](https://icon-sets.iconify.design/)
 
 ![alt text](assets/image-7.png)
+
+## Linux notes
+
+To build on linux you must follow the [Enigo Runtime Dependencies](https://github.com/enigo-rs/enigo?tab=readme-ov-file#runtime-dependencies) instructions for your distribution (They are "Runtime Dependencies" but are also required while building otherwise linking will fail)
