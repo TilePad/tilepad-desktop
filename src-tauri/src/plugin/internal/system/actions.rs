@@ -1,4 +1,4 @@
-use std::{path::Path, sync::Arc, time::Duration};
+use std::{path::Path, time::Duration};
 
 use arboard::Clipboard;
 use enigo::{Enigo, Key, Keyboard};
@@ -7,12 +7,7 @@ use sysinfo::{ProcessRefreshKind, ProcessesToUpdate, RefreshKind, System, Update
 use tauri_plugin_opener::{open_path, open_url};
 use tokio::time::sleep;
 
-use crate::{
-    database::{DbPool, JsonObject, entity::tile::TileModel},
-    device::Devices,
-    events::TileInteractionContext,
-    plugin::Plugins,
-};
+use crate::{database::JsonObject, events::TileInteractionContext};
 
 #[derive(Deserialize)]
 pub struct SystemWebsiteProperties {
@@ -76,12 +71,7 @@ pub struct ClipboardProperties {
     text: Option<String>,
 }
 
-pub async fn handle(
-    devices: &Devices,
-    plugins: &Plugins,
-    context: TileInteractionContext,
-    properties: JsonObject,
-) -> anyhow::Result<()> {
+pub async fn handle(context: TileInteractionContext, properties: JsonObject) -> anyhow::Result<()> {
     match context.action_id.as_str() {
         "website" => {
             let data: SystemWebsiteProperties =
@@ -173,28 +163,28 @@ pub async fn handle(
 
             match action {
                 MultimediaAction::PlayPause => {
-                    enigo.key(Key::MediaPlayPause, enigo::Direction::Click);
+                    enigo.key(Key::MediaPlayPause, enigo::Direction::Click)?;
                 }
                 MultimediaAction::Play => {
-                    enigo.key(Key::Play, enigo::Direction::Click);
+                    enigo.key(Key::Play, enigo::Direction::Click)?;
                 }
                 MultimediaAction::Pause => {
-                    enigo.key(Key::Pause, enigo::Direction::Click);
+                    enigo.key(Key::Pause, enigo::Direction::Click)?;
                 }
                 MultimediaAction::NextTrack => {
-                    enigo.key(Key::MediaNextTrack, enigo::Direction::Click);
+                    enigo.key(Key::MediaNextTrack, enigo::Direction::Click)?;
                 }
                 MultimediaAction::PreviousTrack => {
-                    enigo.key(Key::MediaPrevTrack, enigo::Direction::Click);
+                    enigo.key(Key::MediaPrevTrack, enigo::Direction::Click)?;
                 }
                 MultimediaAction::VolumeUp => {
-                    enigo.key(Key::VolumeUp, enigo::Direction::Click);
+                    enigo.key(Key::VolumeUp, enigo::Direction::Click)?;
                 }
                 MultimediaAction::VolumeDown => {
-                    enigo.key(Key::VolumeDown, enigo::Direction::Click);
+                    enigo.key(Key::VolumeDown, enigo::Direction::Click)?;
                 }
                 MultimediaAction::Mute => {
-                    enigo.key(Key::VolumeMute, enigo::Direction::Click);
+                    enigo.key(Key::VolumeMute, enigo::Direction::Click)?;
                 }
             }
         }
@@ -211,17 +201,17 @@ pub async fn handle(
 
             for key in &keys.modifiers {
                 let key = Key::Other(key.code);
-                enigo.key(key, enigo::Direction::Press);
+                enigo.key(key, enigo::Direction::Press)?;
             }
 
             for key in keys.keys {
                 let key = Key::Other(key.code);
-                enigo.key(key, enigo::Direction::Click);
+                enigo.key(key, enigo::Direction::Click)?;
             }
 
             for key in keys.modifiers {
                 let key = Key::Other(key.code);
-                enigo.key(key, enigo::Direction::Release);
+                enigo.key(key, enigo::Direction::Release)?;
             }
         }
         "clipboard" => {

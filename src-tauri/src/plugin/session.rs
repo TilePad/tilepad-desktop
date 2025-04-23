@@ -1,21 +1,11 @@
-use std::{
-    future::Future,
-    net::SocketAddr,
-    pin::Pin,
-    sync::Arc,
-    task::{Context, Poll, ready},
-};
-
 use crate::{
     database::entity::tile::UpdateKind,
-    events::{AppEvent, PluginAppEvent},
     tile::Tiles,
-    utils::ws::{WebSocketFuture, WsRx, WsTx},
+    utils::ws::{WebSocketFuture, WsTx},
 };
-use anyhow::anyhow;
-use axum::extract::ws::{Message, WebSocket};
+use axum::extract::ws::WebSocket;
 use parking_lot::RwLock;
-use serde_json::{Map, Value};
+use std::sync::Arc;
 use tauri::async_runtime::{spawn, spawn_blocking};
 use tauri_plugin_opener::open_url;
 use tracing::{debug, error};

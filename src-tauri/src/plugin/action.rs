@@ -1,12 +1,7 @@
-use std::sync::Arc;
-
 use serde::Serialize;
 use tilepad_manifest::plugin::Manifest;
 
-use super::{
-    Plugin,
-    manifest::{ActionId, PluginId},
-};
+use super::manifest::{ActionId, PluginId};
 
 #[derive(Debug, Serialize)]
 pub struct ActionCategory {

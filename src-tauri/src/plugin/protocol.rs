@@ -1,18 +1,14 @@
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 use crate::{
     database::{
         JsonObject,
-        entity::{
-            folder::FolderModel,
-            tile::{TileIcon, TileId, TileLabel, TileModel},
-        },
+        entity::tile::{TileIcon, TileId, TileLabel},
     },
     events::{DeepLinkContext, InspectorContext, TileInteractionContext},
 };
 
-use super::manifest::{ActionId, PluginId};
+use super::manifest::PluginId;
 
 /// Plugin message coming from the client side
 #[derive(Debug, Deserialize)]

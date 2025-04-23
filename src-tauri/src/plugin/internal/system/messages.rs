@@ -4,11 +4,7 @@ use anyhow::Context;
 use rfd::AsyncFileDialog;
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    database::{DbPool, entity::tile::TileModel},
-    events::InspectorContext,
-    plugin::Plugins,
-};
+use crate::{events::InspectorContext, plugin::Plugins};
 
 /// Messages from the inspectors
 #[derive(Deserialize)]
@@ -28,7 +24,6 @@ pub enum SystemPluginMessage {
 
 pub async fn handle(
     plugins: &Arc<Plugins>,
-    db: &DbPool,
     context: InspectorContext,
     message: serde_json::Value,
 ) -> anyhow::Result<()> {

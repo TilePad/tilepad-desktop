@@ -1,10 +1,10 @@
-use anyhow::{Context, bail};
+use anyhow::Context;
 use std::{
     io::Cursor,
     path::{Path, PathBuf},
     str::FromStr,
 };
-use tilepad_manifest::plugin::{Arch, BinaryNodeVersion, Manifest as PluginManifest, ManifestBin};
+use tilepad_manifest::plugin::{Arch, Manifest as PluginManifest, ManifestBin};
 use tokio::{
     fs::{create_dir_all, remove_dir_all, remove_file},
     io::BufReader,
@@ -12,10 +12,7 @@ use tokio::{
 
 use crate::utils::zip::{create_zip_reader, extract_zip};
 
-use super::{
-    loader::read_plugin_manifest_zip,
-    node::{download_node, get_node_versions},
-};
+use super::node::{download_node, get_node_versions};
 
 /// Removes any existing plugin data from the provided `path`
 pub async fn remove_plugin_files(path: &Path) -> anyhow::Result<()> {

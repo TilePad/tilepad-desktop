@@ -1,22 +1,12 @@
-use std::sync::Arc;
-
-use anyhow::Context;
-use serde::Deserialize;
-use tauri_plugin_opener::open_url;
-
 use crate::{
     database::{
-        DbPool, JsonObject,
-        entity::{
-            device::{DeviceModel, UpdateDevice},
-            folder::{FolderId, FolderModel},
-            profile::{ProfileId, ProfileModel},
-        },
+        JsonObject,
+        entity::{folder::FolderId, profile::ProfileId},
     },
-    device::{Devices, protocol::ServerDeviceMessage},
+    device::Devices,
     events::TileInteractionContext,
-    plugin::Plugins,
 };
+use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct SwitchFolderProperties {
@@ -30,7 +20,6 @@ pub struct SwitchProfileProperties {
 
 pub async fn handle(
     devices: &Devices,
-    plugins: &Plugins,
     context: TileInteractionContext,
     properties: JsonObject,
 ) -> anyhow::Result<()> {

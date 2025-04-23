@@ -1,44 +1,30 @@
 use std::{
     collections::HashMap,
-    io::Cursor,
-    os::windows::fs::FileTypeExt,
     path::{Path, PathBuf},
     sync::Arc,
 };
 
 use action::{Action, ActionCategory, ActionWithCategory, actions_from_manifests};
-use anyhow::{Context, anyhow};
-use async_zip::base::read::seek::ZipFileReader;
-use garde::Validate;
+use anyhow::Context;
+
 use install::get_node_runtime;
-use loader::{load_plugin_from_path, load_plugins_from_path, read_plugin_manifest};
+use loader::load_plugins_from_path;
 use manifest::{ActionId, Manifest as PluginManifest, PluginId, platform_arch, platform_os};
 use parking_lot::RwLock;
 use protocol::ServerPluginMessage;
-use runner::{PluginTaskState, spawn_native_task};
+use runner::PluginTaskState;
 use serde::Serialize;
-use serde_json::Map;
 use session::{PluginSessionId, PluginSessionRef};
-use tauri::plugin;
 pub use tilepad_manifest::plugin as manifest;
 use tilepad_manifest::plugin::{ManifestBin, ManifestBinNative};
-use tokio::io::{BufReader, BufWriter};
-use tokio_util::compat::FuturesAsyncReadCompatExt;
 
 use crate::{
-    database::{
-        DbPool, JsonObject,
-        entity::{
-            plugin_properties::PluginPropertiesModel,
-            tile::{TileId, TileModel},
-        },
-    },
+    database::{DbPool, JsonObject, entity::plugin_properties::PluginPropertiesModel},
     device::Devices,
     events::{
         AppEvent, AppEventSender, DeepLinkContext, InspectorContext, PluginAppEvent,
         TileInteractionContext,
     },
-    icons::Icons,
 };
 
 pub mod action;
@@ -161,8 +147,7 @@ impl Plugins {
         self.stop_task(&plugin_id).await;
 
         // Start a new task for the plugin
-        self.start_task(plugin_id.clone(), plugin_path, &plugin.manifest)
-            .await;
+        self.start_task(plugin_path, &plugin.manifest).await;
 
         // Store the plugin
         {
@@ -330,7 +315,7 @@ impl Plugins {
             .context("plugin not found")?;
 
         if plugin.manifest.plugin.internal.is_some_and(|value| value) {
-            internal::handle_internal_action(self, devices, ctx, properties).await?;
+            internal::handle_internal_action(devices, ctx, properties).await?;
         } else {
             let session = match self.get_plugin_session(&ctx.plugin_id) {
                 Some(value) => value,
@@ -470,15 +455,10 @@ impl Plugins {
         manifest: &PluginManifest,
     ) {
         self.stop_task(&plugin_id).await;
-        self.start_task(plugin_id, plugin_path, manifest);
+        self.start_task(plugin_path, manifest).await;
     }
 
-    pub async fn start_task(
-        self: &Arc<Self>,
-        plugin_id: PluginId,
-        plugin_path: PathBuf,
-        manifest: &PluginManifest,
-    ) {
+    pub async fn start_task(self: &Arc<Self>, plugin_path: PathBuf, manifest: &PluginManifest) {
         let plugin_id = manifest.plugin.id.clone();
         let connect_url = "ws://localhost:59371/plugins/ws".to_string();
 

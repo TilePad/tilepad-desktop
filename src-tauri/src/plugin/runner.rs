@@ -1,28 +1,19 @@
 use std::{
-    future::Future,
-    path::{Path, PathBuf},
-    pin::Pin,
-    process::{ExitCode, ExitStatus, Stdio},
+    path::PathBuf,
+    process::{ExitStatus, Stdio},
     sync::Arc,
-    task::Poll,
 };
 
 use garde::rules::AsStr;
 use serde::{Serialize, Serializer};
 use tokio::{
-    io::{AsyncBufReadExt, BufReader, Lines},
-    process::{Child, ChildStderr, ChildStdout, Command},
+    io::{AsyncBufReadExt, BufReader},
+    process::{Child, Command},
     select,
     sync::{mpsc, oneshot},
-    task::AbortHandle,
 };
 
-use super::{
-    Plugin, Plugins,
-    manifest::{
-        Arch, ManifestBin, ManifestBinNative, OperatingSystem, PluginId, platform_arch, platform_os,
-    },
-};
+use super::{Plugins, manifest::PluginId};
 
 #[derive(Debug, Default, Clone)]
 pub enum PluginTaskState {
@@ -62,11 +53,6 @@ impl Serialize for PluginTaskState {
             PluginTaskState::Stopped => serializer.serialize_str("Stopped"),
         }
     }
-}
-
-pub enum PluginTaskType {
-    Node,
-    Native,
 }
 
 pub fn spawn_native_task(
@@ -142,8 +128,7 @@ pub fn spawn_native_task(
                 plugins.set_task_state(plugin_id, PluginTaskState::Error);
             }
         }
-    })
-    .abort_handle();
+    });
 
     plugins.set_task_state(plugin_id, PluginTaskState::Running { handle });
 }
@@ -234,8 +219,7 @@ pub fn spawn_node_task(
                 plugins.set_task_state(plugin_id, PluginTaskState::Error);
             }
         }
-    })
-    .abort_handle();
+    });
 
     plugins.set_task_state(plugin_id, PluginTaskState::Running { handle });
 }
@@ -313,8 +297,8 @@ impl ChildTask {
 
                     match msg {
                         ChildTaskMessage::Kill { tx } => {
-                            self.child.kill().await;
-                            tx.send(());
+                            _ = self.child.kill().await;
+                            _ = tx.send(());
                             return Ok(ExitStatus::default())
                         },
                     }

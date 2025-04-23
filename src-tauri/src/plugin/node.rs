@@ -1,7 +1,7 @@
 use crate::utils::{file::move_directory, zip::extract_zip};
 
-use crate::plugin::manifest::{Arch, BinaryNodeVersion};
-use anyhow::{Context, bail, ensure};
+use crate::plugin::manifest::Arch;
+use anyhow::{Context, ensure};
 use async_zip::tokio::read::seek::ZipFileReader;
 use serde::Deserialize;
 use std::path::Path;
@@ -16,7 +16,6 @@ const NODE_DIST_BASE_URL: &str = "https://nodejs.org/dist";
 #[derive(Deserialize)]
 pub struct NodeDist {
     pub version: node_semver::Version,
-    pub files: Vec<String>,
 }
 
 /// Request the list of available node versions from the official repository
@@ -131,10 +130,7 @@ mod test {
 
     use node_semver::Version;
 
-    use crate::plugin::{
-        manifest::Arch,
-        node::{BinaryNodeVersion, download_node},
-    };
+    use crate::plugin::{manifest::Arch, node::download_node};
 
     #[tokio::test]
     async fn test_download_latest() {

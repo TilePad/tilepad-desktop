@@ -3,16 +3,10 @@ pub mod system;
 
 use std::sync::Arc;
 
-use anyhow::Context;
-use serde::{Deserialize, Serialize};
-
 use crate::{
-    database::{
-        DbPool, JsonObject,
-        entity::{folder::FolderModel, profile::ProfileModel, tile::TileModel},
-    },
+    database::{DbPool, JsonObject},
     device::Devices,
-    events::{AppEvent, AppEventSender, InspectorContext, PluginAppEvent, TileInteractionContext},
+    events::{InspectorContext, TileInteractionContext},
     plugin::Plugins,
 };
 
@@ -28,7 +22,7 @@ pub async fn handle_internal_message(
         }
 
         "com.tilepad.system.system" => {
-            system::messages::handle(plugins, db, context, message).await?;
+            system::messages::handle(plugins, context, message).await?;
         }
 
         plugin_id => {
@@ -40,18 +34,17 @@ pub async fn handle_internal_message(
 }
 
 pub async fn handle_internal_action(
-    plugins: &Plugins,
     devices: &Devices,
     context: TileInteractionContext,
     properties: JsonObject,
 ) -> anyhow::Result<()> {
     match context.plugin_id.as_str() {
         "com.tilepad.system.navigation" => {
-            navigation::actions::handle(devices, plugins, context, properties).await?;
+            navigation::actions::handle(devices, context, properties).await?;
         }
 
         "com.tilepad.system.system" => {
-            system::actions::handle(devices, plugins, context, properties).await?;
+            system::actions::handle(context, properties).await?;
         }
 
         plugin_id => {

@@ -1,9 +1,7 @@
-use anyhow::{Context, anyhow};
-use async_zip::tokio::read::seek::ZipFileReader;
+use anyhow::Context;
 use std::{io::Cursor, os::windows::fs::FileTypeExt, path::Path};
 use tilepad_manifest::plugin::Manifest as PluginManifest;
 use tokio::io::BufReader;
-use tokio_util::compat::FuturesAsyncReadCompatExt;
 
 use crate::utils::zip::{create_zip_reader, extract_zip_file};
 

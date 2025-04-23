@@ -140,7 +140,7 @@ pub async fn plugins_start_plugin_task(
     let plugin = plugins.get_plugin(&plugin_id).context("plugin not found")?;
 
     plugins
-        .start_task(plugin_id, plugin.path.clone(), &plugin.manifest)
+        .start_task(plugin.path.clone(), &plugin.manifest)
         .await;
 
     Ok(())
