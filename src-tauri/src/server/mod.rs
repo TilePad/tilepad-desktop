@@ -1,10 +1,8 @@
+use axum::Extension;
 use std::{
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
     sync::Arc,
 };
-
-use anyhow::Context;
-use axum::Extension;
 use tauri::AppHandle;
 use tower_http::cors::CorsLayer;
 
@@ -22,7 +20,7 @@ pub async fn start_http_server(
     plugins: Arc<Plugins>,
     icons: Arc<Icons>,
     tiles: Arc<Tiles>,
-) -> anyhow::Result<()> {
+) {
     // build our application with a single route
     let app = routes::router()
         .layer(Extension(db))
@@ -36,12 +34,21 @@ pub async fn start_http_server(
 
     let addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, HTTP_PORT));
 
-    let listener = tokio::net::TcpListener::bind(addr)
-        .await
-        .context("failed to bind http server socket")?;
-    axum::serve(listener, app)
-        .await
-        .context("error while serving")?;
+    let listener = match tokio::net::TcpListener::bind(addr).await {
+        Ok(value) => value,
+        Err(cause) => {
+            tracing::error!(?cause, "failed to bind http server socket");
+            return;
+        }
+    };
 
-    Ok(())
+    if let Err(cause) = axum::serve(listener, app)
+        // Attach graceful shutdown to the shutdown receiver
+        .with_graceful_shutdown(async move {
+            _ = tokio::signal::ctrl_c().await;
+        })
+        .await
+    {
+        tracing::error!(?cause, "error while serving http server");
+    }
 }
