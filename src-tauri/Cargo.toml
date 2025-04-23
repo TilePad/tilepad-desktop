@@ -96,7 +96,10 @@ enigo = "0.3"
 arboard = "3.5.0"
 
 # File dialogs for file picker prompts
-rfd = { version = "0.15.3", features = ["tokio"] }
+rfd = { version = "0.15.3", default-features = false, features = [
+    "tokio",
+    "xdg-portal",
+] }
 
 tilepad-manifest = { version = "0.1.0" }
 
