@@ -53,9 +53,6 @@ jobs:
       - name: install frontend dependencies
         run: npm install
 
-      - name: Install Tauri cli
-        run: npm install --save-dev @tauri-apps/cli, Cannot find module @rollup
-
       - name: install inspector dependencies
         run: npm install
         working-directory: inspector
