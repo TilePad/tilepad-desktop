@@ -1,5 +1,5 @@
 use anyhow::Context;
-use std::{io::Cursor, os::windows::fs::FileTypeExt, path::Path};
+use std::{io::Cursor, path::Path};
 use tilepad_manifest::plugin::Manifest as PluginManifest;
 use tokio::io::BufReader;
 
@@ -46,10 +46,10 @@ pub async fn load_plugins_from_path(path: &Path) -> anyhow::Result<Vec<Plugin>> 
 
     while let Some(entry) = dir.next_entry().await? {
         let path = entry.path();
-        let file_type = entry.file_type().await?;
+        let metadata = tokio::fs::metadata(&path).await?;
 
         // Ignore anything thats not a directory
-        if !file_type.is_dir() && !file_type.is_symlink_dir() {
+        if !metadata.is_dir() {
             continue;
         }
 

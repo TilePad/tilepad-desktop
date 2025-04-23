@@ -103,6 +103,7 @@ rfd = { version = "0.15.3", default-features = false, features = [
 
 tilepad-manifest = { version = "0.2.0" }
 
+
 # Manifest definitions
 # Database dependencies
 [dependencies.sqlx]
