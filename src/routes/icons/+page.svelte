@@ -21,7 +21,7 @@
     <Aside severity="error" style="width: 100%">
       Failed to load icon packs: {getErrorMessage($iconPacksQuery.error)}
     </Aside>
-  {:else if $iconPacksQuery.isSuccess && $iconPacksQuery.data.length > 0}
+  {:else if $iconPacksQuery.isSuccess}
     <div class="header">
       <h2>Icon Packs</h2>
 
