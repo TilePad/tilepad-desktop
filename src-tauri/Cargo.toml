@@ -33,7 +33,6 @@ tauri-plugin-updater = "2"
 # Serialization
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-toml = "0.8.20"
 
 # Validation
 garde = { version = "0.22.0", features = ["full"] }
@@ -101,10 +100,9 @@ rfd = { version = "0.15.3", default-features = false, features = [
     "xdg-portal",
 ] }
 
-tilepad-manifest = { version = "0.2.0" }
-
-
 # Manifest definitions
+tilepad-manifest = { version = "0.3.0" }
+
 # Database dependencies
 [dependencies.sqlx]
 version = "0.8.2"

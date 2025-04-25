@@ -33,7 +33,7 @@ pub async fn read_icons_from_path(path: &Path) -> anyhow::Result<Vec<Icon>> {
 /// Loads a icon pack from the provided `path` reads the manifest file
 /// returning the loaded [IconPack]
 pub async fn load_icon_pack_from_path(path: &Path) -> anyhow::Result<IconPack> {
-    let manifest_path = path.join("manifest.toml");
+    let manifest_path = path.join("manifest.json");
     let manifest = match read_icon_pack_manifest(&manifest_path).await {
         Ok(value) => value,
         Err(cause) => {
@@ -73,7 +73,7 @@ pub async fn load_icon_packs_from_path(path: &Path) -> anyhow::Result<Vec<IconPa
         }
 
         // Skip directories that don't contain a manifest
-        let manifest_path = path.join("manifest.toml");
+        let manifest_path = path.join("manifest.json");
         if !manifest_path.exists() {
             continue;
         }
@@ -91,9 +91,9 @@ pub async fn read_icon_pack_manifest_zip(data: &[u8]) -> anyhow::Result<IconsMan
     let reader = BufReader::new(Cursor::new(data));
     let zip = create_zip_reader(reader).await?;
 
-    let manifest_data = extract_zip_file(zip, "manifest.toml")
+    let manifest_data = extract_zip_file(zip, "manifest.json")
         .await?
-        .context("icon pack missing manifest.toml")?;
+        .context("icon pack missing manifest.json")?;
 
     read_icon_pack_manifest_bytes(manifest_data).await
 }

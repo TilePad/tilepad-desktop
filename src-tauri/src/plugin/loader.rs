@@ -24,7 +24,7 @@ pub fn read_plugin_manifest_bytes(bytes: Vec<u8>) -> anyhow::Result<PluginManife
 /// Loads a plugin from the provided `path` reads the manifest file
 /// returning the loaded [Plugin]
 pub async fn load_plugin_from_path(path: &Path) -> anyhow::Result<Plugin> {
-    let manifest_path = path.join("manifest.toml");
+    let manifest_path = path.join("manifest.json");
     let manifest = match read_plugin_manifest(&manifest_path).await {
         Ok(value) => value,
         Err(cause) => {
@@ -54,7 +54,7 @@ pub async fn load_plugins_from_path(path: &Path) -> anyhow::Result<Vec<Plugin>> 
         }
 
         // Skip directories that don't contain a manifest
-        let manifest_path = path.join("manifest.toml");
+        let manifest_path = path.join("manifest.json");
         if !manifest_path.exists() {
             continue;
         }
@@ -72,9 +72,9 @@ pub async fn read_plugin_manifest_zip(data: &[u8]) -> anyhow::Result<PluginManif
     let reader = BufReader::new(Cursor::new(data));
     let zip = create_zip_reader(reader).await?;
 
-    let manifest_data = extract_zip_file(zip, "manifest.toml")
+    let manifest_data = extract_zip_file(zip, "manifest.json")
         .await?
-        .context("plugin missing manifest.toml")?;
+        .context("plugin missing manifest.json")?;
 
     read_plugin_manifest_bytes(manifest_data)
 }

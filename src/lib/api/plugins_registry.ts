@@ -28,7 +28,7 @@ export async function getPluginRegistry(): Promise<PluginRegistryEntry[]> {
 }
 
 async function getPluginManifest(repo: string): Promise<PluginManifest> {
-  const manifestURL = `https://raw.githubusercontent.com/${repo}/HEAD/.tilepadPlugin/manifest.toml`;
+  const manifestURL = `https://raw.githubusercontent.com/${repo}/HEAD/.tilepadPlugin/manifest.json`;
 
   // Download the manifest
   const manifestResponse = await fetch(manifestURL);

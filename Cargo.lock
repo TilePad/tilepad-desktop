@@ -5841,7 +5841,6 @@ dependencies = [
  "tilepad-manifest",
  "tokio",
  "tokio-util",
- "toml",
  "tower-http",
  "tracing",
  "tracing-subscriber",
@@ -5850,9 +5849,9 @@ dependencies = [
 
 [[package]]
 name = "tilepad-manifest"
-version = "0.2.0"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8d3551138deaff3fd0b5e22817ce826d9bac996bc107a0bbc17374818e316532"
+checksum = "42aca89b0bd8289c6442910c39353fb95159d20468b72fb5b090af7e3126688d"
 dependencies = [
  "dirs",
  "garde",
@@ -5862,7 +5861,6 @@ dependencies = [
  "serde_json",
  "strum 0.27.1",
  "thiserror 2.0.12",
- "toml",
 ]
 
 [[package]]
