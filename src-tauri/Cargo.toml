@@ -103,6 +103,9 @@ rfd = { version = "0.15.3", default-features = false, features = [
 # Manifest definitions
 tilepad-manifest = { version = "0.3.0" }
 
+# Database of fonts and getting system fonts
+fontdb = "0.23.0"
+
 # Database dependencies
 [dependencies.sqlx]
 version = "0.8.2"

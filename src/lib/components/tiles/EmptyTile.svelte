@@ -46,6 +46,7 @@
             enabled: true,
             label: "",
             align: LabelAlign.Bottom,
+            font: "Roboto",
             font_size: 12,
             bold: false,
             italic: false,

@@ -24,6 +24,7 @@
   import TextInput from "../input/TextInput.svelte";
   import NumberInput from "../input/NumberInput.svelte";
   import ToggleButton from "../input/ToggleButton.svelte";
+  import FontSelector from "../fonts/FontSelector.svelte";
   import PopoverButton from "../popover/PopoverButton.svelte";
   type Props = {
     tileId: TileId;
@@ -90,6 +91,11 @@
     updateLabel(label);
   };
 
+  const onChangeFont = (font: string) => {
+    label = { ...label, font };
+    updateLabel(label);
+  };
+
   // Only update label state when remote state is different from the
   // last debounced saved state (Prevent UI flickering from controlled changes)
   watch(
@@ -132,6 +138,8 @@
         {/snippet}
 
         {#snippet content()}
+          <FontSelector value={label.font} onChangeValue={onChangeFont} />
+
           <div>
             Font Size (pt)
             <NumberInput value={label.font_size} oninput={onChangeFontSize} />

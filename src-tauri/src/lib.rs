@@ -3,6 +3,7 @@ use std::{error::Error, str::FromStr, sync::Arc};
 use anyhow::Context;
 use device::Devices;
 use events::DeepLinkContext;
+use fonts::Fonts;
 use icons::Icons;
 use plugin::Plugins;
 use server::{HTTP_PORT, create_http_socket};
@@ -21,6 +22,7 @@ mod commands;
 mod database;
 mod device;
 mod events;
+mod fonts;
 mod icons;
 mod plugin;
 mod server;
@@ -29,7 +31,7 @@ mod utils;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    use commands::{actions, devices, folders, icons, plugins, profiles, server, tiles};
+    use commands::{actions, devices, folders, fonts, icons, plugins, profiles, server, tiles};
 
     tauri::Builder::default()
         .plugin(tauri_plugin_updater::Builder::new().build())
@@ -94,6 +96,8 @@ pub fn run() {
             icons::icons_uninstall_icon_pack,
             icons::icons_upload_user_icon,
             icons::icons_download_bundle,
+            // Fonts
+            fonts::fonts_fonts
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -165,6 +169,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         plugins.clone(),
     ));
     let tiles = Arc::new(Tiles::new(db.clone(), icons.clone(), devices.clone()));
+    let fonts = Arc::new(Fonts::new());
 
     app.manage(app_event_tx.clone());
     app.manage(db.clone());
@@ -172,6 +177,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
     app.manage(plugins.clone());
     app.manage(icons.clone());
     app.manage(tiles.clone());
+    app.manage(fonts.clone());
 
     // Handle deep links (tilepad://deep-link/com.tilepad.system.system.tilePlugin#code=1)
     app.deep_link().on_open_url({
@@ -221,6 +227,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         plugins.clone(),
         icons.clone(),
         tiles.clone(),
+        fonts,
     ));
 
     // Load the plugins from the default paths

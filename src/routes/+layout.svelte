@@ -1,5 +1,6 @@
 <script lang="ts">
   import "$lib/styles/app.css";
+  import "@fontsource-variable/roboto";
   import { Tooltip } from "bits-ui";
   import { queryClient } from "$lib/api/client";
   import Header from "$lib/components/layout/Header.svelte";

@@ -6,7 +6,9 @@ use std::{
 use tokio::net::TcpListener;
 use tower_http::cors::CorsLayer;
 
-use crate::{database::DbPool, device::Devices, icons::Icons, plugin::Plugins, tile::Tiles};
+use crate::{
+    database::DbPool, device::Devices, fonts::Fonts, icons::Icons, plugin::Plugins, tile::Tiles,
+};
 
 pub mod extractors;
 pub mod http_content;
@@ -27,6 +29,7 @@ pub async fn start_http_server(
     plugins: Arc<Plugins>,
     icons: Arc<Icons>,
     tiles: Arc<Tiles>,
+    fonts: Arc<Fonts>,
 ) {
     // Create router and attach extensions
     let app = routes::router()
@@ -35,6 +38,7 @@ pub async fn start_http_server(
         .layer(Extension(plugins))
         .layer(Extension(icons))
         .layer(Extension(tiles))
+        .layer(Extension(fonts))
         .layer(CorsLayer::very_permissive())
         .into_make_service_with_connect_info::<SocketAddr>();
 

@@ -79,6 +79,7 @@ pub struct TileLabel {
     pub enabled: bool,
     pub label: String,
     pub align: LabelAlign,
+    pub font: String,
 
     pub font_size: u32,
 
@@ -95,6 +96,7 @@ impl Default for TileLabel {
             enabled: true,
             label: Default::default(),
             align: Default::default(),
+            font: "Roboto".to_string(),
             font_size: 10,
             bold: false,
             italic: false,

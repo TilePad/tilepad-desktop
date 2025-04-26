@@ -69,6 +69,7 @@ export interface TileLabel {
   enabled: boolean;
   label: string;
   align: LabelAlign;
+  font: string;
   font_size: number;
   bold: boolean;
   italic: boolean;
