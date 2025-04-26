@@ -104,7 +104,7 @@ impl HttpError for AnyhowHttpError {
 
     fn reason(&self) -> String {
         // Anyhow errors use a generic message
-        "Server error".to_string()
+        "internal server error".to_string()
     }
 }
 
