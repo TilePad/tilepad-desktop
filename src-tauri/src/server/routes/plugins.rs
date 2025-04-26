@@ -27,12 +27,6 @@ pub async fn ws(
     Extension(connect_info): Extension<ConnectInfo<SocketAddr>>,
     ws: WebSocketUpgrade,
 ) -> Result<Response, DynHttpError> {
-    if !connect_info.ip().is_loopback() {
-        return Err(
-            anyhow!("plugin sessions cannot be started from hosts other than loopback").into(),
-        );
-    }
-
     tracing::debug!(?connect_info, "plugin session starting");
 
     Ok(ws.on_upgrade(move |socket| handle_plugin_socket(plugins, tiles, socket)))

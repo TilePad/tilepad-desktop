@@ -28,7 +28,7 @@ where
             .extensions
             .get::<ConnectInfo<SocketAddr>>()
             .context("missing connection info")?;
-        if !connect_info.0.ip().is_loopback() {
+        if !connect_info.ip().is_loopback() {
             return Err(RemoteConnectionNotAllowed {
                 addr: connect_info.0,
             }
