@@ -1,6 +1,6 @@
 use std::{borrow::Cow, net::SocketAddr, sync::Arc};
 
-use anyhow::{Context, anyhow};
+use anyhow::Context;
 use axum::{
     Extension,
     body::Body,
@@ -26,10 +26,10 @@ pub async fn ws(
     Extension(tiles): Extension<Arc<Tiles>>,
     Extension(connect_info): Extension<ConnectInfo<SocketAddr>>,
     ws: WebSocketUpgrade,
-) -> Result<Response, DynHttpError> {
+) -> Response {
     tracing::debug!(?connect_info, "plugin session starting");
 
-    Ok(ws.on_upgrade(move |socket| handle_plugin_socket(plugins, tiles, socket)))
+    ws.on_upgrade(move |socket| handle_plugin_socket(plugins, tiles, socket))
 }
 
 /// Handle the connection of a new plugin socket
