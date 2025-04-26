@@ -21,40 +21,44 @@
 
   const serverContext = getServerContext();
 
+  const src = $derived(getIconSrc(icon));
   const style = $derived(
     `padding: calc(${iconOptions.padding}px * var(--tile-size-adjustment)); background-color: ${iconOptions.background_color}`,
   );
 
   let error = $state(false);
 
-  function onError(event: Event) {
+  function onError() {
     error = true;
+  }
+
+  function getIconSrc(icon: TileIcon) {
+    switch (icon.type) {
+      case TileIconType.PluginIcon:
+        return getPluginAssetPath(
+          serverContext.serverURL,
+          icon.plugin_id,
+          icon.icon,
+        );
+      case TileIconType.IconPack:
+        return getIconAssetPath(
+          serverContext.serverURL,
+          icon.pack_id,
+          icon.path,
+        );
+      case TileIconType.Uploaded:
+        return getUploadedIconAssetPath(serverContext.serverURL, icon.path);
+      default:
+        return null;
+    }
   }
 </script>
 
-{#if icon.type === TileIconType.PluginIcon}
+{#if src !== null}
   <img
     class="tile__icon"
     class:tile__icon--error={error}
-    src={getPluginAssetPath(serverContext.serverURL, icon.plugin_id, icon.icon)}
-    alt="Tile Icon"
-    onerror={onError}
-    {style}
-  />
-{:else if icon.type === TileIconType.IconPack}
-  <img
-    class="tile__icon"
-    class:tile__icon--error={error}
-    src={getIconAssetPath(serverContext.serverURL, icon.pack_id, icon.path)}
-    alt="Tile Icon"
-    onerror={onError}
-    {style}
-  />
-{:else if icon.type === TileIconType.Uploaded}
-  <img
-    class="tile__icon"
-    class:tile__icon--error={error}
-    src={getUploadedIconAssetPath(serverContext.serverURL, icon.path)}
+    {src}
     alt="Tile Icon"
     onerror={onError}
     {style}
