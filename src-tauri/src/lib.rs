@@ -38,6 +38,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .setup(setup)
         .invoke_handler(tauri::generate_handler![
+            // Devices
             devices::devices_get_requests,
             devices::devices_get_devices,
             devices::devices_get_connected_devices,
@@ -46,19 +47,24 @@ pub fn run() {
             devices::devices_revoke_device,
             devices::devices_set_device_profile,
             devices::devices_set_device_folder,
+            // Server
             server::server_get_connection_info,
+            // Profiles
             profiles::profiles_get_profiles,
             profiles::profiles_get_profile,
             profiles::profiles_delete_profile,
             profiles::profiles_update_profile,
             profiles::profiles_create_profile,
+            // Folders
             folders::folders_get_folders,
             folders::folders_get_folder,
             folders::folders_delete_folder,
             folders::folders_update_folder,
             folders::folders_create_folder,
+            // Actions
             actions::actions_get_actions,
             actions::actions_get_action,
+            // Tiles
             tiles::tiles_get_tiles,
             tiles::tiles_get_tile,
             tiles::tiles_create_tile,
@@ -67,6 +73,7 @@ pub fn run() {
             tiles::tiles_update_tile_icon,
             tiles::tiles_update_tile_icon_options,
             tiles::tiles_delete_tile,
+            // Plugins
             plugins::plugins_send_plugin_message,
             plugins::plugins_open_inspector,
             plugins::plugins_close_inspector,
@@ -81,6 +88,7 @@ pub fn run() {
             plugins::plugins_uninstall_plugin,
             plugins::plugins_parse_manifest,
             plugins::plugins_download_bundle,
+            // Icons
             icons::icons_get_icon_packs,
             icons::icons_install_icon_pack,
             icons::icons_uninstall_icon_pack,
