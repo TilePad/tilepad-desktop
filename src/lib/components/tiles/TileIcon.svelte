@@ -10,12 +10,16 @@
     getUploadedIconAssetPath,
   } from "$lib/api/utils/url";
 
+  import { getServerContext } from "../ServerProvider.svelte";
+
   type Props = {
     icon: TileIcon;
     iconOptions: TileIconOptions;
   };
 
   const { icon, iconOptions }: Props = $props();
+
+  const serverContext = getServerContext();
 
   const style = $derived(
     `padding: calc(${iconOptions.padding}px * var(--tile-size-adjustment)); background-color: ${iconOptions.background_color}`,
@@ -32,7 +36,7 @@
   <img
     class="tile__icon"
     class:tile__icon--error={error}
-    src={getPluginAssetPath(icon.plugin_id, icon.icon)}
+    src={getPluginAssetPath(serverContext.serverURL, icon.plugin_id, icon.icon)}
     alt="Tile Icon"
     onerror={onError}
     {style}
@@ -41,7 +45,7 @@
   <img
     class="tile__icon"
     class:tile__icon--error={error}
-    src={getIconAssetPath(icon.pack_id, icon.path)}
+    src={getIconAssetPath(serverContext.serverURL, icon.pack_id, icon.path)}
     alt="Tile Icon"
     onerror={onError}
     {style}
@@ -50,7 +54,7 @@
   <img
     class="tile__icon"
     class:tile__icon--error={error}
-    src={getUploadedIconAssetPath(icon.path)}
+    src={getUploadedIconAssetPath(serverContext.serverURL, icon.path)}
     alt="Tile Icon"
     onerror={onError}
     {style}

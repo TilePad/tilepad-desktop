@@ -7,6 +7,7 @@
   import SolarAltArrowRightOutline from "~icons/solar/alt-arrow-right-outline";
 
   import ActionsSidebarList from "./ActionList.svelte";
+  import { getServerContext } from "../ServerProvider.svelte";
 
   type Props = {
     category: ActionCategory;
@@ -15,6 +16,8 @@
   };
 
   const { category, expanded, onToggleExpanded }: Props = $props();
+
+  const serverContext = getServerContext();
 </script>
 
 <div class="section">
@@ -28,7 +31,11 @@
     {#if category.icon !== null}
       <img
         class="icon"
-        src={getPluginAssetPath(category.plugin_id, category.icon)}
+        src={getPluginAssetPath(
+          serverContext.serverURL,
+          category.plugin_id,
+          category.icon,
+        )}
         alt="Action Icon"
       />
     {/if}

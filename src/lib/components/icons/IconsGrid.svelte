@@ -4,6 +4,8 @@
   import { getIconAssetPath } from "$lib/api/utils/url";
   import { createVirtualizer } from "$lib/utils/virtualization.svelte";
 
+  import { getServerContext } from "../ServerProvider.svelte";
+
   type Props = {
     pack: IconPack;
     // Available items for the grid
@@ -14,6 +16,9 @@
   };
 
   const { pack, items, itemHeight, columns, onClickIcon }: Props = $props();
+
+  const serverContext = getServerContext();
+  const serverURL = $derived(serverContext.serverURL);
 
   let wrapper: HTMLDivElement | undefined = $state();
 
@@ -77,7 +82,11 @@
       >
         <img
           class="item__image"
-          src={getIconAssetPath(pack.manifest.icons.id, item.icon.path)}
+          src={getIconAssetPath(
+            serverURL,
+            pack.manifest.icons.id,
+            item.icon.path,
+          )}
           alt={item.icon.name}
           width="64px"
           height="64px"

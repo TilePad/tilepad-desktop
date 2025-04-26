@@ -8,6 +8,7 @@
   import type { DialogProps } from "../dialog/Dialog.svelte";
 
   import Dialog from "../dialog/Dialog.svelte";
+  import { getServerContext } from "../ServerProvider.svelte";
   import DialogCloseButton from "../dialog/DialogCloseButton.svelte";
 
   type Props = DialogProps & {
@@ -15,6 +16,8 @@
   };
 
   let { onSelect, ...restProps }: Props = $props();
+
+  const serverContext = getServerContext();
 
   let activeAction: Action | null = $state(null);
 
@@ -40,6 +43,7 @@
                   {#if category.icon !== null}
                     <img
                       src={getPluginAssetPath(
+                        serverContext.serverURL,
                         category.plugin_id,
                         category.icon,
                       )}
@@ -58,6 +62,7 @@
                       {#if action.icon !== null}
                         <img
                           src={getPluginAssetPath(
+                            serverContext.serverURL,
                             action.plugin_id,
                             action.icon,
                           )}

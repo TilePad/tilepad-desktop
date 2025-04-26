@@ -10,28 +10,31 @@
   import DeviceRequests from "$lib/components/devices/DeviceRequests.svelte";
   import UpdateNotification from "$lib/components/UpdateNotification.svelte";
   import ProfilesProvider from "$lib/components/profiles/ProfilesProvider.svelte";
+  import InternalServerProvider from "$lib/components/InternalServerProvider.svelte";
 
   let { children } = $props();
 </script>
 
 <Tooltip.Provider>
   <QueryClientProvider client={queryClient}>
-    <div class="layout">
-      <Header />
+    <InternalServerProvider>
+      <div class="layout">
+        <Header />
 
-      <main class="main">
-        <ProfilesProvider>
-          <FolderProvider>
-            {@render children()}
+        <main class="main">
+          <ProfilesProvider>
+            <FolderProvider>
+              {@render children()}
 
-            <DeviceRequests />
-          </FolderProvider>
-        </ProfilesProvider>
-      </main>
-    </div>
+              <DeviceRequests />
+            </FolderProvider>
+          </ProfilesProvider>
+        </main>
+      </div>
 
-    <AppToaster />
-    <UpdateNotification />
+      <AppToaster />
+      <UpdateNotification />
+    </InternalServerProvider>
 
     <SvelteQueryDevtools buttonPosition="bottom-left" position="bottom" />
   </QueryClientProvider>

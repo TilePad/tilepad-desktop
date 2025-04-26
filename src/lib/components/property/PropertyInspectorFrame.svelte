@@ -8,6 +8,8 @@
 
   import type { PropertyInspectorMessage } from "./propertyInspectorMessage";
 
+  import { getServerContext } from "../ServerProvider.svelte";
+
   type Props = {
     ctx: InspectorContext;
     inspector: string;
@@ -20,12 +22,17 @@
   };
 
   const { ctx, inspector, onFrameEvent, onFrameMount }: Props = $props();
+  const serverContext = getServerContext();
 
   const inspectorSrc = $derived.by(() => {
     const params = new URLSearchParams();
     params.append("ctx", encodeInspectorContext(ctx));
 
-    const baseSrc = getPluginAssetPath(ctx.plugin_id, inspector);
+    const baseSrc = getPluginAssetPath(
+      serverContext.serverURL,
+      ctx.plugin_id,
+      inspector,
+    );
 
     return `${baseSrc}?${params.toString()}`;
   });

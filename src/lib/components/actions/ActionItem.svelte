@@ -3,18 +3,26 @@
 
   import { getPluginAssetPath } from "$lib/api/utils/url";
 
+  import { getServerContext } from "../ServerProvider.svelte";
+
   type Props = {
     action: Action;
   };
 
   const { action }: Props = $props();
+
+  const serverContext = getServerContext();
 </script>
 
 <div class="action">
   {#if action.icon !== null}
     <img
       class="icon"
-      src={getPluginAssetPath(action.plugin_id, action.icon)}
+      src={getPluginAssetPath(
+        serverContext.serverURL,
+        action.plugin_id,
+        action.icon,
+      )}
       alt="Action Icon"
     />
   {/if}
