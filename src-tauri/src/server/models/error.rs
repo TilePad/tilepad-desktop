@@ -1,19 +1,18 @@
 //! Module for HTTP error dynamic backed types, also contains
 //! shared HTTP error types used by multiple route groups
 
-use reqwest::StatusCode;
+use axum::{
+    Json,
+    http::StatusCode,
+    response::{IntoResponse, Response},
+};
+use serde::Serialize;
 use std::{
     error::Error,
     fmt::{Debug, Display},
 };
 use thiserror::Error;
 use tracing::error;
-
-use axum::{
-    Json,
-    response::{IntoResponse, Response},
-};
-use serde::Serialize;
 
 /// Type alias for dynamic error handling and JSON responses
 #[allow(unused)]
@@ -50,9 +49,6 @@ impl IntoResponse for DynHttpError {
         // Create the response body
         let body = Json(RawHttpError {
             reason: self.inner.reason(),
-            cause: None,
-            stack_trace: None,
-            trace_id: None,
         });
         let status = self.inner.status();
 
@@ -86,34 +82,24 @@ pub trait HttpError: Error + Send + Sync + 'static {
     }
 }
 
-/// Wrapper around [anyhow::Error] allowing it to be used as a [HttpError]
-/// without exposing the details.
-///
-/// Treats the error as a generic error meaning its still logged but not
-/// used as the HTTP response, since anyhow errors may contain information
-/// that shouldn't be visible to the requester
+/// HTTP error, commonly encountered when creating HTTP
+/// responses
 #[derive(Debug, Error)]
 #[error(transparent)]
-pub struct AnyhowHttpError(anyhow::Error);
+pub struct AxumHttpError(pub axum::http::Error);
 
-impl HttpError for AnyhowHttpError {
-    fn log(&self) {
-        // Anyhow errors contain a stacktrace so only the debug variant is used
-        error!("{:?}", self.0);
-    }
+impl HttpError for AxumHttpError {
+    fn log(&self) {}
 
-    fn reason(&self) -> String {
-        // Anyhow errors use a generic message
-        "internal server error".to_string()
+    fn status(&self) -> StatusCode {
+        StatusCode::INTERNAL_SERVER_ERROR
     }
 }
 
-/// Allow conversion from anyhow errors into [DynHttpError] by wrapping
-/// them with [AnyhowHttpError]
-impl From<anyhow::Error> for DynHttpError {
-    fn from(value: anyhow::Error) -> Self {
+impl From<axum::http::Error> for DynHttpError {
+    fn from(value: axum::http::Error) -> Self {
         DynHttpError {
-            inner: Box::new(AnyhowHttpError(value)),
+            inner: Box::new(AxumHttpError(value)),
         }
     }
 }
@@ -135,7 +121,4 @@ where
 #[serde(rename_all = "camelCase")]
 pub struct RawHttpError {
     pub reason: String,
-    pub cause: Option<String>,
-    pub stack_trace: Option<String>,
-    pub trace_id: Option<String>,
 }

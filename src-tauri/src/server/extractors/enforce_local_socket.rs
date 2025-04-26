@@ -1,14 +1,10 @@
-use std::net::SocketAddr;
-
-use anyhow::Context;
+use crate::server::models::error::{DynHttpError, HttpError};
 use axum::{
     extract::{ConnectInfo, FromRequestParts},
-    http::request::Parts,
+    http::{StatusCode, request::Parts},
 };
-use reqwest::StatusCode;
+use std::net::SocketAddr;
 use thiserror::Error;
-
-use crate::server::models::error::{DynHttpError, HttpError};
 
 /// Extractor that enforces any requests must have a
 /// loopback address
@@ -27,7 +23,7 @@ where
         let connect_info = parts
             .extensions
             .get::<ConnectInfo<SocketAddr>>()
-            .context("missing connection info")?;
+            .expect("connection info missing from request");
         if !connect_info.ip().is_loopback() {
             return Err(RemoteConnectionNotAllowed {
                 addr: connect_info.0,
@@ -50,7 +46,7 @@ impl HttpError for RemoteConnectionNotAllowed {
         tracing::warn!(addr = ?self.addr, "remote address attempted to access local only endpoint");
     }
 
-    fn status(&self) -> reqwest::StatusCode {
+    fn status(&self) -> StatusCode {
         StatusCode::FORBIDDEN
     }
 }

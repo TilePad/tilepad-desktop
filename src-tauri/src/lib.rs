@@ -100,12 +100,15 @@ pub fn run() {
 }
 
 fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
+    // For debug mode we load the deep link at runtime to provide
+    // deep linking while developing
     #[cfg(any(target_os = "linux", all(debug_assertions, windows)))]
     {
         use tauri_plugin_deep_link::DeepLinkExt;
         app.deep_link().register_all()?;
     }
 
+    // Setup logging
     let filter = EnvFilter::from_default_env();
     let subscriber = tracing_subscriber::fmt()
         .compact()
@@ -116,7 +119,6 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         .with_target(false)
         .finish();
 
-    // use that subscriber to process traces emitted after this point
     tracing::subscriber::set_global_default(subscriber)?;
 
     let app_handle = app.handle();

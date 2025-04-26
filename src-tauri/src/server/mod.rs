@@ -28,7 +28,7 @@ pub async fn start_http_server(
     icons: Arc<Icons>,
     tiles: Arc<Tiles>,
 ) {
-    // build our application with a single route
+    // Create router and attach extensions
     let app = routes::router()
         .layer(Extension(db))
         .layer(Extension(devices))
