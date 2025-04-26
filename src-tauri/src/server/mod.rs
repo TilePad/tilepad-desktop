@@ -3,7 +3,7 @@ use std::{
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
     sync::Arc,
 };
-use tauri::AppHandle;
+use tokio::net::TcpListener;
 use tower_http::cors::CorsLayer;
 
 use crate::{database::DbPool, device::Devices, icons::Icons, plugin::Plugins, tile::Tiles};
@@ -15,10 +15,15 @@ pub mod routes;
 
 pub const HTTP_PORT: u16 = 59371;
 
+pub async fn create_http_socket() -> std::io::Result<TcpListener> {
+    let addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, HTTP_PORT));
+    TcpListener::bind(addr).await
+}
+
 pub async fn start_http_server(
+    listener: TcpListener,
     db: DbPool,
     devices: Arc<Devices>,
-    app_handle: AppHandle,
     plugins: Arc<Plugins>,
     icons: Arc<Icons>,
     tiles: Arc<Tiles>,
@@ -27,22 +32,11 @@ pub async fn start_http_server(
     let app = routes::router()
         .layer(Extension(db))
         .layer(Extension(devices))
-        .layer(Extension(app_handle))
         .layer(Extension(plugins))
         .layer(Extension(icons))
         .layer(Extension(tiles))
         .layer(CorsLayer::very_permissive())
         .into_make_service_with_connect_info::<SocketAddr>();
-
-    let addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, HTTP_PORT));
-
-    let listener = match tokio::net::TcpListener::bind(addr).await {
-        Ok(value) => value,
-        Err(cause) => {
-            tracing::error!(?cause, "failed to bind http server socket");
-            return;
-        }
-    };
 
     if let Err(cause) = axum::serve(listener, app)
         // Attach graceful shutdown to the shutdown receiver

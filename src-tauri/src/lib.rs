@@ -5,12 +5,13 @@ use device::Devices;
 use events::DeepLinkContext;
 use icons::Icons;
 use plugin::Plugins;
+use server::{HTTP_PORT, create_http_socket};
 use std::path::PathBuf;
 use tauri::{
     App, Manager,
     async_runtime::{block_on, spawn},
 };
-use tauri_plugin_deep_link::DeepLinkExt;
+use tauri_plugin_deep_link::{DeepLinkExt, OpenUrlEvent};
 use tile::Tiles;
 use tilepad_manifest::plugin::PluginId;
 use tokio::sync::mpsc;
@@ -103,7 +104,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         .with_file(true)
         .with_env_filter(filter)
         .with_line_number(true)
-        .with_thread_ids(true)
+        .with_thread_ids(false)
         .with_target(false)
         .finish();
 
@@ -162,7 +163,55 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
     app.manage(icons.clone());
     app.manage(tiles.clone());
 
+    // Handle deep links (tilepad://deep-link/com.tilepad.system.system.tilePlugin#code=1)
+    app.deep_link().on_open_url({
+        tracing::debug!("prepared to handle deep links");
+
+        let plugins = plugins.clone();
+        move |event| on_deep_link(&plugins, event)
+    });
+
     tracing::debug!("starting event processor");
+
+    // Spawn event processor
+    spawn(events::processing::process_events(
+        app_handle.clone(),
+        db.clone(),
+        app_event_rx,
+    ));
+
+    // Binding a socket must come before the rest of the app setup
+    // (Socket must be bound before plugins load to prevent phantom processes holding the port)
+    let http_socket = match tauri::async_runtime::block_on(create_http_socket()) {
+        Ok(value) => value,
+        Err(cause) => {
+            tracing::error!(?cause, "failed to bind http server socket");
+
+            // Show error dialog about the failed port binding
+            rfd::MessageDialog::new()
+                .set_title("Failed to start")
+                .set_description(format!(
+                    "The port {} required to run TilePad is currently in use",
+                    HTTP_PORT
+                ))
+                .set_level(rfd::MessageLevel::Error)
+                .set_buttons(rfd::MessageButtons::Ok)
+                .show();
+
+            // Failing to start the HTTP socket is a fatal error, app will not work without this
+            std::process::exit(1);
+        }
+    };
+
+    // Spawn HTTP server
+    spawn(server::start_http_server(
+        http_socket,
+        db,
+        devices,
+        plugins.clone(),
+        icons.clone(),
+        tiles.clone(),
+    ));
 
     // Load the plugins from the default paths
     spawn({
@@ -180,72 +229,54 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         }
     });
 
-    // Spawn event processor
-    spawn(events::processing::process_events(
-        app_handle.clone(),
-        db.clone(),
-        app_event_rx,
-    ));
-
-    // Spawn HTTP server
-    spawn(server::start_http_server(
-        db,
-        devices,
-        app_handle.clone(),
-        plugins.clone(),
-        icons.clone(),
-        tiles.clone(),
-    ));
-
-    // Handle deep links (tilepad://deep-link/com.tilepad.system.system.tilePlugin#code=1)
-    app.deep_link().on_open_url(move |event| {
-        for url in event.urls() {
-            tracing::debug!(?url, "execute deep link url");
-
-            // Domain part must be "deep-link" to be treated as a deep link
-            match url.domain() {
-                Some("deep-link") => {}
-                _ => continue,
-            }
-
-            let mut path = match url.path_segments() {
-                Some(value) => value,
-                None => continue,
-            };
-
-            let plugin_id = match path.next() {
-                Some(value) => PluginId::from_str(value),
-                None => continue,
-            };
-
-            let plugin_id = match plugin_id {
-                Ok(value) => value,
-                Err(cause) => {
-                    tracing::error!(?cause, "invalid deep link plugin id");
-                    continue;
-                }
-            };
-
-            let host = url.host_str().map(|value| value.to_string());
-            let path = url.path().to_string();
-            let query = url.query().map(|value| value.to_string());
-            let fragment = url.fragment().map(|value| value.to_string());
-            let url = url.to_string();
-
-            plugins.deep_link(
-                &plugin_id,
-                DeepLinkContext {
-                    url,
-                    host,
-                    path,
-                    query,
-                    fragment,
-                },
-            );
-        }
-    });
-
     Ok(())
+}
+
+fn on_deep_link(plugins: &Arc<Plugins>, event: OpenUrlEvent) {
+    for url in event.urls() {
+        tracing::debug!(?url, "execute deep link url");
+
+        // Domain part must be "deep-link" to be treated as a deep link
+        match url.domain() {
+            Some("deep-link") => {}
+            _ => continue,
+        }
+
+        let mut path = match url.path_segments() {
+            Some(value) => value,
+            None => continue,
+        };
+
+        let plugin_id = match path.next() {
+            Some(value) => PluginId::from_str(value),
+            None => continue,
+        };
+
+        let plugin_id = match plugin_id {
+            Ok(value) => value,
+            Err(cause) => {
+                tracing::error!(?cause, "invalid deep link plugin id");
+                continue;
+            }
+        };
+
+        let host = url.host_str().map(|value| value.to_string());
+        let path = url.path().to_string();
+        let query = url.query().map(|value| value.to_string());
+        let fragment = url.fragment().map(|value| value.to_string());
+        let url = url.to_string();
+
+        plugins.deep_link(
+            &plugin_id,
+            DeepLinkContext {
+                url,
+                host,
+                path,
+                query,
+                fragment,
+            },
+        );
+    }
 }
 
 /// In development we directly use the source path to "core" resources  
