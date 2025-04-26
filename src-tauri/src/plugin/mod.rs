@@ -25,6 +25,7 @@ use crate::{
         AppEvent, AppEventSender, DeepLinkContext, InspectorContext, PluginAppEvent,
         TileInteractionContext,
     },
+    server::HTTP_PORT,
 };
 
 pub mod action;
@@ -460,7 +461,7 @@ impl Plugins {
 
     pub async fn start_task(self: &Arc<Self>, plugin_path: PathBuf, manifest: &PluginManifest) {
         let plugin_id = manifest.plugin.id.clone();
-        let connect_url = "ws://localhost:59371/plugins/ws".to_string();
+        let connect_url = format!("ws://127.0.0.1:{}/plugins/ws", HTTP_PORT);
 
         tracing::debug!(?plugin_id, "starting background task for plugin");
 
