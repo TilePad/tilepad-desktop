@@ -48,7 +48,6 @@ pub async fn ws(
 ///
 /// Get a file from a specific plugin
 pub async fn get_plugin_file(
-    _: EnforceLocalSocket,
     Path((plugin_id, path)): Path<(PluginId, String)>,
     Extension(plugins): Extension<Arc<Plugins>>,
 ) -> Result<impl IntoResponse, DynHttpError> {
