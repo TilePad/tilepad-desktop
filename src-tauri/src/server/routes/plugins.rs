@@ -13,7 +13,7 @@ use tokio::join;
 
 use crate::{
     plugin::{Plugins, manifest::PluginId, session::PluginSession},
-    server::models::error::DynHttpError,
+    server::{extractors::enforce_local_socket::EnforceLocalSocket, models::error::DynHttpError},
     tile::Tiles,
 };
 
@@ -21,6 +21,7 @@ use crate::{
 ///
 /// Accept a new plugin websocket connection upgrade
 pub async fn ws(
+    _: EnforceLocalSocket,
     Extension(plugins): Extension<Arc<Plugins>>,
     Extension(tiles): Extension<Arc<Tiles>>,
     Extension(connect_info): Extension<ConnectInfo<SocketAddr>>,
@@ -38,7 +39,7 @@ pub async fn ws(
 }
 
 /// Handle the connection of a new plugin socket
-pub async fn handle_plugin_socket(plugins: Arc<Plugins>, tiles: Arc<Tiles>, socket: WebSocket) {
+async fn handle_plugin_socket(plugins: Arc<Plugins>, tiles: Arc<Tiles>, socket: WebSocket) {
     PluginSession::start(plugins, tiles, socket);
 }
 
@@ -90,6 +91,7 @@ async fn get_inspector_styles() -> Cow<'static, str> {
 
 /// GET /plugins/{plugin_id}/assets/{file_path*}
 pub async fn get_plugin_file(
+    _: EnforceLocalSocket,
     Path((plugin_id, path)): Path<(PluginId, String)>,
     Extension(plugins): Extension<Arc<Plugins>>,
 ) -> Result<Response<Body>, DynHttpError> {

@@ -8,6 +8,7 @@ use tower_http::cors::CorsLayer;
 
 use crate::{database::DbPool, device::Devices, icons::Icons, plugin::Plugins, tile::Tiles};
 
+pub mod extractors;
 pub mod models;
 pub mod routes;
 
