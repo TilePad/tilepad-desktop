@@ -3,7 +3,6 @@ use std::sync::Arc;
 use anyhow::Context;
 use axum::{Extension, body::Body, extract::Path, response::Response};
 use reqwest::{StatusCode, header::CONTENT_TYPE};
-use tauri::{AppHandle, Manager};
 use tilepad_manifest::icons::IconPackId;
 
 use crate::{icons::Icons, server::models::error::DynHttpError};
@@ -41,15 +40,9 @@ pub async fn get_icon_file(
 /// GET /uploaded-icons/{file_path*}
 pub async fn get_uploaded_icon_file(
     Path(path): Path<String>,
-    Extension(app): Extension<AppHandle>,
+    Extension(icons): Extension<Arc<Icons>>,
 ) -> Result<Response<Body>, DynHttpError> {
-    let app_data_path = app
-        .path()
-        .app_data_dir()
-        .context("failed to get app data dir")?;
-    let uploaded_icons = app_data_path.join("uploaded_icons");
-    let file_path = uploaded_icons.join(path);
-
+    let file_path = icons.uploaded_path().join(path);
     // TODO: Assert file path is within uploaded icons path
 
     if !file_path.exists() {
