@@ -1,6 +1,14 @@
 use std::{collections::VecDeque, path::Path};
 
 use anyhow::Context;
+use tokio::{fs::canonicalize, try_join};
+
+/// Checks if the provided `target` path is contained with the provided `base`
+/// path
+pub async fn is_within(base: &Path, target: &Path) -> std::io::Result<bool> {
+    let (base, target) = try_join!(canonicalize(base), canonicalize(target),)?;
+    Ok(target.starts_with(&base))
+}
 
 /// Get the file extension from a file name
 pub fn file_extension(name: String) -> anyhow::Result<String> {
