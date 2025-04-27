@@ -6,6 +6,7 @@
   import Header from "$lib/components/layout/Header.svelte";
   import AppToaster from "$lib/components/AppToaster.svelte";
   import { QueryClientProvider } from "@tanstack/svelte-query";
+  import I18nProvider from "$lib/components/I18nProvider.svelte";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import FolderProvider from "$lib/components/folders/FolderProvider.svelte";
   import DeviceRequests from "$lib/components/devices/DeviceRequests.svelte";
@@ -16,30 +17,32 @@
   let { children } = $props();
 </script>
 
-<Tooltip.Provider>
-  <QueryClientProvider client={queryClient}>
-    <InternalServerProvider>
-      <div class="layout">
-        <Header />
+<I18nProvider>
+  <Tooltip.Provider>
+    <QueryClientProvider client={queryClient}>
+      <InternalServerProvider>
+        <div class="layout">
+          <Header />
 
-        <main class="main">
-          <ProfilesProvider>
-            <FolderProvider>
-              {@render children()}
+          <main class="main">
+            <ProfilesProvider>
+              <FolderProvider>
+                {@render children()}
 
-              <DeviceRequests />
-            </FolderProvider>
-          </ProfilesProvider>
-        </main>
-      </div>
+                <DeviceRequests />
+              </FolderProvider>
+            </ProfilesProvider>
+          </main>
+        </div>
 
-      <AppToaster />
-      <UpdateNotification />
-    </InternalServerProvider>
+        <AppToaster />
+        <UpdateNotification />
+      </InternalServerProvider>
 
-    <SvelteQueryDevtools buttonPosition="bottom-left" position="bottom" />
-  </QueryClientProvider>
-</Tooltip.Provider>
+      <SvelteQueryDevtools buttonPosition="bottom-left" position="bottom" />
+    </QueryClientProvider>
+  </Tooltip.Provider>
+</I18nProvider>
 
 <style>
   .layout {

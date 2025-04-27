@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "svelte-i18n";
   import SolarDevicesBoldDuotone from "~icons/solar/devices-bold-duotone";
   import SolarSettingsBoldDuotone from "~icons/solar/settings-bold-duotone";
   import SolarPlugCircleBoldDuotone from "~icons/solar/plug-circle-bold-duotone";
@@ -14,19 +15,27 @@
     <NavButton
       icon={SolarLayersMinimalisticBoldDuotone}
       href="/"
-      title="Profiles"
+      title={$t("nav.profiles")}
     />
-    <NavButton icon={SolarDevicesBoldDuotone} href="/devices" title="Devices" />
+    <NavButton
+      icon={SolarDevicesBoldDuotone}
+      href="/devices"
+      title={$t("nav.devices")}
+    />
     <NavButton
       icon={SolarPlugCircleBoldDuotone}
       href="/plugins"
-      title="Plugins"
+      title={$t("nav.plugins")}
     />
-    <NavButton icon={SolarGalleryWideBoldDuotone} href="/icons" title="Icons" />
+    <NavButton
+      icon={SolarGalleryWideBoldDuotone}
+      href="/icons"
+      title={$t("nav.icons")}
+    />
     <NavButton
       icon={SolarSettingsBoldDuotone}
       href="/settings"
-      title="Settings"
+      title={$t("nav.settings")}
     />
 
     {#if import.meta.env.DEV}

@@ -1,0 +1,9 @@
+{
+    "nav": {
+        "profiles": "Profiles",
+        "devices": "Devices",
+        "plugins": "Plugins",
+        "icons": "Icons",
+        "settings": "Settings"
+    }
+}
