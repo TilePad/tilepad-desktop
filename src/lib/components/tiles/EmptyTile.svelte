@@ -1,9 +1,9 @@
 <!-- Empty tile that can be used to add a new tile -->
 <script lang="ts">
   import { toast } from "svelte-sonner";
+  import { TileIconType } from "$lib/api/types/tiles";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import { createCreateTileMutation } from "$lib/api/tiles";
-  import { LabelAlign, TileIconType } from "$lib/api/types/tiles";
   import {
     dndzone,
     type DndEvent,
@@ -42,17 +42,6 @@
         column,
         folder_id: currentFolder.id,
         config: {
-          label: {
-            enabled: true,
-            label: "",
-            align: LabelAlign.Bottom,
-            font: "Roboto",
-            font_size: 12,
-            bold: false,
-            italic: false,
-            underline: false,
-            color: "#ffffff",
-          },
           action_id: action.action_id,
           plugin_id: action.plugin_id,
           icon:
@@ -63,14 +52,6 @@
                   plugin_id: action.plugin_id,
                   icon: action.icon,
                 },
-          icon_options: {
-            padding: 0,
-            background_color: "#00000000",
-          },
-          user_flags: {
-            icon: false,
-            label: false,
-          },
         },
         properties: {},
       },

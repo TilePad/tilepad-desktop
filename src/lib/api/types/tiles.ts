@@ -1,3 +1,5 @@
+import type { DeepPartial } from "$lib/types";
+
 import type { Uuid } from "./shared";
 import type { PluginId } from "./plugin";
 import type { ActionId } from "./actions";
@@ -61,9 +63,18 @@ export type TileIcon =
   | ({ type: TileIconType.IconPack } & TileIconIconPack)
   | ({ type: TileIconType.Uploaded } & TileIconUploaded);
 
-export type CreateTile = Omit<TileModel, "id">;
+export type CreateTile = Omit<TileModel, "id" | "config"> & {
+  // When creating a tile only the plugin_id and action_id are
+  // required parts of the configuration
+  config: Pick<TileConfig, "plugin_id" | "action_id"> &
+    DeepPartial<Omit<TileConfig, "plugin_id" | "action_id">>;
+};
 
-export type UpdateTile = Partial<Omit<TileModel, "id">>;
+export type UpdateTile = Partial<Omit<TileModel, "id" | "config">> & {
+  //
+  config: Pick<TileConfig, "plugin_id" | "action_id"> &
+    DeepPartial<Omit<TileConfig, "plugin_id" | "action_id">>;
+};
 
 export interface TileLabel {
   enabled: boolean;
@@ -74,7 +85,9 @@ export interface TileLabel {
   bold: boolean;
   italic: boolean;
   underline: boolean;
+  outline: boolean;
   color: string;
+  outline_color: string;
 }
 
 export enum LabelAlign {

@@ -11,11 +11,12 @@
 {#if label.enabled && label.label.length > 0}
   <p
     class="label"
-    style="font-size: calc({label.font_size}pt * var(--tile-size-adjustment)); font-family: {label.font}, 'Roboto'; color: {label.color};"
+    style="font-size: calc({label.font_size}pt * var(--tile-size-adjustment)); font-family: {label.font}, 'Roboto'; color: {label.color}; --outline-color: {label.outline_color};"
     data-align={label.align}
     class:label--bold={label.bold}
     class:label--italic={label.italic}
     class:label--underline={label.underline}
+    class:label--outline={label.outline}
   >
     {label.label}
   </p>
@@ -25,11 +26,6 @@
   .label {
     position: absolute;
     text-align: center;
-    text-shadow:
-      -1px -1px 0 #000,
-      1px -1px 0 #000,
-      -1px 1px 0 #000,
-      1px 1px 0 #000;
     font-weight: normal;
   }
 
@@ -57,5 +53,13 @@
 
   .label--underline {
     text-decoration: underline;
+  }
+
+  .label--outline {
+    text-shadow:
+      -1px -1px 0 var(--outline-color),
+      1px -1px 0 var(--outline-color),
+      -1px 1px 0 var(--outline-color),
+      1px 1px 0 var(--outline-color);
   }
 </style>

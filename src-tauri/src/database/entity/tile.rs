@@ -79,15 +79,17 @@ pub struct TileLabel {
     pub enabled: bool,
     pub label: String,
     pub align: LabelAlign,
-    pub font: String,
 
+    pub font: String,
     pub font_size: u32,
 
     pub bold: bool,
     pub italic: bool,
     pub underline: bool,
+    pub outline: bool,
 
     pub color: String,
+    pub outline_color: String,
 }
 
 impl Default for TileLabel {
@@ -101,7 +103,9 @@ impl Default for TileLabel {
             bold: false,
             italic: false,
             underline: false,
+            outline: true,
             color: "#ffffff".to_string(),
+            outline_color: "#000000".to_string(),
         }
     }
 }

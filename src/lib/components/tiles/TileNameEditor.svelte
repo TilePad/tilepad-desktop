@@ -8,6 +8,7 @@
   import SolarAlignTopBoldDuotone from "~icons/solar/align-top-bold-duotone";
   import SolarTextBoldBoldDuotone from "~icons/solar/text-bold-bold-duotone";
   import SolarTextItalicBoldDuotone from "~icons/solar/text-italic-bold-duotone";
+  import SolarTextBoldSquareOutline from "~icons/solar/text-bold-square-outline";
   import SolarAlignBottomBoldDuotone from "~icons/solar/align-bottom-bold-duotone";
   import SolarTextUnderlineBoldDuotone from "~icons/solar/text-underline-bold-duotone";
   import SolarAlignVerticalSpacingBoldDuotone from "~icons/solar/align-vertical-spacing-bold-duotone";
@@ -66,6 +67,11 @@
     updateLabel(label);
   };
 
+  const onChangeOutlineColor = (value: string) => {
+    label = { ...label, outline_color: value };
+    updateLabel(label);
+  };
+
   const onToggleEnabled = () => {
     label = { ...label, enabled: !label.enabled };
     updateLabel(label);
@@ -83,6 +89,11 @@
 
   const onToggleUnderline = () => {
     label = { ...label, underline: !label.underline };
+    updateLabel(label);
+  };
+
+  const onToggleOutline = () => {
+    label = { ...label, outline: !label.outline };
     updateLabel(label);
   };
 
@@ -159,6 +170,9 @@
               >
                 <SolarTextUnderlineBoldDuotone />
               </ToggleButton>
+              <ToggleButton active={label.outline} onclick={onToggleOutline}>
+                <SolarTextBoldSquareOutline />
+              </ToggleButton>
             </div>
 
             <div class="toggle-button-list">
@@ -183,16 +197,22 @@
             </div>
           </div>
 
-          <div class="color-picker">
-            <ColorPicker
-              hex={label.color}
-              on:input={(event) => {
-                if (event.detail.hex) onChangeColor(event.detail.hex);
-              }}
-              position="responsive"
-              label="Text color"
-            />
-          </div>
+          <ColorPicker
+            hex={label.color}
+            on:input={(event) => {
+              if (event.detail.hex) onChangeColor(event.detail.hex);
+            }}
+            position="responsive"
+            label="Text color"
+          />
+          <ColorPicker
+            hex={label.outline_color}
+            on:input={(event) => {
+              if (event.detail.hex) onChangeOutlineColor(event.detail.hex);
+            }}
+            position="responsive"
+            label="Text outline color"
+          />
         {/snippet}
       </PopoverButton>
     {/snippet}
