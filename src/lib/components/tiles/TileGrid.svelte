@@ -29,7 +29,7 @@
 
   const sizeAdjust = $derived.by(() => {
     const ratio = (tileWidth - desiredWidth) / desiredWidth;
-    return 1 - Math.max(0.0, -ratio);
+    return 1 + ratio;
   });
 </script>
 
