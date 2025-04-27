@@ -16,7 +16,7 @@
     "plugin_install_error": "Failed to install plugin",
     "plugin_uninstalling": "Uninstalling plugin",
     "plugin_uninstalled": "Uninstalled plugin",
-    "plugin_uninstall_error": "Failed to uninstall icon pack",
+    "plugin_uninstall_error": "Failed to uninstall plugin",
     "plugin_reloading": "Reloading plugin",
     "plugin_reloaded": "Reloaded plugin",
     "plugin_reload_error": "Failed to reload plugin",
