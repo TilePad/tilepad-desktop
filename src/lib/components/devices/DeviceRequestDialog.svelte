@@ -2,6 +2,7 @@
 <script lang="ts">
   import type { DeviceRequest } from "$lib/api/types/devices";
 
+  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import { approveDeviceRequest, declineDeviceRequest } from "$lib/api/devices";
@@ -18,9 +19,9 @@
     const approvePromise = approveDeviceRequest(request.id);
 
     toast.promise(approvePromise, {
-      loading: "Approving device",
-      success: "Approved device",
-      error: toastErrorMessage("Failed to approve device"),
+      loading: $t("device_approving"),
+      success: $t("device_approved"),
+      error: toastErrorMessage($t("device_approve_error")),
     });
   }
 
@@ -28,16 +29,16 @@
     const declinePromise = declineDeviceRequest(request.id);
 
     toast.promise(declinePromise, {
-      loading: "Declining device",
-      success: "Declined device",
-      error: toastErrorMessage("Failed to decline device"),
+      loading: $t("device_declining"),
+      success: $t("device_declined"),
+      error: toastErrorMessage($t("device_decline_error")),
     });
   }
 </script>
 
 <div class="device">
-  <h2>Device Approval Request</h2>
-  <p>Pending request for device approval</p>
+  <h2>{$t("device_approval_request")}</h2>
+  <p>{$t("device_approval_request_desc")}</p>
 
   <h3 class="device__name">
     {request.device_name}
@@ -45,8 +46,12 @@
   <span class="device__id">Address: {request.socket_addr}</span>
 
   <div class="actions">
-    <Button variant="error" onclick={handleDecline}>Decline</Button>
-    <Button onclick={handleApprove}>Approve</Button>
+    <Button variant="error" onclick={handleDecline}>
+      {$t("decline")}
+    </Button>
+    <Button onclick={handleApprove}>
+      {$t("approve")}
+    </Button>
   </div>
 </div>
 

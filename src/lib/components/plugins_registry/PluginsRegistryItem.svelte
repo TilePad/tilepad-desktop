@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { PluginRegistryEntry } from "$lib/api/types/plugins_registry";
 
+  import { t } from "svelte-i18n";
+
   type Props = {
     item: PluginRegistryEntry;
     selected: boolean;
@@ -20,7 +22,7 @@
   <p class="repo">{item.repo}</p>
 
   {#if installed}
-    <p class="installed">Installed</p>
+    <p class="installed">{$t("installed")}</p>
   {/if}
 </button>
 

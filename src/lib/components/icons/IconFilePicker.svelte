@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { uploadUserIcon } from "$lib/api/icons";
   import { toastErrorMessage } from "$lib/api/utils/error";
@@ -27,7 +28,7 @@
       const path = await uploadUserIcon(file);
       onSelectIcon({ type: TileIconType.Uploaded, path });
     } catch (err) {
-      toast.error(toastErrorMessage("failed to upload file")(err));
+      toast.error(toastErrorMessage($t("file_upload_failed"))(err));
     }
   }
 </script>
@@ -39,7 +40,7 @@
   }}
   style="width: 100%"
 >
-  Select Icon File
+  {$t("select_icon_file")}
 </Button>
 
 <input

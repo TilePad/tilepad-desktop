@@ -1,5 +1,6 @@
 <!-- Empty tile that can be used to add a new tile -->
 <script lang="ts">
+  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { TileIconType } from "$lib/api/types/tiles";
   import { toastErrorMessage } from "$lib/api/utils/error";
@@ -58,9 +59,9 @@
     });
 
     toast.promise(createPromise, {
-      loading: "Creating tile",
-      success: "Created tile",
-      error: toastErrorMessage("Failed to create tile"),
+      loading: $t("tile_creating"),
+      success: $t("tile_created"),
+      error: toastErrorMessage($t("tile_create_error")),
     });
   }
 </script>

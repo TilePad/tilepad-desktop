@@ -2,12 +2,15 @@
   import type { PluginId } from "$lib/api/types/plugin";
   import type { ActionCategory } from "$lib/api/types/actions";
 
+  import { t } from "svelte-i18n";
   import { createActionsQuery } from "$lib/api/actions";
   import { getErrorMessage } from "$lib/api/utils/error";
   import { persistedState } from "$lib/utils/localStorage.svelte";
   import SolarAltArrowLeftOutline from "~icons/solar/alt-arrow-left-outline";
   import SolarAltArrowRightOutline from "~icons/solar/alt-arrow-right-outline";
 
+  import Aside from "../Aside.svelte";
+  import SkeletonList from "../skeleton/SkeletonList.svelte";
   import ActionsSidebarCategory from "./ActionCategory.svelte";
 
   type ActionSidebarState = {
@@ -93,16 +96,20 @@
         bind:value={search}
         class="search"
         type="text"
-        placeholder="Search..."
+        placeholder={$t("search_placeholder")}
       />
     </div>
   </div>
 
   <div class="content">
     {#if $actionsQuery.isLoading}
-      Loading actions...
+      <SkeletonList style="margin: 1rem" />
     {:else if $actionsQuery.isError}
-      Failed to load actions: {getErrorMessage($actionsQuery.error)}
+      <Aside severity="error" style="margin: 1rem;">
+        {$t("actions_error", {
+          values: { error: getErrorMessage($actionsQuery.error) },
+        })}
+      </Aside>
     {:else if $actionsQuery.isSuccess}
       {#each filteredCategories as category}
         <ActionsSidebarCategory
@@ -111,7 +118,9 @@
           onToggleExpanded={() => onToggleCategoryExpanded(category.plugin_id)}
         />
       {:else}
-        <p class="none">No results found...</p>
+        <p class="none">
+          {$t("no_results")}
+        </p>
       {/each}
     {/if}
   </div>

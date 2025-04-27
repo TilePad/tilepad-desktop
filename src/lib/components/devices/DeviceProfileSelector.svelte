@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { ProfileModel } from "$lib/api/types/profiles";
 
+  import { t } from "svelte-i18n";
   import { Select } from "bits-ui";
   import { slide } from "svelte/transition";
   import { createProfilesQuery } from "$lib/api/profiles";
@@ -41,7 +42,7 @@
         {#if currentProfile}
           {currentProfile.name}
         {:else}
-          Choose a profile
+          {$t("choose_profile")}
         {/if}
 
         {#if open}

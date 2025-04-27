@@ -4,6 +4,7 @@
   import type { ProfileId } from "$lib/api/types/profiles";
   import type { DeviceModel } from "$lib/api/types/devices";
 
+  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import SolarTrashBin2BoldDuotone from "~icons/solar/trash-bin-2-bold-duotone";
@@ -28,9 +29,9 @@
     const revokePromise = revokeDevice(device.id);
 
     toast.promise(revokePromise, {
-      loading: "Revoking device",
-      success: "Revoked device",
-      error: toastErrorMessage("Failed to revoke device"),
+      loading: $t("device_revoking"),
+      success: $t("device_revoked"),
+      error: toastErrorMessage($t("device_revoke_error")),
     });
   }
 
@@ -52,10 +53,10 @@
     <span class="state" data-connected={connected}>
       {#if connected}
         <SolarTranslationBoldDuotone />
-        Connected
+        {$t("connected")}
       {:else}
         <SolarTranslationBoldDuotone />
-        Not Connected
+        {$t("not_connected")}
       {/if}
     </span>
   </h2>
@@ -72,7 +73,8 @@
   />
 
   <Button variant="error" onclick={handleRevoke} style="margin-top: 0.5rem">
-    <SolarTrashBin2BoldDuotone /> Revoke
+    <SolarTrashBin2BoldDuotone />
+    {$t("revoke")}
   </Button>
 </div>
 

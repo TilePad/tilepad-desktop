@@ -2,6 +2,7 @@
 <script lang="ts">
   import type { PluginWithState } from "$lib/api/types/plugin";
 
+  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import SolarRefreshLinear from "~icons/solar/refresh-linear";
@@ -19,9 +20,9 @@
     const revokePromise = reloadPlugin(manifest.plugin.id);
 
     toast.promise(revokePromise, {
-      loading: "Reloading plugin",
-      success: "Reloaded plugin",
-      error: toastErrorMessage("Failed to reload plugin"),
+      loading: $t("plugin_reloading"),
+      success: $t("plugin_reloaded"),
+      error: toastErrorMessage($t("plugin_reload_error")),
     });
   }
 
@@ -29,9 +30,9 @@
     const revokePromise = uninstallPlugin(manifest.plugin.id);
 
     toast.promise(revokePromise, {
-      loading: "Uninstalling plugin",
-      success: "Uninstalled plugin",
-      error: toastErrorMessage("Failed to uninstall plugin"),
+      loading: $t("plugin_uninstalling"),
+      success: $t("plugin_uninstalled"),
+      error: toastErrorMessage($t("plugin_uninstall_error")),
     });
   }
 </script>
@@ -43,12 +44,14 @@
     </span>
 
     <div class="plugin__actions">
-      <Button title="Reload" size="small" onclick={handleReload}>
+      <Button title={$t("Reload")} size="small" onclick={handleReload}>
         <SolarRefreshLinear />
       </Button>
 
       {#if !plugin.manifest.plugin.internal}
-        <Button size="small" onclick={handleUninstall}>Uninstall</Button>
+        <Button size="small" onclick={handleUninstall}>
+          {$t("uninstall")}
+        </Button>
       {/if}
     </div>
   </div>

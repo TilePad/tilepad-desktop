@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { FolderModel } from "$lib/api/types/folders";
 
+  import { t } from "svelte-i18n";
   import { useDebounce } from "runed";
   import { mergeProps } from "bits-ui";
   import { queryClient } from "$lib/api/client";
@@ -56,7 +57,7 @@
   }
 </script>
 
-<Tooltip title="Folder Settings">
+<Tooltip title={$t("folder_settings")}>
   {#snippet trigger({ props: triggerProps })}
     <PopoverButton {triggerProps}>
       {#snippet button({ props })}
@@ -67,8 +68,9 @@
 
       {#snippet content()}
         <div>
-          <label for="">Rows</label>
+          <label for="rows">{$t("rows")}</label>
           <NumberInput
+            id="rows"
             type="number"
             value={folder.config.rows}
             onchange={(event) => {
@@ -77,8 +79,9 @@
           />
         </div>
         <div>
-          <label for="">Columns</label>
+          <label for="columns">{$t("columns")}</label>
           <NumberInput
+            id="columns"
             type="number"
             value={folder.config.columns}
             onchange={(event) => {

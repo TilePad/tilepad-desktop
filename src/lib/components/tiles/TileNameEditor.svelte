@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "svelte-i18n";
   import { watch, useDebounce } from "runed";
   import SolarEyeBold from "~icons/solar/eye-bold";
   import ColorPicker from "svelte-awesome-color-picker";
@@ -121,11 +122,11 @@
 <div class="layout">
   <TextInput
     value={label.label}
-    placeholder="My Action"
+    placeholder={$t("tile_label_placeholder")}
     oninput={onChangeTileName}
   />
 
-  <Tooltip>
+  <Tooltip title={$t("toggle_label_tooltip")}>
     {#snippet trigger({ props })}
       <Button {...props} onclick={onToggleEnabled}>
         {#if label.enabled}
@@ -135,13 +136,9 @@
         {/if}
       </Button>
     {/snippet}
-
-    {#snippet children()}
-      Toggle Label Visible
-    {/snippet}
   </Tooltip>
 
-  <Tooltip>
+  <Tooltip title={$t("label_options_tooltip")}>
     {#snippet trigger({ props })}
       <PopoverButton triggerProps={props}>
         {#snippet children()}
@@ -152,7 +149,7 @@
           <FontSelector value={label.font} onChangeValue={onChangeFont} />
 
           <div>
-            Font Size (pt)
+            {$t("font_size")}
             <NumberInput value={label.font_size} oninput={onChangeFontSize} />
           </div>
 
@@ -203,7 +200,7 @@
               if (event.detail.hex) onChangeColor(event.detail.hex);
             }}
             position="responsive"
-            label="Text color"
+            label={$t("text_color")}
           />
           <ColorPicker
             hex={label.outline_color}
@@ -211,14 +208,10 @@
               if (event.detail.hex) onChangeOutlineColor(event.detail.hex);
             }}
             position="responsive"
-            label="Text outline color"
+            label={$t("text_outline_color")}
           />
         {/snippet}
       </PopoverButton>
-    {/snippet}
-
-    {#snippet children()}
-      Label Options
     {/snippet}
   </Tooltip>
 </div>

@@ -17,6 +17,7 @@
   import type { FolderId, FolderModel } from "$lib/api/types/folders";
 
   import { watch } from "runed";
+  import { t } from "svelte-i18n";
   import { getErrorMessage } from "$lib/api/utils/error";
   import { getContext, setContext, type Snippet } from "svelte";
   import {
@@ -25,6 +26,8 @@
     createCreateFolderMutation,
   } from "$lib/api/folders";
 
+  import Aside from "../Aside.svelte";
+  import SkeletonList from "../skeleton/SkeletonList.svelte";
   import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
 
   type Props = {
@@ -88,7 +91,7 @@
       $createFolder.mutate(
         {
           create: {
-            name: "Default Folder",
+            name: $t("default_folder"),
             default: true,
             config: {},
             profile_id: currentProfile.id,
@@ -106,25 +109,30 @@
   );
 </script>
 
-<!-- Query create default -->
-{#if $createFolder.isIdle || $createFolder.isSuccess}
-  <!-- Query folders -->
-  {#if $foldersQuery.isLoading}
-    Loading folders...
-  {:else if $foldersQuery.isError}
-    Failed to load profiles {getErrorMessage($foldersQuery.error)}
-  {:else if $foldersQuery.isSuccess}
-    <!-- Query the current folder -->
-    {#if $folderQuery.isLoading}
-      Loading folder...
-    {:else if $folderQuery.isError}
-      Failed to load folder {getErrorMessage($folderQuery.error)}
-    {:else if $folderQuery.isSuccess}
-      {@render children?.()}
-    {/if}
-  {/if}
-{:else if $createFolder.isPending}
-  Creating default profile...
+{#if $createFolder.isPending || $foldersQuery.isLoading || $folderQuery.isLoading}
+  <!-- Loading states -->
+  <SkeletonList style="margin: 1rem;" />
 {:else if $createFolder.isError}
-  Failed to create default profile {getErrorMessage($createFolder.error)}
+  <!-- Error creating current folder -->
+  <Aside severity="error" style="margin: 1rem;">
+    {$t("create_folder_error", {
+      values: { error: getErrorMessage($createFolder.error) },
+    })}
+  </Aside>
+{:else if $foldersQuery.isError}
+  <!-- Error loading folders list -->
+  <Aside severity="error" style="margin: 1rem;">
+    {$t("folders_error", {
+      values: { error: getErrorMessage($foldersQuery.error) },
+    })}
+  </Aside>
+{:else if $folderQuery.isError}
+  <!-- Error loading current folder -->
+  <Aside severity="error" style="margin: 1rem;">
+    {$t("folder_error", {
+      values: { error: getErrorMessage($folderQuery.error) },
+    })}
+  </Aside>
+{:else if ($createFolder.isIdle || $createFolder.isSuccess) && $foldersQuery.isSuccess && $folderQuery.isSuccess}
+  {@render children?.()}
 {/if}

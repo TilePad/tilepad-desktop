@@ -2,6 +2,7 @@
   import type { FolderModel } from "$lib/api/types/folders";
 
   import { watch } from "runed";
+  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { updateFolder } from "$lib/api/folders";
   import { toastErrorMessage } from "$lib/api/utils/error";
@@ -29,9 +30,9 @@
     });
 
     toast.promise(updatePromise, {
-      loading: "Updating folder",
-      success: "Updated folder",
-      error: toastErrorMessage("Failed to update folder"),
+      loading: $t("folder_updating"),
+      success: $t("folder_updated"),
+      error: toastErrorMessage($t("folder_update_error")),
     });
 
     open = false;
@@ -53,11 +54,11 @@
 
 <Dialog bind:open>
   {#snippet button({ props })}
-    <Button {...props}>Edit Folder</Button>
+    <Button {...props}>{$t("edit_folder")}</Button>
   {/snippet}
 
   {#snippet title()}
-    Edit Folder
+    {$t("edit_folder")}
   {/snippet}
 
   {#snippet children()}
@@ -69,13 +70,13 @@
           required
           minlength="1"
           class="input"
-          placeholder="Name"
+          placeholder={$t("name")}
         />
       </div>
 
       <div class="actions">
-        <DialogCloseButton buttonLabel={{ text: "Close" }} />
-        <Button type="submit">Save</Button>
+        <DialogCloseButton buttonLabel={{ text: $t("close") }} />
+        <Button type="submit">{$t("save")}</Button>
       </div>
     </form>
   {/snippet}

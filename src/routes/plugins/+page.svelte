@@ -1,9 +1,11 @@
 <script lang="ts">
+  import { t } from "svelte-i18n";
   import Aside from "$lib/components/Aside.svelte";
   import { createPluginsQuery } from "$lib/api/plugins";
   import { getErrorMessage } from "$lib/api/utils/error";
   import SolarShopBoldDuotone from "~icons/solar/shop-bold-duotone";
   import PluginCard from "$lib/components/plugins/PluginCard.svelte";
+  import SkeletonList from "$lib/components/skeleton/SkeletonList.svelte";
   import ManualImportPlugin from "$lib/components/plugins/ManualImportPlugin.svelte";
   import PluginsRegistryDialog from "$lib/components/plugins_registry/PluginsRegistryDialog.svelte";
 
@@ -12,22 +14,20 @@
 
 <div class="layout">
   {#if $pluginsQuery.isLoading}
-    <div class="skeleton-list">
-      <div class="skeleton" style="width: 80%; height: 1rem"></div>
-      <div class="skeleton" style="width: 70%; height: 1rem"></div>
-      <div class="skeleton" style="width: 30%; height: 1rem"></div>
-    </div>
+    <SkeletonList style="margin: 1rem" />
   {:else if $pluginsQuery.isError}
-    <Aside severity="error" style="width: 100%">
-      Failed to load plugins: {getErrorMessage($pluginsQuery.error)}
+    <Aside severity="error" style="margin: 1rem">
+      {$t("plugins_error", {
+        values: { error: getErrorMessage($pluginsQuery.error) },
+      })}
     </Aside>
-  {:else if $pluginsQuery.isSuccess && $pluginsQuery.data.length > 0}
+  {:else if $pluginsQuery.isSuccess}
     <div class="header">
-      <h2>Plugins</h2>
+      <h2>{$t("plugins")}</h2>
       <div class="actions">
         <PluginsRegistryDialog
           buttonLabel={{
-            text: "Community Plugins",
+            text: $t("community_plugins"),
             icon: SolarShopBoldDuotone,
           }}
         />
@@ -41,6 +41,8 @@
           {#if !plugin.manifest.plugin.internal || import.meta.env.DEV}
             <PluginCard {plugin} />
           {/if}
+        {:else}
+          {$t("plugins_none")}
         {/each}
       </div>
     </div>

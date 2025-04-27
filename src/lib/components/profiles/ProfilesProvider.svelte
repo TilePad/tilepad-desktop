@@ -16,6 +16,7 @@
   import type { ProfileId, ProfileModel } from "$lib/api/types/profiles";
 
   import { watch } from "runed";
+  import { t } from "svelte-i18n";
   import { getErrorMessage } from "$lib/api/utils/error";
   import { getContext, setContext, type Snippet } from "svelte";
   import {
@@ -24,19 +25,22 @@
     createCreateProfileMutation,
   } from "$lib/api/profiles";
 
+  import Aside from "../Aside.svelte";
+  import SkeletonList from "../skeleton/SkeletonList.svelte";
+
   type Props = {
     children?: Snippet | undefined;
   };
 
   const { children }: Props = $props();
 
+  // State for the actively selected profile
+  let profileId: ProfileId | undefined = $state(undefined);
+
   const profilesQuery = createProfilesQuery();
   const profilesQueryData = $derived($profilesQuery.data);
 
   const createProfile = createCreateProfileMutation();
-
-  // State for the actively selected profile
-  let profileId: ProfileId | undefined = $state(undefined);
 
   const profileQuery = createProfileQuery(() => profileId ?? null);
   const profile = $derived($profileQuery.data);
@@ -81,7 +85,7 @@
       $createProfile.mutate(
         {
           create: {
-            name: "Default Profile",
+            name: $t("default_profile"),
             default: true,
             config: {},
             order: 0,
@@ -98,23 +102,31 @@
   );
 </script>
 
-{#if $createProfile.isIdle || $createProfile.isSuccess}
-  {#if $profilesQuery.isLoading}
-    Loading...
-  {:else if $profilesQuery.isError}
-    Failed to load profiles {getErrorMessage($profilesQuery.error)}
-  {:else if $profilesQuery.isSuccess}
-    <!-- Query the current folder -->
-    {#if $profileQuery.isLoading || $profileQuery.isRefetching}
-      Loading profile...
-    {:else if $profileQuery.isError}
-      Failed to load profile {getErrorMessage($profileQuery.error)}
-    {:else if $profileQuery.isSuccess}
-      {@render children?.()}
-    {/if}
-  {/if}
-{:else if $createProfile.isPending}
-  Creating default profile...
+{#if $createProfile.isPending || $profilesQuery.isLoading || $profileQuery.isLoading || $profileQuery.isRefetching}
+  <!-- Loading states -->
+  <SkeletonList style="margin: 1rem;" />
 {:else if $createProfile.isError}
-  Failed to create default profile {getErrorMessage($createProfile.error)}
+  <!-- Error creating current profile -->
+  <Aside severity="error" style="margin: 1rem;">
+    {$t("create_profile_error", {
+      values: { error: getErrorMessage($createProfile.error) },
+    })}
+  </Aside>
+{:else if $profilesQuery.isError}
+  <!-- Error loading profiles list -->
+  <Aside severity="error" style="margin: 1rem;">
+    {$t("profiles_error", {
+      values: { error: getErrorMessage($profilesQuery.error) },
+    })}
+  </Aside>
+{:else if $profileQuery.isError}
+  <!-- Error loading current profile -->
+  <Aside severity="error" style="margin: 1rem;">
+    {$t("profile_error", {
+      values: { error: getErrorMessage($profileQuery.error) },
+    })}
+  </Aside>
+{:else if ($createProfile.isIdle || $createProfile.isSuccess) && $profilesQuery.isSuccess && $profileQuery.isSuccess}
+  <!-- Profiles are loaded, current profile is loaded, current profile is created -->
+  {@render children?.()}
 {/if}

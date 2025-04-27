@@ -1,5 +1,6 @@
 <script lang="ts">
   import { watch } from "runed";
+  import { t } from "svelte-i18n";
   import ColorPicker from "svelte-awesome-color-picker";
   import SolarGalleryEditBoldDuotone from "~icons/solar/gallery-edit-bold-duotone";
   import {
@@ -43,19 +44,16 @@
   );
 </script>
 
-<Tooltip>
+<Tooltip title={$t("icon_options")}>
   {#snippet trigger({ props })}
     <PopoverButton
       triggerProps={props}
       rootProps={{ open, onOpenChange: (value) => (open = value) }}
     >
       {#snippet button({ props })}
-        <Button {...props}
-          ><SolarGalleryEditBoldDuotone
-            width="1.65rem"
-            height="1.65rem"
-          /></Button
-        >
+        <Button {...props}>
+          <SolarGalleryEditBoldDuotone width="1.65rem" height="1.65rem" />
+        </Button>
       {/snippet}
 
       {#snippet content()}
@@ -72,7 +70,7 @@
           />
         {:else}
           <div>
-            Padding (px)
+            {$t("icon_padding")}
             <NumberInput
               value={iconOptions.padding}
               oninput={(event) =>
@@ -80,20 +78,18 @@
             />
           </div>
 
-          <div class="color-picker">
-            <ColorPicker
-              hex={iconOptions.background_color}
-              on:input={(event) => {
-                if (event.detail.hex) onChangeBackgroundColor(event.detail.hex);
-              }}
-              position="responsive"
-              label="Background color"
-            />
-          </div>
+          <ColorPicker
+            hex={iconOptions.background_color}
+            on:input={(event) => {
+              if (event.detail.hex) onChangeBackgroundColor(event.detail.hex);
+            }}
+            position="responsive"
+            label={$t("background_color")}
+          />
 
           <div class="content">
             <Button style="width: 100%;" onclick={() => (pickPack = true)}>
-              Icon Pack Icon
+              {$t("icon_pack_icon")}
             </Button>
 
             <IconFilePicker
@@ -110,15 +106,11 @@
               }}
               style="width: 100%"
             >
-              Reset to default
+              {$t("reset_default")}
             </Button>
           </div>
         {/if}
       {/snippet}
     </PopoverButton>
-  {/snippet}
-
-  {#snippet children()}
-    Icon Options
   {/snippet}
 </Tooltip>

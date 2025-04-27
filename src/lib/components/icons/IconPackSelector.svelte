@@ -1,11 +1,14 @@
 <script lang="ts">
   import type { Icon, IconPack, IconPackId } from "$lib/api/types/icons";
 
+  import { t } from "svelte-i18n";
   import { createIconPacksQuery } from "$lib/api/icons";
   import { getErrorMessage } from "$lib/api/utils/error";
 
+  import Aside from "../Aside.svelte";
   import TextInput from "../input/TextInput.svelte";
   import IconPackCategory from "./IconPackCategory.svelte";
+  import SkeletonList from "../skeleton/SkeletonList.svelte";
 
   type Props = { onClickIcon: (packId: IconPackId, icon: Icon) => void };
 
@@ -44,15 +47,17 @@
 
 <div class="content">
   {#if $iconPacksQuery.isLoading}
-    <p>Loading...</p>
+    <SkeletonList />
   {:else if $iconPacksQuery.isError}
-    <p>
-      Failed to load icon packs: {getErrorMessage($iconPacksQuery.error)}
-    </p>
+    <Aside severity="error" style="margin: 1rem">
+      {$t("icon_packs_error", {
+        values: { error: getErrorMessage($iconPacksQuery.error) },
+      })}
+    </Aside>
   {:else if $iconPacksQuery.isSuccess}
     <TextInput
       fullWidth
-      placeholder="Search"
+      placeholder={$t("search_placeholder")}
       bind:value={search}
       style="margin-bottom: 8px"
     />

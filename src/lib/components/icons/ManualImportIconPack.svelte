@@ -35,7 +35,7 @@
   }}
 >
   <SolarImportBoldDuotone width="1.5rem" height="1.5rem" />
-  {$t("icon_packs_manual_import")}
+  {$t("import_pack")}
 </Button>
 
 <input

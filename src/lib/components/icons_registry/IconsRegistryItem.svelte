@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { IconRegistryEntry } from "$lib/api/types/icons_registry";
 
+  import { t } from "svelte-i18n";
+
   type Props = {
     item: IconRegistryEntry;
     selected: boolean;
@@ -20,7 +22,7 @@
   <p class="repo">{item.repo}</p>
 
   {#if installed}
-    <p class="installed">Installed</p>
+    <p class="installed">{$t("installed")}</p>
   {/if}
 </button>
 

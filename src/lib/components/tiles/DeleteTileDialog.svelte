@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { TileModel } from "$lib/api/types/tiles";
 
+  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import { createDeleteTileMutation } from "$lib/api/tiles";
@@ -32,9 +33,9 @@
     });
 
     toast.promise(deletePromise, {
-      loading: "Deleting tile",
-      success: "Deleted tile",
-      error: toastErrorMessage("Failed to delete tile"),
+      loading: $t("tile_deleting"),
+      success: $t("tile_deleted"),
+      error: toastErrorMessage($t("tile_delete_error")),
     });
 
     open = false;
@@ -50,15 +51,17 @@
   {/snippet}
 
   {#snippet title()}
-    Confirm Delete
+    {$t("confirm_delete")}
   {/snippet}
 
   {#snippet description()}
-    Are you sure you want to delete this tile?
+    {$t("confirm_delete_tile")}
   {/snippet}
 
   {#snippet actions()}
-    <DialogCloseButton buttonLabel={{ text: "Close" }} />
-    <Button type="submit" variant="error" onclick={onDelete}>Delete</Button>
+    <DialogCloseButton buttonLabel={{ text: $t("close") }} />
+    <Button type="submit" variant="error" onclick={onDelete}>
+      {$t("delete")}
+    </Button>
   {/snippet}
 </Dialog>

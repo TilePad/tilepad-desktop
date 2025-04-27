@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { createProfile } from "$lib/api/profiles";
   import { toastErrorMessage } from "$lib/api/utils/error";
@@ -28,14 +29,14 @@
     });
 
     toast.promise(createPromise, {
-      loading: "Creating profile",
-      success: "Created profile",
-      error: toastErrorMessage("Failed to create profile"),
+      loading: $t("profile_creating"),
+      success: $t("profile_created"),
+      error: toastErrorMessage($t("profile_create_error")),
     });
   }
 </script>
 
-<Tooltip title="Create Profile">
+<Tooltip title={$t("create_profile")}>
   {#snippet trigger({ props: triggerProps })}
     <Dialog {triggerProps} {...restProps}>
       {#snippet button({ props })}
@@ -45,7 +46,7 @@
       {/snippet}
 
       {#snippet title()}
-        Create Profile
+        {$t("create_profile")}
       {/snippet}
 
       {#snippet children()}
@@ -56,14 +57,14 @@
               minlength="1"
               class="input"
               bind:value={name}
-              placeholder="Name"
+              placeholder={$t("name")}
             />
           </div>
 
           <div class="actions">
-            <DialogCloseButton buttonLabel={{ text: "Close" }} />
+            <DialogCloseButton buttonLabel={{ text: $t("close") }} />
             <DialogCloseButton
-              buttonLabel={{ text: "Create" }}
+              buttonLabel={{ text: $t("create") }}
               onclick={onCreate}
               type="submit"
             />

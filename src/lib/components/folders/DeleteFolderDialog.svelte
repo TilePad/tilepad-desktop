@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { FolderModel } from "$lib/api/types/folders";
 
+  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { deleteFolder } from "$lib/api/folders";
   import { toastErrorMessage } from "$lib/api/utils/error";
@@ -30,9 +31,9 @@
     const createPromise = deleteFolder(currentProfile.id, folder.id);
 
     toast.promise(createPromise, {
-      loading: "Deleting folder",
-      success: "Deleted folder",
-      error: toastErrorMessage("Failed to delete folder"),
+      loading: $t("folder_deleting"),
+      success: $t("folder_deleted"),
+      error: toastErrorMessage($t("folder_delete_error")),
     });
 
     open = false;
@@ -41,19 +42,21 @@
 
 <Dialog bind:open>
   {#snippet button({ props })}
-    <Button variant="error" {...props}>Delete Folder</Button>
+    <Button variant="error" {...props}>{$t("delete_folder")}</Button>
   {/snippet}
 
   {#snippet title()}
-    Delete Folder
+    {$t("delete_folder")}
   {/snippet}
 
   {#snippet description()}
-    Are you sure you want to delete this folder?
+    {$t("confirm_delete_folder")}
   {/snippet}
 
   {#snippet actions()}
-    <DialogCloseButton buttonLabel={{ text: "Close" }} />
-    <Button type="submit" variant="error" onclick={onDelete}>Delete</Button>
+    <DialogCloseButton buttonLabel={{ text: $t("close") }} />
+    <Button type="submit" variant="error" onclick={onDelete}>
+      {$t("delete")}
+    </Button>
   {/snippet}
 </Dialog>

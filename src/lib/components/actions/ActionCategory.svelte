@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { ActionCategory } from "$lib/api/types/actions";
 
+  import { t } from "svelte-i18n";
   import { slide } from "svelte/transition";
   import { getPluginAssetPath } from "$lib/api/utils/url";
   import SolarAltArrowDownOutline from "~icons/solar/alt-arrow-down-outline";
@@ -36,7 +37,7 @@
           category.plugin_id,
           category.icon,
         )}
-        alt="Action Icon"
+        alt={$t("action_icon")}
       />
     {/if}
 

@@ -3,6 +3,7 @@
   import type { TileId, TileModel } from "$lib/api/types/tiles";
 
   import { watch } from "runed";
+  import { t } from "svelte-i18n";
   import { createTilesQuery } from "$lib/api/tiles";
   import { getErrorMessage } from "$lib/api/utils/error";
   import TileGrid from "$lib/components/tiles/TileGrid.svelte";
@@ -14,6 +15,7 @@
   import TileEditor from "../tiles/TileEditor.svelte";
   import FolderSelector from "./FolderSelector.svelte";
   import { getFolderContext } from "./FolderProvider.svelte";
+  import SkeletonList from "../skeleton/SkeletonList.svelte";
   import ProfileSelector from "../profiles/ProfileSelector.svelte";
   import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
 
@@ -46,29 +48,21 @@
 <div class="layout">
   {#if $tilesQuery.isLoading}
     <div class="content">
-      <div class="skeleton-list">
-        <div class="skeleton" style="width: 80%; height: 1rem"></div>
-        <div class="skeleton" style="width: 70%; height: 1rem"></div>
-        <div class="skeleton" style="width: 30%; height: 1rem"></div>
-      </div>
+      <SkeletonList />
     </div>
   {:else if $tilesQuery.isError}
     <div class="content">
       <Aside severity="error" style="width: 100%">
-        Failed to load tiles: {getErrorMessage($tilesQuery.error)}
+        {$t("tiles_error", {
+          values: { error: getErrorMessage($tilesQuery.error) },
+        })}
       </Aside>
     </div>
   {:else if $tilesQuery.isSuccess}
     <div class="header">
-      <div>
-        <ProfileSelector />
-      </div>
-
+      <ProfileSelector />
       <SolarAltArrowRightLinear />
-
-      <div>
-        <FolderSelector />
-      </div>
+      <FolderSelector />
     </div>
     <div class="content">
       <TileGrid

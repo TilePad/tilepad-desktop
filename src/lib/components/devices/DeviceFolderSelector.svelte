@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { ProfileModel } from "$lib/api/types/profiles";
 
+  import { t } from "svelte-i18n";
   import { Select } from "bits-ui";
   import { slide } from "svelte/transition";
   import { createFoldersQuery } from "$lib/api/folders";
@@ -42,7 +43,7 @@
         {#if currentFolder}
           {currentFolder.name}
         {:else}
-          Choose a profile
+          {$t("choose_folder")}
         {/if}
 
         {#if open}

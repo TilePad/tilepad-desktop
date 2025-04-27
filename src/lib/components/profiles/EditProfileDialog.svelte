@@ -2,6 +2,7 @@
   import type { ProfileModel } from "$lib/api/types/profiles";
 
   import { watch } from "runed";
+  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { updateProfile } from "$lib/api/profiles";
   import { toastErrorMessage } from "$lib/api/utils/error";
@@ -29,13 +30,12 @@
     });
 
     toast.promise(updatePromise, {
-      loading: "Updating profile",
-      success: "Updated profile",
-      error: toastErrorMessage("Failed to update profile"),
+      loading: $t("profile_updating"),
+      success: $t("profile_updated"),
+      error: toastErrorMessage($t("profile_update_error")),
     });
 
     open = false;
-
     reset();
   }
 
@@ -53,11 +53,11 @@
 
 <Dialog bind:open>
   {#snippet button({ props })}
-    <Button {...props}>Edit Profile</Button>
+    <Button {...props}>{$t("edit_profile")}</Button>
   {/snippet}
 
   {#snippet title()}
-    Edit Profile
+    {$t("edit_profile")}
   {/snippet}
 
   {#snippet children()}
@@ -69,13 +69,13 @@
           required
           minlength="1"
           class="input"
-          placeholder="Name"
+          placeholder={$t("name")}
         />
       </div>
 
       <div class="actions">
-        <DialogCloseButton buttonLabel={{ text: "Close" }} />
-        <Button type="submit">Save</Button>
+        <DialogCloseButton buttonLabel={{ text: $t("close") }} />
+        <Button type="submit">{$t("save")}</Button>
       </div>
     </form>
   {/snippet}

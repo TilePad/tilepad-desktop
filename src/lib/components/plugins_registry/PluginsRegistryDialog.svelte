@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { PluginRegistryEntry } from "$lib/api/types/plugins_registry";
 
+  import { t } from "svelte-i18n";
   import { createPluginsQuery } from "$lib/api/plugins";
   import { getErrorMessage } from "$lib/api/utils/error";
   import { createPluginRegistryQuery } from "$lib/api/plugins_registry";
@@ -9,6 +10,7 @@
 
   import Aside from "../Aside.svelte";
   import Dialog from "../dialog/Dialog.svelte";
+  import SkeletonList from "../skeleton/SkeletonList.svelte";
   import PluginsRegistryItem from "./PluginsRegistryItem.svelte";
   import PluginRegistryViewer from "./PluginRegistryViewer.svelte";
   import DialogCloseButton from "../dialog/DialogCloseButton.svelte";
@@ -43,40 +45,40 @@
   {#snippet children()}
     <div class="content">
       {#if $pluginRegistryQuery.isLoading || $pluginsQuery.isLoading}
-        <div class="skeleton-list" style="padding: 1rem">
-          <div class="skeleton" style="width: 80%; height: 1rem"></div>
-          <div class="skeleton" style="width: 70%; height: 1rem"></div>
-          <div class="skeleton" style="width: 30%; height: 1rem"></div>
-        </div>
+        <SkeletonList style="padding: 1rem" />
       {:else if $pluginRegistryQuery.isError}
         <Aside severity="error" style="margin: 1rem;">
-          Failed to load community plugins: {getErrorMessage(
-            $pluginRegistryQuery.error,
-          )}
+          {$t("community_plugins_error", {
+            values: { error: getErrorMessage($pluginRegistryQuery.error) },
+          })}
         </Aside>
       {:else if $pluginsQuery.isError}
         <Aside severity="error" style="margin: 1rem;">
-          Failed to load installed plugins: {getErrorMessage(
-            $pluginsQuery.error,
-          )}
+          {$t("plugins_installed_error", {
+            values: { error: getErrorMessage($pluginsQuery.error) },
+          })}
         </Aside>
       {:else if $pluginRegistryQuery.isSuccess && $pluginsQuery.isSuccess}
         <div class="split">
           <div class="plugins">
             <div class="titlebar">
               <div class="titlebar__text">
-                <h2>Community Plugins</h2>
-                <p class="total">{filteredRegistry.length} Plugins</p>
+                <h2>{$t("community_plugins")}</h2>
+                <p class="total">
+                  {$t("count_plugins", {
+                    values: { count: filteredRegistry.length },
+                  })}
+                </p>
               </div>
 
-              <DialogCloseButton buttonLabel={{ text: "Close" }} />
+              <DialogCloseButton buttonLabel={{ text: $t("close") }} />
             </div>
 
             <input
               bind:value={search}
               class="search"
               type="text"
-              placeholder="Search..."
+              placeholder={$t("search_placeholder")}
             />
 
             <div class="plugins-list">
@@ -96,7 +98,7 @@
                   selected={active !== undefined && active.id === item.id}
                 />
               {:else}
-                No plugins available
+                {$t("community_plugins_none")}
               {/each}
             </div>
           </div>

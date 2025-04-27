@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { installPlugin } from "$lib/api/plugins";
   import { toastErrorMessage } from "$lib/api/utils/error";
@@ -20,9 +21,9 @@
     const createPromise = installPlugin(file);
 
     toast.promise(createPromise, {
-      loading: "Installing plugin...",
-      success: "Installed plugin",
-      error: toastErrorMessage("Failed to install plugin"),
+      loading: $t("plugin_installing"),
+      success: $t("plugin_installed"),
+      error: toastErrorMessage($t("plugin_install_error")),
     });
   }
 </script>
@@ -34,8 +35,7 @@
   }}
 >
   <SolarImportBoldDuotone width="1.5rem" height="1.5rem" />
-
-  Import Plugin
+  {$t("import_plugin")}
 </Button>
 
 <input

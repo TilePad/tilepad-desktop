@@ -66,7 +66,9 @@
       <SkeletonList style="padding: 1rem" />
     {:else if $manifestQuery.isError}
       <Aside severity="error" style="margin: 1rem;">
-        {$t("manifest_error")}: {getErrorMessage($manifestQuery.error)}
+        {$t("manifest_error", {
+          values: { error: getErrorMessage($manifestQuery.error) },
+        })}
       </Aside>
     {:else if $manifestQuery.isSuccess}
       <h2>{item.name}</h2>
@@ -86,7 +88,9 @@
     {#if $readmeQuery.isLoading}
       <SkeletonList style="padding: 1rem" />
     {:else if $readmeQuery.isError}
-      {$t("readme_error")}
+      {$t("readme_error", {
+        values: { error: getErrorMessage($readmeQuery.error) },
+      })}
     {:else if $readmeQuery.isSuccess}
       {@const markdown = replaceMarkdownRelativeUrls(
         $readmeQuery.data.readme,

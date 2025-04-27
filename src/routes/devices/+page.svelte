@@ -24,10 +24,12 @@
 <div class="layout">
   <div class="layout__devices">
     {#if $devices.isLoading}
-      <SkeletonList />
+      <SkeletonList style="margin: 1rem" />
     {:else if $devices.isError}
-      <Aside severity="error" style="width: 100%">
-        {$t("devices_error")}: {getErrorMessage($devices.error)}
+      <Aside severity="error" style="margin: 1rem">
+        {$t("devices_error", {
+          values: { error: getErrorMessage($devices.error) },
+        })}
       </Aside>
     {:else if $devices.isSuccess}
       <div class="header">

@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { ProfileModel } from "$lib/api/types/profiles";
 
+  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { deleteProfile } from "$lib/api/profiles";
   import { toastErrorMessage } from "$lib/api/utils/error";
@@ -25,9 +26,9 @@
     const createPromise = deleteProfile(profile.id);
 
     toast.promise(createPromise, {
-      loading: "Deleting profile",
-      success: "Deleted profile",
-      error: toastErrorMessage("Failed to delete profile"),
+      loading: $t("profile_deleting"),
+      success: $t("profile_deleted"),
+      error: toastErrorMessage($t("profile_delete_error")),
     });
 
     open = false;
@@ -36,19 +37,21 @@
 
 <Dialog bind:open>
   {#snippet button({ props })}
-    <Button variant="error" {...props}>Delete Profile</Button>
+    <Button variant="error" {...props}>{$t("delete_profile")}</Button>
   {/snippet}
 
   {#snippet title()}
-    Delete Profile
+    {$t("delete_profile")}
   {/snippet}
 
   {#snippet description()}
-    Are you sure you want to delete this profile?
+    {$t("confirm_delete_profile")}
   {/snippet}
 
   {#snippet actions()}
-    <DialogCloseButton buttonLabel={{ text: "Close" }} />
-    <Button type="submit" variant="error" onclick={onDelete}>Delete</Button>
+    <DialogCloseButton buttonLabel={{ text: $t("close") }} />
+    <Button type="submit" variant="error" onclick={onDelete}>
+      {$t("delete")}
+    </Button>
   {/snippet}
 </Dialog>

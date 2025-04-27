@@ -17,6 +17,8 @@
 
   import { waitLocale } from "svelte-i18n";
 
+  import SkeletonList from "./skeleton/SkeletonList.svelte";
+
   type Props = {
     children?: Snippet;
   };
@@ -26,11 +28,7 @@
 
 {#await waitLocale()}
   <!-- Loading current locale -->
-  <div class="skeleton-list">
-    <div class="skeleton" style="width: 80%; height: 1rem"></div>
-    <div class="skeleton" style="width: 70%; height: 1rem"></div>
-    <div class="skeleton" style="width: 30%; height: 1rem"></div>
-  </div>
+  <SkeletonList />
 {:then}
   {@render children?.()}
 {/await}

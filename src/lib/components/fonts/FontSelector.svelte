@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "svelte-i18n";
   import { Select } from "bits-ui";
   import { slide } from "svelte/transition";
   import { createFontsQuery } from "$lib/api/fonts";
@@ -28,7 +29,7 @@
     {#snippet child({ props })}
       <div class="trigger-wrapper">
         <button class="trigger" {...props}>
-          {value ?? "Select Font"}
+          {value ?? $t("select_font")}
 
           {#if open}
             <SolarAltArrowUpBold />

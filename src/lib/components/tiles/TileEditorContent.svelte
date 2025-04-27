@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { TileId } from "$lib/api/types/tiles";
 
+  import { t } from "svelte-i18n";
   import { createTileQuery } from "$lib/api/tiles";
   import { createActionQuery } from "$lib/api/actions";
   import { getErrorMessage } from "$lib/api/utils/error";
@@ -92,10 +93,13 @@
         {/if}
       {:else if $actionQuery.isSuccess && $actionQuery.data === null}
         <Aside severity="error" title="Action not found" style="margin: 1rem;">
-          Action <b>{tile.plugin_id}.{tile.action_id}</b> not found.
-          <br />
-          <br />
-          Ensure you have the plugin for this action <b>installed</b>
+          <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+          {@html $t("action_not_found", {
+            values: {
+              plugin_id: tile.plugin_id,
+              action_id: tile.action_id,
+            },
+          })}
         </Aside>
       {:else if $actionQuery.isLoading}
         <div class="skeleton-list" style="padding: 1rem;">
@@ -111,14 +115,16 @@
         </div>
       {:else if $actionQuery.isError}
         <Aside severity="error" style="margin: 1rem;">
-          Failed to load action: {getErrorMessage($actionQuery.error)}
+          {$t("action_error", {
+            values: { error: getErrorMessage($actionQuery.error) },
+          })}
         </Aside>
       {/if}
     </div>
   </div>
 {:else if $tileQuery.isSuccess}
-  <Aside severity="error" title="Tile not found" style="margin: 1rem;">
-    Tile could not be found
+  <Aside severity="error" style="margin: 1rem;">
+    {$t("tile_not_found")}
   </Aside>
 {:else if $tileQuery.isLoading}
   <div class="skeleton-list" style="padding: 1rem;">
@@ -136,7 +142,9 @@
   </div>
 {:else if $tileQuery.isError}
   <Aside severity="error" style="margin: 1rem;">
-    Failed to load tile: {getErrorMessage($tileQuery.error)}
+    {$t("tile_error", {
+      values: { error: getErrorMessage($tileQuery.error) },
+    })}
   </Aside>
 {/if}
 

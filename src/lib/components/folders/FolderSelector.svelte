@@ -41,12 +41,7 @@
       <div class="trigger-wrapper">
         <button class="trigger" {...props}>
           <SolarFolder2BoldDuotone />
-
-          {#if currentFolder}
-            {currentFolder.name}
-          {:else}
-            Choose a folder
-          {/if}
+          {currentFolder.name}
 
           {#if open}
             <SolarAltArrowUpBold />

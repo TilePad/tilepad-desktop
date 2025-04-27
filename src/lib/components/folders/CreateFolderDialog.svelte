@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { createFolder } from "$lib/api/folders";
   import { toastErrorMessage } from "$lib/api/utils/error";
@@ -12,6 +13,7 @@
   import { getFolderContext } from "./FolderProvider.svelte";
   import DialogCloseButton from "../dialog/DialogCloseButton.svelte";
   import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
+
   type Props = DialogProps & {
     order: number;
   };
@@ -43,9 +45,9 @@
     });
 
     toast.promise(createPromise, {
-      loading: "Creating folder",
-      success: "Created folder",
-      error: toastErrorMessage("Failed to create folder"),
+      loading: $t("folder_creating"),
+      success: $t("folder_created"),
+      error: toastErrorMessage($t("folder_create_error")),
     });
 
     open = false;
@@ -58,7 +60,7 @@
   }
 </script>
 
-<Tooltip title="Create Folder">
+<Tooltip title={$t("create_folder")}>
   {#snippet trigger({ props: triggerProps })}
     <Dialog {triggerProps} bind:open>
       {#snippet button({ props })}
@@ -68,7 +70,7 @@
       {/snippet}
 
       {#snippet title()}
-        Create Folder
+        {$t("create_folder")}
       {/snippet}
 
       {#snippet children()}
@@ -80,13 +82,13 @@
               required
               minlength="1"
               class="input"
-              placeholder="Name"
+              placeholder={$t("name")}
             />
           </div>
 
           <div class="actions">
-            <DialogCloseButton buttonLabel={{ text: "Close" }} />
-            <Button type="submit">Create</Button>
+            <DialogCloseButton buttonLabel={{ text: $t("close") }} />
+            <Button type="submit">{$t("create")}</Button>
           </div>
         </form>
       {/snippet}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import { check, Update } from "@tauri-apps/plugin-updater";
@@ -19,13 +20,18 @@
     if (automatic) {
       installUpdate(update);
     } else {
-      toast("An update is available v" + newVersion, {
-        duration: Infinity,
-        action: {
-          label: "Update",
-          onClick: () => installUpdate(update),
+      toast(
+        $t("update_available", {
+          values: { version: newVersion },
+        }),
+        {
+          duration: Infinity,
+          action: {
+            label: "Update",
+            onClick: () => installUpdate(update),
+          },
         },
-      });
+      );
     }
   }
 
@@ -33,14 +39,18 @@
     const updatePromise = update.download();
 
     toast.promise(updatePromise, {
-      loading: `Downloading update v${update.version}...`,
-      success: "Update downloaded",
-      error: toastErrorMessage("Failed to download update"),
+      loading: $t("update_downloading", {
+        values: {
+          version: update.version,
+        },
+      }),
+      success: $t("update_downloaded"),
+      error: toastErrorMessage($t("udpate_download_error")),
     });
 
     await updatePromise;
 
-    toast("Install the update (Will restart TilePad)", {
+    toast($t("install_update"), {
       duration: Infinity,
       action: {
         label: "Install",
