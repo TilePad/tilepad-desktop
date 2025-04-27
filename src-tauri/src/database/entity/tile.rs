@@ -15,40 +15,75 @@ use uuid::Uuid;
 
 pub type TileId = Uuid;
 
+#[derive(IdenStatic, Copy, Clone)]
+#[iden(rename = "tiles")]
+pub struct TilesTable;
+
+#[derive(IdenStatic, Copy, Clone)]
+pub enum TilesColumn {
+    /// Unique ID for the tile
+    Id,
+    /// Tile configuration (JSON)
+    Config,
+    /// Plugin properties for this tile
+    Properties,
+    /// ID of a folder this tile is within
+    FolderId,
+    /// ID of the plugin the action is apart of
+    PluginId,
+    /// ID of the action within the plugin to execute
+    ActionId,
+    /// Row the tile is on
+    Row,
+    /// Column the tile is on
+    Column,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct TileModel {
+    /// Unique ID of the tile
     pub id: TileId,
+
+    /// Configuration for the tile and how it appears in the UI
     #[sqlx(json)]
     pub config: TileConfig,
+
+    /// Properties / settings defined on this specific tile
     #[sqlx(json)]
     pub properties: JsonObject,
+
+    /// ID of the folder this tile is within
     pub folder_id: FolderId,
+
+    /// ID of the plugin the `action_id` is apart of
+    #[sqlx(try_from = "String")]
+    pub plugin_id: PluginId,
+    /// ID of the action within the plugin to execute
+    #[sqlx(try_from = "String")]
+    pub action_id: ActionId,
+
+    /// Row within the UI to display at
     pub row: u32,
+    /// Column within the UI to display at
     pub column: u32,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct TileConfig {
-    /// ID of the plugin the action we are executing is withins
-    pub plugin_id: PluginId,
-    /// ID of the action to execution
-    pub action_id: ActionId,
     /// Icon to use
-    #[serde(default)]
     pub icon: TileIcon,
     /// Icon options to use
-    #[serde(default)]
     pub icon_options: TileIconOptions,
     /// Label to display on top of the tile
-    #[serde(default)]
     pub label: TileLabel,
     /// States for whether a part of the config has been modified
     /// by the user or not
-    #[serde(default)]
     pub user_flags: UserFlags,
 }
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct UserFlags {
     /// User has modified the icon
     pub icon: bool,
@@ -157,6 +192,10 @@ pub enum TileIcon {
 pub struct CreateTile {
     pub config: TileConfig,
     pub folder_id: FolderId,
+
+    pub plugin_id: PluginId,
+    pub action_id: ActionId,
+
     pub row: u32,
     pub column: u32,
 }
@@ -181,6 +220,8 @@ impl TileModel {
             config: create.config,
             properties: Default::default(),
             folder_id: create.folder_id,
+            plugin_id: create.plugin_id,
+            action_id: create.action_id,
             row: create.row,
             column: create.column,
         };
@@ -197,6 +238,8 @@ impl TileModel {
                     TilesColumn::Config,
                     TilesColumn::Properties,
                     TilesColumn::FolderId,
+                    TilesColumn::PluginId,
+                    TilesColumn::ActionId,
                     TilesColumn::Row,
                     TilesColumn::Column,
                 ])
@@ -205,6 +248,8 @@ impl TileModel {
                     config.into(),
                     properties.into(),
                     model.folder_id.into(),
+                    model.plugin_id.0.clone().into(),
+                    model.action_id.0.clone().into(),
                     model.row.into(),
                     model.column.into(),
                 ]),
@@ -348,6 +393,8 @@ impl TileModel {
                     TilesColumn::Config,
                     TilesColumn::Properties,
                     TilesColumn::FolderId,
+                    TilesColumn::PluginId,
+                    TilesColumn::ActionId,
                     TilesColumn::Row,
                     TilesColumn::Column,
                 ])
@@ -366,6 +413,8 @@ impl TileModel {
                     TilesColumn::Config,
                     TilesColumn::Properties,
                     TilesColumn::FolderId,
+                    TilesColumn::PluginId,
+                    TilesColumn::ActionId,
                     TilesColumn::Row,
                     TilesColumn::Column,
                 ])
@@ -383,24 +432,4 @@ impl TileModel {
         )
         .await
     }
-}
-
-#[derive(IdenStatic, Copy, Clone)]
-#[iden(rename = "tiles")]
-pub struct TilesTable;
-
-#[derive(IdenStatic, Copy, Clone)]
-pub enum TilesColumn {
-    /// Unique ID for the tile
-    Id,
-    /// Tile configuration (JSON)
-    Config,
-    /// Plugin properties for this tile
-    Properties,
-    /// ID of a folder this tile is within
-    FolderId,
-    /// Row the tile is on
-    Row,
-    /// Column the tile is on
-    Column,
 }

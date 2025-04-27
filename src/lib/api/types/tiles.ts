@@ -19,13 +19,13 @@ export interface TileModel {
   config: TileConfig;
   properties: object;
   folder_id: FolderId;
+  plugin_id: PluginId;
+  action_id: ActionId;
   row: number;
   column: number;
 }
 
 export interface TileConfig {
-  plugin_id: PluginId;
-  action_id: ActionId;
   icon: TileIcon;
   icon_options: TileIconOptions;
   label: TileLabel;
@@ -64,16 +64,11 @@ export type TileIcon =
   | ({ type: TileIconType.Uploaded } & TileIconUploaded);
 
 export type CreateTile = Omit<TileModel, "id" | "config"> & {
-  // When creating a tile only the plugin_id and action_id are
-  // required parts of the configuration
-  config: Pick<TileConfig, "plugin_id" | "action_id"> &
-    DeepPartial<Omit<TileConfig, "plugin_id" | "action_id">>;
+  config: DeepPartial<TileConfig>;
 };
 
 export type UpdateTile = Partial<Omit<TileModel, "id" | "config">> & {
-  //
-  config: Pick<TileConfig, "plugin_id" | "action_id"> &
-    DeepPartial<Omit<TileConfig, "plugin_id" | "action_id">>;
+  config: DeepPartial<TileConfig>;
 };
 
 export interface TileLabel {

@@ -36,20 +36,18 @@
   const tile = $derived($tileQuery.data);
 
   const actionQuery = createActionQuery(
-    () => tile?.config?.plugin_id ?? null,
-    () => tile?.config?.action_id ?? null,
+    () => tile?.plugin_id ?? null,
+    () => tile?.action_id ?? null,
   );
 </script>
 
 {#if $tileQuery.isSuccess && $tileQuery.data}
   {@const tile = $tileQuery.data}
-  {@const tileConfig = tile.config}
-
   {@const ctx = {
     profile_id: currentProfile.id,
     folder_id: tile.folder_id,
-    plugin_id: tileConfig.plugin_id,
-    action_id: tileConfig.action_id,
+    plugin_id: tile.plugin_id,
+    action_id: tile.action_id,
     tile_id: tile.id,
   }}
 
@@ -94,7 +92,7 @@
         {/if}
       {:else if $actionQuery.isSuccess && $actionQuery.data === null}
         <Aside severity="error" title="Action not found" style="margin: 1rem;">
-          Action <b>{tileConfig.plugin_id}.{tileConfig.action_id}</b> not found.
+          Action <b>{tile.plugin_id}.{tile.action_id}</b> not found.
           <br />
           <br />
           Ensure you have the plugin for this action <b>installed</b>

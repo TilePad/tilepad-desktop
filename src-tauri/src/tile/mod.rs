@@ -39,7 +39,7 @@ impl Tiles {
             .context("tile not found")?;
 
         anyhow::ensure!(
-            plugin_id.is_none_or(|plugin_id| tile.config.plugin_id == plugin_id),
+            plugin_id.is_none_or(|plugin_id| tile.plugin_id == plugin_id),
             anyhow::anyhow!("tile is not apart of the same plugin")
         );
 
@@ -60,7 +60,7 @@ impl Tiles {
             .context("tile not found")?;
 
         anyhow::ensure!(
-            plugin_id.is_none_or(|plugin_id| tile.config.plugin_id == plugin_id),
+            plugin_id.is_none_or(|plugin_id| tile.plugin_id == plugin_id),
             anyhow::anyhow!("tile is not apart of the same plugin")
         );
 
@@ -83,7 +83,7 @@ impl Tiles {
             .context("tile not found")?;
 
         anyhow::ensure!(
-            plugin_id.is_none_or(|plugin_id| tile.config.plugin_id == plugin_id),
+            plugin_id.is_none_or(|plugin_id| tile.plugin_id == plugin_id),
             anyhow::anyhow!("tile is not apart of the same plugin")
         );
 
@@ -110,7 +110,7 @@ impl Tiles {
             .context("tile not found")?;
 
         anyhow::ensure!(
-            plugin_id.is_none_or(|plugin_id| tile.config.plugin_id == plugin_id),
+            plugin_id.is_none_or(|plugin_id| tile.plugin_id == plugin_id),
             anyhow::anyhow!("tile is not apart of the same plugin")
         );
 
@@ -133,7 +133,7 @@ impl Tiles {
             .context("tile not found")?;
 
         anyhow::ensure!(
-            plugin_id.is_none_or(|plugin_id| tile.config.plugin_id == plugin_id),
+            plugin_id.is_none_or(|plugin_id| tile.plugin_id == plugin_id),
             anyhow::anyhow!("tile is not apart of the same plugin")
         );
 

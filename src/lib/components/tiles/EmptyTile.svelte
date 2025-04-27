@@ -41,9 +41,9 @@
         row,
         column,
         folder_id: currentFolder.id,
+        action_id: action.action_id,
+        plugin_id: action.plugin_id,
         config: {
-          action_id: action.action_id,
-          plugin_id: action.plugin_id,
           icon:
             action.icon === null
               ? { type: TileIconType.None }

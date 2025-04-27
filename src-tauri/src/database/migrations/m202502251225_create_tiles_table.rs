@@ -21,7 +21,9 @@ impl Migration for TilesMigration {
                 .col(pk_uuid(TilesColumn::Id))
                 .col(json(TilesColumn::Config))
                 .col(json(TilesColumn::Properties))
-                .col(uuid_null(TilesColumn::FolderId))
+                .col(uuid(TilesColumn::FolderId))
+                .col(string(TilesColumn::PluginId))
+                .col(string(TilesColumn::ActionId))
                 .col(integer(TilesColumn::Row))
                 .col(integer(TilesColumn::Column))
                 // Connect to profiles table
@@ -56,6 +58,10 @@ pub enum TilesColumn {
     Properties,
     /// ID of a folder this tile is within
     FolderId,
+    /// ID of the plugin the action is apart of
+    PluginId,
+    /// ID of the action within the plugin to execute
+    ActionId,
     /// Row the tile is on
     Row,
     /// Column the tile is on

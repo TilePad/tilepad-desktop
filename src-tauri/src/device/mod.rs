@@ -417,8 +417,8 @@ impl Devices {
 
         let context = TileInteractionContext {
             device_id,
-            plugin_id: tile.config.plugin_id,
-            action_id: tile.config.action_id,
+            plugin_id: tile.plugin_id,
+            action_id: tile.action_id,
             tile_id,
         };
 
