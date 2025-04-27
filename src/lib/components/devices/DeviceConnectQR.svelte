@@ -1,8 +1,11 @@
 <script lang="ts">
   import type { ServerConnectionInfo } from "$lib/api/types/server";
 
+  import { t } from "svelte-i18n";
   import QRCode from "@castlenine/svelte-qrcode";
   import { getConnectionInfo } from "$lib/api/server";
+
+  import SkeletonList from "../skeleton/SkeletonList.svelte";
 
   function encodeInterfaces(info: ServerConnectionInfo) {
     return {
@@ -14,14 +17,14 @@
 
 <div class="column">
   {#await getConnectionInfo()}
-    Loading...
+    <SkeletonList />
   {:then connectInfo}
     <div class="qr">
       <QRCode size={250} data={JSON.stringify(encodeInterfaces(connectInfo))} />
     </div>
 
     <div class="port">
-      <b>Port</b>
+      <b>{$t("port")}</b>
       {connectInfo.port}
     </div>
 

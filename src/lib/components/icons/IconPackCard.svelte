@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { IconPack } from "$lib/api/types/icons";
 
+  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { uninstallIconPack } from "$lib/api/icons";
   import { toastErrorMessage } from "$lib/api/utils/error";
@@ -18,9 +19,9 @@
     const revokePromise = uninstallIconPack(manifest.icons.id);
 
     toast.promise(revokePromise, {
-      loading: "Uninstalling icon pack",
-      success: "Uninstalled icon pack",
-      error: toastErrorMessage("Failed to uninstall icon pack"),
+      loading: $t("icon_packs_uninstalling"),
+      success: $t("icon_packs_uninstalled"),
+      error: toastErrorMessage($t("icon_packs_uninstall_error")),
     });
   }
 </script>
@@ -30,7 +31,7 @@
     <span class="version">{manifest.icons.version}</span>
 
     <div class="actions">
-      <Button size="small" onclick={handleUninstall}>Uninstall</Button>
+      <Button size="small" onclick={handleUninstall}>{$t("uninstall")}</Button>
     </div>
   </div>
 

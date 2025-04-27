@@ -1,9 +1,11 @@
 <script lang="ts">
+  import { t } from "svelte-i18n";
   import Aside from "$lib/components/Aside.svelte";
   import { createIconPacksQuery } from "$lib/api/icons";
   import { getErrorMessage } from "$lib/api/utils/error";
   import SolarShopBoldDuotone from "~icons/solar/shop-bold-duotone";
   import IconPackCard from "$lib/components/icons/IconPackCard.svelte";
+  import SkeletonList from "$lib/components/skeleton/SkeletonList.svelte";
   import ManualImportIconPack from "$lib/components/icons/ManualImportIconPack.svelte";
   import IconsRegistryDialog from "$lib/components/icons_registry/IconsRegistryDialog.svelte";
 
@@ -12,23 +14,21 @@
 
 <div class="layout">
   {#if $iconPacksQuery.isLoading}
-    <div class="skeleton-list">
-      <div class="skeleton" style="width: 80%; height: 1rem"></div>
-      <div class="skeleton" style="width: 70%; height: 1rem"></div>
-      <div class="skeleton" style="width: 30%; height: 1rem"></div>
-    </div>
+    <SkeletonList style="margin: 1rem" />
   {:else if $iconPacksQuery.isError}
-    <Aside severity="error" style="width: 100%">
-      Failed to load icon packs: {getErrorMessage($iconPacksQuery.error)}
+    <Aside severity="error" style="margin: 1rem">
+      {$t("icon_packs_installed_error", {
+        values: { error: getErrorMessage($iconPacksQuery.error) },
+      })}
     </Aside>
   {:else if $iconPacksQuery.isSuccess}
     <div class="header">
-      <h2>Icon Packs</h2>
+      <h2>{$t("icon_packs")}</h2>
 
       <div class="actions">
         <IconsRegistryDialog
           buttonLabel={{
-            text: "Community Icon Packs",
+            text: $t("community_icon_packs"),
             icon: SolarShopBoldDuotone,
           }}
         />

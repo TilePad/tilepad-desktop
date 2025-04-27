@@ -3,7 +3,7 @@
   import { init, register, getLocaleFromNavigator } from "svelte-i18n";
 
   // Register languages
-  register("en", () => import("../i18n/en.json"));
+  register("en", () => import("../i18n/locales/en.json"));
 
   // Initialize i18n
   init({

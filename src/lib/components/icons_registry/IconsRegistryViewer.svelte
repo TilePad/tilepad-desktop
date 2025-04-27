@@ -1,18 +1,21 @@
 <script lang="ts">
   import type { IconRegistryEntry } from "$lib/api/types/icons_registry";
 
+  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { uninstallIconPack } from "$lib/api/icons";
-  import { toastErrorMessage } from "$lib/api/utils/error";
   import { replaceMarkdownRelativeUrls } from "$lib/utils/markdown";
+  import { getErrorMessage, toastErrorMessage } from "$lib/api/utils/error";
   import {
     createIconPackReadmeQuery,
     createIconPackManifestQuery,
     createInstallIconPackFromRegistry,
   } from "$lib/api/icons_registry";
 
+  import Aside from "../Aside.svelte";
   import Button from "../input/Button.svelte";
   import Markdown from "../markdown/Markdown.svelte";
+  import SkeletonList from "../skeleton/SkeletonList.svelte";
 
   type Props = {
     item: IconRegistryEntry;
@@ -40,9 +43,9 @@
     );
 
     toast.promise(installPromise, {
-      loading: "Installing icon pack...",
-      success: "Installed icon pack",
-      error: toastErrorMessage("Failed to install icon pack"),
+      loading: $t("icon_packs_installing"),
+      success: $t("icon_packs_installed"),
+      error: toastErrorMessage($t("icon_packs_install_error")),
     });
   }
 
@@ -50,9 +53,9 @@
     const revokePromise = uninstallIconPack(item.id);
 
     toast.promise(revokePromise, {
-      loading: "Uninstalling icon pack",
-      success: "Uninstalled icon pack",
-      error: toastErrorMessage("Failed to uninstall icon pack"),
+      loading: $t("icon_packs_uninstalling"),
+      success: $t("icon_packs_uninstalled"),
+      error: toastErrorMessage($t("icon_packs_uninstall_error")),
     });
   }
 </script>
@@ -60,28 +63,30 @@
 <div class="container">
   <div class="toolbar">
     {#if $manifestQuery.isLoading}
-      Loading manifest..
+      <SkeletonList style="padding: 1rem" />
     {:else if $manifestQuery.isError}
-      Failed to load manifest
+      <Aside severity="error" style="margin: 1rem;">
+        {$t("manifest_error")}: {getErrorMessage($manifestQuery.error)}
+      </Aside>
     {:else if $manifestQuery.isSuccess}
       <h2>{item.name}</h2>
       <p>{item.description}</p>
 
       {#if installed}
-        <Button onclick={handleUninstall}>Uninstall</Button>
+        <Button onclick={handleUninstall}>{$t("uninstall")}</Button>
       {:else}
-        <Button disabled={$install.isPending} onclick={onInstall}
-          >Install</Button
-        >
+        <Button disabled={$install.isPending} onclick={onInstall}>
+          {$t("install")}
+        </Button>
       {/if}
     {/if}
   </div>
 
   <div class="readme">
     {#if $readmeQuery.isLoading}
-      Loading readme..
+      <SkeletonList style="padding: 1rem" />
     {:else if $readmeQuery.isError}
-      Failed to load readme
+      {$t("readme_error")}
     {:else if $readmeQuery.isSuccess}
       {@const markdown = replaceMarkdownRelativeUrls(
         $readmeQuery.data.readme,

@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { IconRegistryEntry } from "$lib/api/types/icons_registry";
 
+  import { t } from "svelte-i18n";
   import { createIconPacksQuery } from "$lib/api/icons";
   import { getErrorMessage } from "$lib/api/utils/error";
   import { createIconPackRegistryQuery } from "$lib/api/icons_registry";
@@ -10,6 +11,7 @@
   import Aside from "../Aside.svelte";
   import Dialog from "../dialog/Dialog.svelte";
   import IconsRegistryItem from "./IconsRegistryItem.svelte";
+  import SkeletonList from "../skeleton/SkeletonList.svelte";
   import IconsRegistryViewer from "./IconsRegistryViewer.svelte";
   import DialogCloseButton from "../dialog/DialogCloseButton.svelte";
 
@@ -43,40 +45,40 @@
   {#snippet children()}
     <div class="content">
       {#if $iconRegistryQuery.isLoading || $iconPacksQuery.isLoading}
-        <div class="skeleton-list" style="padding: 1rem">
-          <div class="skeleton" style="width: 80%; height: 1rem"></div>
-          <div class="skeleton" style="width: 70%; height: 1rem"></div>
-          <div class="skeleton" style="width: 30%; height: 1rem"></div>
-        </div>
+        <SkeletonList style="padding: 1rem" />
       {:else if $iconRegistryQuery.isError}
         <Aside severity="error" style="margin: 1rem;">
-          Failed to load community icons: {getErrorMessage(
-            $iconRegistryQuery.error,
-          )}
+          {$t("community_icons_error", {
+            values: { error: getErrorMessage($iconRegistryQuery.error) },
+          })}
         </Aside>
       {:else if $iconPacksQuery.isError}
         <Aside severity="error" style="margin: 1rem;">
-          Failed to load installed icon packs: {getErrorMessage(
-            $iconPacksQuery.error,
-          )}
+          {$t("icon_packs_installed_error", {
+            values: { error: getErrorMessage($iconPacksQuery.error) },
+          })}
         </Aside>
       {:else if $iconRegistryQuery.isSuccess && $iconPacksQuery.isSuccess}
         <div class="split">
           <div class="plugins">
             <div class="titlebar">
               <div class="titlebar__text">
-                <h2>Community Icons</h2>
-                <p class="total">{filteredRegistry.length} Icon Packs</p>
+                <h2>{$t("community_icons")}</h2>
+                <p class="total">
+                  {$t("count_icon_packs", {
+                    values: { count: filteredRegistry.length },
+                  })}
+                </p>
               </div>
 
-              <DialogCloseButton buttonLabel={{ text: "Close" }} />
+              <DialogCloseButton buttonLabel={{ text: $t("close") }} />
             </div>
 
             <input
               bind:value={search}
               class="search"
               type="text"
-              placeholder="Search..."
+              placeholder={$t("search_placeholder")}
             />
 
             <div class="plugins-list">
@@ -96,7 +98,7 @@
                   selected={active !== undefined && active.id === item.id}
                 />
               {:else}
-                No plugins available
+                {$t("community_icons_none")}
               {/each}
             </div>
           </div>

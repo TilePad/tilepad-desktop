@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { t } from "svelte-i18n";
   import Aside from "$lib/components/Aside.svelte";
   import { getErrorMessage } from "$lib/api/utils/error";
   import DeviceCard from "$lib/components/devices/DeviceCard.svelte";
   import { devicesQuery, connectedDevicesQuery } from "$lib/api/devices";
+  import SkeletonList from "$lib/components/skeleton/SkeletonList.svelte";
   import ConnectInfo from "$lib/components/devices/DeviceConnectQR.svelte";
 
   const devices = devicesQuery();
@@ -22,18 +24,14 @@
 <div class="layout">
   <div class="layout__devices">
     {#if $devices.isLoading}
-      <div class="skeleton-list">
-        <div class="skeleton" style="width: 80%; height: 1rem"></div>
-        <div class="skeleton" style="width: 70%; height: 1rem"></div>
-        <div class="skeleton" style="width: 30%; height: 1rem"></div>
-      </div>
+      <SkeletonList />
     {:else if $devices.isError}
       <Aside severity="error" style="width: 100%">
-        Failed to load devices: {getErrorMessage($devices.error)}
+        {$t("devices_error")}: {getErrorMessage($devices.error)}
       </Aside>
     {:else if $devices.isSuccess}
       <div class="header">
-        <h2>Devices</h2>
+        <h2>{$t("devices")}</h2>
       </div>
 
       <div class="devices-wrapper">
@@ -42,7 +40,7 @@
             {@const connected = isDeviceConnected(device.id)}
             <DeviceCard {device} {connected} />
           {:else}
-            No devices connected...
+            {$t("devices_none")}
           {/each}
         </div>
       </div>

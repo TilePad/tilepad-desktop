@@ -15,27 +15,27 @@
     <NavButton
       icon={SolarLayersMinimalisticBoldDuotone}
       href="/"
-      title={$t("nav.profiles")}
+      title={$t("profiles")}
     />
     <NavButton
       icon={SolarDevicesBoldDuotone}
       href="/devices"
-      title={$t("nav.devices")}
+      title={$t("devices")}
     />
     <NavButton
       icon={SolarPlugCircleBoldDuotone}
       href="/plugins"
-      title={$t("nav.plugins")}
+      title={$t("plugins")}
     />
     <NavButton
       icon={SolarGalleryWideBoldDuotone}
       href="/icons"
-      title={$t("nav.icons")}
+      title={$t("icon_packs")}
     />
     <NavButton
       icon={SolarSettingsBoldDuotone}
       href="/settings"
-      title={$t("nav.settings")}
+      title={$t("settings")}
     />
 
     {#if import.meta.env.DEV}
