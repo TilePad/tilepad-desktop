@@ -1,25 +1,9 @@
 use crate::{
-    database::{
-        DbErr, DbPool, DbResult,
-        helpers::{UpdateStatementExt, sql_exec, sql_query_maybe_one},
-    },
+    database::{DbErr, DbPool, DbResult},
     utils::device::get_device_name,
 };
-use sea_query::{Expr, IdenStatic, Query};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
-
-#[derive(IdenStatic, Copy, Clone)]
-#[iden(rename = "settings")]
-pub struct SettingsTable;
-
-#[derive(IdenStatic, Copy, Clone)]
-pub enum SettingsColumn {
-    /// ID for the row
-    Id,
-    /// settings configuration (JSON)
-    Config,
-}
 
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct SettingsModel {
@@ -62,14 +46,13 @@ impl SettingsModel {
     }
 
     pub async fn update(mut self, db: &DbPool, config: SettingsConfig) -> DbResult<SettingsModel> {
-        sql_exec(
-            db,
-            Query::update()
-                .table(SettingsTable)
-                .and_where(Expr::col(SettingsColumn::Id).eq(self.id))
-                .value_json(SettingsColumn::Config, &config)?,
-        )
-        .await?;
+        let config_json = serde_json::to_value(&config).map_err(|err| DbErr::Encode(err.into()))?;
+
+        sqlx::query("UPDATE \"settings\" SET \"config\" = ? WHERE \"id\" = ?")
+            .bind(config_json)
+            .bind(self.id)
+            .execute(db)
+            .await?;
 
         self.config = config;
 
@@ -78,14 +61,10 @@ impl SettingsModel {
 
     // Get a settings model by ID
     async fn get_by_id(db: &DbPool, id: u32) -> DbResult<Option<SettingsModel>> {
-        sql_query_maybe_one(
-            db,
-            Query::select()
-                .from(SettingsTable)
-                .columns([SettingsColumn::Id, SettingsColumn::Config])
-                .and_where(Expr::col(SettingsColumn::Id).eq(id)),
-        )
-        .await
+        sqlx::query_as("SELECT * FROM \"settings\" WHERE \"id\" = ?")
+            .bind(id)
+            .fetch_optional(db)
+            .await
     }
 
     /// Create a settings model
@@ -95,16 +74,18 @@ impl SettingsModel {
             config,
         };
 
-        let config =
+        let config_json =
             serde_json::to_value(&model.config).map_err(|err| DbErr::Encode(err.into()))?;
 
-        sql_exec(
-            db,
-            Query::insert()
-                .into_table(SettingsTable)
-                .columns([SettingsColumn::Id, SettingsColumn::Config])
-                .values_panic([model.id.into(), config.into()]),
+        sqlx::query(
+            "
+                INSERT INTO \"settings\" (\"id\", \"config\")
+                VALUES (?, ?)
+            ",
         )
+        .bind(model.id)
+        .bind(config_json)
+        .execute(db)
         .await?;
 
         Ok(model)

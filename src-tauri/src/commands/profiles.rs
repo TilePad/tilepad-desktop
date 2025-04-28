@@ -5,9 +5,9 @@ use crate::{
     database::{
         DbPool,
         entity::{
-            device::{DeviceModel, UpdateDevice},
+            device::DeviceModel,
             folder::FolderModel,
-            profile::{CreateProfile, ProfileId, ProfileModel, UpdateProfile},
+            profile::{CreateProfile, ProfileId, ProfileModel},
         },
     },
     device::Devices,
@@ -43,19 +43,19 @@ pub async fn profiles_create_profile(
     Ok(profile)
 }
 
-/// Update a specific profile
+/// Update a specific profiles name
 #[tauri::command]
-pub async fn profiles_update_profile(
+pub async fn profiles_set_name(
     db: State<'_, DbPool>,
     profile_id: ProfileId,
-    update: UpdateProfile,
+    name: String,
 ) -> CmdResult<ProfileModel> {
     let db = db.inner();
     let profile = ProfileModel::get_by_id(db, profile_id)
         .await?
         .context("unknown profile")?;
 
-    let profile = profile.update(db, update).await?;
+    let profile = profile.set_name(db, name).await?;
     Ok(profile)
 }
 
@@ -81,14 +81,7 @@ pub async fn profiles_delete_profile(
     let profile_devices = DeviceModel::all_by_profile(db, profile_id).await?;
     for device in profile_devices {
         device
-            .update(
-                db,
-                UpdateDevice {
-                    profile_id: Some(default_profile.id),
-                    folder_id: Some(default_folder.id),
-                    ..Default::default()
-                },
-            )
+            .set_profile(db, default_profile.id, default_folder.id)
             .await?;
     }
 

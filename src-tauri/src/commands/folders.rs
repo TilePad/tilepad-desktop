@@ -8,8 +8,8 @@ use crate::{
     database::{
         DbPool,
         entity::{
-            device::{DeviceModel, UpdateDevice},
-            folder::{CreateFolder, FolderId, FolderModel, UpdateFolder},
+            device::DeviceModel,
+            folder::{CreateFolder, FolderConfig, FolderId, FolderModel},
             profile::ProfileId,
         },
     },
@@ -48,16 +48,34 @@ pub async fn folders_create_folder(
 
 /// Update a specific folder
 #[tauri::command]
-pub async fn folders_update_folder(
+pub async fn folders_set_name(
     db: State<'_, DbPool>,
     devices: State<'_, Arc<Devices>>,
     folder_id: FolderId,
-    update: UpdateFolder,
+    name: String,
 ) -> CmdResult<FolderModel> {
     let folder = FolderModel::get_by_id(db.inner(), folder_id)
         .await?
         .context("unknown folder")?;
-    let folder = folder.update(&db, update).await?;
+    let folder = folder.set_name(&db, name).await?;
+
+    devices.background_update_folder(folder.id);
+
+    Ok(folder)
+}
+
+/// Update a specific folder
+#[tauri::command]
+pub async fn folders_set_config(
+    db: State<'_, DbPool>,
+    devices: State<'_, Arc<Devices>>,
+    folder_id: FolderId,
+    config: FolderConfig,
+) -> CmdResult<FolderModel> {
+    let folder = FolderModel::get_by_id(db.inner(), folder_id)
+        .await?
+        .context("unknown folder")?;
+    let folder = folder.set_config(&db, config).await?;
 
     devices.background_update_folder(folder.id);
 
@@ -91,13 +109,7 @@ pub async fn folders_delete_folder(
     let folder_devices = DeviceModel::all_by_folder(db, folder_id).await?;
     for device in folder_devices {
         device
-            .update(
-                db,
-                UpdateDevice {
-                    folder_id: Some(default_folder.id),
-                    ..Default::default()
-                },
-            )
+            .set_profile(db, default_folder.profile_id, default_folder.id)
             .await?;
     }
 

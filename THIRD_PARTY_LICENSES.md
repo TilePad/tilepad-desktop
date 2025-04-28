@@ -169,7 +169,6 @@ This page lists the licenses of third party dependencies used by this project
 - [image](https://github.com/image-rs/image) - 0.25.6
 - [indexmap](https://github.com/bluss/indexmap) - 1.9.3
 - [indexmap](https://github.com/indexmap-rs/indexmap) - 2.9.0
-- [inherent](https://github.com/dtolnay/inherent) - 1.0.12
 - [ipnet](https://github.com/krisprice/ipnet) - 2.11.0
 - [itoa](https://github.com/dtolnay/itoa) - 0.4.8
 - [itoa](https://github.com/dtolnay/itoa) - 1.0.15
@@ -271,9 +270,6 @@ This page lists the licenses of third party dependencies used by this project
 - [rustls-pki-types](https://github.com/rustls/pki-types) - 1.11.0
 - [rustversion](https://github.com/dtolnay/rustversion) - 1.0.20
 - [scopeguard](https://github.com/bluss/scopeguard) - 1.2.0
-- [sea-query](https://github.com/SeaQL/sea-query) - 0.32.4
-- [sea-query-binder](https://github.com/SeaQL/sea-query) - 0.7.0
-- [sea-query-derive](https://github.com/SeaQL/sea-query) - 0.4.3
 - [security-framework](https://github.com/kornelski/rust-security-framework) - 2.11.1
 - [security-framework-sys](https://github.com/kornelski/rust-security-framework) - 2.14.0
 - [semver](https://github.com/dtolnay/semver) - 1.0.26

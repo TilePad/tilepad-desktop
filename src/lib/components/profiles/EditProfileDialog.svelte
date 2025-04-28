@@ -4,7 +4,7 @@
   import { watch } from "runed";
   import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
-  import { updateProfile } from "$lib/api/profiles";
+  import { setProfileName } from "$lib/api/profiles";
   import { toastErrorMessage } from "$lib/api/utils/error";
 
   import type { DialogProps } from "../dialog/Dialog.svelte";
@@ -25,9 +25,7 @@
   async function onSave(event: Event) {
     event.preventDefault();
 
-    const updatePromise = updateProfile(profile.id, {
-      name,
-    });
+    const updatePromise = setProfileName(profile.id, name);
 
     toast.promise(updatePromise, {
       loading: $t("profile_updating"),

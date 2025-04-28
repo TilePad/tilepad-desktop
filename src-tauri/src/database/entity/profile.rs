@@ -1,12 +1,7 @@
-use sea_query::{Expr, IdenStatic, Order, Query};
+use crate::database::{DbErr, DbPool, DbResult};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 use uuid::Uuid;
-
-use crate::database::{
-    DbPool, DbResult,
-    helpers::{UpdateStatementExt, sql_exec, sql_query_all, sql_query_maybe_one},
-};
 
 pub type ProfileId = Uuid;
 
@@ -31,17 +26,9 @@ pub struct CreateProfile {
     pub order: u32,
 }
 
-#[derive(Deserialize)]
-pub struct UpdateProfile {
-    pub name: Option<String>,
-    pub default: Option<bool>,
-    pub config: Option<ProfileConfig>,
-    pub order: Option<u32>,
-}
-
 impl ProfileModel {
     /// Create a new profile
-    pub async fn create(db: &DbPool, create: CreateProfile) -> anyhow::Result<ProfileModel> {
+    pub async fn create(db: &DbPool, create: CreateProfile) -> DbResult<ProfileModel> {
         let mut model = ProfileModel {
             id: Uuid::new_v4(),
             name: create.name,
@@ -50,27 +37,21 @@ impl ProfileModel {
             order: create.order,
         };
 
-        let config = serde_json::to_value(&model.config)?;
+        let config =
+            serde_json::to_value(&model.config).map_err(|err| DbErr::Encode(err.into()))?;
 
-        sql_exec(
-            db,
-            Query::insert()
-                .into_table(ProfilesTable)
-                .columns([
-                    ProfilesColumn::Id,
-                    ProfilesColumn::Name,
-                    ProfilesColumn::Default,
-                    ProfilesColumn::Config,
-                    ProfilesColumn::Order,
-                ])
-                .values_panic([
-                    model.id.into(),
-                    model.name.clone().into(),
-                    model.default.into(),
-                    config.into(),
-                    model.order.into(),
-                ]),
+        sqlx::query(
+            "
+            INSERT INTO \"profiles\" (\"id\", \"name\", \"default\", \"config\", \"order\")
+            VALUES (?, ?, ?, ?, ?)
+        ",
         )
+        .bind(model.id)
+        .bind(model.name.clone())
+        .bind(model.default)
+        .bind(config)
+        .bind(model.order)
+        .execute(db)
         .await?;
 
         if create.default {
@@ -81,58 +62,32 @@ impl ProfileModel {
     }
 
     pub async fn get_by_id(db: &DbPool, id: ProfileId) -> DbResult<Option<ProfileModel>> {
-        sql_query_maybe_one(
-            db,
-            Query::select()
-                .from(ProfilesTable)
-                .columns([
-                    ProfilesColumn::Id,
-                    ProfilesColumn::Name,
-                    ProfilesColumn::Default,
-                    ProfilesColumn::Config,
-                    ProfilesColumn::Order,
-                ])
-                .and_where(Expr::col(ProfilesColumn::Id).eq(id)),
-        )
-        .await
+        sqlx::query_as("SELECT * FROM \"profiles\" WHERE \"id\" = ?")
+            .bind(id)
+            .fetch_optional(db)
+            .await
     }
 
-    pub async fn update(
-        mut self,
-        db: &DbPool,
-        update: UpdateProfile,
-    ) -> anyhow::Result<ProfileModel> {
-        sql_exec(
-            db,
-            Query::update()
-                .table(ProfilesTable)
-                .and_where(Expr::col(ProfilesColumn::Id).eq(self.id))
-                .cond_value(ProfilesColumn::Name, update.name.as_ref())
-                .cond_value_json(ProfilesColumn::Config, update.config.as_ref())?
-                .cond_value(ProfilesColumn::Order, update.order),
-        )
-        .await?;
+    /// Update the name of the profile
+    pub async fn set_name(mut self, db: &DbPool, name: String) -> DbResult<ProfileModel> {
+        sqlx::query("UPDATE \"profiles\" SET \"name\" = ? WHERE \"id\" = ?")
+            .bind(&name)
+            .bind(self.id)
+            .execute(db)
+            .await?;
 
-        self.name = update.name.unwrap_or(self.name);
-        self.config = update.config.unwrap_or(self.config);
-        self.order = update.order.unwrap_or(self.order);
-
-        if let Some(true) = update.default {
-            self = self.set_default(db).await?;
-        }
+        self.name = name;
 
         Ok(self)
     }
 
     /// Set this profile as the default profile
-    async fn set_default(mut self, db: &DbPool) -> DbResult<ProfileModel> {
-        sql_exec(
-            db,
-            Query::update().table(ProfilesTable).value(
-                ProfilesColumn::Default,
-                Expr::case(Expr::col(ProfilesColumn::Id).eq(self.id), true).finally(false),
-            ),
+    pub async fn set_default(mut self, db: &DbPool) -> DbResult<ProfileModel> {
+        sqlx::query(
+            "UPDATE \"profiles\" SET \"default\" = CASE WHEN \"id\" = ? THEN TRUE ELSE FALSE END",
         )
+        .bind(self.id)
+        .execute(db)
         .await?;
 
         self.default = true;
@@ -142,65 +97,22 @@ impl ProfileModel {
 
     /// Get the first profile marked as default
     pub async fn get_default_profile(db: &DbPool) -> DbResult<Option<ProfileModel>> {
-        sql_query_maybe_one(
-            db,
-            Query::select()
-                .from(ProfilesTable)
-                .columns([
-                    ProfilesColumn::Id,
-                    ProfilesColumn::Name,
-                    ProfilesColumn::Default,
-                    ProfilesColumn::Config,
-                    ProfilesColumn::Order,
-                ])
-                .and_where(Expr::col(ProfilesColumn::Default).eq(true)),
-        )
-        .await
+        sqlx::query_as("SELECT * FROM \"profiles\" WHERE \"default\" = TRUE")
+            .fetch_optional(db)
+            .await
     }
 
     pub async fn all(db: &DbPool) -> DbResult<Vec<ProfileModel>> {
-        sql_query_all(
-            db,
-            Query::select()
-                .from(ProfilesTable)
-                .columns([
-                    ProfilesColumn::Id,
-                    ProfilesColumn::Name,
-                    ProfilesColumn::Default,
-                    ProfilesColumn::Config,
-                    ProfilesColumn::Order,
-                ])
-                .order_by(ProfilesColumn::Order, Order::Asc),
-        )
-        .await
+        sqlx::query_as("SELECT * FROM \"profiles\" ORDER BY \"order\" ASC")
+            .fetch_all(db)
+            .await
     }
 
     pub async fn delete(db: &DbPool, profile_id: ProfileId) -> DbResult<()> {
-        sql_exec(
-            db,
-            Query::delete()
-                .from_table(ProfilesTable)
-                .and_where(Expr::col(ProfilesColumn::Id).eq(profile_id))
-                .and_where(Expr::col(ProfilesColumn::Default).eq(false)),
-        )
-        .await
+        sqlx::query("DELETE FROM \"profiles\" WHERE \"id\" = ? AND \"default\" = FALSE")
+            .bind(profile_id)
+            .execute(db)
+            .await?;
+        Ok(())
     }
-}
-
-#[derive(IdenStatic, Copy, Clone)]
-#[iden(rename = "profiles")]
-pub struct ProfilesTable;
-
-#[derive(IdenStatic, Copy, Clone)]
-pub enum ProfilesColumn {
-    /// Unique ID for the profile
-    Id,
-    /// Name of the profile
-    Name,
-    /// Whether the profile is the default profile
-    Default,
-    /// Profile configuration (JSON)
-    Config,
-    /// Order position of the profile
-    Order,
 }

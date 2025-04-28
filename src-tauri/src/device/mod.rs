@@ -11,7 +11,7 @@ use crate::{
     database::{
         DbPool,
         entity::{
-            device::{CreateDevice, DeviceConfig, DeviceId, DeviceModel, UpdateDevice},
+            device::{CreateDevice, DeviceConfig, DeviceId, DeviceModel},
             folder::{FolderId, FolderModel},
             profile::{ProfileId, ProfileModel},
             tile::{TileId, TileModel},
@@ -319,16 +319,7 @@ impl Devices {
         let tiles = TileModel::get_by_folder(db, folder.id).await?;
 
         // Update the profile on the device
-        device
-            .update(
-                db,
-                UpdateDevice {
-                    profile_id: Some(profile_id),
-                    folder_id: Some(folder.id),
-                    ..Default::default()
-                },
-            )
-            .await?;
+        device.set_profile(db, profile_id, folder.id).await?;
 
         if let Some(session) = self.get_session_by_device(device_id) {
             session.send_message(ServerDeviceMessage::Tiles { tiles, folder });
@@ -351,15 +342,7 @@ impl Devices {
             .context("unknown folder")?;
         let tiles = TileModel::get_by_folder(db, folder.id).await?;
 
-        device
-            .update(
-                db,
-                UpdateDevice {
-                    folder_id: Some(folder_id),
-                    ..Default::default()
-                },
-            )
-            .await?;
+        device.set_profile(db, folder.profile_id, folder_id).await?;
 
         if let Some(session) = self.get_session_by_device(device_id) {
             session.send_message(ServerDeviceMessage::Tiles { tiles, folder });

@@ -1,15 +1,9 @@
+use super::{folder::FolderId, profile::ProfileId};
+use crate::database::{DbErr, DbPool, DbResult};
 use chrono::{DateTime, Utc};
-use sea_query::{Expr, IdenStatic, Query};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 use uuid::Uuid;
-
-use crate::database::{
-    DbPool, DbResult,
-    helpers::{UpdateStatementExt, sql_exec, sql_query_all, sql_query_maybe_one},
-};
-
-use super::{folder::FolderId, profile::ProfileId};
 
 pub type DeviceId = Uuid;
 
@@ -40,17 +34,8 @@ pub struct CreateDevice {
     pub folder_id: FolderId,
 }
 
-#[derive(Default, Deserialize)]
-pub struct UpdateDevice {
-    pub name: Option<String>,
-    pub config: Option<DeviceConfig>,
-    pub order: Option<u32>,
-    pub profile_id: Option<ProfileId>,
-    pub folder_id: Option<FolderId>,
-}
-
 impl DeviceModel {
-    pub async fn create(db: &DbPool, create: CreateDevice) -> anyhow::Result<DeviceModel> {
+    pub async fn create(db: &DbPool, create: CreateDevice) -> DbResult<DeviceModel> {
         let model = DeviceModel {
             id: Uuid::new_v4(),
             name: create.name,
@@ -63,80 +48,71 @@ impl DeviceModel {
             last_connected_at: Utc::now(),
         };
 
-        let config = serde_json::to_value(&model.config)?;
+        let config =
+            serde_json::to_value(&model.config).map_err(|err| DbErr::Encode(err.into()))?;
 
-        sql_exec(
-            db,
-            Query::insert()
-                .into_table(DevicesTable)
-                .columns([
-                    DevicesColumn::Id,
-                    DevicesColumn::Name,
-                    DevicesColumn::AccessToken,
-                    DevicesColumn::Config,
-                    DevicesColumn::Order,
-                    DevicesColumn::ProfileId,
-                    DevicesColumn::FolderId,
-                    DevicesColumn::CreatedAt,
-                    DevicesColumn::LastConnectedAt,
-                ])
-                .values_panic([
-                    model.id.into(),
-                    model.name.clone().into(),
-                    model.access_token.clone().into(),
-                    config.into(),
-                    model.order.into(),
-                    model.profile_id.into(),
-                    model.folder_id.into(),
-                    model.created_at.into(),
-                    model.last_connected_at.into(),
-                ]),
+        sqlx::query(
+            "
+            INSERT INTO \"devices\" (
+                \"id\", 
+                \"name\", 
+                \"access_token\", 
+                \"config\", 
+                \"order\", 
+                \"profile_id\", 
+                \"folder_id\", 
+                \"created_at\",
+                \"last_connected_at\"
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ",
         )
+        .bind(model.id)
+        .bind(model.name.clone())
+        .bind(model.access_token.clone())
+        .bind(config)
+        .bind(model.order)
+        .bind(model.profile_id)
+        .bind(model.folder_id)
+        .bind(model.created_at)
+        .bind(model.last_connected_at)
+        .execute(db)
         .await?;
 
         Ok(model)
     }
 
-    pub async fn update(
+    pub async fn set_profile(
         mut self,
         db: &DbPool,
-        update: UpdateDevice,
-    ) -> anyhow::Result<DeviceModel> {
-        sql_exec(
-            db,
-            Query::update()
-                .table(DevicesTable)
-                .and_where(Expr::col(DevicesColumn::Id).eq(self.id))
-                .cond_value(DevicesColumn::Name, update.name.as_ref())
-                .cond_value_json(DevicesColumn::Config, update.config.as_ref())?
-                .cond_value(DevicesColumn::Order, update.order)
-                .cond_value(DevicesColumn::ProfileId, update.profile_id)
-                .cond_value(DevicesColumn::FolderId, update.folder_id),
+        profile_id: ProfileId,
+        folder_id: FolderId,
+    ) -> DbResult<DeviceModel> {
+        sqlx::query(
+            "UPDATE \"devices\" SET \"profile_id\" = ?, \"folder_id\" = ? WHERE \"id\" = ?",
         )
+        .bind(profile_id)
+        .bind(folder_id)
+        .bind(self.id)
+        .execute(db)
         .await?;
 
-        self.name = update.name.unwrap_or(self.name);
-        self.config = update.config.unwrap_or(self.config);
-        self.order = update.order.unwrap_or(self.order);
-        self.profile_id = update.profile_id.unwrap_or(self.profile_id);
-        self.folder_id = update.folder_id.unwrap_or(self.folder_id);
+        self.profile_id = profile_id;
+        self.folder_id = folder_id;
 
         Ok(self)
     }
 
     pub async fn set_connected_now(&mut self, db: &DbPool) -> DbResult<()> {
-        self.last_connected_at = Utc::now();
-        sql_exec(
-            db,
-            Query::update()
-                .table(DevicesTable)
-                .value(
-                    DevicesColumn::LastConnectedAt,
-                    Expr::value(self.last_connected_at),
-                )
-                .and_where(Expr::col(DevicesColumn::Id).eq(self.id)),
-        )
-        .await
+        let last_connected_at = Utc::now();
+        sqlx::query("UPDATE \"devices\" SET \"last_connected_at\" = ? WHERE \"id\" = ?")
+            .bind(last_connected_at)
+            .bind(self.id)
+            .execute(db)
+            .await?;
+
+        self.last_connected_at = last_connected_at;
+        Ok(())
     }
 
     /// Get a device using its access token
@@ -144,140 +120,44 @@ impl DeviceModel {
         db: &DbPool,
         access_token: &str,
     ) -> DbResult<Option<DeviceModel>> {
-        sql_query_maybe_one(
-            db,
-            Query::select()
-                .from(DevicesTable)
-                .columns([
-                    DevicesColumn::Id,
-                    DevicesColumn::Name,
-                    DevicesColumn::AccessToken,
-                    DevicesColumn::Config,
-                    DevicesColumn::Order,
-                    DevicesColumn::ProfileId,
-                    DevicesColumn::FolderId,
-                    DevicesColumn::CreatedAt,
-                    DevicesColumn::LastConnectedAt,
-                ])
-                .and_where(Expr::col(DevicesColumn::AccessToken).eq(access_token)),
-        )
-        .await
+        sqlx::query_as("SELECT * FROM \"devices\" WHERE \"access_token\" = ?")
+            .bind(access_token)
+            .fetch_optional(db)
+            .await
     }
 
     pub async fn get_by_id(db: &DbPool, id: DeviceId) -> DbResult<Option<DeviceModel>> {
-        sql_query_maybe_one(
-            db,
-            Query::select()
-                .from(DevicesTable)
-                .columns([
-                    DevicesColumn::Id,
-                    DevicesColumn::Name,
-                    DevicesColumn::AccessToken,
-                    DevicesColumn::Config,
-                    DevicesColumn::Order,
-                    DevicesColumn::ProfileId,
-                    DevicesColumn::FolderId,
-                    DevicesColumn::CreatedAt,
-                    DevicesColumn::LastConnectedAt,
-                ])
-                .and_where(Expr::col(DevicesColumn::Id).eq(id)),
-        )
-        .await
+        sqlx::query_as("SELECT * FROM \"devices\" WHERE \"id\" = ?")
+            .bind(id)
+            .fetch_optional(db)
+            .await
     }
 
     pub async fn all(db: &DbPool) -> DbResult<Vec<DeviceModel>> {
-        sql_query_all(
-            db,
-            Query::select().from(DevicesTable).columns([
-                DevicesColumn::Id,
-                DevicesColumn::Name,
-                DevicesColumn::AccessToken,
-                DevicesColumn::Config,
-                DevicesColumn::Order,
-                DevicesColumn::ProfileId,
-                DevicesColumn::FolderId,
-                DevicesColumn::CreatedAt,
-                DevicesColumn::LastConnectedAt,
-            ]),
-        )
-        .await
+        sqlx::query_as("SELECT * FROM \"devices\"")
+            .fetch_all(db)
+            .await
     }
 
     pub async fn all_by_profile(db: &DbPool, profile_id: ProfileId) -> DbResult<Vec<DeviceModel>> {
-        sql_query_all(
-            db,
-            Query::select()
-                .from(DevicesTable)
-                .columns([
-                    DevicesColumn::Id,
-                    DevicesColumn::Name,
-                    DevicesColumn::AccessToken,
-                    DevicesColumn::Config,
-                    DevicesColumn::Order,
-                    DevicesColumn::ProfileId,
-                    DevicesColumn::FolderId,
-                    DevicesColumn::CreatedAt,
-                    DevicesColumn::LastConnectedAt,
-                ])
-                .and_where(Expr::col(DevicesColumn::ProfileId).eq(profile_id)),
-        )
-        .await
+        sqlx::query_as("SELECT * FROM \"devices\" WHERE \"profile_id\" = ?")
+            .bind(profile_id)
+            .fetch_all(db)
+            .await
     }
 
     pub async fn all_by_folder(db: &DbPool, folder_id: FolderId) -> DbResult<Vec<DeviceModel>> {
-        sql_query_all(
-            db,
-            Query::select()
-                .from(DevicesTable)
-                .columns([
-                    DevicesColumn::Id,
-                    DevicesColumn::Name,
-                    DevicesColumn::AccessToken,
-                    DevicesColumn::Config,
-                    DevicesColumn::Order,
-                    DevicesColumn::ProfileId,
-                    DevicesColumn::FolderId,
-                    DevicesColumn::CreatedAt,
-                    DevicesColumn::LastConnectedAt,
-                ])
-                .and_where(Expr::col(DevicesColumn::FolderId).eq(folder_id)),
-        )
-        .await
+        sqlx::query_as("SELECT * FROM \"devices\" WHERE \"folder_id\" = ?")
+            .bind(folder_id)
+            .fetch_all(db)
+            .await
     }
 
     pub async fn delete(db: &DbPool, device_id: DeviceId) -> DbResult<()> {
-        sql_exec(
-            db,
-            Query::delete()
-                .from_table(DevicesTable)
-                .and_where(Expr::col(DevicesColumn::Id).eq(device_id)),
-        )
-        .await
+        sqlx::query("DELETE FROM \"devices\" WHERE \"id\" = ?")
+            .bind(device_id)
+            .execute(db)
+            .await?;
+        Ok(())
     }
-}
-
-#[derive(IdenStatic, Copy, Clone)]
-#[iden(rename = "devices")]
-pub struct DevicesTable;
-
-#[derive(IdenStatic, Copy, Clone)]
-pub enum DevicesColumn {
-    /// Unique ID for the device
-    Id,
-    /// Name of the device
-    Name,
-    /// Access token for the device
-    AccessToken,
-    /// Additional device configuration
-    Config,
-    /// Order of the device in the UI
-    Order,
-    /// Current profile the device is using
-    ProfileId,
-    /// Current folder the device is using
-    FolderId,
-    /// Timestamp of when the device was first approved
-    CreatedAt,
-    /// Timestamp of when the device last connected
-    LastConnectedAt,
 }

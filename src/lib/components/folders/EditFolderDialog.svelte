@@ -4,7 +4,7 @@
   import { watch } from "runed";
   import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
-  import { updateFolder } from "$lib/api/folders";
+  import { setFolderName } from "$lib/api/folders";
   import { toastErrorMessage } from "$lib/api/utils/error";
 
   import type { DialogProps } from "../dialog/Dialog.svelte";
@@ -25,9 +25,7 @@
   async function onSave(event: Event) {
     event.preventDefault();
 
-    const updatePromise = updateFolder(folder.id, {
-      name,
-    });
+    const updatePromise = setFolderName(folder.id, name);
 
     toast.promise(updatePromise, {
       loading: $t("folder_updating"),

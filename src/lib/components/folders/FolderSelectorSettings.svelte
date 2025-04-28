@@ -6,7 +6,7 @@
   import { mergeProps } from "bits-ui";
   import { queryClient } from "$lib/api/client";
   import SolarSettingsBold from "~icons/solar/settings-bold";
-  import { foldersKeys, updateFolder } from "$lib/api/folders";
+  import { foldersKeys, setFolderConfig } from "$lib/api/folders";
 
   import Tooltip from "../Tooltip.svelte";
   import NumberInput from "../input/NumberInput.svelte";
@@ -21,12 +21,10 @@
   const { folder }: Props = $props();
 
   const debounceUpdateFolder = useDebounce(({ rows, columns }) => {
-    updateFolder(folder.id, {
-      config: {
-        ...folder.config,
-        rows,
-        columns,
-      },
+    setFolderConfig(folder.id, {
+      ...folder.config,
+      rows,
+      columns,
     });
   }, 100);
 

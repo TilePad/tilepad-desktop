@@ -58,13 +58,14 @@ pub fn run() {
             profiles::profiles_get_profiles,
             profiles::profiles_get_profile,
             profiles::profiles_delete_profile,
-            profiles::profiles_update_profile,
+            profiles::profiles_set_name,
             profiles::profiles_create_profile,
             // Folders
             folders::folders_get_folders,
             folders::folders_get_folder,
             folders::folders_delete_folder,
-            folders::folders_update_folder,
+            folders::folders_set_name,
+            folders::folders_set_config,
             folders::folders_create_folder,
             // Actions
             actions::actions_get_actions,
@@ -157,8 +158,13 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
     let user_icons = app_data_path.join("icons");
     let uploaded_icons = app_data_path.join("uploaded_icons");
 
-    let db = block_on(database::connect_database(app_data_path.join("app.db")))
-        .context("failed to load database")?;
+    let db = match block_on(database::connect_database(app_data_path.join("app.db"))) {
+        Ok(value) => value,
+        Err(cause) => {
+            tracing::error!(?cause, "failed to load database");
+            std::process::exit(1);
+        }
+    };
 
     let (app_event_tx, app_event_rx) = mpsc::unbounded_channel();
     let icons = Arc::new(Icons::new(app_event_tx.clone(), user_icons, uploaded_icons));

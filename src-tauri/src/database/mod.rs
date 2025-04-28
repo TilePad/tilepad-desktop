@@ -4,8 +4,6 @@ use std::{path::PathBuf, str::FromStr};
 use tokio::fs::{File, create_dir_all};
 
 pub mod entity;
-#[allow(unused)]
-pub mod helpers;
 mod migrations;
 
 pub type DbPool = SqlitePool;
@@ -33,25 +31,19 @@ pub async fn connect_database(path: PathBuf) -> anyhow::Result<DbPool> {
         .await
         .context("failed to connect")?;
 
-    setup_database(&db).await.context("failed to setup")?;
+    migrations::migrate(&db)
+        .await
+        .context("failed to run database migrations")?;
 
     Ok(db)
 }
 
 #[cfg(test)]
+#[allow(unused)]
 pub async fn mock_database() -> DbPool {
     let db = SqlitePool::connect_with(SqliteConnectOptions::from_str("sqlite::memory:").unwrap())
         .await
         .unwrap();
-
-    setup_database(&db).await.unwrap();
+    migrations::migrate(&db).await.unwrap();
     db
-}
-
-pub async fn setup_database(db: &DbPool) -> anyhow::Result<()> {
-    migrations::migrate(db)
-        .await
-        .context("failed to migrate database")?;
-
-    Ok(())
 }

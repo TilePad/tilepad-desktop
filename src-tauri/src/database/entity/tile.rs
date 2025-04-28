@@ -1,43 +1,15 @@
 use crate::{
-    database::{
-        DbPool, DbResult, JsonObject,
-        helpers::{UpdateStatementExt, sql_exec, sql_query_all, sql_query_maybe_one},
-    },
+    database::{DbErr, DbPool, DbResult, JsonObject},
     plugin::manifest::{ActionId, PluginId},
 };
 
 use super::folder::FolderId;
-use sea_query::{Expr, IdenStatic, Query};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 use tilepad_manifest::icons::IconPackId;
 use uuid::Uuid;
 
 pub type TileId = Uuid;
-
-#[derive(IdenStatic, Copy, Clone)]
-#[iden(rename = "tiles")]
-pub struct TilesTable;
-
-#[derive(IdenStatic, Copy, Clone)]
-pub enum TilesColumn {
-    /// Unique ID for the tile
-    Id,
-    /// Tile configuration (JSON)
-    Config,
-    /// Plugin properties for this tile
-    Properties,
-    /// ID of a folder this tile is within
-    FolderId,
-    /// ID of the plugin the action is apart of
-    PluginId,
-    /// ID of the action within the plugin to execute
-    ActionId,
-    /// Row the tile is on
-    Row,
-    /// Column the tile is on
-    Column,
-}
 
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct TileModel {
@@ -214,7 +186,7 @@ pub enum UpdateKind {
 
 impl TileModel {
     /// Create a new profile
-    pub async fn create(db: &DbPool, create: CreateTile) -> anyhow::Result<TileModel> {
+    pub async fn create(db: &DbPool, create: CreateTile) -> DbResult<TileModel> {
         let model = TileModel {
             id: Uuid::new_v4(),
             config: create.config,
@@ -226,34 +198,25 @@ impl TileModel {
             column: create.column,
         };
 
-        let config = serde_json::to_value(&model.config)?;
+        let config =
+            serde_json::to_value(&model.config).map_err(|err| DbErr::Encode(err.into()))?;
         let properties = serde_json::Value::Object(Default::default());
 
-        sql_exec(
-            db,
-            Query::insert()
-                .into_table(TilesTable)
-                .columns([
-                    TilesColumn::Id,
-                    TilesColumn::Config,
-                    TilesColumn::Properties,
-                    TilesColumn::FolderId,
-                    TilesColumn::PluginId,
-                    TilesColumn::ActionId,
-                    TilesColumn::Row,
-                    TilesColumn::Column,
-                ])
-                .values_panic([
-                    model.id.into(),
-                    config.into(),
-                    properties.into(),
-                    model.folder_id.into(),
-                    model.plugin_id.0.clone().into(),
-                    model.action_id.0.clone().into(),
-                    model.row.into(),
-                    model.column.into(),
-                ]),
+        sqlx::query(
+            "
+            INSERT INTO \"tiles\" (\"id\", \"config\", \"properties\", \"folder_id\", \"plugin_id\", \"action_id\", \"row\", \"column\")
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ",
         )
+        .bind(model.id)
+        .bind(config)
+        .bind(properties)
+        .bind(model.folder_id)
+        .bind(model.plugin_id.0.as_str())
+        .bind(model.action_id.0.as_str())
+        .bind(model.row)
+        .bind(model.column)
+        .execute(db)
         .await?;
 
         Ok(model)
@@ -265,7 +228,7 @@ impl TileModel {
         db: &DbPool,
         properties: JsonObject,
         partial: bool,
-    ) -> anyhow::Result<TileModel> {
+    ) -> DbResult<TileModel> {
         let properties = if partial {
             let mut existing_properties = self.properties.clone();
             // Merge the new properties onto the old
@@ -277,26 +240,36 @@ impl TileModel {
             properties
         };
 
-        sql_exec(
-            db,
-            Query::update()
-                .table(TilesTable)
-                .and_where(Expr::col(TilesColumn::Id).eq(self.id))
-                .value_json(TilesColumn::Properties, &properties)?,
-        )
-        .await?;
+        sqlx::query("UPDATE \"tiles\" SET \"properties\" = ? WHERE \"id\" = ?")
+            .bind(serde_json::Value::Object(properties.clone()))
+            .bind(self.id)
+            .execute(db)
+            .await?;
 
         self.properties = properties;
         Ok(self)
     }
 
+    pub async fn update_config(mut self, db: &DbPool, config: TileConfig) -> DbResult<TileModel> {
+        let config_json = serde_json::to_value(&config).map_err(|err| DbErr::Encode(err.into()))?;
+
+        sqlx::query("UPDATE \"tiles\" SET \"config\" = ? WHERE \"id\" = ?")
+            .bind(config_json)
+            .bind(self.id)
+            .execute(db)
+            .await?;
+
+        self.config = config;
+        Ok(self)
+    }
+
     /// Update the label portion of the config
     pub async fn update_label(
-        mut self,
+        self,
         db: &DbPool,
         label: TileLabel,
         kind: UpdateKind,
-    ) -> anyhow::Result<TileModel> {
+    ) -> DbResult<TileModel> {
         // Label update is ignored if the user has already set a label and
         // the update is from plugin / inspector
         if matches!(kind, UpdateKind::Program) && self.config.user_flags.label {
@@ -318,26 +291,16 @@ impl TileModel {
             UpdateKind::Program => false,
         };
 
-        sql_exec(
-            db,
-            Query::update()
-                .table(TilesTable)
-                .and_where(Expr::col(TilesColumn::Id).eq(self.id))
-                .value_json(TilesColumn::Config, &new_config)?,
-        )
-        .await?;
-
-        self.config = new_config;
-        Ok(self)
+        self.update_config(db, new_config).await
     }
 
     /// Update the icon portion of the config
     pub async fn update_icon(
-        mut self,
+        self,
         db: &DbPool,
         icon: TileIcon,
         kind: UpdateKind,
-    ) -> anyhow::Result<TileModel> {
+    ) -> DbResult<TileModel> {
         // Icon update is ignored if the user has already set a icon and
         // the update is from plugin / inspector
         if matches!(kind, UpdateKind::Program) && self.config.user_flags.icon {
@@ -348,88 +311,40 @@ impl TileModel {
         new_config.icon = icon;
         new_config.user_flags.icon = matches!(kind, UpdateKind::User);
 
-        sql_exec(
-            db,
-            Query::update()
-                .table(TilesTable)
-                .and_where(Expr::col(TilesColumn::Id).eq(self.id))
-                .value_json(TilesColumn::Config, &new_config)?,
-        )
-        .await?;
-
-        self.config = new_config;
-        Ok(self)
+        self.update_config(db, new_config).await
     }
 
     /// Update the icon portion of the config
     pub async fn update_icon_options(
-        mut self,
+        self,
         db: &DbPool,
         icon_options: TileIconOptions,
-    ) -> anyhow::Result<TileModel> {
+    ) -> DbResult<TileModel> {
         let mut new_config = self.config.clone();
         new_config.icon_options = icon_options;
 
-        sql_exec(
-            db,
-            Query::update()
-                .table(TilesTable)
-                .and_where(Expr::col(TilesColumn::Id).eq(self.id))
-                .value_json(TilesColumn::Config, &new_config)?,
-        )
-        .await?;
-
-        self.config = new_config;
-        Ok(self)
+        self.update_config(db, new_config).await
     }
 
     pub async fn get_by_folder(db: &DbPool, folder_id: FolderId) -> DbResult<Vec<TileModel>> {
-        sql_query_all(
-            db,
-            Query::select()
-                .from(TilesTable)
-                .columns([
-                    TilesColumn::Id,
-                    TilesColumn::Config,
-                    TilesColumn::Properties,
-                    TilesColumn::FolderId,
-                    TilesColumn::PluginId,
-                    TilesColumn::ActionId,
-                    TilesColumn::Row,
-                    TilesColumn::Column,
-                ])
-                .and_where(Expr::col(TilesColumn::FolderId).eq(folder_id)),
-        )
-        .await
+        sqlx::query_as("SELECT * FROM \"tiles\" WHERE \"folder_id\" = ?")
+            .bind(folder_id)
+            .fetch_all(db)
+            .await
     }
 
     pub async fn get_by_id(db: &DbPool, tile_id: TileId) -> DbResult<Option<TileModel>> {
-        sql_query_maybe_one(
-            db,
-            Query::select()
-                .from(TilesTable)
-                .columns([
-                    TilesColumn::Id,
-                    TilesColumn::Config,
-                    TilesColumn::Properties,
-                    TilesColumn::FolderId,
-                    TilesColumn::PluginId,
-                    TilesColumn::ActionId,
-                    TilesColumn::Row,
-                    TilesColumn::Column,
-                ])
-                .and_where(Expr::col(TilesColumn::Id).eq(tile_id)),
-        )
-        .await
+        sqlx::query_as("SELECT * FROM \"tiles\" WHERE \"id\" = ?")
+            .bind(tile_id)
+            .fetch_optional(db)
+            .await
     }
 
     pub async fn delete(db: &DbPool, tile_id: TileId) -> DbResult<()> {
-        sql_exec(
-            db,
-            Query::delete()
-                .from_table(TilesTable)
-                .and_where(Expr::col(TilesColumn::Id).eq(tile_id)),
-        )
-        .await
+        sqlx::query("DELETE FROM \"tiles\" WHERE \"id\" = ?")
+            .bind(tile_id)
+            .execute(db)
+            .await?;
+        Ok(())
     }
 }

@@ -1,35 +1,64 @@
 use anyhow::Context;
 use chrono::{DateTime, Utc};
-use sea_query::{ColumnDef, IdenStatic, Query, SqliteQueryBuilder, Table};
-use sea_query_binder::SqlxBinder;
 use sqlx::prelude::FromRow;
 
 use super::{DbPool, DbResult};
 
-mod m202502251151_create_profiles_table;
-mod m202502251153_create_folders_table;
-mod m202502251225_create_tiles_table;
-mod m202502251226_create_devices_table;
-mod m202503210907_create_plugin_properties;
-mod m202504281419_create_settings_table;
-mod schema;
-
-fn migrations() -> Vec<Box<dyn Migration>> {
+fn migrations() -> Vec<SqlMigration> {
     vec![
-        Box::new(m202502251151_create_profiles_table::ProfilesMigration),
-        Box::new(m202502251153_create_folders_table::ProfilesMigration),
-        Box::new(m202502251225_create_tiles_table::TilesMigration),
-        Box::new(m202502251226_create_devices_table::DevicesMigration),
-        Box::new(m202503210907_create_plugin_properties::PluginPropertiesMigration),
-        Box::new(m202504281419_create_settings_table::SettingsMigration),
+        SqlMigration::new(
+            "m202502251151_create_profiles_table",
+            include_str!("m202502251151_create_profiles_table.sql"),
+        ),
+        SqlMigration::new(
+            "m202502251153_create_folders_table",
+            include_str!("m202502251153_create_folders_table.sql"),
+        ),
+        SqlMigration::new(
+            "m202502251225_create_tiles_table",
+            include_str!("m202502251225_create_tiles_table.sql"),
+        ),
+        SqlMigration::new(
+            "m202502251226_create_devices_table",
+            include_str!("m202502251226_create_devices_table.sql"),
+        ),
+        SqlMigration::new(
+            "m202503210907_create_plugin_properties",
+            include_str!("m202503210907_create_plugin_properties.sql"),
+        ),
+        SqlMigration::new(
+            "m202504281419_create_settings_table",
+            include_str!("m202504281419_create_settings_table.sql"),
+        ),
     ]
 }
 
-#[async_trait::async_trait]
-pub trait Migration {
+pub trait Migration: Send + Sync {
     fn name(&self) -> &str;
 
-    async fn up(&self, db: &DbPool) -> anyhow::Result<()>;
+    async fn up(&self, db: &DbPool) -> DbResult<()>;
+}
+
+pub struct SqlMigration {
+    name: &'static str,
+    sql: &'static str,
+}
+
+impl SqlMigration {
+    pub fn new(name: &'static str, sql: &'static str) -> Self {
+        Self { name, sql }
+    }
+}
+
+impl Migration for SqlMigration {
+    fn name(&self) -> &str {
+        self.name
+    }
+
+    async fn up(&self, db: &DbPool) -> DbResult<()> {
+        sqlx::query(self.sql).execute(db).await?;
+        Ok(())
+    }
 }
 
 #[derive(FromRow)]
@@ -37,20 +66,6 @@ struct AppliedMigration {
     name: String,
     #[allow(unused)]
     applied_at: DateTime<Utc>,
-}
-
-/// Table for storing migrations
-#[derive(IdenStatic, Copy, Clone)]
-#[iden(rename = "migrations")]
-pub struct MigrationsTable;
-
-/// Columns on the migrations table
-#[derive(IdenStatic, Copy, Clone)]
-pub enum MigrationsColumn {
-    /// Name of the migration
-    Name,
-    /// When the migration was applied
-    AppliedAt,
 }
 
 pub async fn migrate(db: &DbPool) -> anyhow::Result<()> {
@@ -101,36 +116,17 @@ pub async fn migrate(db: &DbPool) -> anyhow::Result<()> {
     Ok(())
 }
 
-async fn create_migrations_table(db: &DbPool) -> anyhow::Result<()> {
-    sqlx::query(
-        &Table::create()
-            .table(MigrationsTable)
-            .if_not_exists()
-            .col(
-                ColumnDef::new(MigrationsColumn::Name)
-                    .uuid()
-                    .not_null()
-                    .primary_key(),
-            )
-            .col(
-                ColumnDef::new(MigrationsColumn::AppliedAt)
-                    .date_time()
-                    .not_null(),
-            )
-            .build(SqliteQueryBuilder),
-    )
-    .execute(db)
-    .await?;
-
+async fn create_migrations_table(db: &DbPool) -> DbResult<()> {
+    sqlx::query(include_str!("m202502251151_create_migrations_table.sql"))
+        .execute(db)
+        .await?;
     Ok(())
 }
 
 async fn get_applied_migrations(db: &DbPool) -> DbResult<Vec<AppliedMigration>> {
-    let (query, _values) = Query::select()
-        .columns([MigrationsColumn::Name, MigrationsColumn::AppliedAt])
-        .from(MigrationsTable)
-        .build(SqliteQueryBuilder);
-    let result: Vec<AppliedMigration> = sqlx::query_as(&query).fetch_all(db).await?;
+    let result: Vec<AppliedMigration> = sqlx::query_as("SELECT * FROM migrations")
+        .fetch_all(db)
+        .await?;
     Ok(result)
 }
 
@@ -139,15 +135,12 @@ async fn create_applied_migration(
     name: String,
     applied_at: DateTime<Utc>,
 ) -> DbResult<AppliedMigration> {
-    let (query, values) = Query::insert()
-        .columns([MigrationsColumn::Name, MigrationsColumn::AppliedAt])
-        .into_table(MigrationsTable)
-        .values_panic([name.as_str().into(), applied_at.into()])
-        .build_sqlx(SqliteQueryBuilder);
-
-    sqlx::query_with(&query, values).execute(db).await?;
+    sqlx::query("INSERT INTO migrations (name, applied_at) VALUES (?, ?)")
+        .bind(&name)
+        .bind(applied_at)
+        .execute(db)
+        .await?;
 
     let model = AppliedMigration { name, applied_at };
-
     Ok(model)
 }

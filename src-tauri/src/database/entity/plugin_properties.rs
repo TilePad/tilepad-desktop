@@ -1,12 +1,8 @@
 use crate::{
-    database::{
-        DbPool, DbResult, JsonObject,
-        helpers::{sql_exec, sql_query_maybe_one},
-    },
+    database::{DbPool, DbResult, JsonObject},
     plugin::manifest::PluginId,
 };
 
-use sea_query::{Expr, IdenStatic, OnConflict, Query};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 
@@ -20,24 +16,17 @@ pub struct PluginPropertiesModel {
 impl PluginPropertiesModel {
     /// Create a new profile
     pub async fn set(db: &DbPool, plugin_id: PluginId, properties: JsonObject) -> DbResult<()> {
-        sql_exec(
-            db,
-            Query::insert()
-                .into_table(PluginPropertiesTable)
-                .columns([
-                    PluginPropertiesColumn::PluginId,
-                    PluginPropertiesColumn::Properties,
-                ])
-                .values_panic([
-                    plugin_id.0.into(),
-                    serde_json::Value::Object(properties).into(),
-                ])
-                .on_conflict(
-                    OnConflict::column(PluginPropertiesColumn::PluginId)
-                        .update_column(PluginPropertiesColumn::Properties)
-                        .to_owned(),
-                ),
+        sqlx::query(
+            "
+            INSERT INTO \"plugin_properties\" (\"plugin_id\", \"properties\")
+            VALUES (?, ?)
+            ON CONFLICT (\"plugin_id\")
+            DO UPDATE SET \"properties\" = excluded.\"properties\"
+        ",
         )
+        .bind(plugin_id.0)
+        .bind(serde_json::Value::Object(properties))
+        .execute(db)
         .await?;
 
         Ok(())
@@ -47,39 +36,18 @@ impl PluginPropertiesModel {
         db: &DbPool,
         plugin_id: PluginId,
     ) -> DbResult<Option<PluginPropertiesModel>> {
-        sql_query_maybe_one(
-            db,
-            Query::select()
-                .from(PluginPropertiesTable)
-                .columns([
-                    PluginPropertiesColumn::PluginId,
-                    PluginPropertiesColumn::Properties,
-                ])
-                .and_where(Expr::col(PluginPropertiesColumn::PluginId).eq(plugin_id.0)),
-        )
-        .await
+        sqlx::query_as("SELECT * FROM \"plugin_properties\" WHERE \"plugin_id\" = ?")
+            .bind(plugin_id.0)
+            .fetch_optional(db)
+            .await
     }
 
     #[allow(unused)]
     pub async fn delete(db: &DbPool, plugin_id: PluginId) -> DbResult<()> {
-        sql_exec(
-            db,
-            Query::delete()
-                .from_table(PluginPropertiesTable)
-                .and_where(Expr::col(PluginPropertiesColumn::PluginId).eq(plugin_id.0)),
-        )
-        .await
+        sqlx::query("DELETE FROM \"plugin_properties\" WHERE \"plugin_id\" = ?")
+            .bind(plugin_id.0)
+            .execute(db)
+            .await?;
+        Ok(())
     }
-}
-
-#[derive(IdenStatic, Copy, Clone)]
-#[iden(rename = "plugin_properties")]
-pub struct PluginPropertiesTable;
-
-#[derive(IdenStatic, Copy, Clone)]
-pub enum PluginPropertiesColumn {
-    /// ID of
-    PluginId,
-    /// Properties (JSON)
-    Properties,
 }

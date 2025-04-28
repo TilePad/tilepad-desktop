@@ -6,7 +6,7 @@ import type {
   FolderId,
   FolderModel,
   CreateFolder,
-  UpdateFolder,
+  FolderConfig,
 } from "./types/folders";
 
 import { queryClient } from "./client";
@@ -51,10 +51,28 @@ export async function createFolder(create: CreateFolder) {
   return folder;
 }
 
-export async function updateFolder(folderId: FolderId, update: UpdateFolder) {
-  const folder = await invoke<FolderModel>("folders_update_folder", {
+export async function setFolderName(folderId: FolderId, name: string) {
+  const folder = await invoke<FolderModel>("folders_set_name", {
     folderId,
-    update,
+    name,
+  });
+
+  invalidateFoldersList(folder.profile_id);
+  queryClient.setQueryData(
+    foldersKeys.specific(folder.profile_id, folder.id),
+    folder,
+  );
+
+  return folder;
+}
+
+export async function setFolderConfig(
+  folderId: FolderId,
+  config: FolderConfig,
+) {
+  const folder = await invoke<FolderModel>("folders_set_config", {
+    folderId,
+    config,
   });
 
   invalidateFoldersList(folder.profile_id);

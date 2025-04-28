@@ -38,13 +38,10 @@ export async function createProfile(create: CreateProfile) {
   return profile;
 }
 
-export async function updateProfile(
-  profileId: ProfileId,
-  update: UpdateProfile,
-) {
-  const profile = await invoke<ProfileModel>("profiles_update_profile", {
+export async function setProfileName(profileId: ProfileId, name: string) {
+  const profile = await invoke<ProfileModel>("profiles_set_name", {
     profileId,
-    update,
+    name,
   });
 
   invalidateProfilesList();
