@@ -23,7 +23,7 @@ fn inject_property_inspector(
 /// In release mode bake in the inspector script
 #[cfg(not(debug_assertions))]
 async fn get_inspector_script() -> Cow<'static, str> {
-    Cow::Borrowed(include_str!("../../../../inspector/dist/inspector.js"))
+    Cow::Borrowed(include_str!("../../../inspector/dist/inspector.js"))
 }
 
 /// When debugging, load the inspector script directly from the file system
@@ -46,7 +46,7 @@ async fn get_inspector_script() -> Cow<'static, str> {
 /// In release mode bake in the inspector script
 #[cfg(not(debug_assertions))]
 async fn get_inspector_styles() -> Cow<'static, str> {
-    Cow::Borrowed(include_str!("../../../../inspector/dist/inspector.css"))
+    Cow::Borrowed(include_str!("../../../inspector/dist/inspector.css"))
 }
 
 /// When debugging, load the inspector script directly from the file system
