@@ -1,36 +1,13 @@
-use anyhow::Context;
 use chrono::{DateTime, Utc};
 use sqlx::prelude::FromRow;
 
 use super::{DbPool, DbResult};
 
 fn migrations() -> Vec<SqlMigration> {
-    vec![
-        SqlMigration::new(
-            "m202502251151_create_profiles_table",
-            include_str!("m202502251151_create_profiles_table.sql"),
-        ),
-        SqlMigration::new(
-            "m202502251153_create_folders_table",
-            include_str!("m202502251153_create_folders_table.sql"),
-        ),
-        SqlMigration::new(
-            "m202502251225_create_tiles_table",
-            include_str!("m202502251225_create_tiles_table.sql"),
-        ),
-        SqlMigration::new(
-            "m202502251226_create_devices_table",
-            include_str!("m202502251226_create_devices_table.sql"),
-        ),
-        SqlMigration::new(
-            "m202503210907_create_plugin_properties",
-            include_str!("m202503210907_create_plugin_properties.sql"),
-        ),
-        SqlMigration::new(
-            "m202504281419_create_settings_table",
-            include_str!("m202504281419_create_settings_table.sql"),
-        ),
-    ]
+    vec![SqlMigration::new(
+        "m202502251226_create_devices_table",
+        include_str!("m202502251226_create_devices_table.sql"),
+    )]
 }
 
 pub trait Migration: Send + Sync {
@@ -68,15 +45,14 @@ struct AppliedMigration {
     applied_at: DateTime<Utc>,
 }
 
-pub async fn migrate(db: &DbPool) -> anyhow::Result<()> {
-    create_migrations_table(db)
-        .await
-        .context("failed to create migrations table")?;
+pub async fn migrate(db: &DbPool) -> DbResult<()> {
+    if let Err(cause) = create_migrations_table(db).await {
+        tracing::error!(?cause, "failed to create migrations table");
+        return Err(cause);
+    }
 
     let migrations = migrations();
-    let mut applied = get_applied_migrations(db)
-        .await
-        .context("failed to get applied migrations")?;
+    let mut applied = get_applied_migrations(db).await?;
     let mut migration_names = Vec::new();
 
     for migration in &migrations {
@@ -89,16 +65,20 @@ pub async fn migrate(db: &DbPool) -> anyhow::Result<()> {
         }
 
         // Apply migration
-        migration
-            .up(db)
-            .await
-            .with_context(|| format!("failed to apply migration \"{name}\""))?;
+        if let Err(cause) = migration.up(db).await {
+            tracing::warn!(?cause, migration = ?name, "failed to apply migration");
+            return Err(cause);
+        }
 
         // Store applied migration
         let applied_at = Utc::now();
-        let migration = create_applied_migration(db, name.to_string(), applied_at)
-            .await
-            .with_context(|| format!("failed to store applied migration \"{name}\""))?;
+        let migration = match create_applied_migration(db, name.to_string(), applied_at).await {
+            Ok(value) => value,
+            Err(cause) => {
+                tracing::warn!(?cause, migration = ?name, "failed to store applied migration");
+                return Err(cause);
+            }
+        };
 
         applied.push(migration);
     }
