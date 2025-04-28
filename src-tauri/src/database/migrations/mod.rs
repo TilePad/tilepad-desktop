@@ -4,10 +4,32 @@ use sqlx::prelude::FromRow;
 use super::{DbPool, DbResult};
 
 fn migrations() -> Vec<SqlMigration> {
-    vec![SqlMigration::new(
-        "m202502251226_create_devices_table",
-        include_str!("m202502251226_create_devices_table.sql"),
-    )]
+    vec![
+        SqlMigration::new(
+            "m202502251151_create_profiles_table",
+            include_str!("m202502251151_create_profiles_table.sql"),
+        ),
+        SqlMigration::new(
+            "m202502251153_create_folders_table",
+            include_str!("m202502251153_create_folders_table.sql"),
+        ),
+        SqlMigration::new(
+            "m202502251225_create_tiles_table",
+            include_str!("m202502251225_create_tiles_table.sql"),
+        ),
+        SqlMigration::new(
+            "m202502251226_create_devices_table",
+            include_str!("m202502251226_create_devices_table.sql"),
+        ),
+        SqlMigration::new(
+            "m202503210907_create_plugin_properties",
+            include_str!("m202503210907_create_plugin_properties.sql"),
+        ),
+        SqlMigration::new(
+            "m202504281419_create_settings_table",
+            include_str!("m202504281419_create_settings_table.sql"),
+        ),
+    ]
 }
 
 pub trait Migration: Send + Sync {
