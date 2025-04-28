@@ -1,8 +1,6 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
 
-  import { range } from "$lib/api/utils/svelte.svelte";
-
   type Props = {
     rows: number;
     columns: number;
@@ -31,42 +29,48 @@
     const ratio = (tileWidth - desiredWidth) / desiredWidth;
     return 1 + ratio;
   });
+
+  const items = $derived(createGridItems());
+
+  function createGridItems() {
+    const out = [];
+    for (let i = 0; i < rows * columns; i += 1) {
+      const row = Math.floor(i / columns);
+      const column = i % columns;
+      out.push({ id: i, row, column });
+    }
+    return out;
+  }
 </script>
 
 <div
   class="grid"
-  style="--tile-size-adjustment: {sizeAdjust};"
+  style="--tile-size-adjustment: {sizeAdjust}; --tile-width: {tileWidth}px; --rows: {rows}; --columns: {columns}"
   bind:this={container}
   bind:clientWidth={containerWidth}
   bind:clientHeight={containerHeight}
 >
-  {#each range(0, rows) as row}
-    <div class="row">
-      {#each range(0, columns) as column}
-        <div class="tile" style="width: {tileWidth}px; height: {tileWidth}px;">
-          {@render tile(row, column)}
-        </div>
-      {/each}
+  {#each items as item}
+    <div class="tile">
+      {@render tile(item.row, item.column)}
     </div>
   {/each}
 </div>
 
 <style>
   .grid {
-    display: flex;
-    flex-flow: column;
+    display: grid;
+    grid-template-columns: repeat(var(--columns), var(--tile-width));
+    grid-auto-rows: var(--tile-width);
+    justify-content: center;
 
     width: 100%;
     height: 100%;
     gap: 10px;
   }
 
-  .row {
-    display: flex;
-    flex-flow: row;
-    justify-content: center;
-
-    width: 100%;
-    gap: 10px;
+  .tile {
+    width: var(--tile-width);
+    height: var(--tile-width);
   }
 </style>

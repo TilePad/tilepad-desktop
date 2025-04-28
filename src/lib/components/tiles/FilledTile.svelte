@@ -39,8 +39,8 @@
     font-weight: bold;
     text-align: center;
     cursor: pointer;
-    width: 100%;
-    height: 100%;
+    width: var(--tile-width);
+    height: var(--tile-width);
     color: #ccc;
     font-size: 1.5rem;
     user-select: none;
