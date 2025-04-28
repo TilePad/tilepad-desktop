@@ -141,4 +141,26 @@ impl Tiles {
         self.devices.background_update_folder(tile.folder_id);
         Ok(tile)
     }
+
+    pub async fn update_tile_position(
+        &self,
+        tile_id: TileId,
+        plugin_id: Option<PluginId>,
+        row: u32,
+        column: u32,
+    ) -> anyhow::Result<TileModel> {
+        let db = &self.db;
+        let tile = TileModel::get_by_id(db, tile_id)
+            .await?
+            .context("tile not found")?;
+
+        anyhow::ensure!(
+            plugin_id.is_none_or(|plugin_id| tile.plugin_id == plugin_id),
+            anyhow::anyhow!("tile is not apart of the same plugin")
+        );
+
+        let tile = tile.update_position(db, row, column).await?;
+        self.devices.background_update_folder(tile.folder_id);
+        Ok(tile)
+    }
 }

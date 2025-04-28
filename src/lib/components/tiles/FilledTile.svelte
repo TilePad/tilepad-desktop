@@ -29,21 +29,20 @@
 
 <style>
   .tile {
-    position: relative;
     background-color: #151318;
-    border: 2px solid #715c8f;
-    border-radius: 5px;
+    position: relative;
+
     display: flex;
     justify-content: center;
     align-items: center;
-    font-weight: bold;
-    text-align: center;
-    cursor: pointer;
+
     width: var(--tile-width);
     height: var(--tile-width);
-    color: #ccc;
-    font-size: 1.5rem;
+
     user-select: none;
     overflow: hidden;
+
+    font-size: 1.5rem;
+    text-align: center;
   }
 </style>

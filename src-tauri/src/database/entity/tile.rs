@@ -263,6 +263,24 @@ impl TileModel {
         Ok(self)
     }
 
+    pub async fn update_position(
+        mut self,
+        db: &DbPool,
+        row: u32,
+        column: u32,
+    ) -> DbResult<TileModel> {
+        sqlx::query("UPDATE \"tiles\" SET \"row\" = ?, \"column\" = ? WHERE \"id\" = ?")
+            .bind(row)
+            .bind(column)
+            .bind(self.id)
+            .execute(db)
+            .await?;
+
+        self.row = row;
+        self.column = column;
+        Ok(self)
+    }
+
     /// Update the label portion of the config
     pub async fn update_label(
         self,

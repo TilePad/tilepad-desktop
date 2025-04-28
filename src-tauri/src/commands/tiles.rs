@@ -77,6 +77,20 @@ pub async fn tiles_update_tile_label(
 
     Ok(tile)
 }
+/// Update a specific tile label
+#[tauri::command]
+pub async fn tiles_update_tile_position(
+    tiles: State<'_, Arc<Tiles>>,
+    tile_id: TileId,
+    row: u32,
+    column: u32,
+) -> CmdResult<TileModel> {
+    let tile = tiles
+        .update_tile_position(tile_id, None, row, column)
+        .await?;
+
+    Ok(tile)
+}
 
 /// Update a specific tile icon
 #[tauri::command]

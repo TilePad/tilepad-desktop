@@ -42,6 +42,14 @@ function createTile(create: CreateTile) {
   });
 }
 
+function updateTilePosition(tileId: TileId, row: number, column: number) {
+  return invoke<TileModel>("tiles_update_tile_position", {
+    tileId,
+    row,
+    column,
+  });
+}
+
 function updateTileProperties(
   tileId: TileId,
   properties: object,
@@ -116,6 +124,27 @@ export function createTileQuery(
 export function createCreateTileMutation() {
   return createMutation({
     mutationFn: ({ create }: { create: CreateTile }) => createTile(create),
+    onSuccess: (tile) => {
+      invalidateTilesList(tile.folder_id);
+      queryClient.setQueryData(
+        tilesKeys.specific(tile.folder_id, tile.id),
+        tile,
+      );
+    },
+  });
+}
+
+export function createUpdateTilePositionMutation() {
+  return createMutation({
+    mutationFn: ({
+      tileId,
+      row,
+      column,
+    }: {
+      tileId: TileId;
+      row: number;
+      column: number;
+    }) => updateTilePosition(tileId, row, column),
     onSuccess: (tile) => {
       invalidateTilesList(tile.folder_id);
       queryClient.setQueryData(

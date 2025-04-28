@@ -16,6 +16,8 @@
     SHADOW_ITEM_MARKER_PROPERTY_NAME,
   } from "svelte-dnd-action";
 
+  import type { TileDropItemAction } from "../tiles/TileDragZone.svelte";
+
   import ActionItem from "./ActionItem.svelte";
 
   type Props = {
@@ -24,10 +26,10 @@
 
   const { actions }: Props = $props();
 
-  let items: MovableAction[] = $state([]);
+  let items: TileDropItemAction[] = $state([]);
   let shouldIgnoreDndEvents = $state(false);
 
-  function handleDndConsider(e: CustomEvent<DndEvent<MovableAction>>) {
+  function handleDndConsider(e: CustomEvent<DndEvent<TileDropItemAction>>) {
     const { trigger, id } = e.detail.info;
     if (trigger === TRIGGERS.DRAG_STARTED) {
       const idx = items.findIndex((item) => item.id === id);
@@ -54,7 +56,7 @@
     }
   }
 
-  function handleDndFinalize(e: CustomEvent<DndEvent<MovableAction>>) {
+  function handleDndFinalize(e: CustomEvent<DndEvent<TileDropItemAction>>) {
     if (!shouldIgnoreDndEvents) {
       items = e.detail.items;
     } else {
@@ -66,7 +68,11 @@
   watch(
     () => actions,
     (actions) => {
-      items = actions.map((action) => ({ id: action.action_id, ...action }));
+      items = actions.map((action) => ({
+        type: "Action",
+        id: action.action_id,
+        ...action,
+      }));
     },
   );
 </script>
@@ -74,10 +80,13 @@
 <section
   class="list action-list"
   use:dndzone={{
+    type: "tile",
     items,
     flipDurationMs: 0,
     dropTargetStyle: {},
     morphDisabled: true,
+    dropAnimationDisabled: true,
+    dropFromOthersDisabled: true,
     centreDraggedOnCursor: true,
   }}
   onconsider={handleDndConsider}
