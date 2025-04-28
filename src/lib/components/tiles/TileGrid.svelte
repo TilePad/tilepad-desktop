@@ -51,9 +51,7 @@
   bind:clientHeight={containerHeight}
 >
   {#each items as item}
-    <div class="tile">
-      {@render tile(item.row, item.column)}
-    </div>
+    {@render tile(item.row, item.column)}
   {/each}
 </div>
 
@@ -67,10 +65,5 @@
     width: 100%;
     height: 100%;
     gap: 10px;
-  }
-
-  .tile {
-    width: var(--tile-width);
-    height: var(--tile-width);
   }
 </style>
