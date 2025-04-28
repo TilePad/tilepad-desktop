@@ -17,9 +17,8 @@
 </script>
 
 <script lang="ts">
-  import type { Snippet } from "svelte";
-
-  import { waitLocale, locale as svelteLocale } from "svelte-i18n";
+  import { type Snippet } from "svelte";
+  import { isLoading, locale as svelteLocale } from "svelte-i18n";
 
   import SkeletonList from "../skeleton/SkeletonList.svelte";
   import { getSettingsContext } from "../SettingsProvider.svelte";
@@ -29,7 +28,9 @@
   };
 
   const settingsContext = getSettingsContext();
-  const locale = $derived(settingsContext.settings().language);
+  const settings = $derived.by(settingsContext.settings);
+
+  const locale = $derived(settings.language);
 
   const { children }: Props = $props();
 
@@ -38,9 +39,8 @@
   });
 </script>
 
-{#await waitLocale()}
-  <!-- Loading current locale -->
+{#if $isLoading}
   <SkeletonList />
-{:then}
+{:else}
   {@render children?.()}
-{/await}
+{/if}
