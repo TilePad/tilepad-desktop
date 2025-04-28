@@ -41,6 +41,10 @@ pub async fn load_plugin_from_path(path: &Path) -> anyhow::Result<Plugin> {
 
 /// Loads all plugins found in the provided `path`
 pub async fn load_plugins_from_path(path: &Path) -> anyhow::Result<Vec<Plugin>> {
+    if !path.exists() {
+        return Ok(vec![]);
+    }
+
     let mut plugins = Vec::new();
     let mut dir = tokio::fs::read_dir(path).await?;
 

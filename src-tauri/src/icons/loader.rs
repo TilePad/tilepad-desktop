@@ -60,6 +60,10 @@ pub async fn load_icon_pack_from_path(path: &Path) -> anyhow::Result<IconPack> {
 
 /// Loads all icon packs found in the provided `path`
 pub async fn load_icon_packs_from_path(path: &Path) -> anyhow::Result<Vec<IconPack>> {
+    if !path.exists() {
+        return Ok(vec![]);
+    }
+
     let mut icon_packs = Vec::new();
     let mut dir = tokio::fs::read_dir(path).await?;
 
