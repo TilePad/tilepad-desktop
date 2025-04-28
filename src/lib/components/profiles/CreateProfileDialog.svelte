@@ -9,11 +9,14 @@
 
   import Tooltip from "../Tooltip.svelte";
   import Dialog from "../dialog/Dialog.svelte";
+  import { getProfileContext } from "./ProfilesProvider.svelte";
   import DialogCloseButton from "../dialog/DialogCloseButton.svelte";
 
   type Props = DialogProps & { order: number };
 
   let { order, ...restProps }: Props = $props();
+
+  const { setProfileId } = getProfileContext();
 
   let open = $state(false);
   let name = $state("");
@@ -35,9 +38,12 @@
       error: toastErrorMessage($t("profile_create_error")),
     });
 
-    open = false;
+    const promise = await createPromise;
 
+    open = false;
     reset();
+
+    setProfileId(promise.id);
   }
 
   function reset() {

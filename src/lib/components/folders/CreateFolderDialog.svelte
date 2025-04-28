@@ -21,7 +21,7 @@
   let { order }: Props = $props();
 
   const { profile } = getProfileContext();
-  const { folder } = getFolderContext();
+  const { folder, setFolderId } = getFolderContext();
 
   const currentProfile = $derived.by(profile);
   const currentFolder = $derived.by(folder);
@@ -50,9 +50,12 @@
       error: toastErrorMessage($t("folder_create_error")),
     });
 
-    open = false;
+    const folder = await createPromise;
 
+    open = false;
     reset();
+
+    setFolderId(folder.id);
   }
 
   function reset() {
