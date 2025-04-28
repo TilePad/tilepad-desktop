@@ -1,6 +1,6 @@
 <!-- Editor for editing the contents of a folder -->
 <script lang="ts">
-  import type { TileId, TileModel } from "$lib/api/types/tiles";
+  import type { TileId } from "$lib/api/types/tiles";
 
   import { watch } from "runed";
   import { t } from "svelte-i18n";
@@ -10,8 +10,6 @@
   import SolarAltArrowRightLinear from "~icons/solar/alt-arrow-right-linear";
 
   import Aside from "../Aside.svelte";
-  import EmptyTile from "../tiles/EmptyTile.svelte";
-  import FilledTile from "../tiles/FilledTile.svelte";
   import TileEditor from "../tiles/TileEditor.svelte";
   import FolderSelector from "./FolderSelector.svelte";
   import { getFolderContext } from "./FolderProvider.svelte";
@@ -31,10 +29,6 @@
   const tilesQuery = createTilesQuery(() => currentFolderId);
 
   let activeTileId: TileId | null = $state(null);
-
-  function getTile(tiles: TileModel[], row: number, column: number) {
-    return tiles.find((tile) => tile.row === row && tile.column === column);
-  }
 
   // Clear the active tile whenever switching profile or folders
   watch(
@@ -66,27 +60,17 @@
     </div>
     <div class="content">
       <TileGrid
+        tiles={$tilesQuery.data}
         rows={currentFolder.config.rows}
         columns={currentFolder.config.columns}
-      >
-        {#snippet tile(row, column)}
-          {@const tile = getTile($tilesQuery.data, row, column) ?? null}
-          {#if tile !== null}
-            <FilledTile
-              {tile}
-              onClick={() => {
-                if (activeTileId === tile.id) {
-                  activeTileId = null;
-                } else {
-                  activeTileId = tile.id;
-                }
-              }}
-            />
-          {:else}
-            <EmptyTile {row} {column} />
-          {/if}
-        {/snippet}
-      </TileGrid>
+        onClickTile={(tile) => {
+          if (activeTileId === tile.id) {
+            activeTileId = null;
+          } else {
+            activeTileId = tile.id;
+          }
+        }}
+      ></TileGrid>
     </div>
 
     <!-- Bottom segment that pops up to edit a tile -->

@@ -1,13 +1,17 @@
 <script lang="ts">
-  import type { Snippet } from "svelte";
+  import type { TileModel } from "$lib/api/types/tiles";
+
+  import EmptyTile from "./EmptyTile.svelte";
+  import FilledTile from "./FilledTile.svelte";
 
   type Props = {
+    tiles: TileModel[];
     rows: number;
     columns: number;
-    tile: Snippet<[number, number]>;
+    onClickTile: (tile: TileModel) => void;
   };
 
-  const { rows, columns, tile }: Props = $props();
+  const { tiles, rows, columns, onClickTile }: Props = $props();
 
   let container: HTMLDivElement | undefined = $state();
 
@@ -30,16 +34,23 @@
     return 1 + ratio;
   });
 
-  const items = $derived(createGridItems());
+  const items = $derived(createGridItems(tiles));
 
-  function createGridItems() {
+  function createGridItems(tiles: TileModel[]) {
     const out = [];
     for (let i = 0; i < rows * columns; i += 1) {
       const row = Math.floor(i / columns);
       const column = i % columns;
-      out.push({ id: i, row, column });
+      const tile = getTile(tiles, row, column);
+      const id = tile?.id ?? `${i}`;
+
+      out.push({ id, tile, row, column });
     }
     return out;
+  }
+
+  function getTile(tiles: TileModel[], row: number, column: number) {
+    return tiles.find((tile) => tile.row === row && tile.column === column);
   }
 </script>
 
@@ -51,7 +62,18 @@
   bind:clientHeight={containerHeight}
 >
   {#each items as item}
-    {@render tile(item.row, item.column)}
+    {#if item.tile !== undefined}
+      {@const tile = item.tile}
+
+      <FilledTile
+        {tile}
+        onClick={() => {
+          onClickTile(tile);
+        }}
+      />
+    {:else}
+      <EmptyTile row={item.row} column={item.column} />
+    {/if}
   {/each}
 </div>
 
