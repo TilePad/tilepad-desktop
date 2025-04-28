@@ -1,12 +1,13 @@
 <script lang="ts">
   import type { SettingsConfig } from "$lib/api/types/settings";
 
+  import { t } from "svelte-i18n";
   import { watch, useDebounce } from "runed";
   import { createSetSettingsMutation } from "$lib/api/settings";
   import TextInput from "$lib/components/input/TextInput.svelte";
+  import CreatorSection from "$lib/components/CreatorSection.svelte";
   import LanguageSelector from "$lib/components/i18n/LanguageSelector.svelte";
   import { getSettingsContext } from "$lib/components/SettingsProvider.svelte";
-  import { t } from "svelte-i18n";
 
   const settingsContext = getSettingsContext();
   const currentSettings = $derived.by(settingsContext.settings);
@@ -51,31 +52,59 @@
   );
 </script>
 
-<div class="settings">
-  <div class="tile-item">
-    <label class="tile-label" for="language">{$t("language")}</label>
-    <LanguageSelector
-      value={settings.language}
-      onChangeValue={(value) => onChangeLanguage(value)}
-    />
-    <p class="tile-description">{$t("language_description")}</p>
+<div class="layout">
+  <div class="header">
+    <h2>{$t("settings")}</h2>
   </div>
 
-  <div class="tile-item">
-    <label class="tile-label" for="deviceName">{$t("device_name")}</label>
-    <TextInput
-      style="width: 100%"
-      id="deviceName"
-      value={settings.device_name}
-      onchange={(event) => onChangeDeviceName(event.currentTarget.value)}
-    />
-    <p class="tile-description">
-      {$t("device_name_description")}
-    </p>
+  <div class="settings">
+    <div class="tile-item">
+      <label class="tile-label" for="language">{$t("language")}</label>
+      <LanguageSelector
+        value={settings.language}
+        onChangeValue={(value) => onChangeLanguage(value)}
+      />
+      <p class="tile-description">{$t("language_description")}</p>
+    </div>
+
+    <div class="tile-item">
+      <label class="tile-label" for="deviceName">{$t("device_name")}</label>
+      <TextInput
+        style="width: 100%"
+        id="deviceName"
+        value={settings.device_name}
+        onchange={(event) => onChangeDeviceName(event.currentTarget.value)}
+      />
+      <p class="tile-description">
+        {$t("device_name_description")}
+      </p>
+    </div>
+
+    <CreatorSection />
   </div>
 </div>
 
 <style>
+  .layout {
+    height: 100%;
+    overflow: hidden;
+
+    display: flex;
+    flex-flow: column;
+  }
+
+  .header {
+    display: flex;
+    flex-flow: row;
+    flex-shrink: 0;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+    border-bottom: 1px solid #333;
+    background-color: #29262e;
+  }
+
   .tile-item {
     padding: 8px;
   }
@@ -93,5 +122,12 @@
     font-size: 12px;
     color: #aaa;
     margin-top: 4px;
+  }
+
+  .settings {
+    display: flex;
+    flex-flow: column;
+    gap: 0.5rem;
+    padding: 1rem;
   }
 </style>
