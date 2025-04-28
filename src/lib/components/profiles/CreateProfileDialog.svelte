@@ -15,6 +15,7 @@
 
   let { order, ...restProps }: Props = $props();
 
+  let open = $state(false);
   let name = $state("");
 
   async function onCreate(event: Event) {
@@ -33,12 +34,20 @@
       success: $t("profile_created"),
       error: toastErrorMessage($t("profile_create_error")),
     });
+
+    open = false;
+
+    reset();
+  }
+
+  function reset() {
+    name = "";
   }
 </script>
 
 <Tooltip title={$t("create_profile")}>
   {#snippet trigger({ props: triggerProps })}
-    <Dialog {triggerProps} {...restProps}>
+    <Dialog {triggerProps} {...restProps} bind:open>
       {#snippet button({ props })}
         <button {...props} class="button">
           <SolarUserPlusBold width="1.5rem" height="1.5rem" />
