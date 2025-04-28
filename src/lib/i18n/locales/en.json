@@ -145,5 +145,6 @@
     "approve": "Approve",
     "actions": "Actions",
     "cancel": "Cancel",
-    "settings_error": "Failed to load settings: {error}"
+    "settings_error": "Failed to load settings: {error}",
+    "select_language": "Select Language"
 }

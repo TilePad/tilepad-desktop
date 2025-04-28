@@ -70,7 +70,7 @@
           />
         {:else}
           <div>
-            {$t("icon_padding")}
+            {$t("padding_px")}
             <NumberInput
               value={iconOptions.padding}
               oninput={(event) =>

@@ -37,6 +37,7 @@
     "@castlenine/svelte-qrcode": "^2.3.0",
     "@eslint/js": "^9.21.0",
     "@iconify-json/solar": "^1.2.2",
+    "@iconify-json/twemoji": "^1.2.2",
     "@sveltejs/adapter-static": "^3.0.6",
     "@sveltejs/kit": "^2.9.0",
     "@sveltejs/vite-plugin-svelte": "^5.0.0",

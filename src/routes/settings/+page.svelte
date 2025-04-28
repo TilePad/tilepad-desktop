@@ -4,6 +4,7 @@
   import { watch, useDebounce } from "runed";
   import { createSetSettingsMutation } from "$lib/api/settings";
   import TextInput from "$lib/components/input/TextInput.svelte";
+  import LanguageSelector from "$lib/components/i18n/LanguageSelector.svelte";
   import { getSettingsContext } from "$lib/components/SettingsProvider.svelte";
 
   const settingsContext = getSettingsContext();
@@ -32,6 +33,10 @@
     updateSettings({ ...settings, device_name: name });
   };
 
+  const onChangeLanguage = (language: string) => {
+    updateSettings({ ...settings, language });
+  };
+
   // Update local settings state with remote
   watch(
     () => ({ currentSettings }),
@@ -46,6 +51,15 @@
 </script>
 
 <div class="settings">
+  <div class="tile-item">
+    <label class="tile-label" for="language">Language</label>
+    <LanguageSelector
+      value={settings.language}
+      onChangeValue={(value) => onChangeLanguage(value)}
+    />
+    <p class="tile-description">Language for the user interface</p>
+  </div>
+
   <div class="tile-item">
     <label class="tile-label" for="deviceName">Device Name</label>
     <TextInput
