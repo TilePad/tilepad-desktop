@@ -144,5 +144,11 @@
     "decline": "Rechazar",
     "approve": "Aprobar",
     "actions": "Acciones",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "auto": "Auto",
+    "auto_generated": "Generado automáticamente",
+    "language": "Idioma",
+    "language_description": "Idioma de la interfaz de usuario",
+    "device_name": "Nombre del dispositivo",
+    "device_name_description": "Este nombre de dispositivo es visible para otros dispositivos que intentan conectarse a este dispositivo"
 }

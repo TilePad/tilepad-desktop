@@ -9,6 +9,8 @@
   import SolarAltArrowDownBold from "~icons/solar/alt-arrow-down-bold";
   import TwemojiFlagUnitedStates from "~icons/twemoji/flag-united-states";
 
+  import Tooltip from "../Tooltip.svelte";
+
   type Props = {
     value: string;
     onChangeValue: (value: string) => void;
@@ -18,9 +20,9 @@
 
   const languages = [
     { icon: TwemojiFlagUnitedStates, label: "English", value: "en" },
-    { icon: TwemojiFlagGermany, label: "Deutsch", value: "de" },
-    { icon: TwemojiFlagFrance, label: "Français", value: "fr" },
-    { icon: TwemojiFlagSpain, label: "Español", value: "es" },
+    { icon: TwemojiFlagGermany, label: "Deutsch", value: "de", auto: true },
+    { icon: TwemojiFlagFrance, label: "Français", value: "fr", auto: true },
+    { icon: TwemojiFlagSpain, label: "Español", value: "es", auto: true },
   ];
 
   const language = $derived(
@@ -79,8 +81,20 @@
                       class:item--selected={selected}
                       class:item--highlighted={highlighted}
                     >
-                      <language.icon />
-                      {language.label}
+                      <span class="label">
+                        <language.icon />
+                        {language.label}
+                      </span>
+
+                      {#if language.auto}
+                        <Tooltip title={$t("auto_generated")}>
+                          {#snippet trigger({ props })}
+                            <span {...props} class="auto-label">
+                              {$t("auto")}
+                            </span>
+                          {/snippet}
+                        </Tooltip>
+                      {/if}
                     </div>
                   {/snippet}
                 </Select.Item>
@@ -116,6 +130,8 @@
     border-radius: 0.25rem;
     padding: 0.5rem;
     max-width: 500px;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .item:hover {
@@ -157,7 +173,9 @@
     display: flex;
   }
 
-  .content-wrapper {
-    z-index: 999 !important;
+  .auto-label {
+    padding: 0.25rem 0.5rem;
+    background-color: #141316;
+    border-radius: 0.25rem;
   }
 </style>

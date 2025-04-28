@@ -146,5 +146,11 @@
     "actions": "Actions",
     "cancel": "Cancel",
     "settings_error": "Failed to load settings: {error}",
-    "select_language": "Select Language"
+    "select_language": "Select Language",
+    "auto": "Auto",
+    "auto_generated": "Automatically Generated",
+    "language": "Language",
+    "language_description": "Language for the user interface",
+    "device_name": "Device Name",
+    "device_name_description": "This device name is visible to other devices attempting to connect to this device"
 }

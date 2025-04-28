@@ -6,6 +6,7 @@
   import TextInput from "$lib/components/input/TextInput.svelte";
   import LanguageSelector from "$lib/components/i18n/LanguageSelector.svelte";
   import { getSettingsContext } from "$lib/components/SettingsProvider.svelte";
+  import { t } from "svelte-i18n";
 
   const settingsContext = getSettingsContext();
   const currentSettings = $derived.by(settingsContext.settings);
@@ -52,16 +53,16 @@
 
 <div class="settings">
   <div class="tile-item">
-    <label class="tile-label" for="language">Language</label>
+    <label class="tile-label" for="language">{$t("language")}</label>
     <LanguageSelector
       value={settings.language}
       onChangeValue={(value) => onChangeLanguage(value)}
     />
-    <p class="tile-description">Language for the user interface</p>
+    <p class="tile-description">{$t("language_description")}</p>
   </div>
 
   <div class="tile-item">
-    <label class="tile-label" for="deviceName">Device Name</label>
+    <label class="tile-label" for="deviceName">{$t("device_name")}</label>
     <TextInput
       style="width: 100%"
       id="deviceName"
@@ -69,8 +70,7 @@
       onchange={(event) => onChangeDeviceName(event.currentTarget.value)}
     />
     <p class="tile-description">
-      This device name is visible to other devices attempting to connect to this
-      device
+      {$t("device_name_description")}
     </p>
   </div>
 </div>

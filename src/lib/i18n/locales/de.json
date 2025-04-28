@@ -144,5 +144,11 @@
     "decline": "Ablehnen",
     "approve": "Genehmigen",
     "actions": "Aktionen",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "auto": "Auto",
+    "auto_generated": "Automatisch generiert",
+    "language": "Sprache",
+    "language_description": "Sprache der Benutzeroberfläche",
+    "device_name": "Gerätename",
+    "device_name_description": "Dieser Gerätename ist für andere Geräte sichtbar, die versuchen, sich mit diesem Gerät zu verbinden"
 }
