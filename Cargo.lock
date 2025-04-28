@@ -1787,16 +1787,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gethostname"
-version = "1.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ed7131e57abbde63513e0e6636f76668a1ca9798dcae2df4e283cae9ee83859e"
-dependencies = [
- "rustix 1.0.5",
- "windows-targets 0.52.6",
-]
-
-[[package]]
 name = "getrandom"
 version = "0.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3005,6 +2995,21 @@ name = "new_debug_unreachable"
 version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "650eef8c711430f1a879fdd01d4745a7deea475becfb90269c06775983bbf086"
+
+[[package]]
+name = "nick-name"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9860c725ce654683dbf1bb8264b9c9251027cb25f62ed016da15aeffb919ba84"
+dependencies = [
+ "cfg-if",
+ "jni",
+ "libc",
+ "ndk-context",
+ "objc2 0.5.2",
+ "thiserror 1.0.69",
+ "winapi",
+]
 
 [[package]]
 name = "nix"
@@ -5810,9 +5815,9 @@ dependencies = [
  "fontdb",
  "futures",
  "garde",
- "gethostname 1.0.1",
  "local-ip-address",
  "mime_guess",
+ "nick-name",
  "node-semver",
  "parking_lot",
  "rand 0.9.1",
@@ -7469,7 +7474,7 @@ version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5d91ffca73ee7f68ce055750bf9f6eca0780b8c85eff9bc046a3b0da41755e12"
 dependencies = [
- "gethostname 0.4.3",
+ "gethostname",
  "rustix 0.38.44",
  "x11rb-protocol",
 ]

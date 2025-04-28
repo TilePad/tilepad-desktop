@@ -82,9 +82,6 @@ uuid = { version = "1", features = ["v4"] }
 # Get local addresses for LAN 
 local-ip-address = "0.6.3"
 
-# Hostname library to get device name
-gethostname = "1"
-
 # System info library
 sysinfo = "0.34"
 
@@ -105,6 +102,9 @@ tilepad-manifest = { version = "0.4.0", path = "../../tilepad-manifest" }
 
 # Database of fonts and getting system fonts
 fontdb = "0.23.0"
+
+# Used to get the friendly name of the users device
+nick-name = "0.1"
 
 # Database dependencies
 [dependencies.sqlx]
