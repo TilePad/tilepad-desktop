@@ -122,7 +122,6 @@
     dropTargetStyle: {},
     flipDurationMs: 0,
     morphDisabled: true,
-    centreDraggedOnCursor: true,
     dropAnimationDisabled: true,
     // Disable dragging on an empty slot
     dragDisabled: items.length < 1,
