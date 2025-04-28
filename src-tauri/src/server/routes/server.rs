@@ -1,6 +1,10 @@
-use axum::Json;
+use axum::{Extension, Json};
 
-use crate::{server::models::server::ServerDetails, utils::device::get_device_name};
+use crate::{
+    database::{DbPool, entity::settings::SettingsModel},
+    server::models::{error::HttpResult, server::ServerDetails},
+    utils::device::get_device_name,
+};
 
 const IDENTIFIER: &str = "TILEPAD_CONTROLLER_SERVER";
 
@@ -8,9 +12,12 @@ const IDENTIFIER: &str = "TILEPAD_CONTROLLER_SERVER";
 ///
 /// Get simple details about the server, used to check if a server
 /// is alive by device clients
-pub async fn details() -> Json<ServerDetails> {
+pub async fn details(Extension(db): Extension<DbPool>) -> HttpResult<ServerDetails> {
+    let settings = SettingsModel::get_or_default(&db).await?;
+    let name = settings.config.device_name;
+
     Json(ServerDetails {
         identifier: IDENTIFIER,
-        hostname: get_device_name(),
+        hostname: name,
     })
 }
