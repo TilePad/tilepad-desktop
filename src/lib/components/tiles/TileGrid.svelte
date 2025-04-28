@@ -45,7 +45,7 @@
 
 <div
   class="grid"
-  style="--tile-size-adjustment: {sizeAdjust}; --tile-width: {tileWidth}px; --rows: {rows}; --columns: {columns}"
+  style="--tile-size-adjustment: {sizeAdjust}; --tile-width: {tileWidth}px; --rows: {rows}; --columns: {columns}; --tile-gap: {gap}px;"
   bind:this={container}
   bind:clientWidth={containerWidth}
   bind:clientHeight={containerHeight}
@@ -64,6 +64,6 @@
 
     width: 100%;
     height: 100%;
-    gap: 10px;
+    gap: var(--tile-gap);
   }
 </style>
