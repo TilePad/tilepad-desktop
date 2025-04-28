@@ -109,18 +109,12 @@ fontdb = "0.23.0"
 # Database dependencies
 [dependencies.sqlx]
 version = "0.8.2"
-features = [
-    "runtime-tokio",
-    "tls-rustls",
-    "sqlite",
-    "derive",
-    "uuid",
-    "chrono",
-    "json",
-]
+default-features = false
+features = ["runtime-tokio", "sqlite", "uuid", "chrono", "json", "macros"]
 
 [dependencies.sea-query]
 version = "0.32.1"
+default-features = false
 features = [
     "derive",
     "thread-safe",
@@ -137,5 +131,5 @@ features = [
     "with-chrono",
     "with-json",
     "with-uuid",
-    "runtime-tokio-rustls",
+    "runtime-tokio",
 ]
