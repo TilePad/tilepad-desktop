@@ -16,8 +16,8 @@ pub async fn details(Extension(db): Extension<DbPool>) -> HttpResult<ServerDetai
     let settings = SettingsModel::get_or_default(&db).await?;
     let name = settings.config.device_name;
 
-    Json(ServerDetails {
+    Ok(Json(ServerDetails {
         identifier: IDENTIFIER,
         hostname: name,
-    })
+    }))
 }
