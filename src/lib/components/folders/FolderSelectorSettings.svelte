@@ -89,7 +89,9 @@
         </div>
 
         <EditFolderDialog {folder} />
-        <DeleteFolderDialog {folder} />
+        {#if !folder.default}
+          <DeleteFolderDialog {folder} />
+        {/if}
       {/snippet}
     </PopoverButton>
   {/snippet}

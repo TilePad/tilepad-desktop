@@ -26,7 +26,9 @@
       {/snippet}
       {#snippet content()}
         <EditProfileDialog {profile} />
-        <DeleteProfileDialog {profile} />
+        {#if !profile.default}
+          <DeleteProfileDialog {profile} />
+        {/if}
       {/snippet}
     </PopoverButton>
   {/snippet}
