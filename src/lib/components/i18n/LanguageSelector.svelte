@@ -5,6 +5,7 @@
   import TwemojiFlagSpain from "~icons/twemoji/flag-spain";
   import TwemojiFlagFrance from "~icons/twemoji/flag-france";
   import TwemojiFlagGermany from "~icons/twemoji/flag-germany";
+  import TwemojiFlagCzechia from "~icons/twemoji/flag-czechia";
   import SolarAltArrowUpBold from "~icons/solar/alt-arrow-up-bold";
   import SolarAltArrowDownBold from "~icons/solar/alt-arrow-down-bold";
   import TwemojiFlagUnitedStates from "~icons/twemoji/flag-united-states";
@@ -23,6 +24,7 @@
     { icon: TwemojiFlagGermany, label: "Deutsch", value: "de", auto: true },
     { icon: TwemojiFlagFrance, label: "Français", value: "fr", auto: true },
     { icon: TwemojiFlagSpain, label: "Español", value: "es", auto: true },
+    { icon: TwemojiFlagCzechia, label: "Čeština", value: "cs", auto: true },
   ];
 
   const language = $derived(

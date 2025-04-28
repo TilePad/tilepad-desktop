@@ -7,6 +7,7 @@
   register("de", () => import("../../i18n/locales/de.json"));
   register("es", () => import("../../i18n/locales/es.json"));
   register("fr", () => import("../../i18n/locales/fr.json"));
+  register("cs", () => import("../../i18n/locales/cs.json"));
 
   // Initialize i18n
   init({
