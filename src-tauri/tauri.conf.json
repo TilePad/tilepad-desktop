@@ -33,7 +33,8 @@
       "icons/icon.ico"
     ],
     "resources": {
-      "../core/": "core/"
+      "../core/": "core/",
+      "../THIRD_PARTY_LICENSES.md": "THIRD_PARTY_LICENSES.md"
     },
     "createUpdaterArtifacts": true
   },

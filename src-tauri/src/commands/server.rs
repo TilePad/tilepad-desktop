@@ -1,6 +1,7 @@
 use std::net::{IpAddr, Ipv4Addr};
 
 use serde::Serialize;
+use tauri::{AppHandle, Manager};
 
 use crate::server::HTTP_PORT;
 
@@ -38,4 +39,12 @@ pub fn server_get_connection_info() -> CmdResult<ServerConnectionInfo> {
         .collect();
 
     Ok(ServerConnectionInfo { interfaces, port })
+}
+
+/// Get the third party licenses file
+#[tauri::command]
+pub async fn server_get_licenses(app: AppHandle) -> CmdResult<String> {
+    let file = app.path().resource_dir()?.join("THIRD_PARTY_LICENSES.md");
+    let contents = tokio::fs::read_to_string(file).await?;
+    Ok(contents)
 }

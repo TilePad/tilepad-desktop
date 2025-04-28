@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "npm run build:inspector && vite build",
+    "build": "npm run prebuild && vite build",
+    "prebuild": "npm run build:inspector",
     "preview": "vite preview",
     "build:inspector": "cd inspector && npm run build",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -13,7 +14,8 @@
     "tauri": "tauri",
     "format": "prettier -w src",
     "lint": "eslint src",
-    "lint:fix": "eslint src --fix"
+    "lint:fix": "eslint src --fix",
+    "make:licenses": "node scripts/generate-licenses.mjs"
   },
   "license": "MIT",
   "dependencies": {

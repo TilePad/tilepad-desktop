@@ -1,7 +1,7 @@
 import fs from "node:fs";
 
 // Load the two translation files
-const baseFile = JSON.parse(fs.readFileSync('en.json', 'utf8'));
+const baseFile = JSON.parse(fs.readFileSync('src/lib/i18n/locales/en.json', 'utf8'));
 
 const languages = ['de', 'es', 'fr']
 
@@ -31,7 +31,7 @@ function findMissingKeys(base, compare, path = '') {
 }
 
 for (const language of languages) {
-    const compareFile = JSON.parse(fs.readFileSync(language + '.json', 'utf8'));
+    const compareFile = JSON.parse(fs.readFileSync('src/lib/i18n/locales/' + language + '.json', 'utf8'));
 
     const missingKeys = findMissingKeys(baseFile, compareFile);
 

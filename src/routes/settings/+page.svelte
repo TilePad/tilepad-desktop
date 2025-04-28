@@ -8,7 +8,8 @@
   import CreatorSection from "$lib/components/CreatorSection.svelte";
   import LanguageSelector from "$lib/components/i18n/LanguageSelector.svelte";
   import { getSettingsContext } from "$lib/components/SettingsProvider.svelte";
-
+  import LicensesDialog from "$lib/components/liceneses/LicensesDialog.svelte";
+  import SolarDocumentAddBoldDuotone from "~icons/solar/document-add-bold-duotone";
   const settingsContext = getSettingsContext();
   const currentSettings = $derived.by(settingsContext.settings);
   const setSettings = createSetSettingsMutation();
@@ -55,6 +56,15 @@
 <div class="layout">
   <div class="header">
     <h2>{$t("settings")}</h2>
+
+    <div class="actions">
+      <LicensesDialog
+        buttonLabel={{
+          text: $t("third_party_licenses"),
+          icon: SolarDocumentAddBoldDuotone,
+        }}
+      />
+    </div>
   </div>
 
   <div class="settings">
