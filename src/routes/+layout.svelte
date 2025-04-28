@@ -8,6 +8,7 @@
   import { QueryClientProvider } from "@tanstack/svelte-query";
   import I18nProvider from "$lib/components/I18nProvider.svelte";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
+  import SettingsProvider from "$lib/components/SettingsProvider.svelte";
   import FolderProvider from "$lib/components/folders/FolderProvider.svelte";
   import DeviceRequests from "$lib/components/devices/DeviceRequests.svelte";
   import UpdateNotification from "$lib/components/UpdateNotification.svelte";
@@ -25,13 +26,15 @@
           <Header />
 
           <main class="main">
-            <ProfilesProvider>
-              <FolderProvider>
-                {@render children()}
+            <SettingsProvider>
+              <ProfilesProvider>
+                <FolderProvider>
+                  {@render children()}
 
-                <DeviceRequests />
-              </FolderProvider>
-            </ProfilesProvider>
+                  <DeviceRequests />
+                </FolderProvider>
+              </ProfilesProvider>
+            </SettingsProvider>
           </main>
         </div>
 

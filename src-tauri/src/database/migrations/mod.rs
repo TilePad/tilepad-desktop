@@ -11,6 +11,7 @@ mod m202502251153_create_folders_table;
 mod m202502251225_create_tiles_table;
 mod m202502251226_create_devices_table;
 mod m202503210907_create_plugin_properties;
+mod m202504281419_create_settings_table;
 mod schema;
 
 fn migrations() -> Vec<Box<dyn Migration>> {
@@ -20,6 +21,7 @@ fn migrations() -> Vec<Box<dyn Migration>> {
         Box::new(m202502251225_create_tiles_table::TilesMigration),
         Box::new(m202502251226_create_devices_table::DevicesMigration),
         Box::new(m202503210907_create_plugin_properties::PluginPropertiesMigration),
+        Box::new(m202504281419_create_settings_table::SettingsMigration),
     ]
 }
 

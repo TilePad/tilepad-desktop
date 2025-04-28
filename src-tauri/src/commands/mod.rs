@@ -8,6 +8,7 @@ pub mod icons;
 pub mod plugins;
 pub mod profiles;
 pub mod server;
+pub mod settings;
 pub mod tiles;
 
 type CmdResult<T> = Result<T, CmdError>;

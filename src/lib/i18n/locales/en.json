@@ -144,5 +144,6 @@
     "decline": "Decline",
     "approve": "Approve",
     "actions": "Actions",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "settings_error": "Failed to load settings: {error}"
 }

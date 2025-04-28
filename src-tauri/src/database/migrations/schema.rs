@@ -11,6 +11,17 @@ where
         .to_owned()
 }
 
+pub fn pk_integer<T>(name: T) -> ColumnDef
+where
+    T: IntoIden,
+{
+    ColumnDef::new(name)
+        .integer()
+        .not_null()
+        .primary_key()
+        .to_owned()
+}
+
 pub fn uuid<T>(name: T) -> ColumnDef
 where
     T: IntoIden,

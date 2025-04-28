@@ -6,7 +6,7 @@ use sqlx::{
     sqlite::{SqliteQueryResult, SqliteRow},
 };
 
-use super::DbResult;
+use super::{DbErr, DbResult};
 
 /// Executes the provided SQL query
 #[inline]
@@ -89,12 +89,12 @@ pub trait UpdateStatementExt {
         C: IntoIden,
         T: Into<SimpleExpr>;
 
-    fn cond_value_json<C, T>(&mut self, column: C, value: Option<T>) -> anyhow::Result<&mut Self>
+    fn cond_value_json<C, T>(&mut self, column: C, value: Option<T>) -> DbResult<&mut Self>
     where
         C: IntoIden,
         T: Serialize;
 
-    fn value_json<C, T>(&mut self, column: C, value: T) -> anyhow::Result<&mut Self>
+    fn value_json<C, T>(&mut self, column: C, value: T) -> DbResult<&mut Self>
     where
         C: IntoIden,
         T: Serialize;
@@ -113,25 +113,25 @@ impl UpdateStatementExt for UpdateStatement {
         self
     }
 
-    fn cond_value_json<C, T>(&mut self, column: C, value: Option<T>) -> anyhow::Result<&mut Self>
+    fn cond_value_json<C, T>(&mut self, column: C, value: Option<T>) -> DbResult<&mut Self>
     where
         C: IntoIden,
         T: Serialize,
     {
         if let Some(value) = value {
-            let value = serde_json::to_value(&value)?;
+            let value = serde_json::to_value(&value).map_err(|err| DbErr::Encode(err.into()))?;
             self.value(column, value);
         }
 
         Ok(self)
     }
 
-    fn value_json<C, T>(&mut self, column: C, value: T) -> anyhow::Result<&mut Self>
+    fn value_json<C, T>(&mut self, column: C, value: T) -> DbResult<&mut Self>
     where
         C: IntoIden,
         T: Serialize,
     {
-        let value = serde_json::to_value(&value)?;
+        let value = serde_json::to_value(&value).map_err(|err| DbErr::Encode(err.into()))?;
         self.value(column, value);
         Ok(self)
     }

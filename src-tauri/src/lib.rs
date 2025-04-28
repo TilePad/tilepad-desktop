@@ -31,7 +31,9 @@ mod utils;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    use commands::{actions, devices, folders, fonts, icons, plugins, profiles, server, tiles};
+    use commands::{
+        actions, devices, folders, fonts, icons, plugins, profiles, server, settings, tiles,
+    };
 
     tauri::Builder::default()
         .plugin(tauri_plugin_updater::Builder::new().build())
@@ -97,7 +99,10 @@ pub fn run() {
             icons::icons_upload_user_icon,
             icons::icons_download_bundle,
             // Fonts
-            fonts::fonts_fonts
+            fonts::fonts_fonts,
+            // Settings
+            settings::settings_get_settings,
+            settings::settings_set_settings
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,6 +1,6 @@
 use axum::Json;
 
-use crate::server::models::server::ServerDetails;
+use crate::{server::models::server::ServerDetails, utils::device::get_device_name};
 
 const IDENTIFIER: &str = "TILEPAD_CONTROLLER_SERVER";
 
@@ -11,6 +11,6 @@ const IDENTIFIER: &str = "TILEPAD_CONTROLLER_SERVER";
 pub async fn details() -> Json<ServerDetails> {
     Json(ServerDetails {
         identifier: IDENTIFIER,
-        hostname: gethostname::gethostname().to_string_lossy().to_string(),
+        hostname: get_device_name(),
     })
 }
