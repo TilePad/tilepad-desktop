@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { ProfileModel } from "$lib/api/types/profiles";
 
+  import { t } from "svelte-i18n";
   import { Select } from "bits-ui";
   import { slide } from "svelte/transition";
   import { createProfilesQuery } from "$lib/api/profiles";
@@ -11,6 +12,7 @@
   import { getProfileContext } from "./ProfilesProvider.svelte";
   import CreateProfileDialog from "./CreateProfileDialog.svelte";
   import ProfileSelectorSettings from "./ProfileSelectorSettings.svelte";
+
   const profilesQuery = createProfilesQuery();
   const profiles = $derived($profilesQuery.data ?? []);
 
@@ -22,6 +24,12 @@
 
 {#snippet item(profile: ProfileModel)}
   <span>{profile.name} </span>
+
+  {#if profile.default}
+    <span class="default-label">
+      {$t("default")}
+    </span>
+  {/if}
 {/snippet}
 
 <Select.Root
@@ -102,9 +110,12 @@
   .item {
     cursor: pointer;
     display: flex;
+    gap: 0.5rem;
     border-radius: 0.25rem;
     padding: 0.5rem;
     max-width: 500px;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .item:hover {
@@ -136,5 +147,11 @@
 
   .trigger-wrapper {
     display: flex;
+  }
+
+  .default-label {
+    padding: 0.25rem 0.5rem;
+    background-color: #141316;
+    border-radius: 0.25rem;
   }
 </style>

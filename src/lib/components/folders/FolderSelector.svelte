@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { ProfileModel } from "$lib/api/types/profiles";
-
+  import { t } from "svelte-i18n";
   import { Select } from "bits-ui";
   import { slide } from "svelte/transition";
   import { createFoldersQuery } from "$lib/api/folders";
+  import { type FolderModel } from "$lib/api/types/folders";
   import SolarAltArrowUpBold from "~icons/solar/alt-arrow-up-bold";
   import SolarAltArrowDownBold from "~icons/solar/alt-arrow-down-bold";
   import SolarFolder2BoldDuotone from "~icons/solar/folder-2-bold-duotone";
@@ -25,8 +25,14 @@
   let open = $state(false);
 </script>
 
-{#snippet item(profile: ProfileModel)}
-  <span>{profile.name} </span>
+{#snippet item(folder: FolderModel)}
+  <span>{folder.name}</span>
+
+  {#if folder.default}
+    <span class="default-label">
+      {$t("default")}
+    </span>
+  {/if}
 {/snippet}
 
 <Select.Root
@@ -107,9 +113,12 @@
   .item {
     cursor: pointer;
     display: flex;
+    gap: 0.5rem;
     border-radius: 0.25rem;
     padding: 0.5rem;
     max-width: 500px;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .item:hover {
@@ -141,5 +150,11 @@
 
   .trigger-wrapper {
     display: flex;
+  }
+
+  .default-label {
+    padding: 0.25rem 0.5rem;
+    background-color: #141316;
+    border-radius: 0.25rem;
   }
 </style>
