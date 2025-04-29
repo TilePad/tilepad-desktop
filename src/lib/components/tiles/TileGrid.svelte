@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { TileModel } from "$lib/api/types/tiles";
 
-  import TileDragZone from "./TileDragZone.svelte";
+  import EmptyTile from "./EmptyTile.svelte";
+  import FilledTile from "./FilledTile.svelte";
 
   type Props = {
     tiles: TileModel[];
@@ -61,12 +62,12 @@
   bind:clientHeight={containerHeight}
 >
   {#each items as item}
-    <TileDragZone
-      row={item.row}
-      column={item.column}
-      {onClickTile}
-      tile={item.tile}
-    />
+    {@const tile = item.tile}
+    {#if tile !== undefined}
+      <FilledTile {tile} onClick={() => onClickTile(tile)} />
+    {:else}
+      <EmptyTile row={item.row} column={item.column} />
+    {/if}
   {/each}
 </div>
 

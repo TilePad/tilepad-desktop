@@ -4,17 +4,24 @@
   import { getPluginAssetPath } from "$lib/api/utils/url";
 
   import { getServerContext } from "../ServerProvider.svelte";
+  import { getDraggingContext } from "../tiles/TileDraggingProvider.svelte";
 
   type Props = {
     action: Action;
   };
 
   const { action }: Props = $props();
-
+  const { onStartDragging } = getDraggingContext();
   const serverContext = getServerContext();
+  let button: HTMLDivElement | undefined = $state();
+
+  function onPointerDown(event: PointerEvent) {
+    if (!button) return;
+    onStartDragging(event, { type: "action", ...action }, button);
+  }
 </script>
 
-<div class="action">
+<div class="action" bind:this={button} onpointerdown={onPointerDown}>
   {#if action.icon !== null}
     <img
       class="icon"
@@ -33,11 +40,6 @@
 </div>
 
 <style>
-  /* 	This is the css way of styling the dragged element */
-  :global(#dnd-action-dragged-el .action) {
-    transform: rotate(7deg);
-  }
-
   .action {
     width: 15rem;
     height: 40px;

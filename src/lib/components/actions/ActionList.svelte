@@ -1,22 +1,5 @@
-<script module lang="ts">
-  export type MovableAction = Action & {
-    id: string;
-    [SHADOW_ITEM_MARKER_PROPERTY_NAME]?: boolean;
-  };
-</script>
-
 <script lang="ts">
   import type { Action } from "$lib/api/types/actions";
-
-  import { watch } from "runed";
-  import {
-    dndzone,
-    TRIGGERS,
-    type DndEvent,
-    SHADOW_ITEM_MARKER_PROPERTY_NAME,
-  } from "svelte-dnd-action";
-
-  import type { TileDropItemAction } from "../tiles/TileDragZone.svelte";
 
   import ActionItem from "./ActionItem.svelte";
 
@@ -25,74 +8,10 @@
   };
 
   const { actions }: Props = $props();
-
-  let items: TileDropItemAction[] = $state([]);
-  let shouldIgnoreDndEvents = $state(false);
-
-  function handleDndConsider(e: CustomEvent<DndEvent<TileDropItemAction>>) {
-    const { trigger, id } = e.detail.info;
-    if (trigger === TRIGGERS.DRAG_STARTED) {
-      const idx = items.findIndex((item) => item.id === id);
-      const newId = `${id}_copy_${Math.round(Math.random() * 100000)}`;
-      e.detail.items = e.detail.items.filter(
-        (item) => !item[SHADOW_ITEM_MARKER_PROPERTY_NAME],
-      );
-      e.detail.items.splice(idx, 0, { ...items[idx], id: newId });
-      items = e.detail.items;
-      shouldIgnoreDndEvents = true;
-    } else if (!shouldIgnoreDndEvents) {
-      if (
-        e.target &&
-        e.target instanceof HTMLElement &&
-        e.target.classList.contains("action-list")
-      ) {
-        items = [...items];
-        return;
-      }
-
-      items = e.detail.items;
-    } else {
-      items = [...items];
-    }
-  }
-
-  function handleDndFinalize(e: CustomEvent<DndEvent<TileDropItemAction>>) {
-    if (!shouldIgnoreDndEvents) {
-      items = e.detail.items;
-    } else {
-      items = [...items];
-      shouldIgnoreDndEvents = false;
-    }
-  }
-
-  watch(
-    () => actions,
-    (actions) => {
-      items = actions.map((action) => ({
-        type: "Action",
-        id: action.action_id,
-        ...action,
-      }));
-    },
-  );
 </script>
 
-<section
-  class="list action-list"
-  use:dndzone={{
-    type: "tile",
-    items,
-    flipDurationMs: 0,
-    dropTargetStyle: {},
-    morphDisabled: true,
-    dropAnimationDisabled: true,
-    dropFromOthersDisabled: true,
-    centreDraggedOnCursor: true,
-  }}
-  onconsider={handleDndConsider}
-  onfinalize={handleDndFinalize}
->
-  {#each items as action (action.id)}
+<section class="list action-list">
+  {#each actions as action}
     <ActionItem {action} />
   {/each}
 </section>

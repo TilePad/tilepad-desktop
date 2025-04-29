@@ -1,12 +1,15 @@
 <script lang="ts">
   import FolderEditor from "$lib/components/folders/FolderEditor.svelte";
   import ActionsSidebar from "$lib/components/actions/ActionsSidebar.svelte";
+  import TileDraggingProvider from "$lib/components/tiles/TileDraggingProvider.svelte";
 </script>
 
-<div class="layout">
-  <FolderEditor />
-  <ActionsSidebar />
-</div>
+<TileDraggingProvider>
+  <div class="layout">
+    <FolderEditor />
+    <ActionsSidebar />
+  </div>
+</TileDraggingProvider>
 
 <style>
   .layout {

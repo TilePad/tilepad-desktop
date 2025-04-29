@@ -3,6 +3,7 @@
 
   import TileIcon from "./TileIcon.svelte";
   import TileLabelElm from "./TileLabelElm.svelte";
+  import { getDraggingContext } from "./TileDraggingProvider.svelte";
 
   type Props = {
     tile: TileModel;
@@ -11,33 +12,63 @@
   };
 
   const { tile, onClick }: Props = $props();
+  const { onStartDragging } = getDraggingContext();
+  let touchTimeout: number | undefined;
+
+  let button: HTMLButtonElement | undefined = $state();
 
   const config = $derived(tile.config);
+
+  function onPointerDown(event: PointerEvent) {
+    if (touchTimeout) {
+      clearTimeout(touchTimeout);
+      touchTimeout = undefined;
+    }
+    touchTimeout = setTimeout(() => {
+      if (!button) return;
+      touchTimeout = undefined;
+      onStartDragging(event, { type: "tile", ...tile }, button);
+    }, 100);
+  }
+
+  function onPointerUp() {
+    if (touchTimeout) {
+      clearTimeout(touchTimeout);
+      touchTimeout = undefined;
+    }
+  }
 </script>
 
-<div
+<button
+  bind:this={button}
   class="tile"
   onclick={onClick}
-  tabindex="0"
-  role="button"
   aria-roledescription="button"
-  onkeydown={() => {}}
+  onpointerdown={onPointerDown}
+  onpointerup={onPointerUp}
+  data-drop-zone="filledTile"
+  data-row={tile.row}
+  data-column={tile.column}
 >
   <TileIcon icon={config.icon} iconOptions={config.icon_options} />
   <TileLabelElm label={config.label} />
-</div>
+</button>
 
 <style>
   .tile {
-    background-color: #151318;
     position: relative;
-
+    border-radius: 5px;
     display: flex;
     justify-content: center;
     align-items: center;
-
     width: var(--tile-width);
     height: var(--tile-width);
+    color: #ccc;
+
+    border: 2px solid #715c8f;
+    cursor: pointer;
+
+    background-color: #151318;
 
     user-select: none;
     overflow: hidden;

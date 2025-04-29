@@ -31,7 +31,6 @@
     "marked": "^15.0.8",
     "runed": "^0.23.4",
     "svelte-awesome-color-picker": "^3.1.4",
-    "svelte-dnd-action": "^0.9.57",
     "svelte-i18n": "^4.0.1",
     "svelte-sonner": "^0.3.28"
   },
