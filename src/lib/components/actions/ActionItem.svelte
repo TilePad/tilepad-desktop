@@ -52,6 +52,7 @@
     gap: 0.5rem;
     padding-left: 1rem;
     background-color: #28262c;
+    cursor: grab;
   }
 
   .icon {
