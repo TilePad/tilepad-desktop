@@ -12,12 +12,17 @@
   };
 
   const { tile, onClick }: Props = $props();
-  const { onStartDragging } = getDraggingContext();
-  let touchTimeout: number | undefined;
+  const { draggingState, onStartDragging } = getDraggingContext();
 
+  let touchTimeout: number | undefined;
   let button: HTMLButtonElement | undefined = $state();
 
   const config = $derived(tile.config);
+  const dragging = $derived.by(() => {
+    const target = draggingState();
+    if (target === null) return false;
+    return target.data.type === "tile" && target.data.id === tile.id;
+  });
 
   function onPointerDown(event: PointerEvent) {
     if (touchTimeout) {
@@ -43,6 +48,7 @@
 <button
   bind:this={button}
   class="tile"
+  class:tile--dragging={dragging}
   onclick={onClick}
   aria-roledescription="button"
   onpointerdown={onPointerDown}
@@ -81,5 +87,9 @@
   /* Disable pointer events for children to make dragging work properly */
   .tile > :global(*) {
     pointer-events: none;
+  }
+
+  .tile--dragging {
+    opacity: 0.5;
   }
 </style>
