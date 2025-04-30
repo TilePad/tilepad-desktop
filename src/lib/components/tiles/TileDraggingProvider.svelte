@@ -32,6 +32,7 @@
       };
 
   type TileDraggingContext = {
+    draggingState(): DraggingState | null;
     dropZoneTarget(): DropZoneTarget | null;
 
     onStartDragging: (
@@ -78,6 +79,9 @@
 
     dropZoneTarget() {
       return dropZoneTarget;
+    },
+    draggingState() {
+      return draggingState;
     },
   });
 
@@ -138,8 +142,6 @@
       return;
     }
 
-    console.log(elements);
-
     // Search for a drop zone element
     const dropZoneElement = elements.find(
       (el) => el.hasAttribute("data-drop-zone") && el !== previewElement,
@@ -149,6 +151,7 @@
       return;
     }
 
+    // Extract drop zone state
     const dropZone = dropZoneElement.getAttribute("data-drop-zone");
     const rowRaw = dropZoneElement.getAttribute("data-row");
     const columnRaw = dropZoneElement.getAttribute("data-column");
@@ -156,8 +159,7 @@
       throw new Error("invalid drop zone, missing required attributes");
     }
 
-    console.log(dropZone);
-
+    // Set dropzone target
     const row = parseInt(rowRaw);
     const column = parseInt(columnRaw);
     if (dropZone === "filledTile") {
@@ -176,11 +178,9 @@
   }
 
   function handlePointerUp() {
-    console.log(dropZoneTarget, draggingState);
     if (draggingState === null) return;
 
     if (dropZoneTarget !== null && dropZoneTarget.type === "emptyTile") {
-      console.log("DROPPED", draggingState, dropZoneTarget);
       const { row, column } = dropZoneTarget;
 
       if (draggingState.data.type === "tile") {
@@ -225,6 +225,7 @@
     const previewElement = draggingState.previewElement;
     document.body.removeChild(previewElement);
     draggingState = null;
+    dropZoneTarget = null;
   }
 
   const dragging = $derived(draggingState !== null);
