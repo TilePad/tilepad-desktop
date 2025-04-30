@@ -46,6 +46,7 @@
 </script>
 
 <button
+  style="--tile-border-color: {config.icon_options.border_color}"
   bind:this={button}
   class="tile"
   class:tile--dragging={dragging}
@@ -72,16 +73,13 @@
     height: var(--tile-width);
     color: #ccc;
 
-    border: 2px solid #715c8f;
+    border: 2px solid var(--tile-border-color);
     cursor: pointer;
 
     background-color: #151318;
 
     user-select: none;
     overflow: hidden;
-
-    font-size: 1.5rem;
-    text-align: center;
   }
 
   /* Disable pointer events for children to make dragging work properly */

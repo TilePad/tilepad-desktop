@@ -35,6 +35,7 @@ export interface TileConfig {
 export interface TileIconOptions {
   padding: number;
   background_color: string;
+  border_color: string;
 }
 
 export type TileIconNone = object;

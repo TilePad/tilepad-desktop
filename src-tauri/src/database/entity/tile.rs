@@ -69,6 +69,7 @@ pub struct UserFlags {
 pub struct TileIconOptions {
     pub padding: u32,
     pub background_color: String,
+    pub border_color: String,
 }
 
 impl Default for TileIconOptions {
@@ -76,6 +77,7 @@ impl Default for TileIconOptions {
         Self {
             padding: 0,
             background_color: "#00000000".to_string(),
+            border_color: "#715c8f".to_string(),
         }
     }
 }

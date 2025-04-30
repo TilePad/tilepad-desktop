@@ -20,6 +20,7 @@
     iconOptions: TileIconOptions;
     onChangePadding: (padding: number) => void;
     onChangeBackgroundColor: (color: string) => void;
+    onChangeBorderColor: (color: string) => void;
 
     onSelectIcon: (icon: TileIcon) => void;
     onResetDefault: VoidFunction;
@@ -29,6 +30,7 @@
     iconOptions,
     onChangePadding,
     onChangeBackgroundColor,
+    onChangeBorderColor,
     onSelectIcon,
     onResetDefault,
   }: Props = $props();
@@ -85,6 +87,15 @@
             }}
             position="responsive"
             label={$t("background_color")}
+          />
+
+          <ColorPicker
+            hex={iconOptions.border_color}
+            on:input={(event) => {
+              if (event.detail.hex) onChangeBorderColor(event.detail.hex);
+            }}
+            position="responsive"
+            label={$t("border_color")}
           />
 
           <div class="content">

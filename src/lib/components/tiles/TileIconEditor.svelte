@@ -77,6 +77,11 @@
     updateIconOptions(iconOptions);
   };
 
+  const onChangeBorderColor = (color: string) => {
+    iconOptions = { ...iconOptions, border_color: color };
+    updateIconOptions(iconOptions);
+  };
+
   // Only update icon options state when remote state is different from the
   // last debounced saved state (Prevent UI flickering from controlled changes)
   watch(
@@ -92,7 +97,10 @@
   );
 </script>
 
-<div class="tile" style="--tile-size-adjustment: 1;">
+<div
+  class="tile"
+  style="--tile-size-adjustment: 1; --tile-width: 120px; --tile-border-color: {iconOptions.border_color}"
+>
   <TileIcon icon={config.icon} {iconOptions} />
   <TileLabelElm label={config.label} />
 </div>
@@ -100,6 +108,7 @@
   {iconOptions}
   onSelectIcon={onClickIconPackIcon}
   {onChangeBackgroundColor}
+  {onChangeBorderColor}
   {onChangePadding}
   {onResetDefault}
 />
@@ -107,17 +116,20 @@
 <style>
   .tile {
     position: relative;
-    background-color: #151318;
-    border: 2px solid #715c8f;
     border-radius: 5px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-weight: bold;
-    text-align: center;
-    width: 120px;
-    height: 120px;
+    width: var(--tile-width);
+    height: var(--tile-width);
     color: #ccc;
-    font-size: 1.5rem;
+
+    border: 2px solid var(--tile-border-color);
+    cursor: pointer;
+
+    background-color: #151318;
+
+    user-select: none;
+    overflow: hidden;
   }
 </style>

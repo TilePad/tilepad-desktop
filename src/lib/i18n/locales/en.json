@@ -155,5 +155,6 @@
     "device_name_description": "This device name is visible to other devices attempting to connect to this device",
     "created_by": "Created By",
     "third_party_licenses": "Third party licenses",
-    "default": "Default"
+    "default": "Default",
+    "border_color": "Border Color"
 }
