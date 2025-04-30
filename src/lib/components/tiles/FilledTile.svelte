@@ -25,9 +25,6 @@
       touchTimeout = undefined;
     }
 
-    // Add event listeners to document for better drag handling
-    document.addEventListener("pointerup", onPointerUp);
-
     touchTimeout = setTimeout(() => {
       if (!button) return;
       touchTimeout = undefined;
