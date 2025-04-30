@@ -24,6 +24,10 @@
       clearTimeout(touchTimeout);
       touchTimeout = undefined;
     }
+
+    // Add event listeners to document for better drag handling
+    document.addEventListener("pointerup", onPointerUp);
+
     touchTimeout = setTimeout(() => {
       if (!button) return;
       touchTimeout = undefined;
@@ -75,5 +79,10 @@
 
     font-size: 1.5rem;
     text-align: center;
+  }
+
+  /* Disable pointer events for children to make dragging work properly */
+  .tile > :global(*) {
+    pointer-events: none;
   }
 </style>
