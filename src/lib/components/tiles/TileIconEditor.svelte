@@ -50,12 +50,22 @@
             plugin_id: action.plugin_id,
             icon: action.icon,
           };
+    const defaultIconOptions = {
+      ...iconOptions,
+      padding: 0,
+      background_color: "#00000000",
+      border_color: "#715c8f",
+    };
+
+    iconOptions = defaultIconOptions;
 
     $updateTileIcon.mutate({
       tileId,
       icon: defaultIcon,
       kind: UpdateKind.Reset,
     });
+
+    updateIconOptions(iconOptions);
   };
 
   const updateIconOptions = useDebounce((iconOptions: TileIconOptions) => {
