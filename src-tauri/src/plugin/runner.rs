@@ -1,10 +1,13 @@
 use std::{
+    ffi::OsStr,
+    fmt::Debug,
     path::PathBuf,
     process::{ExitStatus, Stdio},
     sync::Arc,
 };
 
 use garde::rules::AsStr;
+use parking_lot::Mutex;
 use serde::{Serialize, Serializer};
 use tokio::{
     io::{AsyncBufReadExt, BufReader},
@@ -55,6 +58,81 @@ impl Serialize for PluginTaskState {
     }
 }
 
+/// Spawns a child process that represents a plugin task being
+/// executed by the server
+#[tracing::instrument(name = "spawn_child_task", skip(on_state_change))]
+pub fn spawn_child_task<I, S, F>(
+    exe_path: PathBuf,
+    working_dir: PathBuf,
+    args: I,
+    on_state_change: F,
+) -> Arc<Mutex<PluginTaskState>>
+where
+    I: IntoIterator<Item = S> + Debug,
+    S: AsRef<OsStr>,
+    F: Fn(PluginTaskState) + Send + 'static,
+{
+    let state = Arc::new(Mutex::new(PluginTaskState::NotStarted));
+
+    // Exe does not exist
+    if !exe_path.exists() {
+        on_state_change(PluginTaskState::Unavailable);
+        return state;
+    }
+
+    // Starting the exe
+    on_state_change(PluginTaskState::Starting);
+
+    let mut cmd = Command::new(exe_path);
+
+    // Windows creation flag to prevent showing windows for the process
+    // (CREATE_NO_WINDOW https://learn.microsoft.com/en-us/windows/win32/procthread/process-creation-flags)
+    #[cfg(windows)]
+    cmd.creation_flags(0x08000000);
+
+    let child = cmd
+        .current_dir(working_dir)
+        .args(args)
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .kill_on_drop(true)
+        .spawn();
+
+    let child = match child {
+        Ok(child) => child,
+        Err(cause) => {
+            tracing::error!(?cause, "failed to start plugin executable");
+            on_state_change(PluginTaskState::Error);
+            return state;
+        }
+    };
+
+    let (task, handle) = ChildTask::create(child);
+
+    // Entered running state
+    on_state_change(PluginTaskState::Running { handle });
+
+    tokio::spawn(async move {
+        let status = match task.run().await {
+            Ok(child) => child,
+            Err(cause) => {
+                tracing::error!(?cause, "failed to get plugin output");
+                on_state_change(PluginTaskState::Error);
+                return;
+            }
+        };
+
+        if status.success() {
+            on_state_change(PluginTaskState::Stopped);
+        } else {
+            on_state_change(PluginTaskState::Error);
+        }
+    });
+
+    state
+}
+
+#[tracing::instrument(skip(plugins))]
 pub fn spawn_native_task(
     plugins: Arc<Plugins>,
 
@@ -66,73 +144,23 @@ pub fn spawn_native_task(
 ) {
     let exe_path = plugin_path.join(&exe);
 
-    // Exe does not exist
-    if !exe_path.exists() {
-        plugins.set_task_state(plugin_id, PluginTaskState::Unavailable);
-        return;
-    }
-
-    // Starting the exe
-    plugins.set_task_state(plugin_id.clone(), PluginTaskState::Starting);
-
-    tracing::debug!(?plugin_id, ?exe, ?plugin_path, "starting native plugin");
-
-    let mut cmd = Command::new(exe_path);
-
-    // Windows creation flag to prevent showing windows for the process
-    // (CREATE_NO_WINDOW https://learn.microsoft.com/en-us/windows/win32/procthread/process-creation-flags)
-    #[cfg(windows)]
-    cmd.creation_flags(0x08000000);
-
-    let child = cmd
-        .current_dir(plugin_path)
-        .args([
+    spawn_child_task(
+        exe_path,
+        plugin_path,
+        [
             "--connect-url",
             connect_url.as_str(),
             "--plugin-id",
             plugin_id.0.as_str(),
-        ])
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .kill_on_drop(true)
-        .spawn();
-
-    let child = match child {
-        Ok(child) => child,
-        Err(cause) => {
-            tracing::error!(?cause, "failed to start plugin executable");
-            plugins.set_task_state(plugin_id, PluginTaskState::Error);
-            return;
-        }
-    };
-
-    let (task, handle) = ChildTask::create(child);
-    tokio::spawn({
-        let plugins = plugins.clone();
-        let plugin_id = plugin_id.clone();
-        let task = task;
-
-        async move {
-            let status = match task.run().await {
-                Ok(child) => child,
-                Err(cause) => {
-                    tracing::error!(?cause, "failed to get plugin output");
-                    plugins.set_task_state(plugin_id, PluginTaskState::Error);
-                    return;
-                }
-            };
-
-            if status.success() {
-                plugins.set_task_state(plugin_id, PluginTaskState::Stopped);
-            } else {
-                plugins.set_task_state(plugin_id, PluginTaskState::Error);
-            }
-        }
-    });
-
-    plugins.set_task_state(plugin_id, PluginTaskState::Running { handle });
+        ],
+        {
+            let plugin_id = plugin_id.clone();
+            move |task| plugins.set_task_state(plugin_id.clone(), task)
+        },
+    );
 }
 
+#[tracing::instrument(skip(plugins))]
 pub fn spawn_node_task(
     plugins: Arc<Plugins>,
 
@@ -151,77 +179,21 @@ pub fn spawn_node_task(
     #[cfg(not(windows))]
     let exe_path: PathBuf = node_path.join("node");
 
-    // Exe does not exist
-    if !exe_path.exists() {
-        plugins.set_task_state(plugin_id, PluginTaskState::Unavailable);
-        return;
-    }
-
-    // Starting the exe
-    plugins.set_task_state(plugin_id.clone(), PluginTaskState::Starting);
-
-    tracing::debug!(
-        ?plugin_id,
-        ?entrypoint,
-        ?plugin_path,
-        "starting native plugin"
-    );
-
-    let mut cmd = Command::new(exe_path);
-
-    // Windows creation flag to prevent showing windows for the process
-    // (CREATE_NO_WINDOW https://learn.microsoft.com/en-us/windows/win32/procthread/process-creation-flags)
-    #[cfg(windows)]
-    cmd.creation_flags(0x08000000);
-
-    let child = cmd
-        .current_dir(plugin_path)
-        .args([
+    spawn_child_task(
+        exe_path,
+        plugin_path,
+        [
             entry_path.as_str(),
             "--connect-url",
             connect_url.as_str(),
             "--plugin-id",
             plugin_id.0.as_str(),
-        ])
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .kill_on_drop(true)
-        .spawn();
-
-    let child = match child {
-        Ok(child) => child,
-        Err(cause) => {
-            tracing::error!(?cause, "failed to start plugin executable");
-            plugins.set_task_state(plugin_id, PluginTaskState::Error);
-            return;
-        }
-    };
-
-    let (task, handle) = ChildTask::create(child);
-    tokio::spawn({
-        let plugins = plugins.clone();
-        let plugin_id = plugin_id.clone();
-        let task = task;
-
-        async move {
-            let status = match task.run().await {
-                Ok(child) => child,
-                Err(cause) => {
-                    tracing::error!(?cause, "failed to get plugin output");
-                    plugins.set_task_state(plugin_id, PluginTaskState::Error);
-                    return;
-                }
-            };
-
-            if status.success() {
-                plugins.set_task_state(plugin_id, PluginTaskState::Stopped);
-            } else {
-                plugins.set_task_state(plugin_id, PluginTaskState::Error);
-            }
-        }
-    });
-
-    plugins.set_task_state(plugin_id, PluginTaskState::Running { handle });
+        ],
+        {
+            let plugin_id = plugin_id.clone();
+            move |task| plugins.set_task_state(plugin_id.clone(), task)
+        },
+    );
 }
 
 #[derive(Debug, Clone)]
@@ -264,7 +236,7 @@ impl ChildTask {
             };
 
             while let Ok(Some(line)) = stdout.next_line().await {
-                println!("{line}");
+                tracing::debug!("{line}");
             }
         });
 
@@ -275,7 +247,7 @@ impl ChildTask {
             };
 
             while let Ok(Some(line)) = stderr.next_line().await {
-                println!("{line}");
+                tracing::debug!("{line}");
             }
         });
 
