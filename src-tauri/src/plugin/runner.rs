@@ -11,10 +11,14 @@ use parking_lot::Mutex;
 use serde::{Serialize, Serializer};
 use tokio::{
     io::{AsyncBufReadExt, BufReader},
+    join,
     process::{Child, Command},
     select,
     sync::{mpsc, oneshot},
 };
+use tracing::instrument::WithSubscriber;
+
+use crate::utils::tracing::create_plugin_logger;
 
 use super::{Plugins, manifest::PluginId};
 
@@ -64,6 +68,7 @@ impl Serialize for PluginTaskState {
 pub fn spawn_child_task<I, S, F>(
     exe_path: PathBuf,
     working_dir: PathBuf,
+    logs_path: PathBuf,
     args: I,
     on_state_change: F,
 ) -> Arc<Mutex<PluginTaskState>>
@@ -107,7 +112,7 @@ where
         }
     };
 
-    let (task, handle) = ChildTask::create(child);
+    let (task, handle) = ChildTask::create(child, logs_path);
 
     // Entered running state
     on_state_change(PluginTaskState::Running { handle });
@@ -137,6 +142,7 @@ pub fn spawn_native_task(
     plugins: Arc<Plugins>,
 
     plugin_path: PathBuf,
+    logs_path: PathBuf,
     exe: String,
 
     connect_url: String,
@@ -147,6 +153,7 @@ pub fn spawn_native_task(
     spawn_child_task(
         exe_path,
         plugin_path,
+        logs_path,
         [
             "--connect-url",
             connect_url.as_str(),
@@ -166,6 +173,7 @@ pub fn spawn_node_task(
 
     node_path: PathBuf,
     plugin_path: PathBuf,
+    logs_path: PathBuf,
     entrypoint: String,
 
     connect_url: String,
@@ -182,6 +190,7 @@ pub fn spawn_node_task(
     spawn_child_task(
         exe_path,
         plugin_path,
+        logs_path,
         [
             entry_path.as_str(),
             "--connect-url",
@@ -224,32 +233,42 @@ pub struct ChildTask {
 }
 
 impl ChildTask {
-    pub fn create(mut child: Child) -> (ChildTask, ChildTaskHandle) {
+    pub fn create(mut child: Child, logs_path: PathBuf) -> (ChildTask, ChildTaskHandle) {
         // Take the error and output pipes
         let stdout = child.stdout.take().map(|io| BufReader::new(io).lines());
         let stderr = child.stderr.take().map(|io| BufReader::new(io).lines());
+        let (subscriber, guard) = create_plugin_logger(logs_path).unwrap();
 
-        tokio::spawn(async move {
-            let mut stdout = match stdout {
-                Some(value) => value,
-                None => return,
-            };
+        tokio::spawn(
+            async move {
+                let _guard = guard;
 
-            while let Ok(Some(line)) = stdout.next_line().await {
-                tracing::debug!("{line}");
+                let stdout_future = async move {
+                    let mut stdout = match stdout {
+                        Some(value) => value,
+                        None => return,
+                    };
+
+                    while let Ok(Some(line)) = stdout.next_line().await {
+                        tracing::debug!("{line}");
+                    }
+                };
+
+                let stderr_future = async move {
+                    let mut stderr = match stderr {
+                        Some(value) => value,
+                        None => return,
+                    };
+
+                    while let Ok(Some(line)) = stderr.next_line().await {
+                        tracing::error!("{line}");
+                    }
+                };
+
+                join!(stdout_future, stderr_future);
             }
-        });
-
-        tokio::spawn(async move {
-            let mut stderr = match stderr {
-                Some(value) => value,
-                None => return,
-            };
-
-            while let Ok(Some(line)) = stderr.next_line().await {
-                tracing::debug!("{line}");
-            }
-        });
+            .with_subscriber(subscriber),
+        );
 
         let (tx, rx) = mpsc::channel(1);
 

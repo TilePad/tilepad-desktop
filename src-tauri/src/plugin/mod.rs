@@ -17,6 +17,7 @@ use serde::Serialize;
 use session::{PluginSessionId, PluginSessionRef};
 pub use tilepad_manifest::plugin as manifest;
 use tilepad_manifest::plugin::{ManifestBin, ManifestBinNative};
+use tokio::fs::create_dir_all;
 
 use crate::{
     database::{DbPool, JsonObject, entity::plugin_properties::PluginPropertiesModel},
@@ -53,6 +54,9 @@ pub struct Plugins {
     /// Runtimes path
     runtimes_path: PathBuf,
 
+    /// Logs path
+    logs_path: PathBuf,
+
     /// Collection of currently loaded plugins
     plugins: RwLock<HashMap<PluginId, Arc<Plugin>>>,
 
@@ -86,6 +90,7 @@ impl Plugins {
         core_path: PathBuf,
         user_path: PathBuf,
         runtimes_path: PathBuf,
+        logs_path: PathBuf,
     ) -> Self {
         Self {
             event_tx,
@@ -93,6 +98,7 @@ impl Plugins {
             core_path,
             user_path,
             runtimes_path,
+            logs_path,
 
             plugins: Default::default(),
             sessions: Default::default(),
@@ -462,6 +468,12 @@ impl Plugins {
     pub async fn start_task(self: &Arc<Self>, plugin_path: PathBuf, manifest: &PluginManifest) {
         let plugin_id = manifest.plugin.id.clone();
         let connect_url = format!("ws://127.0.0.1:{}/plugins/ws", HTTP_PORT);
+        let logs_path = self.logs_path.join(&plugin_id.0);
+
+        // Try create logging directory
+        if !logs_path.exists() {
+            _ = create_dir_all(&logs_path).await;
+        }
 
         tracing::debug!(?plugin_id, "starting background task for plugin");
 
@@ -504,6 +516,7 @@ impl Plugins {
                     self.clone(),
                     runtime_path,
                     plugin_path,
+                    logs_path,
                     node.entrypoint.clone(),
                     connect_url,
                     plugin_id,
@@ -529,6 +542,7 @@ impl Plugins {
                 runner::spawn_native_task(
                     self.clone(),
                     plugin_path,
+                    logs_path,
                     binary.path.clone(),
                     connect_url,
                     plugin_id,

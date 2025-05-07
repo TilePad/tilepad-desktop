@@ -15,8 +15,8 @@ use tauri::{
 use tauri_plugin_deep_link::{DeepLinkExt, OpenUrlEvent};
 use tile::Tiles;
 use tilepad_manifest::plugin::PluginId;
-use tokio::sync::mpsc;
-use tracing_subscriber::EnvFilter;
+use tokio::{fs::create_dir_all, sync::mpsc};
+use utils::tracing::setup_main_subscriber;
 
 mod commands;
 mod database;
@@ -120,24 +120,24 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         app.deep_link().register_all()?;
     }
 
-    // Setup logging
-    let filter = EnvFilter::from_default_env();
-    let subscriber = tracing_subscriber::fmt()
-        .compact()
-        .with_file(true)
-        .with_env_filter(filter)
-        .with_line_number(true)
-        .with_thread_ids(false)
-        .with_target(false)
-        .finish();
-
-    tracing::subscriber::set_global_default(subscriber)?;
-
     let app_handle = app.handle();
     let app_data_path = app
         .path()
         .app_data_dir()
         .context("failed to get app data dir")?;
+
+    let logs_path = app
+        .path()
+        .app_log_dir()
+        .context("failed to get logging path")?;
+
+    // Create the logs directory
+    if !logs_path.exists() {
+        _ = block_on(create_dir_all(&logs_path));
+    }
+
+    // Setup tracing
+    let worker_guard = setup_main_subscriber(logs_path.clone())?;
 
     #[cfg(not(debug_assertions))]
     let core_resources = {
@@ -175,6 +175,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         core_plugins,
         user_plugins,
         runtimes_path,
+        logs_path,
     ));
     let devices = Arc::new(Devices::new(
         app_event_tx.clone(),
@@ -191,6 +192,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
     app.manage(icons.clone());
     app.manage(tiles.clone());
     app.manage(fonts.clone());
+    app.manage(worker_guard);
 
     // Handle deep links (tilepad://deep-link/com.tilepad.system.system.tilePlugin#code=1)
     app.deep_link().on_open_url({
