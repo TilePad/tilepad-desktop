@@ -1,28 +1,32 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 /**
- * Event emitting and subscribing 
+ * Event emitting and subscribing
  */
 export class EventEmitter {
-    constructor() {
-        this.events = {};
-    }
+  events: Record<string, any>;
 
-    // Subscribe to an event
-    on(event, callback) {
-        if (!this.events[event]) {
-            this.events[event] = [];
-        }
-        this.events[event].push(callback);
-    }
+  constructor() {
+    this.events = {};
+  }
 
-    // Unsubscribe from an event
-    off(event, callback) {
-        if (!this.events[event]) return;
-        this.events[event] = this.events[event].filter((cb) => cb !== callback);
+  // Subscribe to an event
+  on(event, callback) {
+    if (!this.events[event]) {
+      this.events[event] = [];
     }
+    this.events[event].push(callback);
+  }
 
-    // Emit an event
-    emit(event, ...args) {
-        if (!this.events[event]) return;
-        this.events[event].forEach((callback) => callback(...args));
-    }
+  // Unsubscribe from an event
+  off(event, callback) {
+    if (!this.events[event]) return;
+    this.events[event] = this.events[event].filter((cb) => cb !== callback);
+  }
+
+  // Emit an event
+  emit(event, ...args) {
+    if (!this.events[event]) return;
+    this.events[event].forEach((callback) => callback(...args));
+  }
 }
