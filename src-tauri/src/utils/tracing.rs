@@ -105,8 +105,8 @@ pub fn create_plugin_logger(logs_path: PathBuf) -> anyhow::Result<(PluginSubscri
 
     // Formatting for file logs
     let file_format = fmt::format()
-        .with_file(true)
-        .with_line_number(true)
+        .with_file(false)
+        .with_line_number(false)
         .with_thread_ids(false)
         .with_target(false)
         .with_ansi(false)
