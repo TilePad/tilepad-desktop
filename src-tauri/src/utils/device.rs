@@ -1,3 +1,4 @@
+/// Get the name of the device (i.e Desktop-AE123)
 pub fn get_device_name() -> String {
     let name = match nick_name::NickName::new() {
         Ok(value) => value,

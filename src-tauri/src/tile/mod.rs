@@ -28,13 +28,15 @@ impl Tiles {
         Self { db, icons, devices }
     }
 
-    pub async fn get_tile_properties(
+    /// Requests a tile by ID, optionally including a `plugin_id` of the
+    /// plugin requesting the tile, when specified `plugin_id` will be
+    /// used to enforce access control
+    async fn get_tile(
         &self,
         tile_id: TileId,
         plugin_id: Option<PluginId>,
-    ) -> anyhow::Result<JsonObject> {
-        let db = &self.db;
-        let tile = TileModel::get_by_id(db, tile_id)
+    ) -> anyhow::Result<TileModel> {
+        let tile = TileModel::get_by_id(&self.db, tile_id)
             .await?
             .context("tile not found")?;
 
@@ -43,6 +45,16 @@ impl Tiles {
             anyhow::anyhow!("tile is not apart of the same plugin")
         );
 
+        Ok(tile)
+    }
+
+    /// Request the properties for a specific tile
+    pub async fn get_tile_properties(
+        &self,
+        tile_id: TileId,
+        plugin_id: Option<PluginId>,
+    ) -> anyhow::Result<JsonObject> {
+        let tile = self.get_tile(tile_id, plugin_id).await?;
         Ok(tile.properties)
     }
 
@@ -54,17 +66,10 @@ impl Tiles {
         properties: JsonObject,
         partial: bool,
     ) -> anyhow::Result<TileModel> {
-        let db = &self.db;
-        let tile = TileModel::get_by_id(db, tile_id)
-            .await?
-            .context("tile not found")?;
-
-        anyhow::ensure!(
-            plugin_id.is_none_or(|plugin_id| tile.plugin_id == plugin_id),
-            anyhow::anyhow!("tile is not apart of the same plugin")
-        );
-
-        let tile = tile.update_properties(db, properties, partial).await?;
+        let tile = self.get_tile(tile_id, plugin_id).await?;
+        let tile = tile
+            .update_properties(&self.db, properties, partial)
+            .await?;
         self.devices.background_update_folder(tile.folder_id);
         Ok(tile)
     }
@@ -77,22 +82,14 @@ impl Tiles {
         icon: TileIcon,
         kind: UpdateKind,
     ) -> anyhow::Result<TileModel> {
-        let db = &self.db;
-        let tile = TileModel::get_by_id(db, tile_id)
-            .await?
-            .context("tile not found")?;
-
-        anyhow::ensure!(
-            plugin_id.is_none_or(|plugin_id| tile.plugin_id == plugin_id),
-            anyhow::anyhow!("tile is not apart of the same plugin")
-        );
+        let tile = self.get_tile(tile_id, plugin_id).await?;
 
         // Handle change in icon when using an uploaded icon (Remove the old file)
         self.icons
             .handle_tile_change_icon(&tile.config.icon)
             .await?;
 
-        let tile = tile.update_icon(db, icon, kind).await?;
+        let tile = tile.update_icon(&self.db, icon, kind).await?;
         self.devices.background_update_folder(tile.folder_id);
         Ok(tile)
     }
@@ -104,17 +101,8 @@ impl Tiles {
         plugin_id: Option<PluginId>,
         icon_options: TileIconOptions,
     ) -> anyhow::Result<TileModel> {
-        let db = &self.db;
-        let tile = TileModel::get_by_id(db, tile_id)
-            .await?
-            .context("tile not found")?;
-
-        anyhow::ensure!(
-            plugin_id.is_none_or(|plugin_id| tile.plugin_id == plugin_id),
-            anyhow::anyhow!("tile is not apart of the same plugin")
-        );
-
-        let tile = tile.update_icon_options(db, icon_options).await?;
+        let tile = self.get_tile(tile_id, plugin_id).await?;
+        let tile = tile.update_icon_options(&self.db, icon_options).await?;
         self.devices.background_update_folder(tile.folder_id);
         Ok(tile)
     }
@@ -127,21 +115,13 @@ impl Tiles {
         label: TileLabel,
         kind: UpdateKind,
     ) -> anyhow::Result<TileModel> {
-        let db = &self.db;
-        let tile = TileModel::get_by_id(db, tile_id)
-            .await?
-            .context("tile not found")?;
-
-        anyhow::ensure!(
-            plugin_id.is_none_or(|plugin_id| tile.plugin_id == plugin_id),
-            anyhow::anyhow!("tile is not apart of the same plugin")
-        );
-
-        let tile = tile.update_label(db, label, kind).await?;
+        let tile = self.get_tile(tile_id, plugin_id).await?;
+        let tile = tile.update_label(&self.db, label, kind).await?;
         self.devices.background_update_folder(tile.folder_id);
         Ok(tile)
     }
 
+    /// Change the row and column position of a tile
     pub async fn update_tile_position(
         &self,
         tile_id: TileId,
@@ -149,17 +129,8 @@ impl Tiles {
         row: u32,
         column: u32,
     ) -> anyhow::Result<TileModel> {
-        let db = &self.db;
-        let tile = TileModel::get_by_id(db, tile_id)
-            .await?
-            .context("tile not found")?;
-
-        anyhow::ensure!(
-            plugin_id.is_none_or(|plugin_id| tile.plugin_id == plugin_id),
-            anyhow::anyhow!("tile is not apart of the same plugin")
-        );
-
-        let tile = tile.update_position(db, row, column).await?;
+        let tile = self.get_tile(tile_id, plugin_id).await?;
+        let tile = tile.update_position(&self.db, row, column).await?;
         self.devices.background_update_folder(tile.folder_id);
         Ok(tile)
     }
