@@ -1,11 +1,14 @@
 use crate::{
     database::entity::tile::UpdateKind,
     tile::Tiles,
-    utils::ws::{WebSocketFuture, WsTx},
+    utils::{
+        error::try_cast_error,
+        ws::{WebSocketFuture, WsTx},
+    },
 };
 use axum::extract::ws::WebSocket;
 use parking_lot::RwLock;
-use std::sync::Arc;
+use std::{io::ErrorKind, sync::Arc};
 use tauri::async_runtime::{spawn, spawn_blocking};
 use tauri_plugin_opener::open_url;
 use tracing::{debug, error};
@@ -50,7 +53,15 @@ impl PluginSession {
 
         spawn(async move {
             if let Err(cause) = ws_future.await {
-                error!(?cause, "error running device websocket future");
+                // Handle plugin connection lost as just a warning
+                if let Some(cause_io) = try_cast_error::<std::io::Error>(&cause) {
+                    if cause_io.kind() == ErrorKind::ConnectionReset {
+                        tracing::warn!(?cause_io, "plugin connection closed");
+                        return;
+                    }
+                }
+
+                error!(?cause, "error running plugin websocket future");
             }
         });
 
