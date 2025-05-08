@@ -208,6 +208,9 @@
                       plugin_id: action.plugin_id,
                       icon: action.icon,
                     },
+              icon_options: action.icon_options
+                ? action.icon_options
+                : undefined,
             },
             properties: {},
           },

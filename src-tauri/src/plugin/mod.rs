@@ -261,6 +261,7 @@ impl Plugins {
 
                 label: manifest_action.label.clone(),
                 icon: manifest_action.icon.clone(),
+                icon_options: manifest_action.icon_options.clone(),
                 description: manifest_action.description.clone(),
                 inspector: manifest_action.inspector.clone(),
             },

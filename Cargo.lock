@@ -5915,9 +5915,7 @@ dependencies = [
 
 [[package]]
 name = "tilepad-manifest"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c305c09ecbd881c7207640f88171b23366acbeda2db42d3b825a1a5362bec2ec"
+version = "0.6.0"
 dependencies = [
  "dirs 6.0.0",
  "garde",
@@ -5925,6 +5923,7 @@ dependencies = [
  "node-semver",
  "serde",
  "serde_json",
+ "serde_with",
  "strum 0.27.1",
  "thiserror 2.0.12",
 ]

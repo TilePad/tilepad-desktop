@@ -1,5 +1,6 @@
 import type { Option } from "./shared";
 import type { PluginId } from "./plugin";
+import type { TileIconOptions } from "./tiles";
 
 export type ActionId = string;
 
@@ -21,6 +22,7 @@ export interface Action {
 
   label: string;
   icon: Option<string>;
+  icon_options: Option<Partial<TileIconOptions>>;
   description: Option<string>;
   inspector: Option<string>;
 }

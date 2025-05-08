@@ -1,5 +1,5 @@
 use serde::Serialize;
-use tilepad_manifest::plugin::Manifest;
+use tilepad_manifest::plugin::{Manifest, ManifestIconOptions};
 
 use super::manifest::{ActionId, PluginId};
 
@@ -19,6 +19,7 @@ pub struct Action {
 
     pub label: String,
     pub icon: Option<String>,
+    pub icon_options: Option<ManifestIconOptions>,
     pub description: Option<String>,
     pub inspector: Option<String>,
 }
@@ -52,6 +53,7 @@ where
 
                 label: manifest_action.label.clone(),
                 icon: manifest_action.icon.clone(),
+                icon_options: manifest_action.icon_options.clone(),
                 description: manifest_action.description.clone(),
                 inspector: manifest_action.inspector.clone(),
             };

@@ -55,9 +55,10 @@
       padding: 0,
       background_color: "#00000000",
       border_color: "#715c8f",
+      ...(action?.icon_options ?? {}),
     };
 
-    iconOptions = defaultIconOptions;
+    console.log(action?.icon_options, defaultIconOptions);
 
     $updateTileIcon.mutate({
       tileId,
@@ -65,6 +66,7 @@
       kind: UpdateKind.Reset,
     });
 
+    iconOptions = defaultIconOptions;
     updateIconOptions(iconOptions);
   };
 
