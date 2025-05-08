@@ -49,6 +49,9 @@
   const onChangeAutoStart = (start_automatically: boolean) => {
     updateSettings({ ...settings, start_automatically });
   };
+  const onChangeMinimizeTray = (minimize_tray: boolean) => {
+    updateSettings({ ...settings, minimize_tray });
+  };
 
   // Update local settings state with remote
   watch(
@@ -71,18 +74,18 @@
   </div>
 
   <div class="settings">
-    <div class="row">
-      <div class="card">
-        <div class="tile-item">
-          <label class="tile-label" for="language">{$t("language")}</label>
-          <LanguageSelector
-            value={settings.language}
-            onChangeValue={(value) => onChangeLanguage(value)}
-          />
-          <p class="tile-description">{$t("language_description")}</p>
-        </div>
+    <div class="card">
+      <div class="tile-item">
+        <label class="tile-label" for="language">{$t("language")}</label>
+        <LanguageSelector
+          value={settings.language}
+          onChangeValue={(value) => onChangeLanguage(value)}
+        />
+        <p class="tile-description">{$t("language_description")}</p>
       </div>
+    </div>
 
+    <div class="grid">
       <div class="card">
         <div class="tile-item">
           <label class="tile-label" for="deviceName">{$t("device_name")}</label>
@@ -97,9 +100,7 @@
           </p>
         </div>
       </div>
-    </div>
 
-    <div class="row">
       <div class="card">
         <div class="dev-row">
           <div class="tile-item">
@@ -115,6 +116,25 @@
             id="startAutomatically"
             checked={settings.start_automatically}
             onCheckedChange={(value) => onChangeAutoStart(value)}
+          />
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="dev-row">
+          <div class="tile-item">
+            <label class="tile-label" for="startAutomatically"
+              >{$t("minimize_tray")}</label
+            >
+            <p class="tile-description">
+              {$t("minimize_tray_description")}
+            </p>
+          </div>
+
+          <EnabledSwitch
+            id="startAutomatically"
+            checked={settings.minimize_tray}
+            onCheckedChange={(value) => onChangeMinimizeTray(value)}
           />
         </div>
       </div>
@@ -218,7 +238,7 @@
     padding-right: 1rem;
   }
 
-  .row {
+  .grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;

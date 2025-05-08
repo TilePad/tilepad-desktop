@@ -19,6 +19,7 @@ pub struct SettingsConfig {
     pub start_automatically: bool,
     pub device_name: String,
     pub developer_mode: bool,
+    pub minimize_tray: bool,
 }
 
 impl Default for SettingsConfig {
@@ -30,6 +31,7 @@ impl Default for SettingsConfig {
             start_automatically: false,
             device_name,
             developer_mode: false,
+            minimize_tray: false,
         }
     }
 }

@@ -3,4 +3,5 @@ export interface SettingsConfig {
   start_automatically: boolean;
   device_name: string;
   developer_mode: boolean;
+  minimize_tray: boolean;
 }

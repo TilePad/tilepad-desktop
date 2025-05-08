@@ -161,5 +161,7 @@
     "development_mode_description": "Enables additional functionality useful to plugin developers. Such as cli integration and more verbose logging. Restart TilePad to apply",
     "third_party_licenses_description": "Licenses for third party software included in the making of TilePad",
     "auto_start": "Auto Start",
-    "auto_start_description": "Start TilePad automatically when your computer starts. Restart TilePad to apply change"
+    "auto_start_description": "Start TilePad automatically when your computer starts. Restart TilePad to apply change",
+    "minimize_tray": "Minimize to Tray",
+    "minimize_tray_description": "Minimize to the system tray on close instead of stopping TilePad"
 }
