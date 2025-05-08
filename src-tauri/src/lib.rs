@@ -1,6 +1,7 @@
 use std::{error::Error, str::FromStr, sync::Arc};
 
 use anyhow::Context;
+use database::{DbPool, entity::settings::SettingsModel};
 use device::Devices;
 use events::DeepLinkContext;
 use fonts::Fonts;
@@ -9,7 +10,7 @@ use plugin::Plugins;
 use server::{HTTP_PORT, create_http_socket};
 use std::path::PathBuf;
 use tauri::{
-    App, Manager,
+    App, AppHandle, Manager, RunEvent,
     async_runtime::{block_on, spawn},
 };
 use tauri_plugin_deep_link::{DeepLinkExt, OpenUrlEvent};
@@ -27,6 +28,7 @@ mod icons;
 mod plugin;
 mod server;
 mod tile;
+mod tray;
 mod utils;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -37,7 +39,9 @@ pub fn run() {
 
     tauri::Builder::default()
         .plugin(tauri_plugin_updater::Builder::new().build())
-        .plugin(tauri_plugin_single_instance::init(|_app, _argv, _cwd| {}))
+        .plugin(tauri_plugin_single_instance::init(
+            handle_duplicate_instance,
+        ))
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_opener::init())
         .setup(setup)
@@ -107,8 +111,10 @@ pub fn run() {
             settings::settings_get_settings,
             settings::settings_set_settings
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while running tauri application")
+        // Prevent default exit handling, app exiting is done
+        .run(handle_app_event);
 }
 
 fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
@@ -261,6 +267,8 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         }
     });
 
+    tray::create_tray_menu(app)?;
+
     Ok(())
 }
 
@@ -321,4 +329,26 @@ fn debug_core_resources_path() -> PathBuf {
 
     let manifest_dir = std::path::Path::new(&manifest_dir);
     manifest_dir.join("../core")
+}
+
+/// Handle initialization of a second app instance, focuses the main
+/// window instead of allowing multiple instances
+fn handle_duplicate_instance(app: &AppHandle, _args: Vec<String>, _cwd: String) {
+    let _ = app
+        .get_webview_window("main")
+        .expect("no main window")
+        .set_focus();
+}
+
+/// Handles app events, used for the minimize to tray event
+fn handle_app_event(app: &AppHandle, event: RunEvent) {
+    if let tauri::RunEvent::ExitRequested { api, code, .. } = event {
+        let db = app.state::<DbPool>();
+        let settings = block_on(SettingsModel::get_or_default(db.inner()));
+        let minimize_to_tray = settings.is_ok_and(|value| value.config.minimize_tray);
+
+        if code.is_none() && minimize_to_tray {
+            api.prevent_exit();
+        }
+    }
 }
