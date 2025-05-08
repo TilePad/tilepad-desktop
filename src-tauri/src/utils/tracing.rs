@@ -81,7 +81,7 @@ pub fn setup_main_subscriber(logs_path: PathBuf) -> anyhow::Result<WorkerGuard> 
     Ok(guard)
 }
 
-type PluginSubscriber = fmt::Subscriber<
+pub type PluginSubscriber = fmt::Subscriber<
     fmt::format::DefaultFields,
     fmt::format::Format<fmt::format::Compact>,
     EnvFilter,

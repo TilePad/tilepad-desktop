@@ -102,7 +102,7 @@ rfd = { version = "0.15.3", default-features = false, features = [
 ] }
 
 # Manifest definitions
-tilepad-manifest = { version = "0.4.0" }
+tilepad-manifest = { version = "0.5.0", path = "../../tilepad-manifest" }
 
 # Database of fonts and getting system fonts
 fontdb = "0.23.0"

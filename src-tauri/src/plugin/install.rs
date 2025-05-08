@@ -51,16 +51,17 @@ pub async fn install_plugin_zip(data: &[u8], path: &Path) -> anyhow::Result<()> 
 
 /// Attempts to find an existing installed node runtime matching the provided
 /// version range requirement
+#[tracing::instrument]
 pub async fn get_node_runtime(
     runtimes_path: &Path,
     desired: &node_semver::Range,
-) -> anyhow::Result<Option<PathBuf>> {
+) -> std::io::Result<Option<PathBuf>> {
     if !runtimes_path.exists() {
+        tracing::debug!("no installed node runtimes");
         return Ok(None);
     }
 
     let mut runtime_path_entries = tokio::fs::read_dir(runtimes_path).await?;
-
     while let Some(entry) = runtime_path_entries.next_entry().await? {
         let metadata = match entry.metadata().await {
             Ok(value) => value,
@@ -98,10 +99,12 @@ pub async fn get_node_runtime(
 
         // We already have a runtime installed that satisfies the version requirement
         if version.satisfies(desired) {
+            tracing::debug!(?path, "found requested node runtime");
             return Ok(Some(path));
         }
     }
 
+    tracing::debug!("no matching node runtimes found");
     Ok(None)
 }
 

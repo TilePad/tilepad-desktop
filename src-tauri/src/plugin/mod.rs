@@ -1,23 +1,12 @@
 use std::{
     collections::HashMap,
+    fmt::Debug,
     path::{Path, PathBuf},
     sync::Arc,
 };
 
 use action::{Action, ActionCategory, ActionWithCategory, actions_from_manifests};
 use anyhow::Context;
-
-use install::get_node_runtime;
-use loader::load_plugins_from_path;
-use manifest::{ActionId, Manifest as PluginManifest, PluginId, platform_arch, platform_os};
-use parking_lot::RwLock;
-use protocol::ServerPluginMessage;
-use runner::PluginTaskState;
-use serde::Serialize;
-use session::{PluginSessionId, PluginSessionRef};
-pub use tilepad_manifest::plugin as manifest;
-use tilepad_manifest::plugin::{ManifestBin, ManifestBinNative};
-use tokio::fs::create_dir_all;
 
 use crate::{
     database::{DbPool, JsonObject, entity::plugin_properties::PluginPropertiesModel},
@@ -28,6 +17,19 @@ use crate::{
     },
     server::HTTP_PORT,
 };
+use install::get_node_runtime;
+use loader::load_plugins_from_path;
+use manifest::{ActionId, Manifest as PluginManifest, PluginId};
+use parking_lot::RwLock;
+use protocol::ServerPluginMessage;
+use runner::{
+    NativeTaskOptions, NodeTaskOptions, PluginTaskState, TaskOptions, TaskStateHolder,
+    create_task_logger,
+};
+use serde::Serialize;
+use session::{PluginSessionId, PluginSessionRef};
+pub use tilepad_manifest::plugin as manifest;
+use tilepad_manifest::plugin::{ManifestBin, ManifestBinNative, ManifestBinNode};
 
 pub mod action;
 pub mod install;
@@ -465,97 +467,123 @@ impl Plugins {
         self.start_task(plugin_path, manifest).await;
     }
 
+    #[tracing::instrument(
+        name = "start_plugin_task", 
+        skip(self, manifest), 
+        fields(
+            manifest.plugin_id = ?manifest.plugin.id,
+            manifest.bin = ?manifest.bin,
+        )
+    )]
     pub async fn start_task(self: &Arc<Self>, plugin_path: PathBuf, manifest: &PluginManifest) {
         let plugin_id = manifest.plugin.id.clone();
-        let connect_url = format!("ws://127.0.0.1:{}/plugins/ws", HTTP_PORT);
         let logs_path = self.logs_path.join(&plugin_id.0);
 
-        // Try create logging directory
-        if !logs_path.exists() {
-            _ = create_dir_all(&logs_path).await;
-        }
+        let state_handler = PluginsTaskStateHolder {
+            plugin_id: plugin_id.clone(),
+            plugins: self.clone(),
+        };
 
-        tracing::debug!(?plugin_id, "starting background task for plugin");
-
+        // Task has no binary to run
         let binary = match manifest.bin.as_ref() {
             Some(value) => value,
             None => {
                 // No binary available for the plugin
-                tracing::debug!(?plugin_id, "skipping starting plugin without binary");
-                self.set_task_state(plugin_id, PluginTaskState::Unavailable);
+                tracing::debug!("skipping starting plugin without binary");
+                state_handler.on_change_state(PluginTaskState::Unavailable);
                 return;
             }
         };
 
+        // Initialize a logger for the plugin
+        let logger = match create_task_logger(logs_path).await {
+            Ok(value) => value,
+            Err(cause) => {
+                tracing::error!(?cause, "failed to initialize plugin logging");
+                state_handler.on_change_state(PluginTaskState::Error);
+                return;
+            }
+        };
+
+        let connect_url = format!("ws://127.0.0.1:{}/plugins/ws", HTTP_PORT);
+
+        let task_options = TaskOptions {
+            connect_url,
+            plugin_id,
+            logger,
+            plugin_path,
+            state_handler,
+        };
+
         match binary {
             ManifestBin::Node { node } => {
-                let runtime_path = match get_node_runtime(&self.runtimes_path, &node.version.0)
-                    .await
-                {
-                    Ok(Some(value)) => value,
-                    Ok(None) => {
-                        // No binary available for the plugin on the current os + arch
-                        tracing::debug!(?plugin_id, "skipping node plugin, runtime unavailable");
-                        self.set_task_state(plugin_id.clone(), PluginTaskState::Unavailable);
-                        return;
-                    }
-                    Err(cause) => {
-                        tracing::debug!(
-                            ?cause,
-                            ?plugin_id,
-                            "skipping node plugin, failed to find runtime"
-                        );
-                        self.set_task_state(plugin_id.clone(), PluginTaskState::Unavailable);
-                        return;
-                    }
-                };
-                // No binary available for the plugin
-                tracing::debug!(?plugin_id, ?runtime_path, entrypoint = ?node.entrypoint, "starting node plugin");
-
-                runner::spawn_node_task(
-                    self.clone(),
-                    runtime_path,
-                    plugin_path,
-                    logs_path,
-                    node.entrypoint.clone(),
-                    connect_url,
-                    plugin_id,
-                );
+                let runtimes_path = self.runtimes_path.clone();
+                Self::start_node_task(task_options, runtimes_path, node).await;
             }
             ManifestBin::Native { native } => {
-                let binary = match Self::get_native_binary(native) {
-                    Some(value) => value,
-                    None => {
-                        // No binary available for the plugin on the current os + arch
-                        tracing::debug!(
-                            ?plugin_id,
-                            "skipping starting plugin without compatible native binary"
-                        );
-                        self.set_task_state(plugin_id.clone(), PluginTaskState::Unavailable);
-                        return;
-                    }
-                };
-
-                // No binary available for the plugin
-                tracing::debug!(?plugin_id, os = ?binary.os, arch = ?binary.arch, "starting native plugin binary");
-
-                runner::spawn_native_task(
-                    self.clone(),
-                    plugin_path,
-                    logs_path,
-                    binary.path.clone(),
-                    connect_url,
-                    plugin_id,
-                );
+                Self::start_native_task(task_options, native);
             }
         }
     }
 
-    /// Find the `native` binary compatible with the current platform
-    fn get_native_binary(native: &[ManifestBinNative]) -> Option<&ManifestBinNative> {
-        let os = platform_os();
-        let arch = platform_arch();
-        native.iter().find(|bin| os == bin.os && arch == bin.arch)
+    #[tracing::instrument]
+    async fn start_node_task(
+        task_options: TaskOptions<PluginsTaskStateHolder>,
+        runtimes_path: PathBuf,
+        node: &ManifestBinNode,
+    ) {
+        let runtime_path = match get_node_runtime(&runtimes_path, &node.version.0).await {
+            Ok(Some(value)) => value,
+            Ok(None) => {
+                tracing::warn!("cannot start task, suitable runtime unavailable");
+                task_options
+                    .state_handler
+                    .on_change_state(PluginTaskState::Unavailable);
+                return;
+            }
+            Err(cause) => {
+                tracing::warn!(?cause, "cannot start task, failed to search for runtime");
+                task_options
+                    .state_handler
+                    .on_change_state(PluginTaskState::Unavailable);
+                return;
+            }
+        };
+
+        let entrypoint = node.entrypoint.clone();
+
+        let options = NodeTaskOptions {
+            runtime_path,
+            entrypoint,
+            task: task_options,
+        };
+
+        runner::spawn_node_task(options).await;
+    }
+
+    #[tracing::instrument]
+    fn start_native_task(
+        task_options: TaskOptions<PluginsTaskStateHolder>,
+        native: &[ManifestBinNative],
+    ) {
+        let binary = match ManifestBinNative::find_current(native) {
+            Some(value) => value,
+            None => {
+                // No binary available for the plugin on the current os + arch
+                tracing::debug!("task has no compatible native binary");
+                task_options
+                    .state_handler
+                    .on_change_state(PluginTaskState::Unavailable);
+                return;
+            }
+        };
+
+        let options = NativeTaskOptions {
+            exe: binary.path.clone(),
+            task: task_options,
+        };
+
+        runner::spawn_native_task(options);
     }
 
     /// Stop a task by plugin ID
@@ -570,5 +598,26 @@ impl Plugins {
         if let PluginTaskState::Running { handle } = state {
             handle.kill().await;
         }
+    }
+}
+
+/// Task state holder that pushes the state changes to
+/// the plugins service
+pub struct PluginsTaskStateHolder {
+    plugins: Arc<Plugins>,
+    plugin_id: PluginId,
+}
+
+impl Debug for PluginsTaskStateHolder {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("PluginsTaskStateHolder")
+            .field("plugin_id", &self.plugin_id)
+            .finish()
+    }
+}
+
+impl TaskStateHolder for PluginsTaskStateHolder {
+    fn on_change_state(&self, state: PluginTaskState) {
+        self.plugins.set_task_state(self.plugin_id.clone(), state);
     }
 }
