@@ -9,10 +9,8 @@
   import I18nProvider from "$lib/components/i18n/I18nProvider.svelte";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import SettingsProvider from "$lib/components/SettingsProvider.svelte";
-  import FolderProvider from "$lib/components/folders/FolderProvider.svelte";
   import DeviceRequests from "$lib/components/devices/DeviceRequests.svelte";
   import UpdateNotification from "$lib/components/UpdateNotification.svelte";
-  import ProfilesProvider from "$lib/components/profiles/ProfilesProvider.svelte";
   import InternalServerProvider from "$lib/components/InternalServerProvider.svelte";
 
   let { children } = $props();
@@ -27,13 +25,9 @@
             <Header />
 
             <main class="main">
-              <ProfilesProvider>
-                <FolderProvider>
-                  {@render children()}
+              {@render children()}
 
-                  <DeviceRequests />
-                </FolderProvider>
-              </ProfilesProvider>
+              <DeviceRequests />
             </main>
           </div>
 

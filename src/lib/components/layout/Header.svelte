@@ -37,14 +37,6 @@
       href="/settings"
       title={$t("settings")}
     />
-
-    {#if import.meta.env.DEV}
-      <NavButton
-        icon={SolarSettingsBoldDuotone}
-        href="/dev-fields"
-        title="Form Fields Preview"
-      />
-    {/if}
   </nav>
 </header>
 
