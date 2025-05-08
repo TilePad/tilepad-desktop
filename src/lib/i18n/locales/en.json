@@ -163,5 +163,7 @@
     "auto_start": "Auto Start",
     "auto_start_description": "Start TilePad automatically when your computer starts. Restart TilePad to apply change",
     "minimize_tray": "Minimize to Tray",
-    "minimize_tray_description": "Minimize to the system tray on close instead of stopping TilePad"
+    "minimize_tray_description": "Minimize to the system tray on close instead of stopping TilePad",
+    "start_minimized": "Auto Start Minimized",
+    "start_minimized_description": "When starting automatically start as minimized to the tray instead of opening the Window immediately"
 }

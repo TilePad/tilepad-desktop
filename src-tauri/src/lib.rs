@@ -173,6 +173,19 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         }
     };
 
+    // Load database settings
+    let settings = block_on(SettingsModel::get_or_default(&db))
+        .map(|value| value.config)
+        .unwrap_or_default();
+
+    // Setup automatic startup
+    setup_auto_start(app_handle, settings.start_automatically);
+
+    // Handle minimized startup for autostart
+    if settings.start_minimized && is_auto_started() {
+        close_app_window(app_handle);
+    }
+
     let (app_event_tx, app_event_rx) = mpsc::unbounded_channel();
     let icons = Arc::new(Icons::new(app_event_tx.clone(), user_icons, uploaded_icons));
     let plugins = Arc::new(Plugins::new(
@@ -340,6 +353,14 @@ fn handle_duplicate_instance(app: &AppHandle, _args: Vec<String>, _cwd: String) 
         .set_focus();
 }
 
+/// Closes the main app window
+fn close_app_window(app: &AppHandle) {
+    let _ = app
+        .get_webview_window("main")
+        .expect("no main window")
+        .close();
+}
+
 /// Handles app events, used for the minimize to tray event
 fn handle_app_event(app: &AppHandle, event: RunEvent) {
     if let tauri::RunEvent::ExitRequested { api, code, .. } = event {
@@ -351,4 +372,30 @@ fn handle_app_event(app: &AppHandle, event: RunEvent) {
             api.prevent_exit();
         }
     }
+}
+
+/// Handles app events, used for the minimize to tray event
+fn setup_auto_start(app: &AppHandle, auto_start: bool) {
+    use tauri_plugin_autostart::MacosLauncher;
+    use tauri_plugin_autostart::ManagerExt;
+
+    app.app_handle().plugin(tauri_plugin_autostart::init(
+        MacosLauncher::LaunchAgent,
+        Some(vec!["--auto-start"]),
+    ));
+
+    // Get the autostart manager
+    let autostart_manager = app.autolaunch();
+
+    if auto_start {
+        // Enable autostart
+        let _ = autostart_manager.enable();
+    } else {
+        // Disable autostart
+        let _ = autostart_manager.disable();
+    }
+}
+
+fn is_auto_started() -> bool {
+    std::env::args().any(|arg| arg == "--auto-start")
 }

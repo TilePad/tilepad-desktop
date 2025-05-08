@@ -115,3 +115,6 @@ nick-name = "0.1"
 version = "0.8.2"
 default-features = false
 features = ["runtime-tokio", "sqlite", "uuid", "chrono", "json", "macros"]
+
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-autostart = "2"

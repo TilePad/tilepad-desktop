@@ -49,6 +49,11 @@
   const onChangeAutoStart = (start_automatically: boolean) => {
     updateSettings({ ...settings, start_automatically });
   };
+
+  const onChangeStartMinimized = (start_minimized: boolean) => {
+    updateSettings({ ...settings, start_minimized });
+  };
+
   const onChangeMinimizeTray = (minimize_tray: boolean) => {
     updateSettings({ ...settings, minimize_tray });
   };
@@ -74,18 +79,17 @@
   </div>
 
   <div class="settings">
-    <div class="card">
-      <div class="tile-item">
-        <label class="tile-label" for="language">{$t("language")}</label>
-        <LanguageSelector
-          value={settings.language}
-          onChangeValue={(value) => onChangeLanguage(value)}
-        />
-        <p class="tile-description">{$t("language_description")}</p>
-      </div>
-    </div>
-
     <div class="grid">
+      <div class="card">
+        <div class="tile-item">
+          <label class="tile-label" for="language">{$t("language")}</label>
+          <LanguageSelector
+            value={settings.language}
+            onChangeValue={(value) => onChangeLanguage(value)}
+          />
+          <p class="tile-description">{$t("language_description")}</p>
+        </div>
+      </div>
       <div class="card">
         <div class="tile-item">
           <label class="tile-label" for="deviceName">{$t("device_name")}</label>
@@ -116,6 +120,25 @@
             id="startAutomatically"
             checked={settings.start_automatically}
             onCheckedChange={(value) => onChangeAutoStart(value)}
+          />
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="dev-row">
+          <div class="tile-item">
+            <label class="tile-label" for="startMinimized"
+              >{$t("start_minimized")}</label
+            >
+            <p class="tile-description">
+              {$t("start_minimized_description")}
+            </p>
+          </div>
+
+          <EnabledSwitch
+            id="startMinimized"
+            checked={settings.start_minimized}
+            onCheckedChange={(value) => onChangeStartMinimized(value)}
           />
         </div>
       </div>
