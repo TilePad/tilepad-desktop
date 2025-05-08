@@ -1,7 +1,5 @@
 use serde::Serialize;
-use tilepad_manifest::plugin::{Manifest, ManifestIconOptions};
-
-use super::manifest::{ActionId, PluginId};
+use tilepad_manifest::plugin::{ActionId, ManifestActionIconOptions, PluginId, PluginManifest};
 
 #[derive(Debug, Serialize)]
 pub struct ActionCategory {
@@ -19,7 +17,7 @@ pub struct Action {
 
     pub label: String,
     pub icon: Option<String>,
-    pub icon_options: Option<ManifestIconOptions>,
+    pub icon_options: Option<ManifestActionIconOptions>,
     pub description: Option<String>,
     pub inspector: Option<String>,
 }
@@ -33,7 +31,7 @@ pub struct ActionWithCategory {
 
 pub fn actions_from_manifests<'a, I>(manifests: I) -> Vec<ActionCategory>
 where
-    I: IntoIterator<Item = &'a Manifest>,
+    I: IntoIterator<Item = &'a PluginManifest>,
 {
     let mut categories = Vec::new();
 

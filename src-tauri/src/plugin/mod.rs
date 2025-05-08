@@ -18,7 +18,6 @@ use action::{Action, ActionCategory, ActionWithCategory, actions_from_manifests}
 use anyhow::Context;
 use install::get_node_runtime;
 use loader::load_plugins_from_path;
-use manifest::{ActionId, Manifest as PluginManifest, PluginId};
 use parking_lot::RwLock;
 use protocol::ServerPluginMessage;
 use runner::{
@@ -27,8 +26,7 @@ use runner::{
 };
 use serde::Serialize;
 use session::{PluginSessionId, PluginSessionRef};
-pub use tilepad_manifest::plugin as manifest;
-use tilepad_manifest::plugin::{ManifestBin, ManifestBinNative, ManifestBinNode};
+use tilepad_manifest::plugin::{ActionId, MBin, MBinNative, MBinNode, PluginId, PluginManifest};
 
 pub mod action;
 pub mod install;
@@ -535,11 +533,11 @@ impl Plugins {
         };
 
         match binary {
-            ManifestBin::Node { node } => {
+            MBin::Node { node } => {
                 let runtimes_path = self.runtimes_path.clone();
                 Self::start_node_task(task_options, runtimes_path, node).await;
             }
-            ManifestBin::Native { native } => {
+            MBin::Native { native } => {
                 Self::start_native_task(task_options, native);
             }
         }
@@ -549,7 +547,7 @@ impl Plugins {
     async fn start_node_task(
         task_options: TaskOptions<PluginsTaskStateHolder>,
         runtimes_path: PathBuf,
-        node: &ManifestBinNode,
+        node: &MBinNode,
     ) {
         let runtime_path = match get_node_runtime(&runtimes_path, &node.version.0).await {
             Ok(Some(value)) => value,
@@ -581,11 +579,8 @@ impl Plugins {
     }
 
     #[tracing::instrument]
-    fn start_native_task(
-        task_options: TaskOptions<PluginsTaskStateHolder>,
-        native: &[ManifestBinNative],
-    ) {
-        let binary = match ManifestBinNative::find_current(native) {
+    fn start_native_task(task_options: TaskOptions<PluginsTaskStateHolder>, native: &[MBinNative]) {
+        let binary = match MBinNative::find_current(native) {
             Some(value) => value,
             None => {
                 // No binary available for the plugin on the current os + arch

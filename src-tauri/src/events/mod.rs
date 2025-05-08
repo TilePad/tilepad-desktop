@@ -1,15 +1,12 @@
-use serde::{Deserialize, Serialize};
-use tilepad_manifest::icons::IconPackId;
-use tokio::sync::mpsc;
-
 use crate::{
     database::entity::{device::DeviceId, folder::FolderId, profile::ProfileId, tile::TileId},
     device::DeviceRequestId,
-    plugin::{
-        manifest::{ActionId, PluginId},
-        runner::PluginTaskState,
-    },
+    plugin::runner::PluginTaskState,
 };
+use serde::{Deserialize, Serialize};
+use tilepad_manifest::icons::IconPackId;
+use tilepad_manifest::plugin::{ActionId, PluginId};
+use tokio::sync::mpsc;
 
 pub mod processing;
 

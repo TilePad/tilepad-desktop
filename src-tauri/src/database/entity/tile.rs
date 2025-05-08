@@ -1,12 +1,9 @@
-use crate::{
-    database::{DbErr, DbPool, DbResult, JsonObject},
-    plugin::manifest::{ActionId, PluginId},
-};
-
 use super::folder::FolderId;
+use crate::database::{DbErr, DbPool, DbResult, JsonObject};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 use tilepad_manifest::icons::IconPackId;
+use tilepad_manifest::plugin::{ActionId, PluginId};
 use uuid::Uuid;
 
 pub type TileId = Uuid;

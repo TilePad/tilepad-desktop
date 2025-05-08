@@ -379,7 +379,7 @@ fn setup_auto_start(app: &AppHandle, auto_start: bool) {
     use tauri_plugin_autostart::MacosLauncher;
     use tauri_plugin_autostart::ManagerExt;
 
-    app.app_handle().plugin(tauri_plugin_autostart::init(
+    _ = app.app_handle().plugin(tauri_plugin_autostart::init(
         MacosLauncher::LaunchAgent,
         Some(vec!["--auto-start"]),
     ));

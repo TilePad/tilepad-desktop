@@ -1,7 +1,7 @@
 use anyhow::Context;
 use garde::Validate;
 use std::{io::Cursor, path::Path};
-use tilepad_manifest::icons::{Icon, Manifest as IconsManifest};
+use tilepad_manifest::icons::{Icon, IconsManifest};
 use tokio::io::BufReader;
 
 use crate::utils::zip::{create_zip_reader, extract_zip_file};

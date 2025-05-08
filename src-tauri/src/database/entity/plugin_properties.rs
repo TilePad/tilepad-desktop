@@ -1,10 +1,7 @@
-use crate::{
-    database::{DbPool, DbResult, JsonObject},
-    plugin::manifest::PluginId,
-};
-
+use crate::database::{DbPool, DbResult, JsonObject};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
+use tilepad_manifest::plugin::PluginId;
 
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct PluginPropertiesModel {

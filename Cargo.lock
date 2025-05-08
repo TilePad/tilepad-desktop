@@ -5917,7 +5917,6 @@ dependencies = [
 name = "tilepad-manifest"
 version = "0.6.0"
 dependencies = [
- "dirs 6.0.0",
  "garde",
  "indexmap 2.9.0",
  "node-semver",

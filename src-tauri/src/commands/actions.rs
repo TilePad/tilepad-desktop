@@ -1,12 +1,10 @@
-use std::sync::Arc;
-
-use tauri::State;
-
 use crate::plugin::{
     Plugins,
     action::{ActionCategory, ActionWithCategory},
-    manifest::{ActionId, PluginId},
 };
+use std::sync::Arc;
+use tauri::State;
+use tilepad_manifest::plugin::{ActionId, PluginId};
 
 /// Get a list of all available actions from the plugin registry
 #[tauri::command]

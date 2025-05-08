@@ -4,7 +4,7 @@ use std::{
     path::{Path, PathBuf},
     str::FromStr,
 };
-use tilepad_manifest::plugin::{Manifest as PluginManifest, ManifestBin};
+use tilepad_manifest::plugin::{MBin, PluginManifest};
 use tilepad_manifest::system::{Arch, OperatingSystem};
 use tokio::{
     fs::{create_dir_all, remove_dir_all, remove_file},
@@ -120,9 +120,9 @@ pub async fn install_plugin_requirements(
     };
 
     let node = match binary {
-        ManifestBin::Node { node } => node,
+        MBin::Node { node } => node,
         // Native binary does not need installing
-        ManifestBin::Native { .. } => return Ok(()),
+        MBin::Native { .. } => return Ok(()),
     };
 
     let desired_version = &node.version;

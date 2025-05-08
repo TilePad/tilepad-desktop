@@ -1,6 +1,6 @@
 use anyhow::Context;
 use std::{io::Cursor, path::Path};
-use tilepad_manifest::plugin::Manifest as PluginManifest;
+use tilepad_manifest::plugin::PluginManifest;
 use tokio::io::BufReader;
 
 use crate::utils::zip::{create_zip_reader, extract_zip_file};

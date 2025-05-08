@@ -1,3 +1,7 @@
+use super::{
+    Plugins,
+    protocol::{ClientPluginMessage, ServerPluginMessage},
+};
 use crate::{
     database::entity::tile::UpdateKind,
     tile::Tiles,
@@ -11,15 +15,10 @@ use parking_lot::RwLock;
 use std::{io::ErrorKind, sync::Arc};
 use tauri::async_runtime::{spawn, spawn_blocking};
 use tauri_plugin_opener::open_url;
+use tilepad_manifest::plugin::PluginId;
 use tokio::sync::mpsc;
 use tracing::{Instrument, debug, error};
 use uuid::Uuid;
-
-use super::{
-    Plugins,
-    manifest::PluginId,
-    protocol::{ClientPluginMessage, ServerPluginMessage},
-};
 
 pub type PluginSessionId = Uuid;
 

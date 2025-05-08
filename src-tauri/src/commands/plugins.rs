@@ -8,10 +8,9 @@ use crate::{
         PluginWithState, Plugins,
         install::{install_plugin_requirements, install_plugin_zip, remove_plugin_files},
         loader::{load_plugin_from_path, read_plugin_manifest_zip},
-        manifest::PluginId,
     },
 };
-use tilepad_manifest::plugin::Manifest as PluginManifest;
+use tilepad_manifest::plugin::{PluginId, PluginManifest};
 
 use anyhow::Context;
 use tauri::{State, ipc::InvokeResponseBody};

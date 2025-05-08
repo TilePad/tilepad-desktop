@@ -1,3 +1,7 @@
+use crate::utils::tracing::{PluginSubscriber, create_plugin_logger};
+use garde::rules::AsStr;
+use parking_lot::Mutex;
+use serde::{Serialize, Serializer};
 use std::{
     ffi::OsStr,
     fmt::{self, Debug},
@@ -5,12 +9,7 @@ use std::{
     process::{ExitStatus, Stdio},
     sync::Arc,
 };
-
-use super::manifest::PluginId;
-use crate::utils::tracing::{PluginSubscriber, create_plugin_logger};
-use garde::rules::AsStr;
-use parking_lot::Mutex;
-use serde::{Serialize, Serializer};
+use tilepad_manifest::plugin::PluginId;
 use tokio::{
     fs::create_dir_all,
     io::{AsyncBufReadExt, BufReader},

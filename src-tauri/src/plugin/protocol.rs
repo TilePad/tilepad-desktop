@@ -8,7 +8,7 @@ use crate::{
     events::{DeepLinkContext, InspectorContext, TileInteractionContext},
 };
 
-use super::manifest::PluginId;
+use tilepad_manifest::plugin::PluginId;
 
 /// Plugin message coming from the client side
 #[derive(Debug, Deserialize)]

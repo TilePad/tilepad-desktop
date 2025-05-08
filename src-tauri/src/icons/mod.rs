@@ -8,7 +8,7 @@ use anyhow::Context;
 use loader::load_icon_packs_from_path;
 use parking_lot::RwLock;
 use serde::Serialize;
-use tilepad_manifest::icons::{Icon, IconPackId, Manifest as IconPackManifest};
+use tilepad_manifest::icons::{Icon, IconPackId, IconsManifest as IconPackManifest};
 use uuid::Uuid;
 
 use crate::{

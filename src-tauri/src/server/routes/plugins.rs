@@ -1,5 +1,5 @@
 use crate::{
-    plugin::{Plugins, manifest::PluginId, session::PluginSession},
+    plugin::{Plugins, session::PluginSession},
     server::{
         extractors::enforce_local_socket::EnforceLocalSocket,
         http_content::read_serve_file,
@@ -18,6 +18,7 @@ use mime_guess::mime::{self};
 use reqwest::{StatusCode, header::CONTENT_TYPE};
 use std::{net::SocketAddr, sync::Arc};
 use thiserror::Error;
+use tilepad_manifest::plugin::PluginId;
 
 #[derive(Debug, Error)]
 pub enum PluginError {
