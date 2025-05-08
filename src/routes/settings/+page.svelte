@@ -250,6 +250,8 @@
     flex-flow: column;
     gap: 1rem;
     padding: 1rem;
+    flex: auto;
+    overflow: auto;
   }
 
   .dev-row {
