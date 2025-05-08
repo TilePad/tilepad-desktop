@@ -46,6 +46,10 @@
     updateSettings({ ...settings, developer_mode });
   };
 
+  const onChangeAutoStart = (start_automatically: boolean) => {
+    updateSettings({ ...settings, start_automatically });
+  };
+
   // Update local settings state with remote
   watch(
     () => ({ currentSettings }),
@@ -95,22 +99,43 @@
       </div>
     </div>
 
-    <div class="card">
-      <div class="dev-row">
-        <div class="tile-item">
-          <label class="tile-label" for="developmentMode"
-            >{$t("development_mode")}</label
-          >
-          <p class="tile-description">
-            {$t("development_mode_description")}
-          </p>
-        </div>
+    <div class="row">
+      <div class="card">
+        <div class="dev-row">
+          <div class="tile-item">
+            <label class="tile-label" for="startAutomatically"
+              >{$t("auto_start")}</label
+            >
+            <p class="tile-description">
+              {$t("auto_start_description")}
+            </p>
+          </div>
 
-        <EnabledSwitch
-          id="developmentMode"
-          checked={settings.developer_mode}
-          onCheckedChange={(value) => onChangeDeveloperMode(value)}
-        />
+          <EnabledSwitch
+            id="startAutomatically"
+            checked={settings.start_automatically}
+            onCheckedChange={(value) => onChangeAutoStart(value)}
+          />
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="dev-row">
+          <div class="tile-item">
+            <label class="tile-label" for="developmentMode"
+              >{$t("development_mode")}</label
+            >
+            <p class="tile-description">
+              {$t("development_mode_description")}
+            </p>
+          </div>
+
+          <EnabledSwitch
+            id="developmentMode"
+            checked={settings.developer_mode}
+            onCheckedChange={(value) => onChangeDeveloperMode(value)}
+          />
+        </div>
       </div>
     </div>
 
