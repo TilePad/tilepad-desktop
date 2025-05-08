@@ -1,5 +1,14 @@
 <script module>
   const FOLDER_STORE_KEY = Symbol("FolderStore");
+  const currentFolderKey = "currentFolderId";
+
+  export function getPersistedFolderId() {
+    return localStorage.getItem(currentFolderKey) ?? undefined;
+  }
+
+  function setPersistedFolderId(profileId: string) {
+    localStorage.setItem(currentFolderKey, profileId);
+  }
 
   interface FolderContext {
     folder(): FolderModel;
@@ -28,7 +37,10 @@
 
   import Aside from "../Aside.svelte";
   import SkeletonList from "../skeleton/SkeletonList.svelte";
-  import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
+  import {
+    getProfileContext,
+    getPersistedProfileId,
+  } from "../profiles/ProfilesProvider.svelte";
 
   type Props = {
     children?: Snippet | undefined;
@@ -43,7 +55,7 @@
   const foldersQueryData = $derived($foldersQuery.data);
 
   // State for the actively selected folder
-  let folderId: FolderId | undefined = $state(undefined);
+  let folderId: FolderId | undefined = $state(getPersistedCurrentFolder());
 
   const folderQuery = createFolderQuery(
     () => currentProfile.id,
@@ -54,6 +66,14 @@
 
   const createFolder = createCreateFolderMutation();
 
+  function getPersistedCurrentFolder() {
+    const profile = profileContext.profile();
+    const currentProfileId = getPersistedProfileId();
+    if (currentProfileId === undefined || currentProfileId !== profile.id)
+      return undefined;
+    return getPersistedFolderId();
+  }
+
   function getDefaultFolder(folders: FolderModel[]): FolderModel | undefined {
     return folders.find((profile) => profile.default);
   }
@@ -61,7 +81,10 @@
   setContext(FOLDER_STORE_KEY, {
     folder: () => folder!,
     folderId: () => folderId!,
-    setFolderId: (value: FolderId) => (folderId = value),
+    setFolderId: (value: FolderId) => {
+      folderId = value;
+      setPersistedFolderId(value);
+    },
   });
 
   watch(

@@ -1,5 +1,14 @@
 <script module>
   const PROFILE_STORE_KEY = Symbol("ProfileStore");
+  const currentProfileKey = "currentProfileId";
+
+  export function getPersistedProfileId() {
+    return localStorage.getItem(currentProfileKey) ?? undefined;
+  }
+
+  function setPersistedProfileId(profileId: string) {
+    localStorage.setItem(currentProfileKey, profileId);
+  }
 
   interface ProfileContext {
     profile(): ProfileModel;
@@ -35,7 +44,7 @@
   const { children }: Props = $props();
 
   // State for the actively selected profile
-  let profileId: ProfileId | undefined = $state(undefined);
+  let profileId: ProfileId | undefined = $state(getPersistedProfileId());
 
   const profilesQuery = createProfilesQuery();
   const profilesQueryData = $derived($profilesQuery.data);
@@ -53,7 +62,10 @@
 
   setContext(PROFILE_STORE_KEY, {
     profile: () => profile!,
-    setProfileId: (value: string) => (profileId = value),
+    setProfileId: (value: string) => {
+      profileId = value;
+      setPersistedProfileId(value);
+    },
   });
 
   watch(
