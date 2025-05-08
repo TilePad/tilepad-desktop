@@ -11,7 +11,8 @@ use parking_lot::RwLock;
 use std::{io::ErrorKind, sync::Arc};
 use tauri::async_runtime::{spawn, spawn_blocking};
 use tauri_plugin_opener::open_url;
-use tracing::{debug, error};
+use tokio::sync::mpsc;
+use tracing::{Instrument, debug, error};
 use uuid::Uuid;
 
 use super::{
@@ -51,20 +52,6 @@ impl PluginSession {
         let (ws_future, ws_rx, ws_tx) =
             WebSocketFuture::<ServerPluginMessage, ClientPluginMessage>::new(socket);
 
-        spawn(async move {
-            if let Err(cause) = ws_future.await {
-                // Handle plugin connection lost as just a warning
-                if let Some(cause_io) = try_cast_error::<std::io::Error>(&cause) {
-                    if cause_io.kind() == ErrorKind::ConnectionReset {
-                        tracing::warn!(?cause_io, "plugin connection closed");
-                        return;
-                    }
-                }
-
-                error!(?cause, "error running plugin websocket future");
-            }
-        });
-
         let session = Arc::new(PluginSession {
             id,
             state: Default::default(),
@@ -73,22 +60,50 @@ impl PluginSession {
             tx: ws_tx,
         });
 
-        spawn(async move {
-            // Add the session
-            session.plugins.insert_session(id, session.clone());
+        // Spawn task that handles running the socket
+        spawn(
+            Self::run_socket(ws_future)
+                .instrument(tracing::debug_span!("plugin_socket", plugin_id = ?id)),
+        );
 
-            let mut ws_rx = ws_rx;
+        // Spawn task that handles receiving socket messages
+        spawn(
+            session
+                .handle_socket_message(ws_rx)
+                .instrument(tracing::debug_span!("plugin_handler", plugin_id = ?id)),
+        );
+    }
 
-            // Process messages from the session
-            while let Some(msg) = ws_rx.recv().await {
-                session.handle_message(msg).await;
+    async fn run_socket(ws_future: WebSocketFuture<ServerPluginMessage, ClientPluginMessage>) {
+        if let Err(cause) = ws_future.await {
+            // Handle plugin connection lost as just a warning
+            if let Some(cause_io) = try_cast_error::<std::io::Error>(&cause) {
+                if cause_io.kind() == ErrorKind::ConnectionReset {
+                    tracing::warn!(?cause_io, "plugin connection closed");
+                    return;
+                }
             }
 
-            let plugin_id = session.get_plugin_id();
+            error!(?cause, "error running plugin websocket future");
+        }
+    }
 
-            // Remove the session thats no longer running
-            session.plugins.remove_session(session.id, plugin_id);
-        });
+    async fn handle_socket_message(
+        self: Arc<Self>,
+        mut ws_rx: mpsc::UnboundedReceiver<ClientPluginMessage>,
+    ) {
+        // Add the session
+        self.plugins.insert_session(self.id, self.clone());
+
+        // Process messages from the session
+        while let Some(msg) = ws_rx.recv().await {
+            self.handle_message(msg).await;
+        }
+
+        let plugin_id = self.get_plugin_id();
+
+        // Remove the session thats no longer running
+        self.plugins.remove_session(self.id, plugin_id);
     }
 
     /// Get the current plugin ID

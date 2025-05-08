@@ -5,7 +5,7 @@ use tracing::Level;
 use tracing_appender::non_blocking::WorkerGuard;
 use tracing_subscriber::{
     EnvFilter,
-    fmt::{self, writer::MakeWriterExt},
+    fmt::{self, format::FmtSpan, writer::MakeWriterExt},
     layer::SubscriberExt,
     util::SubscriberInitExt,
 };
@@ -44,22 +44,31 @@ pub fn setup_main_subscriber(logs_path: PathBuf) -> anyhow::Result<WorkerGuard> 
 
     // Write everything to file
     let file_layer = fmt::Layer::default()
+        .with_span_events(FmtSpan::NEW | FmtSpan::CLOSE)
         .with_writer(non_blocking)
         .with_ansi(false) // explicitly disable ANSI colors for file
         .event_format(file_format);
 
     // Write the `ERROR` and `WARN` levels to stderr.
     let stderr_layer = fmt::Layer::default()
+        .with_span_events(FmtSpan::NEW | FmtSpan::CLOSE)
         .with_writer(std::io::stderr.with_max_level(Level::WARN))
         .event_format(console_format.clone());
 
-    // Write `INFO` to `stdout`.
+    // Write `INFO` to `stdout` in production
+    #[cfg(not(debug_assertions))]
+    let stdout_writer = std::io::stdout
+        .with_max_level(Level::INFO)
+        .with_min_level(Level::INFO);
+
+    // Write all debug to `stdout` in development
+    #[cfg(debug_assertions)]
+    let stdout_writer = std::io::stdout
+        .with_max_level(Level::DEBUG)
+        .with_min_level(Level::INFO);
+
     let stdout_layer = fmt::Layer::default()
-        .with_writer(
-            std::io::stdout
-                .with_max_level(Level::INFO)
-                .with_min_level(Level::INFO),
-        )
+        .with_writer(stdout_writer)
         .event_format(console_format);
 
     tracing_subscriber::registry()
