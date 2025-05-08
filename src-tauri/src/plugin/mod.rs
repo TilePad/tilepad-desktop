@@ -5,10 +5,6 @@ use std::{
     sync::Arc,
 };
 
-use action::{Action, ActionCategory, ActionWithCategory, actions_from_manifests};
-use anyhow::Context;
-use garde::rules::AsStr;
-
 use crate::{
     database::{DbPool, JsonObject, entity::plugin_properties::PluginPropertiesModel},
     device::Devices,
@@ -18,6 +14,8 @@ use crate::{
     },
     server::HTTP_PORT,
 };
+use action::{Action, ActionCategory, ActionWithCategory, actions_from_manifests};
+use anyhow::Context;
 use install::get_node_runtime;
 use loader::load_plugins_from_path;
 use manifest::{ActionId, Manifest as PluginManifest, PluginId};
