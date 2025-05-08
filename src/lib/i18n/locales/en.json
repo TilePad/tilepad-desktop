@@ -158,7 +158,7 @@
     "default": "Default",
     "border_color": "Border Color",
     "development_mode": "Developer Mode",
-    "development_mode_description": "Enables additional functionality useful to plugin developers. Such as cli integration and more verbose logging. Restart TilePad to apply",
+    "development_mode_description": "Enables additional functionality useful to plugin developers. Such as cli integration",
     "third_party_licenses_description": "Licenses for third party software included in the making of TilePad",
     "auto_start": "Auto Start",
     "auto_start_description": "Start TilePad automatically when your computer starts. Restart TilePad to apply change",
