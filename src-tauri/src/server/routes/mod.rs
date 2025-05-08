@@ -1,5 +1,9 @@
-use axum::{Router, routing::get};
+use axum::{
+    Router,
+    routing::{get, post},
+};
 
+mod dev;
 mod devices;
 mod fonts;
 mod icons;
@@ -10,7 +14,7 @@ pub fn router() -> Router {
     Router::new()
         .nest(
             "/server",
-            Router::new().route_service("/details", get(server::details)),
+            Router::new().route("/details", get(server::details)),
         )
         .nest(
             "/plugins",
@@ -34,5 +38,9 @@ pub fn router() -> Router {
         .nest(
             "/fonts",
             Router::new().route("/{family}", get(fonts::get_font_file)),
+        )
+        .nest(
+            "/dev",
+            Router::new().route("/reload_plugins", post(dev::reload_plugins)),
         )
 }

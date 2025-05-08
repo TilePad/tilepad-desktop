@@ -116,6 +116,14 @@ impl Plugins {
         self.runtimes_path.clone()
     }
 
+    // Unload all currently loaded plugins
+    pub async fn unload_all(&self) {
+        let plugin_ids: Vec<PluginId> = { self.plugins.read().keys().cloned().collect() };
+        for plugin_id in plugin_ids {
+            self.unload_plugin(&plugin_id).await;
+        }
+    }
+
     /// Loads all icon packs from the default icon pack paths
     pub async fn load_defaults(self: &Arc<Self>) {
         // Load from the core plugins directory
