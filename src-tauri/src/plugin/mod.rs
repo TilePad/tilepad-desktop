@@ -7,6 +7,7 @@ use std::{
 
 use action::{Action, ActionCategory, ActionWithCategory, actions_from_manifests};
 use anyhow::Context;
+use garde::rules::AsStr;
 
 use crate::{
     database::{DbPool, JsonObject, entity::plugin_properties::PluginPropertiesModel},
@@ -135,7 +136,18 @@ impl Plugins {
             }
         };
 
-        tracing::debug!(?plugins, "loaded plugins");
+        let plugin_summary: Vec<(&str, &str, String)> = plugins
+            .iter()
+            .map(|plugin| {
+                (
+                    plugin.manifest.plugin.id.as_str(),
+                    plugin.manifest.plugin.name.as_str(),
+                    plugin.path.as_os_str().to_string_lossy().to_string(),
+                )
+            })
+            .collect();
+
+        tracing::debug!(plugins = ?plugin_summary, "loaded plugin files");
 
         self.load_plugins(plugins).await;
     }
@@ -469,7 +481,7 @@ impl Plugins {
 
     #[tracing::instrument(
         name = "start_plugin_task", 
-        skip(self, manifest), 
+        skip(self, manifest),
         fields(
             manifest.plugin_id = ?manifest.plugin.id,
             manifest.bin = ?manifest.bin,
