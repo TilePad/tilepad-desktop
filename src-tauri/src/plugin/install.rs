@@ -4,7 +4,8 @@ use std::{
     path::{Path, PathBuf},
     str::FromStr,
 };
-use tilepad_manifest::plugin::{Arch, Manifest as PluginManifest, ManifestBin, OperatingSystem};
+use tilepad_manifest::plugin::{Manifest as PluginManifest, ManifestBin};
+use tilepad_manifest::system::{Arch, OperatingSystem};
 use tokio::{
     fs::{create_dir_all, remove_dir_all, remove_file},
     io::BufReader,

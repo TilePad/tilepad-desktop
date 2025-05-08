@@ -1,12 +1,11 @@
 use crate::utils::{file::move_directory, zip::extract_zip};
 
-use crate::plugin::manifest::Arch;
 use anyhow::{Context, ensure};
 use async_zip::tokio::read::seek::ZipFileReader;
 use serde::Deserialize;
 use std::path::Path;
 use tempfile::{env::temp_dir, tempfile};
-use tilepad_manifest::plugin::OperatingSystem;
+use tilepad_manifest::system::{Arch, OperatingSystem};
 use tokio::{
     fs::create_dir_all,
     io::{AsyncWriteExt, BufReader},
@@ -134,12 +133,10 @@ pub async fn download_node<P: AsRef<Path>>(
 
 #[cfg(test)]
 mod test {
-    use std::path::Path;
-
+    use crate::plugin::node::download_node;
     use node_semver::Version;
-    use tilepad_manifest::plugin::OperatingSystem;
-
-    use crate::plugin::{manifest::Arch, node::download_node};
+    use std::path::Path;
+    use tilepad_manifest::system::{Arch, OperatingSystem};
 
     #[tokio::test]
     #[ignore = "Downloads a runtime to the local file system"]
