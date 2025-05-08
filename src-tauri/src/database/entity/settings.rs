@@ -18,6 +18,7 @@ pub struct SettingsConfig {
     pub language: String,
     pub start_automatically: bool,
     pub device_name: String,
+    pub developer_mode: bool,
 }
 
 impl Default for SettingsConfig {
@@ -28,6 +29,7 @@ impl Default for SettingsConfig {
             language: "en".to_string(),
             start_automatically: false,
             device_name,
+            developer_mode: false,
         }
     }
 }

@@ -6,10 +6,12 @@
   import { createSetSettingsMutation } from "$lib/api/settings";
   import TextInput from "$lib/components/input/TextInput.svelte";
   import CreatorSection from "$lib/components/CreatorSection.svelte";
+  import EnabledSwitch from "$lib/components/input/EnabledSwitch.svelte";
   import LanguageSelector from "$lib/components/i18n/LanguageSelector.svelte";
   import { getSettingsContext } from "$lib/components/SettingsProvider.svelte";
   import LicensesDialog from "$lib/components/liceneses/LicensesDialog.svelte";
   import SolarDocumentAddBoldDuotone from "~icons/solar/document-add-bold-duotone";
+
   const settingsContext = getSettingsContext();
   const currentSettings = $derived.by(settingsContext.settings);
   const setSettings = createSetSettingsMutation();
@@ -40,6 +42,10 @@
     updateSettings({ ...settings, language });
   };
 
+  const onChangeDeveloperMode = (developer_mode: boolean) => {
+    updateSettings({ ...settings, developer_mode });
+  };
+
   // Update local settings state with remote
   watch(
     () => ({ currentSettings }),
@@ -57,37 +63,74 @@
   <div class="header">
     <h2>{$t("settings")}</h2>
 
-    <div class="actions">
-      <LicensesDialog
-        buttonLabel={{
-          text: $t("third_party_licenses"),
-          icon: SolarDocumentAddBoldDuotone,
-        }}
-      />
-    </div>
+    <div class="actions"></div>
   </div>
 
   <div class="settings">
-    <div class="tile-item">
-      <label class="tile-label" for="language">{$t("language")}</label>
-      <LanguageSelector
-        value={settings.language}
-        onChangeValue={(value) => onChangeLanguage(value)}
-      />
-      <p class="tile-description">{$t("language_description")}</p>
+    <div class="row">
+      <div class="card">
+        <div class="tile-item">
+          <label class="tile-label" for="language">{$t("language")}</label>
+          <LanguageSelector
+            value={settings.language}
+            onChangeValue={(value) => onChangeLanguage(value)}
+          />
+          <p class="tile-description">{$t("language_description")}</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="tile-item">
+          <label class="tile-label" for="deviceName">{$t("device_name")}</label>
+          <TextInput
+            style="width: 100%"
+            id="deviceName"
+            value={settings.device_name}
+            onchange={(event) => onChangeDeviceName(event.currentTarget.value)}
+          />
+          <p class="tile-description">
+            {$t("device_name_description")}
+          </p>
+        </div>
+      </div>
     </div>
 
-    <div class="tile-item">
-      <label class="tile-label" for="deviceName">{$t("device_name")}</label>
-      <TextInput
-        style="width: 100%"
-        id="deviceName"
-        value={settings.device_name}
-        onchange={(event) => onChangeDeviceName(event.currentTarget.value)}
-      />
-      <p class="tile-description">
-        {$t("device_name_description")}
-      </p>
+    <div class="card">
+      <div class="dev-row">
+        <div class="tile-item">
+          <label class="tile-label" for="developmentMode"
+            >{$t("development_mode")}</label
+          >
+          <p class="tile-description">
+            {$t("development_mode_description")}
+          </p>
+        </div>
+
+        <EnabledSwitch
+          id="developmentMode"
+          checked={settings.developer_mode}
+          onCheckedChange={(value) => onChangeDeveloperMode(value)}
+        />
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="dev-row">
+        <div class="tile-item">
+          <label class="tile-label" for="third_party_licenses">
+            {$t("third_party_licenses")}
+          </label>
+          <p class="tile-description">
+            {$t("third_party_licenses_description")}
+          </p>
+        </div>
+        <LicensesDialog
+          buttonLabel={{
+            text: $t("third_party_licenses"),
+            icon: SolarDocumentAddBoldDuotone,
+          }}
+        />
+      </div>
     </div>
 
     <CreatorSection />
@@ -137,7 +180,32 @@
   .settings {
     display: flex;
     flex-flow: column;
-    gap: 0.5rem;
+    gap: 1rem;
     padding: 1rem;
+  }
+
+  .dev-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+    padding-right: 1rem;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .card {
+    display: flex;
+    flex-flow: column;
+    gap: 0.5rem;
+
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    background-color: #2f2c36;
   }
 </style>
