@@ -142,6 +142,7 @@ mod test {
     use crate::plugin::{manifest::Arch, node::download_node};
 
     #[tokio::test]
+    #[ignore = "Downloads a runtime to the local file system"]
     async fn test_download_latest() {
         let client = reqwest::Client::new();
         let path = Path::new("runtimes/22.13.1");
