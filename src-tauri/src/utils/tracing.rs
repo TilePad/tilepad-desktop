@@ -110,6 +110,7 @@ pub fn create_plugin_logger(logs_path: PathBuf) -> anyhow::Result<(PluginSubscri
         .with_thread_ids(false)
         .with_target(false)
         .with_ansi(false)
+        .with_level(false)
         .compact();
 
     // Write everything to file
