@@ -18,7 +18,9 @@ export type TilepadLabel = Partial<{
   bold: boolean;
   italic: boolean;
   underline: boolean;
+  outline: boolean;
   color: string;
+  outline_color: string;
 }>;
 
 export type TilepadIcon =

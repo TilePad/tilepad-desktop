@@ -114,7 +114,6 @@ pub fn create_plugin_logger(logs_path: PathBuf) -> anyhow::Result<(PluginSubscri
         .compact();
 
     // Write everything to file
-
     let subscriber = tracing_subscriber::fmt()
         .with_env_filter(filter)
         .with_writer(non_blocking)
