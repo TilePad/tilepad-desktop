@@ -98,14 +98,14 @@ where
         None => return Ok(None),
     };
 
-    // Create a reader for the manifest file
+    // Create a reader for the file
     let mut file_reader = zip
         .reader_without_entry(file_index)
         .await
         .context("failed to read file from zip")?
         .compat();
 
-    // Read the manifest file
+    // Read the file
     let mut data = Vec::new();
     tokio::io::copy(&mut file_reader, &mut data)
         .await

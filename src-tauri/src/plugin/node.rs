@@ -82,7 +82,7 @@ pub async fn download_node<P: AsRef<Path>>(
         .get(url)
         .send()
         .await
-        .context("failed to reqeust download url")?;
+        .context("failed to request download url")?;
 
     let mut res = res
         .error_for_status()
