@@ -4,6 +4,7 @@
     transparent?: boolean;
     children?: Snippet;
     size?: ButtonSize;
+    loading?: boolean;
   } & HTMLButtonAttributes;
 
   export type ButtonSize = "default" | "small";
@@ -18,6 +19,8 @@
     transparent,
     size = "default",
     children,
+    loading,
+    disabled,
     ...props
   }: ButtonProps = $props();
 </script>
@@ -25,11 +28,17 @@
 <button
   type="button"
   {...props}
+  disabled={disabled || loading}
   class="btn {props.class}"
   class:btn--transparent={transparent}
+  class:btn--loading={loading}
   data-size={size}
   data-variant={variant}
 >
+  {#if loading}
+    <span class="loading-spinner"></span>
+  {/if}
+
   {@render children?.()}
 </button>
 
@@ -46,6 +55,7 @@
     cursor: pointer;
     font-size: 1em;
     text-decoration: none;
+    position: relative;
   }
 
   .btn[data-size="small"] {
@@ -79,15 +89,54 @@
 
   .btn:disabled,
   .btn:disabled:hover {
-    background-color: #222;
+    background-color: #3e3946;
     border: 1px solid #333;
     cursor: not-allowed;
-    color: #777;
+    color: #b3b3b3;
   }
 
   .btn--transparent {
     background-color: transparent !important;
     color: #ffffff;
     border-color: transparent !important;
+  }
+
+  .btn--loading {
+    position: relative;
+    padding-left: 40px !important;
+  }
+
+  .btn--loading.btn[data-size="small"] {
+    padding-left: 35px !important;
+  }
+
+  .btn--loading.btn[data-size="small"] .loading-spinner {
+    left: 10px;
+    width: 15px;
+    height: 15px;
+  }
+
+  .btn--loading .loading-spinner {
+    display: inline-block;
+  }
+
+  .loading-spinner {
+    display: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #777;
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  @keyframes spin {
+    to {
+      transform: translateY(-50%) rotate(360deg);
+    }
   }
 </style>
