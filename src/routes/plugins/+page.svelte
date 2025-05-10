@@ -157,7 +157,10 @@
   .plugins {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(400px, max(200px, 100%)), 1fr)
+    );
     gap: 1rem;
     padding: 1rem;
   }
