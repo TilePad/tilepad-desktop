@@ -145,6 +145,8 @@
     "approve": "Aprobar",
     "actions": "Acciones",
     "cancel": "Cancelar",
+    "settings_error": "Error al cargar la configuración: {error}",
+    "select_language": "Seleccionar idioma",
     "auto": "Auto",
     "auto_generated": "Generado automáticamente",
     "language": "Idioma",

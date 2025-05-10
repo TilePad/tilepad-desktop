@@ -3,7 +3,7 @@ import fs from "node:fs";
 // Load the two translation files
 const baseFile = JSON.parse(fs.readFileSync('src/lib/i18n/locales/en.json', 'utf8'));
 
-const languages = ['de', 'es', 'fr']
+const languages = ['cs', 'de', 'es', 'fr']
 
 /**
  * Recursively find missing keys in an object 

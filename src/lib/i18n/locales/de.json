@@ -145,6 +145,8 @@
     "approve": "Genehmigen",
     "actions": "Aktionen",
     "cancel": "Abbrechen",
+    "settings_error": "Einstellungen konnten nicht geladen werden: {error}",
+    "select_language": "Sprache auswählen",
     "auto": "Auto",
     "auto_generated": "Automatisch generiert",
     "language": "Sprache",

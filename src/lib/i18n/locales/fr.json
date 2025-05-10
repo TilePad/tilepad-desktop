@@ -145,6 +145,8 @@
     "approve": "Approuver",
     "actions": "Actions",
     "cancel": "Annuler",
+    "settings_error": "Échec du chargement des paramètres : {error}",
+    "select_language": "Choisir la langue",
     "auto": "Auto",
     "auto_generated": "Généré automatiquement",
     "language": "Langue",
