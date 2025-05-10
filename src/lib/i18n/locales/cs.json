@@ -153,5 +153,22 @@
     "device_name": "Název zařízení",
     "device_name_description": "Tento název zařízení je viditelný pro ostatní zařízení při pokusu o připojení k tomuto zařízení",
     "created_by": "Vytvořil",
-    "third_party_licenses": "Licence třetích stran"
+    "third_party_licenses": "Licence třetích stran",
+    "default": "Výchozí",
+    "border_color": "Barva okraje",
+    "development_mode": "Režim vývojáře",
+    "development_mode_description": "Povoluje další funkce užitečné pro vývoj pluginů. Například integraci s CLI",
+    "third_party_licenses_description": "Licence pro software třetích stran použitý při tvorbě TilePad",
+    "auto_start": "Automatické spuštění",
+    "auto_start_description": "Spustit TilePad automaticky při startu počítače. Pro změnu restartujte TilePad",
+    "minimize_tray": "Minimalizovat do panelu",
+    "minimize_tray_description": "Minimalizovat do systémového panelu místo ukončení TilePad",
+    "start_minimized": "Automatické spuštění minimalizováno",
+    "start_minimized_description": "Při automatickém spuštění začít minimalizováno do panelu místo okamžitého otevření okna",
+    "update": "Aktualizace",
+    "plugin_updating": "Aktualizace pluginu",
+    "plugin_updated": "Plugin aktualizován",
+    "plugin_update_error": "Nepodařilo se aktualizovat plugin",
+    "updates_found_count": "{count, plural, =0 {Žádné dostupné aktualizace.} one {{count, number} dostupná aktualizace.} other {{count, number} dostupných aktualizací.}}",
+    "installing": "Instaluje se"
 }
