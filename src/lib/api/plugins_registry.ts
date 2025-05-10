@@ -1,12 +1,12 @@
 import { invoke } from "@tauri-apps/api/core";
 import { createQuery, createMutation } from "@tanstack/svelte-query";
 
-import type { PluginManifest } from "./types/plugin";
+import type { PluginId, PluginManifest } from "./types/plugin";
 import type { PluginRegistryEntry } from "./types/plugins_registry";
 
 import { queryClient } from "./client";
 import { runeStore } from "./utils/svelte.svelte";
-import { installPluginBuffer as installPluginBuffer } from "./plugins";
+import { uninstallPlugin, installPluginBuffer } from "./plugins";
 
 export const pluginRegistryKey = {
   root: ["plugin-registry"],
@@ -130,6 +130,29 @@ export function createInstallPluginFromRegistry() {
       version: string;
     }) => {
       const bundle = await getPluginBundle(repo, version);
+      await installPluginBuffer(bundle);
+    },
+  });
+}
+
+export function createUpdatePlugin() {
+  return createMutation({
+    mutationFn: async ({
+      repo,
+      version,
+      pluginId,
+    }: {
+      repo: string;
+      version: string;
+      pluginId: PluginId;
+    }) => {
+      // Download the new bundle
+      const bundle = await getPluginBundle(repo, version);
+
+      // Uninstall the current plugin
+      await uninstallPlugin(pluginId);
+
+      // Install the new version
       await installPluginBuffer(bundle);
     },
   });

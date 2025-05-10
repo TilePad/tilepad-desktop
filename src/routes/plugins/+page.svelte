@@ -2,6 +2,7 @@
   import type { PluginWithState } from "$lib/api/types/plugin";
 
   import { t } from "svelte-i18n";
+  import { toast } from "svelte-sonner";
   import Aside from "$lib/components/Aside.svelte";
   import { compare as semverCompare } from "semver-ts";
   import { createPluginsQuery } from "$lib/api/plugins";
@@ -64,6 +65,10 @@
         }
       }
 
+      toast.success(
+        $t("updates_found_count", { values: { count: updates.length } }),
+      );
+
       return updates;
     },
   });
@@ -86,7 +91,7 @@
           onclick={() => {
             $checkUpdatesMutation.mutate({ plugins: $pluginsQuery.data });
           }}
-          disabled={$checkUpdatesMutation.isPending}
+          loading={$checkUpdatesMutation.isPending}
         >
           Check for updates
         </Button>

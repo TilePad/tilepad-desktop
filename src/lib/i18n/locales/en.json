@@ -169,5 +169,7 @@
     "update": "Update",
     "plugin_updating": "Updating plugin",
     "plugin_updated": "Updated plugin",
-    "plugin_update_error": "Failed to update plugin"
+    "plugin_update_error": "Failed to update plugin",
+    "updates_found_count": "{count, plural, =0 {No available updates.} one {{count, number} update available.} other {{count, number} updates available.}}",
+    "installing": "Installing"
 }

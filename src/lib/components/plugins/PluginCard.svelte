@@ -5,13 +5,9 @@
   import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { toastErrorMessage } from "$lib/api/utils/error";
-  import { getPluginBundle } from "$lib/api/plugins_registry";
   import SolarRefreshLinear from "~icons/solar/refresh-linear";
-  import {
-    reloadPlugin,
-    uninstallPlugin,
-    installPluginBuffer,
-  } from "$lib/api/plugins";
+  import { createUpdatePlugin } from "$lib/api/plugins_registry";
+  import { reloadPlugin, createUninstallPlugin } from "$lib/api/plugins";
 
   import Button from "../input/Button.svelte";
 
@@ -26,6 +22,9 @@
   const { plugin, latestManifest }: Props = $props();
   const { manifest, state } = plugin;
 
+  const uninstall = createUninstallPlugin();
+  const update = createUpdatePlugin();
+
   function handleReload() {
     const reloadPromise = reloadPlugin(manifest.plugin.id);
 
@@ -37,7 +36,9 @@
   }
 
   function handleUninstall() {
-    const uninstallPromise = uninstallPlugin(manifest.plugin.id);
+    const uninstallPromise = $uninstall.mutateAsync({
+      pluginId: manifest.plugin.id,
+    });
 
     toast.promise(uninstallPromise, {
       loading: $t("plugin_uninstalling"),
@@ -49,32 +50,16 @@
   async function handleUpdate() {
     if (!latestManifest) return;
 
-    const updatePromise = update(
-      latestManifest.manifest,
-      latestManifest.remotePlugin,
-    );
+    const updatePromise = $update.mutateAsync({
+      repo: latestManifest.remotePlugin.repo,
+      version: latestManifest.manifest.plugin.version,
+      pluginId: latestManifest.manifest.plugin.id,
+    });
     toast.promise(updatePromise, {
       loading: $t("plugin_updating"),
       success: $t("plugin_updated"),
       error: toastErrorMessage($t("plugin_update_error")),
     });
-  }
-
-  async function update(
-    manifest: PluginManifest,
-    remotePlugin: PluginRegistryEntry,
-  ) {
-    // Download the new bundle
-    const bundle = await getPluginBundle(
-      remotePlugin.repo,
-      manifest.plugin.version,
-    );
-
-    // Uninstall the current plugin
-    await uninstallPlugin(manifest.plugin.id);
-
-    // Install the new version
-    await installPluginBuffer(bundle);
   }
 </script>
 
@@ -107,13 +92,23 @@
 
   <div class="plugin__actions">
     {#if latestManifest}
-      <Button size="small" onclick={handleUpdate}>
+      <Button
+        size="small"
+        onclick={handleUpdate}
+        loading={$update.isPending}
+        disabled={$uninstall.isPending}
+      >
         {$t("update")}
       </Button>
     {/if}
 
     {#if !plugin.manifest.plugin.internal}
-      <Button size="small" onclick={handleUninstall}>
+      <Button
+        size="small"
+        onclick={handleUninstall}
+        loading={$uninstall.isPending}
+        disabled={$update.isPending}
+      >
         {$t("uninstall")}
       </Button>
     {/if}

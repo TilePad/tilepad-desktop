@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import { createQuery } from "@tanstack/svelte-query";
+import { createQuery, createMutation } from "@tanstack/svelte-query";
 
 import type {
   PluginId,
@@ -124,6 +124,15 @@ export function createPluginsQuery() {
   return createQuery({
     queryKey: pluginsKey.list,
     queryFn: getPluginsWithState,
+  });
+}
+
+// [MUTATIONS] ------------------------------------------------------
+
+export function createUninstallPlugin() {
+  return createMutation({
+    mutationFn: ({ pluginId }: { pluginId: PluginId }) =>
+      uninstallPlugin(pluginId),
   });
 }
 

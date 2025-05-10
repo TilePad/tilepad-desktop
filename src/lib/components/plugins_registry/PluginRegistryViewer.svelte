@@ -5,11 +5,11 @@
   import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { compare as semverCompare } from "semver-ts";
+  import { createUninstallPlugin } from "$lib/api/plugins";
   import { replaceMarkdownRelativeUrls } from "$lib/utils/markdown";
-  import { uninstallPlugin, installPluginBuffer } from "$lib/api/plugins";
   import { getErrorMessage, toastErrorMessage } from "$lib/api/utils/error";
   import {
-    getPluginBundle,
+    createUpdatePlugin,
     createPluginReadmeQuery,
     createPluginManifestQuery,
     createInstallPluginFromRegistry,
@@ -31,6 +31,8 @@
   const readmeQuery = createPluginReadmeQuery(() => item.repo);
 
   const install = createInstallPluginFromRegistry();
+  const uninstall = createUninstallPlugin();
+  const update = createUpdatePlugin();
 
   async function onInstall() {
     const manifest = $manifestQuery.data;
@@ -52,7 +54,7 @@
   }
 
   function handleUninstall() {
-    const revokePromise = uninstallPlugin(item.id);
+    const revokePromise = $uninstall.mutateAsync({ pluginId: item.id });
 
     toast.promise(revokePromise, {
       loading: $t("plugin_uninstalling"),
@@ -65,29 +67,17 @@
     manifest: PluginManifest,
     remotePlugin: PluginRegistryEntry,
   ) {
-    const updatePromise = update(manifest, remotePlugin);
+    const updatePromise = $update.mutateAsync({
+      repo: remotePlugin.repo,
+      version: manifest.plugin.version,
+      pluginId: manifest.plugin.id,
+    });
+
     toast.promise(updatePromise, {
       loading: $t("plugin_updating"),
       success: $t("plugin_updated"),
       error: toastErrorMessage($t("plugin_update_error")),
     });
-  }
-
-  async function update(
-    manifest: PluginManifest,
-    remotePlugin: PluginRegistryEntry,
-  ) {
-    // Download the new bundle
-    const bundle = await getPluginBundle(
-      remotePlugin.repo,
-      manifest.plugin.version,
-    );
-
-    // Uninstall the current plugin
-    await uninstallPlugin(manifest.plugin.id);
-
-    // Install the new version
-    await installPluginBuffer(bundle);
   }
 </script>
 
@@ -117,16 +107,24 @@
       {#if installed}
         <div class="actions">
           {#if semverCompare($manifestQuery.data.plugin.version, installed.plugin.version) === 1}
-            <Button onclick={() => handleUpdate($manifestQuery.data, item)}>
+            <Button
+              onclick={() => handleUpdate($manifestQuery.data, item)}
+              loading={$update.isPending}
+              disabled={$uninstall.isPaused}
+            >
               {$t("update")}
             </Button>
           {/if}
 
-          <Button onclick={handleUninstall}>{$t("uninstall")}</Button>
+          <Button
+            onclick={handleUninstall}
+            loading={$uninstall.isPending}
+            disabled={$update.isPending}>{$t("uninstall")}</Button
+          >
         </div>
       {:else}
-        <Button disabled={$install.isPending} onclick={onInstall}>
-          {$t("install")}
+        <Button loading={$install.isPending} onclick={onInstall}>
+          {$install.isPending ? $t("installing") : $t("install")}
         </Button>
       {/if}
     {/if}
