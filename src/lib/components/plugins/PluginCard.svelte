@@ -10,6 +10,7 @@
   import { reloadPlugin, createUninstallPlugin } from "$lib/api/plugins";
 
   import Button from "../input/Button.svelte";
+  import { getSettingsContext } from "../SettingsProvider.svelte";
 
   type Props = {
     plugin: PluginWithState;
@@ -21,6 +22,9 @@
 
   const { plugin, latestManifest }: Props = $props();
   const { manifest, state } = plugin;
+
+  const settingsContext = getSettingsContext();
+  const settings = $derived.by(settingsContext.settings);
 
   const uninstall = createUninstallPlugin();
   const update = createUpdatePlugin();
@@ -75,22 +79,36 @@
       {/if}
     </span>
 
-    <div class="plugin__actions">
-      <Button title={$t("Reload")} size="small" onclick={handleReload}>
-        <SolarRefreshLinear />
-      </Button>
-    </div>
+    <div class="plugin__actions"></div>
   </div>
-
-  <span class="state">{state}</span>
 
   <h2 class="plugin__name">
     {manifest.plugin.name}
   </h2>
 
-  <p class="plugin__description">{manifest.plugin.description}</p>
+  {#if manifest.plugin.authors.length > 0}
+    <span class="authors">
+      By {#each manifest.plugin.authors as author}
+        {author}
+      {/each}
+    </span>
+  {/if}
+
+  <p class="plugin__description">
+    {manifest.plugin.description}.
+  </p>
+
+  {#if settings.developer_mode && !manifest.plugin.internal}
+    <span class="state">{state}</span>
+  {/if}
 
   <div class="plugin__actions">
+    {#if settings.developer_mode}
+      <Button title={$t("Reload")} size="small" onclick={handleReload}>
+        <SolarRefreshLinear />
+      </Button>
+    {/if}
+
     {#if latestManifest}
       <Button
         size="small"
@@ -138,6 +156,7 @@
   .plugin__description {
     color: #ccc;
     font-size: 0.8rem;
+    max-width: 100%;
   }
 
   .plugin__version {
@@ -156,6 +175,8 @@
 
   .plugin__name {
     font-size: 1.2rem;
+    margin-bottom: 0;
+    line-height: 1;
   }
 
   .plugin__actions {
@@ -168,6 +189,11 @@
     gap: 0.5rem;
     font-size: 0.8rem;
     vertical-align: middle;
+    color: #999;
+  }
+
+  .authors {
+    font-size: 0.9rem;
     color: #999;
   }
 </style>
