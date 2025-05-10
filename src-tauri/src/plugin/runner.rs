@@ -144,7 +144,7 @@ where
 }
 
 #[tracing::instrument]
-pub async fn spawn_node_task<S>(options: NodeTaskOptions<S>)
+pub fn spawn_node_task<S>(options: NodeTaskOptions<S>)
 where
     S: TaskStateHolder,
 {

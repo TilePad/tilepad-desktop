@@ -575,7 +575,7 @@ impl Plugins {
             task: task_options,
         };
 
-        runner::spawn_node_task(options).await;
+        runner::spawn_node_task(options);
     }
 
     #[tracing::instrument]
