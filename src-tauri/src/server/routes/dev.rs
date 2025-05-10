@@ -6,7 +6,10 @@ use thiserror::Error;
 use crate::{
     database::{DbErr, DbPool, entity::settings::SettingsModel},
     plugin::Plugins,
-    server::models::error::{DynHttpError, HttpError},
+    server::{
+        extractors::enforce_local_socket::EnforceLocalSocket,
+        models::error::{DynHttpError, HttpError},
+    },
 };
 
 #[derive(Debug, Error)]
@@ -23,6 +26,7 @@ pub enum DevError {
 ///
 /// Reloads all the plugins that are currently loaded
 pub async fn reload_plugins(
+    _: EnforceLocalSocket,
     Extension(db): Extension<DbPool>,
     Extension(plugins): Extension<Arc<Plugins>>,
 ) -> Result<StatusCode, DynHttpError> {
