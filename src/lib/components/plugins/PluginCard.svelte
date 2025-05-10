@@ -88,9 +88,7 @@
 
   {#if manifest.plugin.authors.length > 0}
     <span class="authors">
-      By {#each manifest.plugin.authors as author}
-        {author}
-      {/each}
+      By {manifest.plugin.authors.join(", ")}
     </span>
   {/if}
 
