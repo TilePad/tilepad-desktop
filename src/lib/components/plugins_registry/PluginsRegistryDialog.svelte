@@ -109,7 +109,7 @@
                 item={active}
                 installed={$pluginsQuery.data.find(
                   (plugin) => plugin.manifest.plugin.id === active!.id,
-                ) !== undefined}
+                )?.manifest}
               />
             {/if}
           </div>

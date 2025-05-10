@@ -1,25 +1,35 @@
-<!-- Card for a known device -->
 <script lang="ts">
-  import type { PluginWithState } from "$lib/api/types/plugin";
+  import type { PluginRegistryEntry } from "$lib/api/types/plugins_registry";
+  import type { PluginManifest, PluginWithState } from "$lib/api/types/plugin";
 
   import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { toastErrorMessage } from "$lib/api/utils/error";
+  import { getPluginBundle } from "$lib/api/plugins_registry";
   import SolarRefreshLinear from "~icons/solar/refresh-linear";
-  import { reloadPlugin, uninstallPlugin } from "$lib/api/plugins";
+  import {
+    reloadPlugin,
+    uninstallPlugin,
+    installPluginBuffer,
+  } from "$lib/api/plugins";
 
   import Button from "../input/Button.svelte";
+
   type Props = {
     plugin: PluginWithState;
+    latestManifest?: {
+      manifest: PluginManifest;
+      remotePlugin: PluginRegistryEntry;
+    };
   };
 
-  const { plugin }: Props = $props();
+  const { plugin, latestManifest }: Props = $props();
   const { manifest, state } = plugin;
 
   function handleReload() {
-    const revokePromise = reloadPlugin(manifest.plugin.id);
+    const reloadPromise = reloadPlugin(manifest.plugin.id);
 
-    toast.promise(revokePromise, {
+    toast.promise(reloadPromise, {
       loading: $t("plugin_reloading"),
       success: $t("plugin_reloaded"),
       error: toastErrorMessage($t("plugin_reload_error")),
@@ -27,40 +37,87 @@
   }
 
   function handleUninstall() {
-    const revokePromise = uninstallPlugin(manifest.plugin.id);
+    const uninstallPromise = uninstallPlugin(manifest.plugin.id);
 
-    toast.promise(revokePromise, {
+    toast.promise(uninstallPromise, {
       loading: $t("plugin_uninstalling"),
       success: $t("plugin_uninstalled"),
       error: toastErrorMessage($t("plugin_uninstall_error")),
     });
+  }
+
+  async function handleUpdate() {
+    if (!latestManifest) return;
+
+    const updatePromise = update(
+      latestManifest.manifest,
+      latestManifest.remotePlugin,
+    );
+    toast.promise(updatePromise, {
+      loading: $t("plugin_updating"),
+      success: $t("plugin_updated"),
+      error: toastErrorMessage($t("plugin_update_error")),
+    });
+  }
+
+  async function update(
+    manifest: PluginManifest,
+    remotePlugin: PluginRegistryEntry,
+  ) {
+    // Download the new bundle
+    const bundle = await getPluginBundle(
+      remotePlugin.repo,
+      manifest.plugin.version,
+    );
+
+    // Uninstall the current plugin
+    await uninstallPlugin(manifest.plugin.id);
+
+    // Install the new version
+    await installPluginBuffer(bundle);
   }
 </script>
 
 <div class="plugin">
   <div class="top">
     <span class="plugin__version">
-      {manifest.plugin.version} - <span class="state">{state}</span>
+      {manifest.plugin.version}
+
+      {#if latestManifest}
+        <span class="new-version">
+          New: {latestManifest.manifest.plugin.version}
+        </span>
+      {/if}
     </span>
 
     <div class="plugin__actions">
       <Button title={$t("Reload")} size="small" onclick={handleReload}>
         <SolarRefreshLinear />
       </Button>
-
-      {#if !plugin.manifest.plugin.internal}
-        <Button size="small" onclick={handleUninstall}>
-          {$t("uninstall")}
-        </Button>
-      {/if}
     </div>
   </div>
+
+  <span class="state">{state}</span>
 
   <h2 class="plugin__name">
     {manifest.plugin.name}
   </h2>
 
   <p class="plugin__description">{manifest.plugin.description}</p>
+
+  <div class="plugin__actions">
+    {#if latestManifest}
+      <Button size="small" onclick={handleUpdate}>
+        {$t("update")}
+      </Button>
+    {/if}
+
+    {#if !plugin.manifest.plugin.internal}
+      <Button size="small" onclick={handleUninstall}>
+        {$t("uninstall")}
+      </Button>
+    {/if}
+  </div>
 </div>
 
 <style>
@@ -91,6 +148,15 @@
   .plugin__version {
     color: #ccc;
     font-size: 0.8rem;
+  }
+
+  .new-version {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background-color: #6d5c92;
+    margin-left: 0.5rem;
+    color: #fff;
+    border-radius: 0.5rem;
   }
 
   .plugin__name {

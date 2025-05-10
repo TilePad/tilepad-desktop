@@ -31,6 +31,7 @@
     "isomorphic-dompurify": "^2.23.0",
     "marked": "^15.0.8",
     "runed": "^0.23.4",
+    "semver-ts": "^1.0.3",
     "svelte-awesome-color-picker": "^3.1.4",
     "svelte-i18n": "^4.0.1",
     "svelte-sonner": "^0.3.28"

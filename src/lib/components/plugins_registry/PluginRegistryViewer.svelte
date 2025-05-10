@@ -1,12 +1,15 @@
 <script lang="ts">
+  import type { PluginManifest } from "$lib/api/types/plugin";
   import type { PluginRegistryEntry } from "$lib/api/types/plugins_registry";
 
   import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
-  import { uninstallPlugin } from "$lib/api/plugins";
+  import { compare as semverCompare } from "semver-ts";
   import { replaceMarkdownRelativeUrls } from "$lib/utils/markdown";
+  import { uninstallPlugin, installPluginBuffer } from "$lib/api/plugins";
   import { getErrorMessage, toastErrorMessage } from "$lib/api/utils/error";
   import {
+    getPluginBundle,
     createPluginReadmeQuery,
     createPluginManifestQuery,
     createInstallPluginFromRegistry,
@@ -19,7 +22,7 @@
 
   type Props = {
     item: PluginRegistryEntry;
-    installed: boolean;
+    installed?: PluginManifest;
   };
 
   const { item, installed }: Props = $props();
@@ -57,6 +60,35 @@
       error: toastErrorMessage($t("plugin_uninstall_error")),
     });
   }
+
+  async function handleUpdate(
+    manifest: PluginManifest,
+    remotePlugin: PluginRegistryEntry,
+  ) {
+    const updatePromise = update(manifest, remotePlugin);
+    toast.promise(updatePromise, {
+      loading: $t("plugin_updating"),
+      success: $t("plugin_updated"),
+      error: toastErrorMessage($t("plugin_update_error")),
+    });
+  }
+
+  async function update(
+    manifest: PluginManifest,
+    remotePlugin: PluginRegistryEntry,
+  ) {
+    // Download the new bundle
+    const bundle = await getPluginBundle(
+      remotePlugin.repo,
+      manifest.plugin.version,
+    );
+
+    // Uninstall the current plugin
+    await uninstallPlugin(manifest.plugin.id);
+
+    // Install the new version
+    await installPluginBuffer(bundle);
+  }
 </script>
 
 <div class="container">
@@ -72,10 +104,26 @@
     {:else if $manifestQuery.isSuccess}
       <h2>{$manifestQuery.data.plugin.name}</h2>
       <p>{$manifestQuery.data.plugin.description}</p>
-      <span>{$t("version")}: {$manifestQuery.data.plugin.version}</span>
+      <span>
+        {$t("version")}: {$manifestQuery.data.plugin.version}
+
+        {#if installed}
+          <span class="installed-version">
+            ({$t("installed")}: {installed.plugin.version})
+          </span>
+        {/if}
+      </span>
 
       {#if installed}
-        <Button onclick={handleUninstall}>{$t("uninstall")}</Button>
+        <div class="actions">
+          {#if semverCompare($manifestQuery.data.plugin.version, installed.plugin.version) === 1}
+            <Button onclick={() => handleUpdate($manifestQuery.data, item)}>
+              {$t("update")}
+            </Button>
+          {/if}
+
+          <Button onclick={handleUninstall}>{$t("uninstall")}</Button>
+        </div>
       {:else}
         <Button disabled={$install.isPending} onclick={onInstall}>
           {$t("install")}
@@ -121,5 +169,14 @@
     background-color: #322e38;
     padding: 1rem;
     gap: 0.5rem;
+  }
+
+  .actions {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .installed-version {
+    color: #999;
   }
 </style>

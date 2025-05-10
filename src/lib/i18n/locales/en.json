@@ -165,5 +165,9 @@
     "minimize_tray": "Minimize to Tray",
     "minimize_tray_description": "Minimize to the system tray on close instead of stopping TilePad",
     "start_minimized": "Auto Start Minimized",
-    "start_minimized_description": "When starting automatically start as minimized to the tray instead of opening the Window immediately"
+    "start_minimized_description": "When starting automatically start as minimized to the tray instead of opening the Window immediately",
+    "update": "Update",
+    "plugin_updating": "Updating plugin",
+    "plugin_updated": "Updated plugin",
+    "plugin_update_error": "Failed to update plugin"
 }

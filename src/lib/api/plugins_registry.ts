@@ -4,6 +4,7 @@ import { createQuery, createMutation } from "@tanstack/svelte-query";
 import type { PluginManifest } from "./types/plugin";
 import type { PluginRegistryEntry } from "./types/plugins_registry";
 
+import { queryClient } from "./client";
 import { runeStore } from "./utils/svelte.svelte";
 import { installPluginBuffer as installPluginBuffer } from "./plugins";
 
@@ -46,7 +47,7 @@ async function getPluginManifest(repo: string): Promise<PluginManifest> {
   return manifest;
 }
 
-async function getPluginBundle(
+export async function getPluginBundle(
   repo: string,
   version: string,
 ): Promise<ArrayBuffer> {
@@ -76,6 +77,13 @@ export function createPluginRegistryQuery() {
   });
 }
 
+export function fetchPluginRegistry() {
+  return queryClient.fetchQuery({
+    queryKey: pluginRegistryKey.list,
+    queryFn: getPluginRegistry,
+  });
+}
+
 export function createPluginManifestQuery(repo: () => string) {
   return createQuery(
     runeStore(() => {
@@ -87,6 +95,14 @@ export function createPluginManifestQuery(repo: () => string) {
       };
     }),
   );
+}
+
+export function fetchPluginManifest(repo: string) {
+  return queryClient.fetchQuery({
+    queryKey: pluginRegistryKey.specificManifest(repo),
+    queryFn: () => getPluginManifest(repo),
+    staleTime: Infinity,
+  });
 }
 
 export function createPluginReadmeQuery(repo: () => string) {

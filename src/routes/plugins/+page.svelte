@@ -1,15 +1,72 @@
 <script lang="ts">
+  import type { PluginWithState } from "$lib/api/types/plugin";
+
   import { t } from "svelte-i18n";
   import Aside from "$lib/components/Aside.svelte";
+  import { compare as semverCompare } from "semver-ts";
   import { createPluginsQuery } from "$lib/api/plugins";
   import { getErrorMessage } from "$lib/api/utils/error";
+  import { createMutation } from "@tanstack/svelte-query";
+  import Button from "$lib/components/input/Button.svelte";
   import SolarShopBoldDuotone from "~icons/solar/shop-bold-duotone";
   import PluginCard from "$lib/components/plugins/PluginCard.svelte";
   import SkeletonList from "$lib/components/skeleton/SkeletonList.svelte";
   import ManualImportPlugin from "$lib/components/plugins/ManualImportPlugin.svelte";
   import PluginsRegistryDialog from "$lib/components/plugins_registry/PluginsRegistryDialog.svelte";
+  import {
+    fetchPluginManifest,
+    fetchPluginRegistry,
+  } from "$lib/api/plugins_registry";
 
   const pluginsQuery = createPluginsQuery();
+
+  const checkUpdatesMutation = createMutation({
+    mutationFn: async ({ plugins }: { plugins: PluginWithState[] }) => {
+      // Load remote available plugins
+      const remotePlugins = await fetchPluginRegistry();
+
+      // Find the remote plugins that are currently installed
+      const installedPlugins = remotePlugins.filter((remotePlugin) => {
+        return plugins.find(
+          (plugin) => remotePlugin.id === plugin.manifest.plugin.id,
+        );
+      });
+
+      //
+      const updates = [];
+
+      // Process in batches of 5
+      for (let i = 0; i < installedPlugins.length; i += 5) {
+        // Fetch all the manifests for the installed plugins
+        const remotePluginSet = installedPlugins.slice(i, i + 5);
+        const remotePluginManifests = await Promise.all(
+          remotePluginSet.map(async (remotePlugin) => {
+            const manifest = await fetchPluginManifest(remotePlugin.repo);
+            return { manifest, remotePlugin };
+          }),
+        );
+
+        for (const entry of remotePluginManifests) {
+          const localPlugin = plugins.find(
+            (plugin) => plugin.manifest.plugin.id === entry.manifest.plugin.id,
+          );
+
+          if (!localPlugin) continue;
+
+          if (
+            semverCompare(
+              entry.manifest.plugin.version,
+              localPlugin.manifest.plugin.version,
+            ) === 1
+          ) {
+            updates.push(entry);
+          }
+        }
+      }
+
+      return updates;
+    },
+  });
 </script>
 
 <div class="layout">
@@ -25,6 +82,14 @@
     <div class="header">
       <h2>{$t("plugins")}</h2>
       <div class="actions">
+        <Button
+          onclick={() => {
+            $checkUpdatesMutation.mutate({ plugins: $pluginsQuery.data });
+          }}
+          disabled={$checkUpdatesMutation.isPending}
+        >
+          Check for updates
+        </Button>
         <PluginsRegistryDialog
           buttonLabel={{
             text: $t("community_plugins"),
@@ -39,7 +104,16 @@
       <div class="plugins">
         {#each $pluginsQuery.data as plugin (plugin.manifest.plugin.id)}
           {#if !plugin.manifest.plugin.internal || import.meta.env.DEV}
-            <PluginCard {plugin} />
+            <PluginCard
+              {plugin}
+              latestManifest={$checkUpdatesMutation.data?.find(
+                (entry) =>
+                  entry.manifest.plugin.id === plugin.manifest.plugin.id &&
+                  // Ignore if version already matches
+                  entry.manifest.plugin.version !==
+                    plugin.manifest.plugin.version,
+              )}
+            />
           {/if}
         {:else}
           {$t("plugins_none")}
