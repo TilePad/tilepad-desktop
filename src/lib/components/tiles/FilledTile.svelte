@@ -10,6 +10,7 @@
   } from "$lib/utils/resizable";
 
   import TileIcon from "./TileIcon.svelte";
+  import EmptyTile from "./EmptyTile.svelte";
   import TileLabelElm from "./TileLabel.svelte";
   import { DESIRED_TILE_WIDTH } from "./TileGrid.svelte";
   import { getDraggingContext } from "./TileDraggingProvider.svelte";
@@ -282,6 +283,15 @@
     }
   }
 </script>
+
+{#if resizing}
+  <EmptyTile
+    row={lastPosition.row}
+    column={lastPosition.column}
+    width={tileSize}
+    {gap}
+  />
+{/if}
 
 <div
   class:tile-container--resizing={resizing}
