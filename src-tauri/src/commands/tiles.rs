@@ -10,7 +10,8 @@ use crate::{
         entity::{
             folder::FolderId,
             tile::{
-                CreateTile, TileIcon, TileIconOptions, TileId, TileLabel, TileModel, UpdateKind,
+                CreateTile, TileIcon, TileIconOptions, TileId, TileLabel, TileModel, TilePosition,
+                UpdateKind,
             },
         },
     },
@@ -82,12 +83,9 @@ pub async fn tiles_update_tile_label(
 pub async fn tiles_update_tile_position(
     tiles: State<'_, Arc<Tiles>>,
     tile_id: TileId,
-    row: u32,
-    column: u32,
+    position: TilePosition,
 ) -> CmdResult<TileModel> {
-    let tile = tiles
-        .update_tile_position(tile_id, None, row, column)
-        .await?;
+    let tile = tiles.update_tile_position(tile_id, None, position).await?;
 
     Ok(tile)
 }

@@ -31,10 +31,21 @@ pub struct TileModel {
     #[sqlx(try_from = "String")]
     pub action_id: ActionId,
 
+    /// Position of the tile
+    #[sqlx(json)]
+    pub position: TilePosition,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TilePosition {
     /// Row within the UI to display at
     pub row: u32,
     /// Column within the UI to display at
     pub column: u32,
+    /// Number of rows to span
+    pub row_span: u32,
+    /// Number of columns to span
+    pub column_span: u32,
 }
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
@@ -167,8 +178,7 @@ pub struct CreateTile {
     pub plugin_id: PluginId,
     pub action_id: ActionId,
 
-    pub row: u32,
-    pub column: u32,
+    pub position: TilePosition,
 }
 
 #[derive(Deserialize)]
@@ -193,18 +203,19 @@ impl TileModel {
             folder_id: create.folder_id,
             plugin_id: create.plugin_id,
             action_id: create.action_id,
-            row: create.row,
-            column: create.column,
+            position: create.position,
         };
 
         let config =
             serde_json::to_value(&model.config).map_err(|err| DbErr::Encode(err.into()))?;
+        let position =
+            serde_json::to_value(&model.position).map_err(|err| DbErr::Encode(err.into()))?;
         let properties = serde_json::Value::Object(Default::default());
 
         sqlx::query(
             "
-            INSERT INTO \"tiles\" (\"id\", \"config\", \"properties\", \"folder_id\", \"plugin_id\", \"action_id\", \"row\", \"column\")
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO \"tiles\" (\"id\", \"config\", \"properties\", \"folder_id\", \"plugin_id\", \"action_id\", \"position\")
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         ",
         )
         .bind(model.id)
@@ -213,8 +224,7 @@ impl TileModel {
         .bind(model.folder_id)
         .bind(model.plugin_id.0.as_str())
         .bind(model.action_id.0.as_str())
-        .bind(model.row)
-        .bind(model.column)
+        .bind(position)
         .execute(db)
         .await?;
 
@@ -265,18 +275,18 @@ impl TileModel {
     pub async fn update_position(
         mut self,
         db: &DbPool,
-        row: u32,
-        column: u32,
+        position: TilePosition,
     ) -> DbResult<TileModel> {
-        sqlx::query("UPDATE \"tiles\" SET \"row\" = ?, \"column\" = ? WHERE \"id\" = ?")
-            .bind(row)
-            .bind(column)
+        let position_value =
+            serde_json::to_value(&position).map_err(|err| DbErr::Encode(err.into()))?;
+
+        sqlx::query("UPDATE \"tiles\" SET \"position\" = ? WHERE \"id\" = ?")
+            .bind(position_value)
             .bind(self.id)
             .execute(db)
             .await?;
 
-        self.row = row;
-        self.column = column;
+        self.position = position;
         Ok(self)
     }
 

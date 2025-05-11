@@ -57,7 +57,9 @@
   }
 
   function getTile(tiles: TileModel[], row: number, column: number) {
-    return tiles.find((tile) => tile.row === row && tile.column === column);
+    return tiles.find(
+      (tile) => tile.position.row === row && tile.position.column === column,
+    );
   }
 
   function isTileWithin(
@@ -71,12 +73,17 @@
     const rowEnd = row + rowSpan;
 
     for (const tile of tiles) {
+      const { position } = tile;
+
+      const tileRowEnd = position.row + position.row_span;
+      const tileColEnd = position.column + position.column_span;
+
       if (
         tile.id !== exclude &&
-        tile.row >= row &&
-        tile.column >= col &&
-        tile.row < rowEnd &&
-        tile.column < colEnd
+        position.row >= row &&
+        position.column >= col &&
+        tileRowEnd <= rowEnd &&
+        tileColEnd <= colEnd
       ) {
         return true;
       }

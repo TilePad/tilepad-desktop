@@ -6,7 +6,9 @@ use tilepad_manifest::plugin::PluginId;
 use crate::{
     database::{
         DbPool, JsonObject,
-        entity::tile::{TileIcon, TileIconOptions, TileId, TileLabel, TileModel, UpdateKind},
+        entity::tile::{
+            TileIcon, TileIconOptions, TileId, TileLabel, TileModel, TilePosition, UpdateKind,
+        },
     },
     device::Devices,
     icons::Icons,
@@ -126,11 +128,10 @@ impl Tiles {
         &self,
         tile_id: TileId,
         plugin_id: Option<PluginId>,
-        row: u32,
-        column: u32,
+        position: TilePosition,
     ) -> anyhow::Result<TileModel> {
         let tile = self.get_tile(tile_id, plugin_id).await?;
-        let tile = tile.update_position(&self.db, row, column).await?;
+        let tile = tile.update_position(&self.db, position).await?;
         self.devices.background_update_folder(tile.folder_id);
         Ok(tile)
     }

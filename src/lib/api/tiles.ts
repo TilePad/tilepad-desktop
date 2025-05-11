@@ -9,6 +9,7 @@ import type {
   TileLabel,
   CreateTile,
   UpdateKind,
+  TilePosition,
   TileIconOptions,
 } from "./types/tiles";
 
@@ -42,11 +43,10 @@ function createTile(create: CreateTile) {
   });
 }
 
-function updateTilePosition(tileId: TileId, row: number, column: number) {
+function updateTilePosition(tileId: TileId, position: TilePosition) {
   return invoke<TileModel>("tiles_update_tile_position", {
     tileId,
-    row,
-    column,
+    position,
   });
 }
 
@@ -136,15 +136,14 @@ export function createCreateTileMutation() {
 
 export function createUpdateTilePositionMutation() {
   return createMutation({
+    scope: { id: "tile" },
     mutationFn: ({
       tileId,
-      row,
-      column,
+      position,
     }: {
       tileId: TileId;
-      row: number;
-      column: number;
-    }) => updateTilePosition(tileId, row, column),
+      position: TilePosition;
+    }) => updateTilePosition(tileId, position),
     onSuccess: (tile) => {
       invalidateTilesList(tile.folder_id);
       queryClient.setQueryData(

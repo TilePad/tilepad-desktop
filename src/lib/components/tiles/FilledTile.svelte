@@ -1,6 +1,8 @@
 <script lang="ts">
-  import type { TileId, TileModel } from "$lib/api/types/tiles";
+  import type { TileId, TileModel, TilePosition } from "$lib/api/types/tiles";
 
+  import { useDebounce } from "runed";
+  import { createUpdateTilePositionMutation } from "$lib/api/tiles";
   import {
     resizeHandle,
     ResizeDirection,
@@ -31,33 +33,39 @@
   const { tile, tileSize, gap, onClick, isTileWithin }: Props = $props();
   const { draggingState, onStartDragging } = getDraggingContext();
 
-  let lastRowSpan: number = $state(1);
-  let lastColSpan: number = $state(1);
+  const updateTilePosition = createUpdateTilePositionMutation();
 
-  let lastColStart = $state(tile.column);
-  let lastRowStart = $state(tile.row);
-
-  let colStart = $state(tile.column);
-  let rowStart = $state(tile.row);
-
-  let colSpan = $state(1);
-  let rowSpan = $state(1);
+  let lastPosition: TilePosition = $state(tile.position);
+  let position: TilePosition = $state(tile.position);
 
   const { tileX, tileY, tileZ, tileWidth, tileHeight, sizeAdjust } =
     $derived.by(() => {
-      const tileWidth = tileSize * colSpan + gap * (colSpan - 1);
-      const tileHeight = tileSize * rowSpan + gap * (rowSpan - 1);
+      const tileWidth =
+        tileSize * position.column_span + gap * (position.column_span - 1);
+      const tileHeight =
+        tileSize * position.row_span + gap * (position.row_span - 1);
 
-      const ratioX = (tileWidth - DESIRED_TILE_WIDTH) / DESIRED_TILE_WIDTH;
-      const ratioY = (tileHeight - DESIRED_TILE_WIDTH) / DESIRED_TILE_WIDTH;
+      // When measuring the desired width/height the ratio must first remove the gap size
+      const desiredWidth =
+        DESIRED_TILE_WIDTH - gap * (position.column_span - 1);
+      const desiredHeight = DESIRED_TILE_WIDTH - gap * (position.row_span - 1);
+
+      const ratioX = (tileWidth - desiredWidth) / desiredWidth;
+      const ratioY = (tileHeight - desiredHeight) / desiredHeight;
 
       const sizeAdjustX = 1 + ratioX;
       const sizeAdjustY = 1 + ratioY;
       const sizeAdjust = Math.min(sizeAdjustX, sizeAdjustY);
 
-      const tileX = tileSize * colStart + gap * colStart;
-      const tileY = tileSize * rowStart + gap * rowStart;
-      const tileZ = colStart + colSpan + rowStart + rowSpan;
+      if (tile.config.label.label === "Pause recording") {
+        console.log(tile, sizeAdjust, sizeAdjustX, sizeAdjustY);
+      }
+
+      const tileX = tileSize * position.column + gap * position.column;
+      const tileY = tileSize * position.row + gap * position.row;
+      const tileZ =
+        (position.row + position.row_span) *
+        (position.column + position.column_span);
 
       return {
         tileX,
@@ -78,6 +86,7 @@
     if (target === null) return false;
     return target.data.type === "tile" && target.data.id === tile.id;
   });
+  const distanceThreshold = $derived(tileSize + gap);
 
   function onPointerDown(event: PointerEvent) {
     if (touchTimeout) {
@@ -99,111 +108,165 @@
     }
   }
 
+  const debounceUpdatePosition = useDebounce((position: TilePosition) => {
+    $updateTilePosition.mutate({
+      tileId: tile.id,
+      position,
+    });
+  }, 100);
+
+  function persistPosition(position: TilePosition) {
+    lastPosition = { ...position };
+    debounceUpdatePosition(position);
+  }
+
   function handleResizeVerticalTop(event: CustomEvent<ResizeEventDetail>) {
     const newStart =
-      lastRowStart + Math.min(event.detail.scaleY, lastRowSpan - 1);
-    const newSpan = Math.max(lastRowSpan - event.detail.scaleY, 1);
+      lastPosition.row +
+      Math.min(event.detail.scaleY, lastPosition.row_span - 1);
+    const newSpan = Math.max(lastPosition.row_span - event.detail.scaleY, 1);
 
     // Prevent overlapping
-    if (isTileWithin(colStart, colSpan, newStart, newSpan, tile.id)) {
+    if (
+      isTileWithin(
+        position.column,
+        position.column_span,
+        newStart,
+        newSpan,
+        tile.id,
+      )
+    ) {
       return;
     }
 
-    rowStart = newStart;
-    rowSpan = newSpan;
+    position = { ...position, row: newStart, row_span: newSpan };
 
     if (event.detail.commit) {
-      lastRowStart = rowStart;
-      lastRowSpan = rowSpan;
-
-      // TODO: Persist
+      persistPosition(position);
     }
   }
 
   function handleResizeVerticalBottom(event: CustomEvent<ResizeEventDetail>) {
-    const newSpan = Math.max(lastRowSpan + event.detail.scaleY, 1);
+    const newSpan = Math.max(lastPosition.row_span + event.detail.scaleY, 1);
 
     // Prevent overlapping
-    if (isTileWithin(colStart, colSpan, rowStart, newSpan, tile.id)) {
+    if (
+      isTileWithin(
+        position.column,
+        position.column_span,
+        position.row,
+        newSpan,
+        tile.id,
+      )
+    ) {
       return;
     }
 
-    rowSpan = newSpan;
+    position = { ...position, row_span: newSpan };
 
     if (event.detail.commit) {
-      lastRowSpan = rowSpan;
-
-      // TODO: Persist
+      persistPosition(position);
     }
   }
 
   function handleResizeHorizontalLeft(event: CustomEvent<ResizeEventDetail>) {
     const newStart =
-      lastColStart + Math.min(event.detail.scaleX, lastColSpan - 1);
-    const newSpan = Math.max(lastColSpan - event.detail.scaleX, 1);
+      lastPosition.column +
+      Math.min(event.detail.scaleX, lastPosition.column_span - 1);
+    const newSpan = Math.max(lastPosition.column_span - event.detail.scaleX, 1);
 
     // Prevent overlapping
-    if (isTileWithin(newStart, newSpan, rowStart, rowSpan, tile.id)) {
+    if (
+      isTileWithin(newStart, newSpan, position.row, position.row_span, tile.id)
+    ) {
       return;
     }
 
-    colStart = newStart;
-    colSpan = newSpan;
+    position = { ...position, column: newStart, column_span: newSpan };
 
     if (event.detail.commit) {
-      lastColSpan = colSpan;
-      lastColStart = colStart;
-
-      // TODO: Persist
+      persistPosition(position);
     }
   }
 
   function handleResizeHorizontalRight(event: CustomEvent<ResizeEventDetail>) {
-    const newSpan = Math.max(lastColSpan + event.detail.scaleX, 1);
+    const newSpan = Math.max(lastPosition.column_span + event.detail.scaleX, 1);
 
     // Prevent overlapping
-    if (isTileWithin(colStart, newSpan, rowStart, rowSpan, tile.id)) {
+    if (
+      isTileWithin(
+        position.column,
+        newSpan,
+        position.row,
+        position.row_span,
+        tile.id,
+      )
+    ) {
       return;
     }
 
-    colSpan = newSpan;
+    position = { ...position, column_span: newSpan };
 
     if (event.detail.commit) {
-      lastColSpan = colSpan;
-
-      // TODO: Persist
+      persistPosition(position);
     }
   }
 
   function considerResizeDiagonalLeftTop(
     event: CustomEvent<ResizeEventDetail>,
   ) {
+    let commit = event.detail.commit;
+    event.detail.commit = false;
+
     handleResizeHorizontalLeft(event);
     handleResizeVerticalTop(event);
+
+    if (commit) {
+      persistPosition(position);
+    }
   }
 
   function considerResizeDiagonalLeftBottom(
     event: CustomEvent<ResizeEventDetail>,
   ) {
+    let commit = event.detail.commit;
+    event.detail.commit = false;
+
     handleResizeHorizontalLeft(event);
     handleResizeVerticalBottom(event);
+
+    if (commit) {
+      persistPosition(position);
+    }
   }
 
   function considerResizeDiagonalRightBottom(
     event: CustomEvent<ResizeEventDetail>,
   ) {
+    let commit = event.detail.commit;
+    event.detail.commit = false;
+
     handleResizeHorizontalRight(event);
     handleResizeVerticalBottom(event);
+
+    if (commit) {
+      persistPosition(position);
+    }
   }
 
   function considerResizeDiagonalRightTop(
     event: CustomEvent<ResizeEventDetail>,
   ) {
+    let commit = event.detail.commit;
+    event.detail.commit = false;
+
     handleResizeHorizontalRight(event);
     handleResizeVerticalTop(event);
-  }
 
-  const distanceThreshold = $derived(tileSize + gap);
+    if (commit) {
+      persistPosition(position);
+    }
+  }
 </script>
 
 <div
@@ -220,15 +283,15 @@
     onclick={onClick}
     aria-roledescription="button"
     data-drop-zone="filledTile"
-    data-row={tile.row}
-    data-column={tile.column}
+    data-row={tile.position.row}
+    data-column={tile.position.column}
   >
     <TileIcon icon={config.icon} iconOptions={config.icon_options} />
     <TileLabelElm label={config.label} />
   </button>
 
   <span
-    class="handle handle--top"
+    class="handle handle--vertical handle--top"
     use:resizeHandle={{
       direction: ResizeDirection.VERTICAL,
       distanceThreshold,
@@ -237,7 +300,7 @@
   ></span>
 
   <span
-    class="handle handle--bottom"
+    class="handle handle--vertical handle--bottom"
     use:resizeHandle={{
       direction: ResizeDirection.VERTICAL,
       distanceThreshold,
@@ -246,7 +309,7 @@
   ></span>
 
   <span
-    class="handle handle--left"
+    class="handle handle--horizontal handle--left"
     use:resizeHandle={{
       direction: ResizeDirection.HORIZONTAL,
       distanceThreshold,
@@ -255,7 +318,7 @@
   ></span>
 
   <span
-    class="handle handle--corner-top-left"
+    class="handle handle--corner handle--corner-top-left"
     use:resizeHandle={{
       direction: ResizeDirection.DIAGONAL,
       distanceThreshold,
@@ -264,7 +327,7 @@
   ></span>
 
   <span
-    class="handle handle--corner-bottom-left"
+    class="handle handle--corner handle--corner-bottom-left"
     use:resizeHandle={{
       direction: ResizeDirection.DIAGONAL,
       distanceThreshold,
@@ -273,7 +336,7 @@
   ></span>
 
   <span
-    class="handle handle--right"
+    class="handle handle--horizontal handle--right"
     use:resizeHandle={{
       direction: ResizeDirection.HORIZONTAL,
       distanceThreshold,
@@ -282,7 +345,7 @@
   ></span>
 
   <span
-    class="handle handle--corner-top-right"
+    class="handle handle--corner handle--corner-top-right"
     use:resizeHandle={{
       direction: ResizeDirection.DIAGONAL,
       distanceThreshold,
@@ -290,7 +353,7 @@
     onresize={considerResizeDiagonalRightTop}
   ></span>
   <span
-    class="handle handle--corner-bottom-right"
+    class="handle handle--corner handle--corner-bottom-right"
     use:resizeHandle={{
       direction: ResizeDirection.DIAGONAL,
       distanceThreshold,
@@ -341,71 +404,73 @@
   }
 
   .handle {
+    --handle-width: 4px;
+    --handle-offset: 1px;
+    --handle-corner-size: calc(var(--handle-width) * 2);
+
     position: absolute;
-    background-color: gray;
+  }
+
+  .handle:hover {
+    background-color: #fff;
+  }
+
+  .handle--vertical {
+    left: var(--handle-corner-size);
+    height: var(--handle-width);
+    width: calc(100% - (var(--handle-corner-size) * 2) - var(--handle-offset));
+    cursor: row-resize;
   }
 
   .handle--top {
-    top: 0;
-    left: 8px;
-    height: 8px;
-    width: calc(100% - 24px);
-    cursor: row-resize;
+    top: var(--handle-offset);
   }
 
   .handle--bottom {
-    bottom: 0;
-    left: 8px;
-    height: 8px;
-    width: calc(100% - 24px);
-    cursor: row-resize;
+    bottom: var(--handle-offset);
   }
 
-  .handle--left {
-    top: 8px;
-    left: 0;
-    width: 8px;
-    height: calc(100% - 24px);
+  .handle--horizontal {
+    height: calc(100% - (var(--handle-corner-size) * 2) - var(--handle-offset));
+    top: var(--handle-corner-size);
+    width: var(--handle-width);
     cursor: col-resize;
   }
 
+  .handle--left {
+    left: var(--handle-offset);
+  }
+
+  .handle--right {
+    right: var(--handle-offset);
+  }
+
+  .handle--corner {
+    height: var(--handle-corner-size);
+    width: var(--handle-corner-size);
+  }
+
   .handle--corner-top-left {
-    top: 0;
-    left: 0;
-    height: 16px;
-    width: 16px;
+    top: var(--handle-offset);
+    left: var(--handle-offset);
     cursor: nw-resize;
   }
 
   .handle--corner-bottom-left {
-    bottom: 0;
-    left: 0;
-    height: 16px;
-    width: 16px;
+    bottom: var(--handle-offset);
+    left: var(--handle-offset);
     cursor: sw-resize;
   }
 
-  .handle--right {
-    top: 8px;
-    right: 0;
-    width: 8px;
-    height: calc(100% - 24px);
-    cursor: col-resize;
-  }
-
   .handle--corner-top-right {
-    top: 0;
-    right: 0;
-    height: 16px;
-    width: 16px;
+    top: var(--handle-offset);
+    right: var(--handle-offset);
     cursor: ne-resize;
   }
 
   .handle--corner-bottom-right {
-    bottom: 0;
-    right: 0;
-    height: 16px;
-    width: 16px;
+    bottom: var(--handle-offset);
+    right: var(--handle-offset);
     cursor: se-resize;
   }
 </style>

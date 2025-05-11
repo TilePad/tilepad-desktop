@@ -21,8 +21,14 @@ export interface TileModel {
   folder_id: FolderId;
   plugin_id: PluginId;
   action_id: ActionId;
+  position: TilePosition;
+}
+
+export interface TilePosition {
   row: number;
   column: number;
+  row_span: number;
+  column_span: number;
 }
 
 export interface TileConfig {

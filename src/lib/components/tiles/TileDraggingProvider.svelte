@@ -193,15 +193,24 @@
         const model = draggingState.data as TileModel;
         $updateTilePosition.mutateAsync({
           tileId: model.id,
-          row,
-          column,
+          position: {
+            row,
+            column,
+            // Reset spanning on move
+            row_span: 1,
+            column_span: 1,
+          },
         });
       } else if (draggingState.data.type === "action") {
         const action = draggingState.data as Action;
         const createPromise = $createTile.mutateAsync({
           create: {
-            row,
-            column,
+            position: {
+              row,
+              column,
+              row_span: 1,
+              column_span: 1,
+            },
             folder_id: currentFolder.id,
             action_id: action.action_id,
             plugin_id: action.plugin_id,
