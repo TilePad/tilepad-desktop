@@ -45,13 +45,8 @@
       const tileHeight =
         tileSize * position.row_span + gap * (position.row_span - 1);
 
-      // When measuring the desired width/height the ratio must first remove the gap size
-      const desiredWidth =
-        DESIRED_TILE_WIDTH - gap * (position.column_span - 1);
-      const desiredHeight = DESIRED_TILE_WIDTH - gap * (position.row_span - 1);
-
-      const ratioX = (tileWidth - desiredWidth) / desiredWidth;
-      const ratioY = (tileHeight - desiredHeight) / desiredHeight;
+      const ratioX = (tileWidth - DESIRED_TILE_WIDTH) / DESIRED_TILE_WIDTH;
+      const ratioY = (tileHeight - DESIRED_TILE_WIDTH) / DESIRED_TILE_WIDTH;
 
       const sizeAdjustX = 1 + ratioX;
       const sizeAdjustY = 1 + ratioY;
