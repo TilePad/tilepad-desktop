@@ -16,7 +16,7 @@
   } from "$lib/api/types/tiles";
 
   import TileIcon from "./TileIcon.svelte";
-  import TileLabelElm from "./TileLabelElm.svelte";
+  import TileLabelElm from "./TileLabel.svelte";
   import IconSelector from "../icons/IconSelector.svelte";
 
   type Props = {
