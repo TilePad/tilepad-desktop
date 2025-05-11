@@ -79,6 +79,7 @@
 
   let touchTimeout: number | undefined;
   let button: HTMLButtonElement | undefined = $state();
+  let resizing = $state(false);
 
   const config = $derived(tile.config);
   const dragging = $derived.by(() => {
@@ -121,6 +122,7 @@
   }
 
   function handleResizeVerticalTop(event: CustomEvent<ResizeEventDetail>) {
+    resizing = true;
     const newStart =
       lastPosition.row +
       Math.min(event.detail.scaleY, lastPosition.row_span - 1);
@@ -143,10 +145,12 @@
 
     if (event.detail.commit) {
       persistPosition(position);
+      resizing = false;
     }
   }
 
   function handleResizeVerticalBottom(event: CustomEvent<ResizeEventDetail>) {
+    resizing = true;
     const newSpan = Math.max(lastPosition.row_span + event.detail.scaleY, 1);
 
     // Prevent overlapping
@@ -166,10 +170,12 @@
 
     if (event.detail.commit) {
       persistPosition(position);
+      resizing = false;
     }
   }
 
   function handleResizeHorizontalLeft(event: CustomEvent<ResizeEventDetail>) {
+    resizing = true;
     const newStart =
       lastPosition.column +
       Math.min(event.detail.scaleX, lastPosition.column_span - 1);
@@ -192,10 +198,12 @@
 
     if (event.detail.commit) {
       persistPosition(position);
+      resizing = false;
     }
   }
 
   function handleResizeHorizontalRight(event: CustomEvent<ResizeEventDetail>) {
+    resizing = true;
     const newSpan = Math.max(lastPosition.column_span + event.detail.scaleX, 1);
 
     // Prevent overlapping
@@ -215,6 +223,7 @@
 
     if (event.detail.commit) {
       persistPosition(position);
+      resizing = false;
     }
   }
 
@@ -223,12 +232,14 @@
   ) {
     let commit = event.detail.commit;
     event.detail.commit = false;
+    resizing = true;
 
     handleResizeHorizontalLeft(event);
     handleResizeVerticalTop(event);
 
     if (commit) {
       persistPosition(position);
+      resizing = false;
     }
   }
 
@@ -237,12 +248,14 @@
   ) {
     let commit = event.detail.commit;
     event.detail.commit = false;
+    resizing = true;
 
     handleResizeHorizontalLeft(event);
     handleResizeVerticalBottom(event);
 
     if (commit) {
       persistPosition(position);
+      resizing = false;
     }
   }
 
@@ -251,12 +264,14 @@
   ) {
     let commit = event.detail.commit;
     event.detail.commit = false;
+    resizing = true;
 
     handleResizeHorizontalRight(event);
     handleResizeVerticalBottom(event);
 
     if (commit) {
       persistPosition(position);
+      resizing = false;
     }
   }
 
@@ -265,17 +280,20 @@
   ) {
     let commit = event.detail.commit;
     event.detail.commit = false;
+    resizing = true;
 
     handleResizeHorizontalRight(event);
     handleResizeVerticalTop(event);
 
     if (commit) {
       persistPosition(position);
+      resizing = false;
     }
   }
 </script>
 
 <div
+  class:tile-container--resizing={resizing}
   class="tile-container"
   style="--tile-size-adjustment: {sizeAdjust}; --tile-width: {tileWidth}px; --tile-height: {tileHeight}px; --tile-x: {tileX}px; --tile-y: {tileY}px; --tile-z: {tileZ}"
   onpointerdown={onPointerDown}
@@ -378,6 +396,13 @@
     width: var(--tile-width);
     height: var(--tile-height);
     z-index: calc(var(--tile-z));
+  }
+
+  .tile-container--resizing {
+    transition: all 0.1s ease;
+  }
+
+  .tile-container--resizing .tile {
     transition: all 0.1s ease;
   }
 
@@ -389,8 +414,6 @@
     align-items: center;
     width: var(--tile-width);
     height: var(--tile-height);
-    transition: all 0.1s ease;
-
     color: #ccc;
 
     border: 2px solid var(--tile-border-color);
