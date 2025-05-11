@@ -297,15 +297,15 @@
   class:tile-container--resizing={resizing}
   class="tile-container"
   style="--tile-size-adjustment: {sizeAdjust}; --tile-width: {tileWidth}px; --tile-height: {tileHeight}px; --tile-x: {tileX}px; --tile-y: {tileY}px; --tile-z: {tileZ}"
-  onpointerdown={onPointerDown}
-  onpointerup={onPointerUp}
 >
   <button
+    onpointerdown={onPointerDown}
+    onpointerup={onPointerUp}
+    onclick={onClick}
     style="--tile-border-color: {config.icon_options.border_color}"
     bind:this={button}
     class="tile"
     class:tile--dragging={dragging}
-    onclick={onClick}
     aria-roledescription="button"
     data-drop-zone="filledTile"
     data-row={tile.position.row}
@@ -436,7 +436,7 @@
   }
 
   .handle {
-    --handle-width: 4px;
+    --handle-width: 1px;
     --handle-offset: 1px;
     --handle-corner-size: calc(var(--handle-width) * 2);
 

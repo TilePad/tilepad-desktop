@@ -72,7 +72,6 @@
     width: var(--tile-width);
     height: var(--tile-height);
     color: #ccc;
-    user-select: none;
 
     user-select: none;
     overflow: hidden;
