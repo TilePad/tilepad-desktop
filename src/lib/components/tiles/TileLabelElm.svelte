@@ -9,38 +9,47 @@
 </script>
 
 {#if label.enabled && label.label.length > 0}
-  <p
-    class="label"
-    style="font-size: calc({label.font_size}pt * var(--tile-size-adjustment)); font-family: {label.font}, 'Roboto'; color: {label.color}; --outline-color: {label.outline_color};"
-    data-align={label.align}
-    class:label--bold={label.bold}
-    class:label--italic={label.italic}
-    class:label--underline={label.underline}
-    class:label--outline={label.outline}
-  >
-    {label.label}
-  </p>
+  <div class="label-container" data-align={label.align}>
+    <p
+      class="label"
+      style="font-size: calc({label.font_size}pt * var(--tile-size-adjustment)); font-family: {label.font}, 'Roboto'; color: {label.color}; --outline-color: {label.outline_color};"
+      data-align={label.align}
+      class:label--bold={label.bold}
+      class:label--italic={label.italic}
+      class:label--underline={label.underline}
+      class:label--outline={label.outline}
+    >
+      {label.label}
+    </p>
+  </div>
 {/if}
 
 <style>
-  .label {
+  .label-container {
     position: absolute;
+    left: 0;
+    top: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding: 0.25rem;
+    justify-content: center;
+  }
+
+  .label-container[data-align="Bottom"] {
+    align-items: flex-end;
+  }
+
+  .label-container[data-align="Middle"] {
+    align-items: center;
+  }
+  .label-container[data-align="Top"] {
+    align-items: flex-start;
+  }
+
+  .label {
     text-align: center;
     font-weight: normal;
-  }
-
-  .label[data-align="Bottom"] {
-    bottom: 5%;
-  }
-
-  .label[data-align="Middle"] {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  .label[data-align="Top"] {
-    top: 5%;
   }
 
   .label--bold {
