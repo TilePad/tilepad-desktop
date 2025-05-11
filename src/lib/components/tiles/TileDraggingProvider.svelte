@@ -112,6 +112,7 @@
     previewElement.style.top = `${event.clientY - draggingState.initialY}px`;
     previewElement.style.width = `${previewRect.width}px`;
     previewElement.style.height = `${previewRect.height}px`;
+    previewElement.style.transition = "none";
 
     const copyProperties = [
       "--tile-size-adjustment",

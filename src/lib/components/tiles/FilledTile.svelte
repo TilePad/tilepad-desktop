@@ -378,6 +378,7 @@
     width: var(--tile-width);
     height: var(--tile-height);
     z-index: calc(var(--tile-z));
+    transition: all 0.1s ease;
   }
 
   .tile {
@@ -388,6 +389,7 @@
     align-items: center;
     width: var(--tile-width);
     height: var(--tile-height);
+    transition: all 0.1s ease;
 
     color: #ccc;
 
