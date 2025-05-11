@@ -113,15 +113,21 @@
     previewElement.style.width = `${previewRect.width}px`;
     previewElement.style.height = `${previewRect.height}px`;
 
-    // Copy tile styling variables
-    previewElement.style.setProperty(
+    const copyProperties = [
       "--tile-size-adjustment",
-      computedStyles.getPropertyValue("--tile-size-adjustment"),
-    );
-    previewElement.style.setProperty(
       "--tile-width",
-      computedStyles.getPropertyValue("--tile-width"),
-    );
+      "--tile-height",
+      "--tile-x",
+      "--tile-y",
+    ];
+
+    for (const property of copyProperties) {
+      // Copy tile styling variables
+      previewElement.style.setProperty(
+        property,
+        computedStyles.getPropertyValue(property),
+      );
+    }
 
     // Add preview to DOM
     document.body.append(previewElement);
