@@ -57,10 +57,6 @@
       const sizeAdjustY = 1 + ratioY;
       const sizeAdjust = Math.min(sizeAdjustX, sizeAdjustY);
 
-      if (tile.config.label.label === "Pause recording") {
-        console.log(tile, sizeAdjust, sizeAdjustX, sizeAdjustY);
-      }
-
       const tileX = tileSize * position.column + gap * position.column;
       const tileY = tileSize * position.row + gap * position.row;
       const tileZ =
