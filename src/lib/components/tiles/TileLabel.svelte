@@ -32,7 +32,6 @@
     display: flex;
     width: 100%;
     height: 100%;
-    padding: 0.25rem;
     justify-content: center;
   }
 
@@ -50,6 +49,7 @@
   .label {
     text-align: center;
     font-weight: normal;
+    margin: calc(0.5rem * var(--tile-size-adjustment));
   }
 
   .label--bold {

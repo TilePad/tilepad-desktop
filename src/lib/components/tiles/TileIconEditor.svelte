@@ -16,7 +16,7 @@
   } from "$lib/api/types/tiles";
 
   import TileIcon from "./TileIcon.svelte";
-  import TileLabelElm from "./TileLabel.svelte";
+  import TileLabel from "./TileLabel.svelte";
   import IconSelector from "../icons/IconSelector.svelte";
 
   type Props = {
@@ -26,6 +26,8 @@
   };
 
   const { tileId, action, config }: Props = $props();
+
+  const tileSize = 120;
 
   const updateTileIcon = createUpdateTileIconMutation();
   const updateTileIconOptions = createUpdateTileIconOptionsMutation();
@@ -110,12 +112,15 @@
 </script>
 
 <div
-  class="tile"
-  style="--tile-size-adjustment: 1; --tile-width: 120px; --tile-border-color: {iconOptions.border_color}"
+  class="tile-container"
+  style="--tile-size-adjustment: 1; --tile-width: {tileSize}px; --tile-height: {tileSize}px; --tile-border-color: {iconOptions.border_color}"
 >
-  <TileIcon icon={config.icon} {iconOptions} />
-  <TileLabelElm label={config.label} />
+  <div class="tile">
+    <TileIcon icon={config.icon} {iconOptions} />
+    <TileLabel label={config.label} />
+  </div>
 </div>
+
 <IconSelector
   {iconOptions}
   onSelectIcon={onClickIconPackIcon}
@@ -133,7 +138,7 @@
     justify-content: center;
     align-items: center;
     width: var(--tile-width);
-    height: var(--tile-width);
+    height: var(--tile-height);
     color: #ccc;
 
     border: 2px solid var(--tile-border-color);
