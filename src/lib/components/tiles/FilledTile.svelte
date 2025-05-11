@@ -21,7 +21,7 @@
 
     onClick: VoidFunction;
 
-    isTileWithin: (
+    isAllowedWithin: (
       col: number,
       colSpan: number,
       row: number,
@@ -30,7 +30,7 @@
     ) => boolean;
   };
 
-  const { tile, tileSize, gap, onClick, isTileWithin }: Props = $props();
+  const { tile, tileSize, gap, onClick, isAllowedWithin }: Props = $props();
   const { draggingState, onStartDragging } = getDraggingContext();
 
   const updateTilePosition = createUpdateTilePositionMutation();
@@ -128,7 +128,7 @@
 
     // Prevent overlapping
     if (
-      isTileWithin(
+      !isAllowedWithin(
         position.column,
         position.column_span,
         newStart,
@@ -151,7 +151,7 @@
 
     // Prevent overlapping
     if (
-      isTileWithin(
+      !isAllowedWithin(
         position.column,
         position.column_span,
         position.row,
@@ -177,7 +177,13 @@
 
     // Prevent overlapping
     if (
-      isTileWithin(newStart, newSpan, position.row, position.row_span, tile.id)
+      !isAllowedWithin(
+        newStart,
+        newSpan,
+        position.row,
+        position.row_span,
+        tile.id,
+      )
     ) {
       return;
     }
@@ -194,7 +200,7 @@
 
     // Prevent overlapping
     if (
-      isTileWithin(
+      !isAllowedWithin(
         position.column,
         newSpan,
         position.row,

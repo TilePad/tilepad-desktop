@@ -62,7 +62,7 @@
     );
   }
 
-  function isTileWithin(
+  function isAllowedWithin(
     col: number,
     colSpan: number,
     row: number,
@@ -71,6 +71,16 @@
   ): boolean {
     const colEnd = col + colSpan;
     const rowEnd = row + rowSpan;
+
+    // Out of valid bounds
+    if (col < 0 || row < 0) {
+      return false;
+    }
+
+    // Out of bounds for a valid tile
+    if (col > columns || colEnd > columns || row > rows || rowEnd > rows) {
+      return false;
+    }
 
     for (const tile of tiles) {
       const { position } = tile;
@@ -85,11 +95,11 @@
         tileRowEnd <= rowEnd &&
         tileColEnd <= colEnd
       ) {
-        return true;
+        return false;
       }
     }
 
-    return false;
+    return true;
   }
 </script>
 
@@ -110,7 +120,7 @@
           {tileSize}
           {gap}
           onClick={() => onClickTile(tile)}
-          {isTileWithin}
+          {isAllowedWithin}
         />
       {:else}
         <EmptyTile row={item.row} column={item.column} width={tileSize} {gap} />
