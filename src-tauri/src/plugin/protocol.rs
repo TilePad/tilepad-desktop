@@ -11,7 +11,7 @@ use crate::{
     events::{DeepLinkContext, InspectorContext, TileInteractionContext},
 };
 
-use tilepad_manifest::plugin::{ActionId, PluginId};
+use tilepad_manifest::plugin::PluginId;
 
 /// Plugin message coming from the client side
 #[derive(Debug, Deserialize)]
@@ -65,6 +65,9 @@ pub enum ClientPluginMessage {
 
     /// Set the current label for a tile
     SetTileLabel { tile_id: TileId, label: TileLabel },
+
+    /// Get all currently visible tiles
+    GetVisibleTiles,
 }
 
 fn default_partial_value() -> bool {
@@ -113,6 +116,11 @@ pub enum ServerPluginMessage {
         /// ID of the device that changes
         device_id: DeviceId,
         /// Tiles that are now visible on the device
+        tiles: Vec<TileModel>,
+    },
+
+    VisibleTiles {
+        /// Tiles that are currently visible
         tiles: Vec<TileModel>,
     },
 }

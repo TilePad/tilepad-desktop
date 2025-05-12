@@ -52,20 +52,20 @@ impl DeviceModel {
             serde_json::to_value(&model.config).map_err(|err| DbErr::Encode(err.into()))?;
 
         sqlx::query(
-            "
-            INSERT INTO \"devices\" (
-                \"id\", 
-                \"name\", 
-                \"access_token\", 
-                \"config\", 
-                \"order\", 
-                \"profile_id\", 
-                \"folder_id\", 
-                \"created_at\",
-                \"last_connected_at\"
+            r#"
+            INSERT INTO "devices" (
+                "id", 
+                "name", 
+                "access_token", 
+                "config", 
+                "order", 
+                "profile_id", 
+                "folder_id", 
+                "created_at",
+                "last_connected_at"
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ",
+        "#,
         )
         .bind(model.id)
         .bind(model.name.clone())
@@ -88,14 +88,12 @@ impl DeviceModel {
         profile_id: ProfileId,
         folder_id: FolderId,
     ) -> DbResult<DeviceModel> {
-        sqlx::query(
-            "UPDATE \"devices\" SET \"profile_id\" = ?, \"folder_id\" = ? WHERE \"id\" = ?",
-        )
-        .bind(profile_id)
-        .bind(folder_id)
-        .bind(self.id)
-        .execute(db)
-        .await?;
+        sqlx::query(r#"UPDATE "devices" SET "profile_id" = ?, "folder_id" = ? WHERE "id" = ?"#)
+            .bind(profile_id)
+            .bind(folder_id)
+            .bind(self.id)
+            .execute(db)
+            .await?;
 
         self.profile_id = profile_id;
         self.folder_id = folder_id;
@@ -105,7 +103,7 @@ impl DeviceModel {
 
     pub async fn set_connected_now(&mut self, db: &DbPool) -> DbResult<()> {
         let last_connected_at = Utc::now();
-        sqlx::query("UPDATE \"devices\" SET \"last_connected_at\" = ? WHERE \"id\" = ?")
+        sqlx::query(r#"UPDATE "devices" SET "last_connected_at" = ? WHERE "id" = ?"#)
             .bind(last_connected_at)
             .bind(self.id)
             .execute(db)
@@ -120,41 +118,57 @@ impl DeviceModel {
         db: &DbPool,
         access_token: &str,
     ) -> DbResult<Option<DeviceModel>> {
-        sqlx::query_as("SELECT * FROM \"devices\" WHERE \"access_token\" = ?")
+        sqlx::query_as(r#"SELECT * FROM "devices" WHERE "access_token" = ?"#)
             .bind(access_token)
             .fetch_optional(db)
             .await
     }
 
     pub async fn get_by_id(db: &DbPool, id: DeviceId) -> DbResult<Option<DeviceModel>> {
-        sqlx::query_as("SELECT * FROM \"devices\" WHERE \"id\" = ?")
+        sqlx::query_as(r#"SELECT * FROM "devices" WHERE "id" = ?"#)
             .bind(id)
             .fetch_optional(db)
             .await
     }
 
+    pub async fn get_by_ids(db: &DbPool, ids: &[DeviceId]) -> DbResult<Vec<DeviceModel>> {
+        if ids.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        let placeholders = ids.iter().map(|_| "?").collect::<Vec<_>>().join(",");
+        let query = format!("SELECT * FROM \"devices\" WHERE \"id\" IS IN ({placeholders})");
+
+        let mut query = sqlx::query_as(&query);
+        for id in ids {
+            query = query.bind(id);
+        }
+
+        query.fetch_all(db).await
+    }
+
     pub async fn all(db: &DbPool) -> DbResult<Vec<DeviceModel>> {
-        sqlx::query_as("SELECT * FROM \"devices\"")
+        sqlx::query_as(r#"SELECT * FROM "devices""#)
             .fetch_all(db)
             .await
     }
 
     pub async fn all_by_profile(db: &DbPool, profile_id: ProfileId) -> DbResult<Vec<DeviceModel>> {
-        sqlx::query_as("SELECT * FROM \"devices\" WHERE \"profile_id\" = ?")
+        sqlx::query_as(r#"SELECT * FROM "devices" WHERE "profile_id" = ?"#)
             .bind(profile_id)
             .fetch_all(db)
             .await
     }
 
     pub async fn all_by_folder(db: &DbPool, folder_id: FolderId) -> DbResult<Vec<DeviceModel>> {
-        sqlx::query_as("SELECT * FROM \"devices\" WHERE \"folder_id\" = ?")
+        sqlx::query_as(r#"SELECT * FROM "devices" WHERE "folder_id" = ?"#)
             .bind(folder_id)
             .fetch_all(db)
             .await
     }
 
     pub async fn delete(db: &DbPool, device_id: DeviceId) -> DbResult<()> {
-        sqlx::query("DELETE FROM \"devices\" WHERE \"id\" = ?")
+        sqlx::query(r#"DELETE FROM "devices" WHERE "id" = ?"#)
             .bind(device_id)
             .execute(db)
             .await?;

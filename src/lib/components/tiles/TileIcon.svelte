@@ -48,6 +48,8 @@
         );
       case TileIconType.Uploaded:
         return getUploadedIconAssetPath(serverContext.serverURL, icon.path);
+      case TileIconType.Url:
+        return icon.src;
       default:
         return null;
     }

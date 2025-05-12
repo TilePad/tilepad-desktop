@@ -1,8 +1,3 @@
-use std::sync::Arc;
-
-use anyhow::Context;
-use tilepad_manifest::plugin::PluginId;
-
 use crate::{
     database::{
         DbPool, JsonObject,
@@ -13,6 +8,9 @@ use crate::{
     device::Devices,
     icons::Icons,
 };
+use anyhow::Context;
+use std::sync::Arc;
+use tilepad_manifest::plugin::PluginId;
 
 pub struct Tiles {
     /// Access to the database
@@ -134,5 +132,17 @@ impl Tiles {
         let tile = tile.update_position(&self.db, position).await?;
         self.devices.background_update_folder(tile.folder_id);
         Ok(tile)
+    }
+
+    /// Get all tiles that are currently visible
+    pub async fn get_visible_tiles(&self, plugin_id: PluginId) -> anyhow::Result<Vec<TileModel>> {
+        // Load all connected devices
+        let device_ids = self.devices.get_connected_device_ids();
+
+        // Get all tiles linked to the devices that are for the plugin
+        let tiles =
+            TileModel::get_by_from_devices_by_plugin(&self.db, &device_ids, plugin_id).await?;
+
+        Ok(tiles)
     }
 }

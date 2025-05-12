@@ -1,3 +1,4 @@
+use super::device::DeviceId;
 use super::folder::FolderId;
 use crate::database::{DbErr, DbPool, DbResult, JsonObject};
 use serde::{Deserialize, Serialize};
@@ -358,6 +359,39 @@ impl TileModel {
             .bind(folder_id)
             .fetch_all(db)
             .await
+    }
+
+    pub async fn get_by_from_devices_by_plugin(
+        db: &DbPool,
+        device_ids: &[DeviceId],
+        plugin_id: PluginId,
+    ) -> DbResult<Vec<TileModel>> {
+        if device_ids.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        let placeholders = device_ids.iter().map(|_| "?").collect::<Vec<_>>().join(",");
+
+        let query = format!(
+            r#"
+            SELECT * FROM "tiles"
+            WHERE "plugin_id" = ? AND "folder_id" IN (
+                SELECT DISTINCT "folder_id" FROM "devices"
+                WHERE "id" IN ({placeholders})
+            )
+            "#
+        );
+
+        let mut query = sqlx::query_as(&query)
+            // Bind the plugin ID
+            .bind(plugin_id.as_str());
+
+        // Bind the device IDs
+        for device_id in device_ids {
+            query = query.bind(device_id);
+        }
+
+        query.fetch_all(db).await
     }
 
     pub async fn get_by_id(db: &DbPool, tile_id: TileId) -> DbResult<Option<TileModel>> {

@@ -246,6 +246,17 @@ impl PluginSession {
                 }
             }
 
+            ClientPluginMessage::GetVisibleTiles => {
+                match self.tiles.get_visible_tiles(plugin_id).await {
+                    Ok(tiles) => {
+                        self.send_message(ServerPluginMessage::VisibleTiles { tiles });
+                    }
+                    Err(cause) => {
+                        tracing::error!(?cause, "failed to get visible tiles");
+                    }
+                }
+            }
+
             message => {
                 tracing::warn!(?message, "got unexpected message from authorized plugin");
             }

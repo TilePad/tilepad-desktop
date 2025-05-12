@@ -104,6 +104,18 @@ impl Devices {
             .collect()
     }
 
+    /// Get all device IDs that have active sessions
+    pub fn get_connected_device_ids(&self) -> Vec<DeviceId> {
+        self.sessions
+            .read()
+            .iter()
+            .filter_map(|(_, session_ref)| {
+                let device_id = session_ref.get_device_id()?;
+                Some(device_id)
+            })
+            .collect()
+    }
+
     /// Remove a session
     pub fn remove_session(&self, session_id: DeviceSessionId, device_id: Option<DeviceId>) {
         self.sessions.write().remove(&session_id);
@@ -345,7 +357,7 @@ impl Devices {
         device.set_profile(db, folder.profile_id, folder_id).await?;
 
         // Inform plugins of the new tile sets
-        self.plugins.set_device_tiles(device_id, &tiles);
+        self.plugins.set_device_tiles(device_id, &tiles)?;
 
         // Inform the device of its new tile set
         if let Some(session) = self.get_session_by_device(device_id) {
