@@ -3,12 +3,15 @@ use serde::{Deserialize, Serialize};
 use crate::{
     database::{
         JsonObject,
-        entity::tile::{TileIcon, TileId, TileLabel},
+        entity::{
+            device::DeviceId,
+            tile::{TileIcon, TileId, TileLabel, TileModel},
+        },
     },
     events::{DeepLinkContext, InspectorContext, TileInteractionContext},
 };
 
-use tilepad_manifest::plugin::PluginId;
+use tilepad_manifest::plugin::{ActionId, PluginId};
 
 /// Plugin message coming from the client side
 #[derive(Debug, Deserialize)]
@@ -103,5 +106,13 @@ pub enum ServerPluginMessage {
     TileProperties {
         tile_id: TileId,
         properties: JsonObject,
+    },
+
+    /// Selection of tiles for a device has changed
+    DeviceTiles {
+        /// ID of the device that changes
+        device_id: DeviceId,
+        /// Tiles that are now visible on the device
+        tiles: Vec<TileModel>,
     },
 }

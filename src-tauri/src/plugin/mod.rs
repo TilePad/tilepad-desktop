@@ -6,7 +6,10 @@ use std::{
 };
 
 use crate::{
-    database::{DbPool, JsonObject, entity::plugin_properties::PluginPropertiesModel},
+    database::{
+        DbPool, JsonObject,
+        entity::{device::DeviceId, plugin_properties::PluginPropertiesModel, tile::TileModel},
+    },
     device::Devices,
     events::{
         AppEvent, AppEventSender, DeepLinkContext, InspectorContext, PluginAppEvent,
@@ -274,7 +277,7 @@ impl Plugins {
 
     /// Insert a new session
     pub fn get_session(&self, session_id: &PluginSessionId) -> Option<PluginSessionRef> {
-        self.sessions.write().get(session_id).cloned()
+        self.sessions.read().get(session_id).cloned()
     }
 
     /// Remove a session
@@ -322,6 +325,36 @@ impl Plugins {
             session.send_message(ServerPluginMessage::RecvFromInspector {
                 ctx: context,
                 message,
+            });
+        }
+
+        Ok(())
+    }
+
+    pub fn set_device_tiles(&self, device_id: DeviceId, tiles: &[TileModel]) -> anyhow::Result<()> {
+        // Collect all active plugin sessions
+        let sessions: Vec<(PluginId, PluginSessionRef)> = {
+            self.sessions
+                .read()
+                .iter()
+                .filter_map(|(_, value)| {
+                    let plugin_id = value.get_plugin_id()?;
+                    Some((plugin_id, value.clone()))
+                })
+                .collect()
+        };
+
+        for (plugin_id, session) in sessions {
+            // Filter the tile set to only include those the plugin needs to know about
+            let relevant_tiles: Vec<TileModel> = tiles
+                .iter()
+                .filter(|tile| tile.plugin_id.eq(&plugin_id))
+                .cloned()
+                .collect();
+
+            _ = session.send_message(ServerPluginMessage::DeviceTiles {
+                device_id,
+                tiles: relevant_tiles,
             });
         }
 

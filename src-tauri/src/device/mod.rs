@@ -344,6 +344,10 @@ impl Devices {
 
         device.set_profile(db, folder.profile_id, folder_id).await?;
 
+        // Inform plugins of the new tile sets
+        self.plugins.set_device_tiles(device_id, &tiles);
+
+        // Inform the device of its new tile set
         if let Some(session) = self.get_session_by_device(device_id) {
             session.send_message(ServerDeviceMessage::Tiles { tiles, folder });
         }
