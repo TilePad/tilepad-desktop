@@ -167,20 +167,6 @@ impl DeviceModel {
             .await
     }
 
-    /// Get all devices that have a specific tile
-    pub async fn all_by_tile(db: &DbPool, tile_id: TileId) -> DbResult<Vec<DeviceModel>> {
-        sqlx::query_as(
-            r#"
-            SELECT * FROM "devices" "d" 
-            JOIN "tiles" "t" ON "d"."folder_id" = "t"."folder_id"
-            WHERE "t"."id" = $1
-            "#,
-        )
-        .bind(tile_id)
-        .fetch_all(db)
-        .await
-    }
-
     pub async fn delete(db: &DbPool, device_id: DeviceId) -> DbResult<()> {
         sqlx::query(r#"DELETE FROM "devices" WHERE "id" = ?"#)
             .bind(device_id)

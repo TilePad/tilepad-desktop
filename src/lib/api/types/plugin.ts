@@ -1,6 +1,7 @@
 import type { TileId } from "./tiles";
 import type { ActionId } from "./actions";
 import type { FolderId } from "./folders";
+import type { DeviceId } from "./devices";
 import type { ProfileId } from "./profiles";
 
 export type PluginId = string;
@@ -42,14 +43,19 @@ export function isInspectorContextEqual(
   );
 }
 
+export const CONTROLLER_DEVICE_ID = "00000000-0000-0000-0000-000000000000";
+
 export interface DisplayContext {
+  device_id: DeviceId;
   plugin_id: PluginId;
   action_id: ActionId;
   tile_id: TileId;
 }
 
 export function encodeDisplayContext(ctx: DisplayContext): string {
-  return ctx.plugin_id + "-" + ctx.action_id + "-" + ctx.tile_id;
+  return (
+    ctx.device_id + ctx.plugin_id + "-" + ctx.action_id + "-" + ctx.tile_id
+  );
 }
 
 export function isDisplayContextEqual(
@@ -57,6 +63,7 @@ export function isDisplayContextEqual(
   b: DisplayContext,
 ): boolean {
   return (
+    a.device_id === b.device_id &&
     a.plugin_id === b.plugin_id &&
     a.action_id === b.action_id &&
     a.tile_id === b.tile_id
@@ -95,6 +102,7 @@ export interface ManifestCategory {
 export interface ManifestAction {
   label: string;
   icon: string | null;
+  display: string | null;
   description: string | null;
   inspector: string | null;
 }

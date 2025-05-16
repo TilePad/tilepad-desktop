@@ -1,8 +1,11 @@
 <script lang="ts">
-  import type { DisplayContext } from "$lib/api/types/plugin";
   import type { ActionWithCategory } from "$lib/api/types/actions";
 
   import { watch, useDebounce } from "runed";
+  import {
+    type DisplayContext,
+    CONTROLLER_DEVICE_ID,
+  } from "$lib/api/types/plugin";
   import {
     createUpdateTileIconMutation,
     createUpdateTileIconOptionsMutation,
@@ -33,6 +36,7 @@
   const updateTileIcon = createUpdateTileIconMutation();
   const updateTileIconOptions = createUpdateTileIconOptionsMutation();
   const displayCtx: DisplayContext = $derived({
+    device_id: CONTROLLER_DEVICE_ID,
     tile_id: tileId,
     action_id: action?.action_id ?? "",
     plugin_id: action?.plugin_id ?? "",
@@ -50,14 +54,19 @@
   };
 
   const onResetDefault = () => {
-    const defaultIcon: ITileIcon =
-      !action || action.icon === null
-        ? { type: TileIconType.None }
-        : {
-            type: TileIconType.PluginIcon,
-            plugin_id: action.plugin_id,
-            icon: action.icon,
-          };
+    let icon: ITileIcon = { type: TileIconType.None };
+    if (action) {
+      if (action.display) {
+        icon = { type: TileIconType.Display, path: action.display };
+      } else if (action.icon) {
+        icon = {
+          type: TileIconType.PluginIcon,
+          plugin_id: action.plugin_id,
+          icon: action.icon,
+        };
+      }
+    }
+
     const defaultIconOptions = {
       ...iconOptions,
       padding: 0,
@@ -70,7 +79,7 @@
 
     $updateTileIcon.mutate({
       tileId,
-      icon: defaultIcon,
+      icon,
       kind: UpdateKind.Reset,
     });
 

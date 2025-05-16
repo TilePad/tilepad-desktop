@@ -22,6 +22,7 @@ export interface Action {
 
   label: string;
   icon: Option<string>;
+  display: Option<string>;
   icon_options: Option<Partial<TileIconOptions>>;
   description: Option<string>;
   inspector: Option<string>;

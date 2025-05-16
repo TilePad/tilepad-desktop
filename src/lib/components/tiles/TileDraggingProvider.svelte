@@ -1,7 +1,11 @@
 <script lang="ts" module>
   import type { Action } from "$lib/api/types/actions";
 
-  import { TileIconType, type TileModel } from "$lib/api/types/tiles";
+  import {
+    TileIconType,
+    type TileIcon,
+    type TileModel,
+  } from "$lib/api/types/tiles";
 
   const tileDraggingContextKey = Symbol("TILE_DRAGGING_CONTEXT");
 
@@ -204,6 +208,18 @@
         });
       } else if (draggingState.data.type === "action") {
         const action = draggingState.data as Action;
+
+        let icon: TileIcon = { type: TileIconType.None };
+        if (action.display) {
+          icon = { type: TileIconType.Display, path: action.display };
+        } else if (action.icon) {
+          icon = {
+            type: TileIconType.PluginIcon,
+            plugin_id: action.plugin_id,
+            icon: action.icon,
+          };
+        }
+
         const createPromise = $createTile.mutateAsync({
           create: {
             position: {
@@ -216,14 +232,7 @@
             action_id: action.action_id,
             plugin_id: action.plugin_id,
             config: {
-              icon:
-                action.icon === null
-                  ? { type: TileIconType.None }
-                  : {
-                      type: TileIconType.PluginIcon,
-                      plugin_id: action.plugin_id,
-                      icon: action.icon,
-                    },
+              icon,
               icon_options: action.icon_options
                 ? action.icon_options
                 : undefined,

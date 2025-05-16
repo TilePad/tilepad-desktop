@@ -57,7 +57,7 @@ pub enum ServerDeviceMessage {
     Revoked,
 
     /// Device is authenticated
-    Authenticated,
+    Authenticated { device_id: Uuid },
 
     /// Provided access token was invalid
     InvalidAccessToken,

@@ -170,8 +170,8 @@ pub enum TileIcon {
         path: String,
     },
 
-    /// Embed an inspector as the tile icon
-    Inspector {
+    /// Embed a HTML display as the tile icon
+    Display {
         /// Path the display HTML file
         path: String,
     },

@@ -144,7 +144,7 @@ impl DeviceSession {
 
                 // Authenticate the device session
                 self.set_device_id(Some(device_id));
-                self.send_message(ServerDeviceMessage::Authenticated);
+                self.send_message(ServerDeviceMessage::Authenticated { device_id });
             }
 
             message => {

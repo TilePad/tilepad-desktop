@@ -185,11 +185,13 @@ impl PluginSession {
             }
 
             ClientPluginMessage::SendToDisplay { ctx, message } => {
-                // Send a copy to the UI for updating on the display side
-                self.plugins.send_to_display(ctx.clone(), message.clone());
-
-                // Send the message to devices
-                self.tiles.handle_plugin_message(ctx, message).await;
+                if ctx.device_id.is_nil() {
+                    // "Device" is the controller itself
+                    self.plugins.send_to_display(ctx, message);
+                } else {
+                    // Send the message to devices
+                    _ = self.tiles.handle_plugin_message(ctx, message).await;
+                }
             }
 
             ClientPluginMessage::OpenUrl { url } => {

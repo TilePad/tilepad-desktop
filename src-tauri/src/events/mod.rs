@@ -53,6 +53,7 @@ pub struct InspectorContext {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DisplayContext {
+    pub device_id: DeviceId,
     pub plugin_id: PluginId,
     pub action_id: ActionId,
     pub tile_id: TileId,

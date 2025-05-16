@@ -1,9 +1,12 @@
 <script lang="ts">
-  import type { DisplayContext } from "$lib/api/types/plugin";
   import type { TileId, TileModel, TilePosition } from "$lib/api/types/tiles";
 
   import { useDebounce } from "runed";
   import { createUpdateTilePositionMutation } from "$lib/api/tiles";
+  import {
+    type DisplayContext,
+    CONTROLLER_DEVICE_ID,
+  } from "$lib/api/types/plugin";
   import {
     resizeHandle,
     ResizeDirection,
@@ -36,6 +39,7 @@
   const { draggingState, onStartDragging } = getDraggingContext();
 
   const displayCtx: DisplayContext = $derived({
+    device_id: CONTROLLER_DEVICE_ID,
     tile_id: tile.id,
     action_id: tile.action_id,
     plugin_id: tile.plugin_id,
