@@ -12,8 +12,8 @@
   import TileIconEditor from "./TileIconEditor.svelte";
   import TileNameEditor from "./TileNameEditor.svelte";
   import DeleteTileDialog from "./DeleteTileDialog.svelte";
-  import PropertyInspector from "../property/Display.svelte";
   import { getFolderContext } from "../folders/FolderProvider.svelte";
+  import PropertyInspector from "../property/PropertyInspector.svelte";
   import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
 
   type Props = {

@@ -12,7 +12,7 @@
     getUploadedIconAssetPath,
   } from "$lib/api/utils/url";
 
-  import Display from "../property/Display.svelte";
+  import Display from "../display/Display.svelte";
   import { getServerContext } from "../ServerProvider.svelte";
 
   type Props = {
