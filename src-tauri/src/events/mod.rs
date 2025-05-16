@@ -52,6 +52,13 @@ pub struct InspectorContext {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DisplayContext {
+    pub plugin_id: PluginId,
+    pub action_id: ActionId,
+    pub tile_id: TileId,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TileInteractionContext {
     pub device_id: DeviceId,
 
@@ -75,6 +82,11 @@ pub enum PluginAppEvent {
     /// Got a message from the plugin for the inspector
     Message {
         context: InspectorContext,
+        message: serde_json::Value,
+    },
+    /// Got a message from the plugin for a display
+    DisplayMessage {
+        context: DisplayContext,
         message: serde_json::Value,
     },
 

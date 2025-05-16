@@ -6,7 +6,11 @@ use tauri::{AppHandle, Emitter};
 use tilepad_manifest::plugin::PluginId;
 use tracing::{debug, error};
 
-use crate::{database::DbPool, events::InspectorContext, plugin::runner::PluginTaskState};
+use crate::{
+    database::DbPool,
+    events::{DisplayContext, InspectorContext},
+    plugin::runner::PluginTaskState,
+};
 
 use super::{
     AppEvent, AppEventReceiver, DeviceAppEvent, DeviceRequestAppEvent, IconPackAppEvent,
@@ -86,6 +90,19 @@ async fn process_event(
 
                 app_handle.emit("plugin:recv_plugin_message", &Payload { context, message })?;
             }
+            PluginAppEvent::DisplayMessage { context, message } => {
+                #[derive(Serialize)]
+                struct Payload {
+                    context: DisplayContext,
+                    message: serde_json::Value,
+                }
+
+                app_handle.emit(
+                    "plugin:recv_plugin_display_message",
+                    &Payload { context, message },
+                )?;
+            }
+
             PluginAppEvent::Loaded { plugin_id } => {
                 app_handle.emit("plugins:loaded", plugin_id)?;
             }

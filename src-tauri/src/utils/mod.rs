@@ -1,4 +1,5 @@
 pub mod device;
+pub mod display;
 pub mod error;
 pub mod file;
 pub mod inspector;

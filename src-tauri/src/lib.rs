@@ -86,6 +86,7 @@ pub fn run() {
             tiles::tiles_update_tile_position,
             // Plugins
             plugins::plugins_send_plugin_message,
+            plugins::plugins_send_plugin_display_message,
             plugins::plugins_open_inspector,
             plugins::plugins_close_inspector,
             plugins::plugins_get_plugin_properties,

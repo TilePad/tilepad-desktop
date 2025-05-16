@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "vite dev",
     "build": "npm run prebuild && vite build",
-    "prebuild": "npm run build:inspector",
+    "prebuild": "npm run build:inspector && npm run build:display",
     "preview": "vite preview",
     "build:inspector": "cd inspector && npm run build",
+    "build:display": "cd display && npm run build",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "tauri": "tauri",

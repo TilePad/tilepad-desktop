@@ -6,7 +6,7 @@ use crate::{
         models::error::{DynHttpError, HttpError},
     },
     tile::Tiles,
-    utils::inspector::inject_property_inspector_current,
+    utils::{display::inject_display_current, inspector::inject_property_inspector_current},
 };
 use axum::{
     Extension,
@@ -62,8 +62,23 @@ pub async fn get_plugin_file(
     let (mut file_bytes, mime) = read_serve_file(plugin_path, &file_path).await?;
     let mime_header = HeaderValue::try_from(mime.essence_str()).map_err(axum::http::Error::from)?;
 
+    // Display HTML files use the .display.html extension
+    let is_display = file_path.file_name().is_some_and(|value| {
+        value
+            .to_str()
+            .is_some_and(|name| name.ends_with("display.html"))
+    });
+
+    // Inject display script and styles into display files
+    if is_display {
+        let file_text =
+            String::from_utf8(file_bytes).map_err(|_| PluginError::UnsupportedHtmlEncoding)?;
+        let file_text = inject_display_current(&file_text).await;
+
+        file_bytes = file_text.into_bytes();
+    }
     // Inject inspector script and styles into HTML files
-    if mime == mime::TEXT_HTML {
+    else if mime == mime::TEXT_HTML {
         let file_text =
             String::from_utf8(file_bytes).map_err(|_| PluginError::UnsupportedHtmlEncoding)?;
         let file_text = inject_property_inspector_current(&file_text).await;

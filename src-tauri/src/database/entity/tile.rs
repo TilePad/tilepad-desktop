@@ -169,6 +169,12 @@ pub enum TileIcon {
         /// Path to the uploaded file
         path: String,
     },
+
+    /// Embed an inspector as the tile icon
+    Inspector {
+        /// Path the display HTML file
+        path: String,
+    },
 }
 
 #[derive(Deserialize)]

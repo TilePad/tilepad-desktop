@@ -4,6 +4,7 @@ import { createQuery, createMutation } from "@tanstack/svelte-query";
 
 import type {
   PluginId,
+  DisplayContext,
   PluginWithState,
   InspectorContext,
 } from "./types/plugin";
@@ -48,6 +49,16 @@ export function setPluginProperties(
 
 export function sendPluginMessage(context: InspectorContext, message: unknown) {
   return invoke<void>("plugins_send_plugin_message", {
+    context,
+    message,
+  });
+}
+
+export function sendPluginDisplayMessage(
+  context: DisplayContext,
+  message: unknown,
+) {
+  return invoke<void>("plugins_send_plugin_display_message", {
     context,
     message,
   });

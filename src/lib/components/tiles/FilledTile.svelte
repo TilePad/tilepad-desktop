@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { DisplayContext } from "$lib/api/types/plugin";
   import type { TileId, TileModel, TilePosition } from "$lib/api/types/tiles";
 
   import { useDebounce } from "runed";
@@ -33,6 +34,12 @@
 
   const { tile, tileSize, gap, onClick, isAllowedWithin }: Props = $props();
   const { draggingState, onStartDragging } = getDraggingContext();
+
+  const displayCtx: DisplayContext = $derived({
+    tile_id: tile.id,
+    action_id: tile.action_id,
+    plugin_id: tile.plugin_id,
+  });
 
   const updateTilePosition = createUpdateTilePositionMutation();
 
@@ -311,7 +318,11 @@
     data-row={tile.position.row}
     data-column={tile.position.column}
   >
-    <TileIcon icon={config.icon} iconOptions={config.icon_options} />
+    <TileIcon
+      ctx={displayCtx}
+      icon={config.icon}
+      iconOptions={config.icon_options}
+    />
     <TileLabelElm label={config.label} />
   </button>
 

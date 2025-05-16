@@ -12,8 +12,8 @@ use crate::{
     },
     device::Devices,
     events::{
-        AppEvent, AppEventSender, DeepLinkContext, InspectorContext, PluginAppEvent,
-        TileInteractionContext,
+        AppEvent, AppEventSender, DeepLinkContext, DisplayContext, InspectorContext,
+        PluginAppEvent, TileInteractionContext,
     },
     server::HTTP_PORT,
 };
@@ -327,6 +327,25 @@ impl Plugins {
                 message,
             });
         }
+
+        Ok(())
+    }
+    pub async fn handle_send_display_message(
+        self: &Arc<Self>,
+        context: DisplayContext,
+        message: serde_json::Value,
+    ) -> anyhow::Result<()> {
+        tracing::debug!(?context, ?message, "sending message to plugin from display");
+
+        let session = match self.get_plugin_session(&context.plugin_id) {
+            Some(value) => value,
+            None => return Ok(()),
+        };
+
+        session.send_message(ServerPluginMessage::RecvFromDisplay {
+            ctx: context,
+            message,
+        });
 
         Ok(())
     }

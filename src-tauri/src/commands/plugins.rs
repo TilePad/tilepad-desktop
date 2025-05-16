@@ -3,7 +3,7 @@ use std::sync::Arc;
 use crate::{
     commands::CmdResult,
     database::JsonObject,
-    events::InspectorContext,
+    events::{DisplayContext, InspectorContext},
     plugin::{
         PluginWithState, Plugins,
         install::{install_plugin_requirements, install_plugin_zip, remove_plugin_files},
@@ -73,6 +73,19 @@ pub async fn plugins_send_plugin_message(
     message: serde_json::Value,
 ) -> CmdResult<()> {
     plugins.handle_send_message(context, message).await?;
+
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn plugins_send_plugin_display_message(
+    plugins: State<'_, Arc<Plugins>>,
+    context: DisplayContext,
+    message: serde_json::Value,
+) -> CmdResult<()> {
+    plugins
+        .handle_send_display_message(context, message)
+        .await?;
 
     Ok(())
 }

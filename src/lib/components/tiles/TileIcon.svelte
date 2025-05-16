@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { DisplayContext } from "$lib/api/types/plugin";
+
   import {
     TileIconType,
     type TileIcon,
@@ -10,14 +12,16 @@
     getUploadedIconAssetPath,
   } from "$lib/api/utils/url";
 
+  import Display from "../property/Display.svelte";
   import { getServerContext } from "../ServerProvider.svelte";
 
   type Props = {
+    ctx: DisplayContext;
     icon: TileIcon;
     iconOptions: TileIconOptions;
   };
 
-  const { icon, iconOptions }: Props = $props();
+  const { ctx, icon, iconOptions }: Props = $props();
 
   const serverContext = getServerContext();
 
@@ -56,7 +60,9 @@
   }
 </script>
 
-{#if src !== null}
+{#if icon.type === TileIconType.Display}
+  <Display {ctx} inspector={icon.path} />
+{:else if src !== null}
   <img
     class="tile__icon"
     class:tile__icon--error={error}

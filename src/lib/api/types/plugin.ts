@@ -42,6 +42,27 @@ export function isInspectorContextEqual(
   );
 }
 
+export interface DisplayContext {
+  plugin_id: PluginId;
+  action_id: ActionId;
+  tile_id: TileId;
+}
+
+export function encodeDisplayContext(ctx: DisplayContext): string {
+  return ctx.plugin_id + "-" + ctx.action_id + "-" + ctx.tile_id;
+}
+
+export function isDisplayContextEqual(
+  a: DisplayContext,
+  b: DisplayContext,
+): boolean {
+  return (
+    a.plugin_id === b.plugin_id &&
+    a.action_id === b.action_id &&
+    a.tile_id === b.tile_id
+  );
+}
+
 export type PluginWithState = Plugin & {
   state: PluginTaskState;
 };

@@ -8,7 +8,7 @@ use crate::{
             tile::{TileIcon, TileId, TileLabel, TileModel},
         },
     },
-    events::{DeepLinkContext, InspectorContext, TileInteractionContext},
+    events::{DeepLinkContext, DisplayContext, InspectorContext, TileInteractionContext},
 };
 
 use tilepad_manifest::plugin::PluginId;
@@ -93,6 +93,12 @@ pub enum ServerPluginMessage {
     /// Got a message from the inspector
     RecvFromInspector {
         ctx: InspectorContext,
+        message: serde_json::Value,
+    },
+
+    /// Got a message from a display
+    RecvFromDisplay {
+        ctx: DisplayContext,
         message: serde_json::Value,
     },
 

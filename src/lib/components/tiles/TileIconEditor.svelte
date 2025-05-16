@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { DisplayContext } from "$lib/api/types/plugin";
   import type { ActionWithCategory } from "$lib/api/types/actions";
 
   import { watch, useDebounce } from "runed";
@@ -31,6 +32,11 @@
 
   const updateTileIcon = createUpdateTileIconMutation();
   const updateTileIconOptions = createUpdateTileIconOptionsMutation();
+  const displayCtx: DisplayContext = $derived({
+    tile_id: tileId,
+    action_id: action?.action_id ?? "",
+    plugin_id: action?.plugin_id ?? "",
+  });
 
   let lastOptionsUpdate: TileIconOptions = $state(config.icon_options);
   let iconOptions = $state(config.icon_options);
@@ -116,7 +122,7 @@
   style="--tile-size-adjustment: 1; --tile-width: {tileSize}px; --tile-height: {tileSize}px; --tile-border-color: {iconOptions.border_color}"
 >
   <div class="tile">
-    <TileIcon icon={config.icon} {iconOptions} />
+    <TileIcon ctx={displayCtx} icon={config.icon} {iconOptions} />
     <TileLabel label={config.label} />
   </div>
 </div>
