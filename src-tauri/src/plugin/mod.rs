@@ -423,6 +423,17 @@ impl Plugins {
             }));
     }
 
+    /// Handle sending a message to the provided display context from
+    /// a plugin session
+    pub fn send_to_display(&self, ctx: DisplayContext, message: serde_json::Value) {
+        _ = self
+            .event_tx
+            .send(AppEvent::Plugin(PluginAppEvent::DisplayMessage {
+                context: ctx,
+                message,
+            }));
+    }
+
     /// Handle setting the plugin properties
     pub async fn set_plugin_properties(
         &self,

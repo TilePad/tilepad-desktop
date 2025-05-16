@@ -18,7 +18,8 @@ use crate::{
         },
     },
     events::{
-        AppEvent, AppEventSender, DeviceAppEvent, DeviceRequestAppEvent, TileInteractionContext,
+        AppEvent, AppEventSender, DeviceAppEvent, DeviceRequestAppEvent, DisplayContext,
+        TileInteractionContext,
     },
     plugin::Plugins,
     utils::random::generate_access_token,
@@ -399,6 +400,33 @@ impl Devices {
                 _ = session.send_message(ServerDeviceMessage::Tiles {
                     tiles: tiles.clone(),
                     folder: folder.clone(),
+                });
+            });
+
+        Ok(())
+    }
+
+    /// Handle sending a display message from a plugin to its destination
+    pub async fn handle_plugin_message(
+        &self,
+        ctx: DisplayContext,
+        message: serde_json::Value,
+    ) -> anyhow::Result<()> {
+        let db = &self.db;
+        let devices = DeviceModel::all_by_tile(db, ctx.tile_id).await?;
+
+        // No devices to update
+        if devices.is_empty() {
+            return Ok(());
+        }
+
+        devices
+            .iter()
+            .filter_map(|device| self.get_session_by_device(device.id))
+            .for_each(|session| {
+                _ = session.send_message(ServerDeviceMessage::RecvFromPlugin {
+                    ctx: ctx.clone(),
+                    message: message.clone(),
                 });
             });
 

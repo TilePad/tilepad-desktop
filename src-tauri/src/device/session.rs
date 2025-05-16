@@ -184,6 +184,16 @@ impl DeviceSession {
                 });
             }
 
+            ClientDeviceMessage::RecvFromDisplay { ctx, message } => {
+                let plugins = self.devices.plugins.clone();
+
+                _ = tokio::spawn(async move {
+                    if let Err(cause) = plugins.handle_send_display_message(ctx, message).await {
+                        tracing::error!(?cause, "failed to forward display message");
+                    }
+                });
+            }
+
             message => {
                 tracing::warn!(?message, "got unexpected message from authorized device");
             }

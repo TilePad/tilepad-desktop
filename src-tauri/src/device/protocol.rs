@@ -1,7 +1,10 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::database::entity::{folder::FolderModel, tile::TileModel};
+use crate::{
+    database::entity::{folder::FolderModel, tile::TileModel},
+    events::DisplayContext,
+};
 
 /// Device message coming from the client side
 #[derive(Debug, Deserialize)]
@@ -26,6 +29,12 @@ pub enum ClientDeviceMessage {
     TileClicked {
         /// ID of the tile that was touched
         tile_id: Uuid,
+    },
+
+    /// Got a message from a display
+    RecvFromDisplay {
+        ctx: DisplayContext,
+        message: serde_json::Value,
     },
 }
 
@@ -57,5 +66,11 @@ pub enum ServerDeviceMessage {
     Tiles {
         tiles: Vec<TileModel>,
         folder: FolderModel,
+    },
+
+    /// Got a message from the plugin
+    RecvFromPlugin {
+        ctx: DisplayContext,
+        message: serde_json::Value,
     },
 }

@@ -6,6 +6,7 @@ use crate::{
         },
     },
     device::Devices,
+    events::DisplayContext,
     icons::Icons,
 };
 use anyhow::Context;
@@ -46,6 +47,15 @@ impl Tiles {
         );
 
         Ok(tile)
+    }
+
+    /// Forward handling a plugin message onto the devices
+    pub async fn handle_plugin_message(
+        &self,
+        ctx: DisplayContext,
+        message: serde_json::Value,
+    ) -> anyhow::Result<()> {
+        self.devices.handle_plugin_message(ctx, message).await
     }
 
     /// Request the properties for a specific tile

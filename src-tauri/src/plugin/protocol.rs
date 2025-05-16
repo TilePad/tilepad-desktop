@@ -40,6 +40,14 @@ pub enum ClientPluginMessage {
         message: serde_json::Value,
     },
 
+    /// Send data to a specific display
+    SendToDisplay {
+        /// Inspector context
+        ctx: DisplayContext,
+        /// Message to send the display
+        message: serde_json::Value,
+    },
+
     /// Open a URL
     OpenUrl { url: String },
 

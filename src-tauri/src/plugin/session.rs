@@ -184,6 +184,14 @@ impl PluginSession {
                 self.plugins.send_to_inspector(ctx, message);
             }
 
+            ClientPluginMessage::SendToDisplay { ctx, message } => {
+                // Send a copy to the UI for updating on the display side
+                self.plugins.send_to_display(ctx.clone(), message.clone());
+
+                // Send the message to devices
+                self.tiles.handle_plugin_message(ctx, message).await;
+            }
+
             ClientPluginMessage::OpenUrl { url } => {
                 _ = spawn_blocking(move || {
                     if let Err(cause) = open_url(url, None::<&str>) {
