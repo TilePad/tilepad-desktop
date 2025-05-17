@@ -1,9 +1,9 @@
 use std::net::{IpAddr, Ipv4Addr};
 
 use serde::Serialize;
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle, Manager, State};
 
-use crate::server::HTTP_PORT;
+use crate::server::ServerPort;
 
 use super::CmdResult;
 
@@ -21,8 +21,10 @@ pub struct ServerInterface {
 
 /// Gets a list of current device approval requests
 #[tauri::command]
-pub fn server_get_connection_info() -> CmdResult<ServerConnectionInfo> {
-    let port = HTTP_PORT;
+pub fn server_get_connection_info(
+    port_state: State<'_, ServerPort>,
+) -> CmdResult<ServerConnectionInfo> {
+    let port = port_state.inner().0;
     let interfaces: Vec<ServerInterface> = local_ip_address::list_afinet_netifas()?
         .into_iter()
         .filter_map(|(name, addr)| match addr {
@@ -47,4 +49,10 @@ pub async fn server_get_licenses(app: AppHandle) -> CmdResult<String> {
     let file = app.path().resource_dir()?.join("THIRD_PARTY_LICENSES.md");
     let contents = tokio::fs::read_to_string(file).await?;
     Ok(contents)
+}
+
+/// Get the current HTTP server port
+#[tauri::command]
+pub fn server_get_port(port_state: State<'_, ServerPort>) -> CmdResult<u16> {
+    Ok(port_state.inner().0)
 }

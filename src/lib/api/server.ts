@@ -9,3 +9,7 @@ export function getConnectionInfo() {
 export function getLicenses() {
   return invoke<string>("server_get_licenses");
 }
+
+export function getServerPort() {
+  return invoke<number>("server_get_port");
+}

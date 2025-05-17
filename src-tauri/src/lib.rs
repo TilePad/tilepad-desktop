@@ -7,7 +7,7 @@ use events::DeepLinkContext;
 use fonts::Fonts;
 use icons::Icons;
 use plugin::Plugins;
-use server::{HTTP_PORT, create_http_socket};
+use server::{ServerPort, create_http_socket};
 use std::path::PathBuf;
 use tauri::{
     App, AppHandle, Manager, RunEvent,
@@ -58,6 +58,7 @@ pub fn run() {
             // Server
             server::server_get_connection_info,
             server::server_get_licenses,
+            server::server_get_port,
             // Profiles
             profiles::profiles_get_profiles,
             profiles::profiles_get_profile,
@@ -196,6 +197,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         user_plugins,
         runtimes_path,
         logs_path,
+        ServerPort(settings.port),
     ));
     let devices = Arc::new(Devices::new(
         app_event_tx.clone(),
@@ -213,6 +215,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
     app.manage(tiles.clone());
     app.manage(fonts.clone());
     app.manage(worker_guard);
+    app.manage(ServerPort(settings.port));
 
     // Handle deep links (tilepad://deep-link/com.tilepad.system.system.tilePlugin#code=1)
     app.deep_link().on_open_url({
@@ -233,7 +236,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
 
     // Binding a socket must come before the rest of the app setup
     // (Socket must be bound before plugins load to prevent phantom processes holding the port)
-    match tauri::async_runtime::block_on(create_http_socket()) {
+    match tauri::async_runtime::block_on(create_http_socket(settings.port)) {
         Ok(http_socket) => {
             // Spawn HTTP server
             spawn(server::start_http_server(
@@ -253,8 +256,9 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
             rfd::MessageDialog::new()
                 .set_title("Failed to start")
                 .set_description(format!(
-                    "The port {} required to run TilePad is currently in use, please change your port in settings",
-                    HTTP_PORT
+                    "The port {} required to run TilePad is currently in use, please change your port in settings 
+                    or most features of TilePad will be non-functional",
+                    settings.port
                 ))
                 .set_level(rfd::MessageLevel::Error)
                 .set_buttons(rfd::MessageButtons::Ok)

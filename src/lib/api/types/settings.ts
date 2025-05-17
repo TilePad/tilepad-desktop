@@ -5,4 +5,5 @@ export interface SettingsConfig {
   developer_mode: boolean;
   minimize_tray: boolean;
   start_minimized: boolean;
+  port: number;
 }

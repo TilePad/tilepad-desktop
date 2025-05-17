@@ -1,18 +1,20 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
 
+  import { getServerPort } from "$lib/api/server";
+
   import ServerProvider from "./ServerProvider.svelte";
+  import SkeletonList from "./skeleton/SkeletonList.svelte";
 
   type Props = {
     children?: Snippet;
   };
 
   const { children }: Props = $props();
-
-  const BACKEND_URL_PROD = "http://localhost:8532/";
-  const BACKEND_URL_DEV = "http://localhost:8532/";
-
-  const serverURL = import.meta.env.DEV ? BACKEND_URL_DEV : BACKEND_URL_PROD;
 </script>
 
-<ServerProvider {serverURL} {children} />
+{#await getServerPort()}
+  <SkeletonList />
+{:then port}
+  <ServerProvider serverURL="http://127.0.0.1:{port}/" {children} />
+{/await}

@@ -15,7 +15,7 @@ use crate::{
         AppEvent, AppEventSender, DeepLinkContext, DisplayContext, InspectorContext,
         PluginAppEvent, TileInteractionContext,
     },
-    server::HTTP_PORT,
+    server::ServerPort,
 };
 use action::{Action, ActionCategory, ActionWithCategory, actions_from_manifests};
 use anyhow::Context;
@@ -59,6 +59,9 @@ pub struct Plugins {
     /// Logs path
     logs_path: PathBuf,
 
+    /// Current HTTP server port
+    server_port: ServerPort,
+
     /// Collection of currently loaded plugins
     plugins: RwLock<HashMap<PluginId, Arc<Plugin>>>,
 
@@ -93,6 +96,7 @@ impl Plugins {
         user_path: PathBuf,
         runtimes_path: PathBuf,
         logs_path: PathBuf,
+        server_port: ServerPort,
     ) -> Self {
         Self {
             event_tx,
@@ -101,6 +105,7 @@ impl Plugins {
             user_path,
             runtimes_path,
             logs_path,
+            server_port,
 
             plugins: Default::default(),
             sessions: Default::default(),
@@ -586,7 +591,7 @@ impl Plugins {
             }
         };
 
-        let connect_url = format!("ws://127.0.0.1:{}/plugins/ws", HTTP_PORT);
+        let connect_url = format!("ws://127.0.0.1:{}/plugins/ws", self.server_port.0);
 
         let task_options = TaskOptions {
             connect_url,

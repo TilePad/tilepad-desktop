@@ -15,10 +15,11 @@ pub mod http_content;
 pub mod models;
 pub mod routes;
 
-pub const HTTP_PORT: u16 = 8532;
+#[derive(Clone, Copy)]
+pub struct ServerPort(pub u16);
 
-pub async fn create_http_socket() -> std::io::Result<TcpListener> {
-    let addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, HTTP_PORT));
+pub async fn create_http_socket(port: u16) -> std::io::Result<TcpListener> {
+    let addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, port));
     TcpListener::bind(addr).await
 }
 

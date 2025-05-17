@@ -21,6 +21,7 @@ pub struct SettingsConfig {
     pub developer_mode: bool,
     pub minimize_tray: bool,
     pub start_minimized: bool,
+    pub port: u16,
 }
 
 impl Default for SettingsConfig {
@@ -34,6 +35,7 @@ impl Default for SettingsConfig {
             developer_mode: false,
             minimize_tray: false,
             start_minimized: true,
+            port: 8532,
         }
     }
 }

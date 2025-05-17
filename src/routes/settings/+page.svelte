@@ -6,6 +6,7 @@
   import { createSetSettingsMutation } from "$lib/api/settings";
   import TextInput from "$lib/components/input/TextInput.svelte";
   import CreatorSection from "$lib/components/CreatorSection.svelte";
+  import NumberInput from "$lib/components/input/NumberInput.svelte";
   import EnabledSwitch from "$lib/components/input/EnabledSwitch.svelte";
   import LanguageSelector from "$lib/components/i18n/LanguageSelector.svelte";
   import { getSettingsContext } from "$lib/components/SettingsProvider.svelte";
@@ -36,6 +37,10 @@
 
   const onChangeDeviceName = (name: string) => {
     updateSettings({ ...settings, device_name: name });
+  };
+
+  const onChangeServerPort = (port: number) => {
+    updateSettings({ ...settings, port });
   };
 
   const onChangeLanguage = (language: string) => {
@@ -90,6 +95,7 @@
           <p class="tile-description">{$t("language_description")}</p>
         </div>
       </div>
+
       <div class="card">
         <div class="tile-item">
           <label class="tile-label" for="deviceName">{$t("device_name")}</label>
@@ -179,6 +185,23 @@
             onCheckedChange={(value) => onChangeDeveloperMode(value)}
           />
         </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="tile-item">
+        <label class="tile-label" for="serverPort">{$t("server_port")}</label>
+        <NumberInput
+          style="width: 100%"
+          id="serverPort"
+          value={settings.port}
+          onchange={(event) =>
+            onChangeServerPort(event.currentTarget.valueAsNumber)}
+        />
+
+        <p class="tile-description">
+          {$t("server_port_description")}
+        </p>
       </div>
     </div>
 
