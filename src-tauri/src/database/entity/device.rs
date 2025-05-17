@@ -1,4 +1,4 @@
-use super::{folder::FolderId, profile::ProfileId, tile::TileId};
+use super::{folder::FolderId, profile::ProfileId};
 use crate::database::{DbErr, DbPool, DbResult};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -129,22 +129,6 @@ impl DeviceModel {
             .bind(id)
             .fetch_optional(db)
             .await
-    }
-
-    pub async fn get_by_ids(db: &DbPool, ids: &[DeviceId]) -> DbResult<Vec<DeviceModel>> {
-        if ids.is_empty() {
-            return Ok(Vec::new());
-        }
-
-        let placeholders = ids.iter().map(|_| "?").collect::<Vec<_>>().join(",");
-        let query = format!("SELECT * FROM \"devices\" WHERE \"id\" IS IN ({placeholders})");
-
-        let mut query = sqlx::query_as(&query);
-        for id in ids {
-            query = query.bind(id);
-        }
-
-        query.fetch_all(db).await
     }
 
     pub async fn all(db: &DbPool) -> DbResult<Vec<DeviceModel>> {

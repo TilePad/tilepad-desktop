@@ -15,7 +15,7 @@ pub mod http_content;
 pub mod models;
 pub mod routes;
 
-pub const HTTP_PORT: u16 = 59371;
+pub const HTTP_PORT: u16 = 8532;
 
 pub async fn create_http_socket() -> std::io::Result<TcpListener> {
     let addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, HTTP_PORT));
