@@ -101,7 +101,7 @@ rfd = { version = "0.15.3", default-features = false, features = [
     "xdg-portal",
 ] }
 
-tilepad-manifest = { version = "0.6.0", path = "../../tilepad-manifest" }
+tilepad-manifest = { version = "0.7.0" }
 
 # Manifest definitions
 # Database of fonts and getting system fonts
