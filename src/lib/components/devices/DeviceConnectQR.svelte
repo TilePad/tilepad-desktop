@@ -19,7 +19,6 @@
   {#await getConnectionInfo()}
     <SkeletonList />
   {:then connectInfo}
-    {JSON.stringify(encodeInterfaces(connectInfo))}
     <div class="qr">
       <QRCode size={250} data={JSON.stringify(encodeInterfaces(connectInfo))} />
     </div>
