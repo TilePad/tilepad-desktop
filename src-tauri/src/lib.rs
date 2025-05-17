@@ -233,8 +233,19 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
 
     // Binding a socket must come before the rest of the app setup
     // (Socket must be bound before plugins load to prevent phantom processes holding the port)
-    let http_socket = match tauri::async_runtime::block_on(create_http_socket()) {
-        Ok(value) => value,
+    match tauri::async_runtime::block_on(create_http_socket()) {
+        Ok(http_socket) => {
+            // Spawn HTTP server
+            spawn(server::start_http_server(
+                http_socket,
+                db,
+                devices,
+                plugins.clone(),
+                icons.clone(),
+                tiles.clone(),
+                fonts,
+            ));
+        }
         Err(cause) => {
             tracing::error!(?cause, "failed to bind http server socket");
 
@@ -242,28 +253,14 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
             rfd::MessageDialog::new()
                 .set_title("Failed to start")
                 .set_description(format!(
-                    "The port {} required to run TilePad is currently in use",
+                    "The port {} required to run TilePad is currently in use, please change your port in settings",
                     HTTP_PORT
                 ))
                 .set_level(rfd::MessageLevel::Error)
                 .set_buttons(rfd::MessageButtons::Ok)
                 .show();
-
-            // Failing to start the HTTP socket is a fatal error, app will not work without this
-            std::process::exit(1);
         }
     };
-
-    // Spawn HTTP server
-    spawn(server::start_http_server(
-        http_socket,
-        db,
-        devices,
-        plugins.clone(),
-        icons.clone(),
-        tiles.clone(),
-        fonts,
-    ));
 
     // Load the plugins from the default paths
     spawn({
