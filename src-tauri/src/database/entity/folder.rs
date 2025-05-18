@@ -57,10 +57,10 @@ impl FolderModel {
         let config =
             serde_json::to_value(&model.config).map_err(|err| DbErr::Encode(err.into()))?;
         sqlx::query(
-            "
-            INSERT INTO \"folders\" (\"id\", \"name\", \"default\", \"profile_id\", \"config\", \"order\")
+            r#"
+            INSERT INTO "folders" ("id", "name", "default", "profile_id", "config", "order")
             VALUES (?, ?, ?, ?, ?, ?)
-        ",
+        "#,
         )
         .bind(model.id)
         .bind(model.name.clone())
@@ -75,14 +75,14 @@ impl FolderModel {
     }
 
     pub async fn get_by_id(db: &DbPool, folder_id: FolderId) -> DbResult<Option<FolderModel>> {
-        sqlx::query_as("SELECT * FROM \"folders\" WHERE \"id\" = ?")
+        sqlx::query_as(r#"SELECT * FROM "folders" WHERE "id" = ?"#)
             .bind(folder_id)
             .fetch_optional(db)
             .await
     }
 
     pub async fn set_name(mut self, db: &DbPool, name: String) -> DbResult<FolderModel> {
-        sqlx::query("UPDATE \"folders\" SET \"name\" = ? WHERE \"id\" = ?")
+        sqlx::query(r#"UPDATE "folders" SET "name" = ? WHERE "id" = ?"#)
             .bind(&name)
             .bind(self.id)
             .execute(db)
@@ -96,7 +96,7 @@ impl FolderModel {
     pub async fn set_config(mut self, db: &DbPool, config: FolderConfig) -> DbResult<FolderModel> {
         let config_json = serde_json::to_value(&config).map_err(|err| DbErr::Encode(err.into()))?;
 
-        sqlx::query("UPDATE \"folders\" SET \"config\" = ? WHERE \"id\" = ?")
+        sqlx::query(r#"UPDATE "folders" SET "config" = ? WHERE "id" = ?"#)
             .bind(config_json)
             .bind(self.id)
             .execute(db)
@@ -110,7 +110,7 @@ impl FolderModel {
     #[allow(unused)]
     pub async fn set_default(&mut self, db: &DbPool) -> DbResult<()> {
         sqlx::query(
-            "UPDATE \"folders\" SET \"default\" = CASE WHEN \"id\" = ? THEN TRUE ELSE FALSE END",
+            r#"UPDATE "folders" SET "default" = CASE WHEN "id" = ? THEN TRUE ELSE FALSE END"#,
         )
         .bind(self.id)
         .execute(db)
@@ -122,14 +122,14 @@ impl FolderModel {
     }
 
     pub async fn all(db: &DbPool, profile_id: ProfileId) -> DbResult<Vec<FolderModel>> {
-        sqlx::query_as("SELECT * FROM \"folders\" WHERE \"profile_id\" = ? ORDER BY \"order\" ASC")
+        sqlx::query_as(r#"SELECT * FROM "folders" WHERE "profile_id" = ? ORDER BY "order" ASC"#)
             .bind(profile_id)
             .fetch_all(db)
             .await
     }
 
     pub async fn delete(db: &DbPool, folder_id: FolderId) -> DbResult<()> {
-        sqlx::query("DELETE FROM \"folders\" WHERE \"id\" = ? AND \"default\" = FALSE")
+        sqlx::query(r#"DELETE FROM "folders" WHERE "id" = ? AND "default" = FALSE"#)
             .bind(folder_id)
             .execute(db)
             .await?;
@@ -138,7 +138,7 @@ impl FolderModel {
 
     /// Get the first profile marked as default
     pub async fn get_default(db: &DbPool, profile_id: ProfileId) -> DbResult<Option<FolderModel>> {
-        sqlx::query_as("SELECT * FROM \"folders\" WHERE \"profile_id\" = ? AND \"default\" = TRUE")
+        sqlx::query_as(r#"SELECT * FROM "folders" WHERE "profile_id" = ? AND "default" = TRUE"#)
             .bind(profile_id)
             .fetch_optional(db)
             .await

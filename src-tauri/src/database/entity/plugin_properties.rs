@@ -14,12 +14,12 @@ impl PluginPropertiesModel {
     /// Create a new profile
     pub async fn set(db: &DbPool, plugin_id: PluginId, properties: JsonObject) -> DbResult<()> {
         sqlx::query(
-            "
-            INSERT INTO \"plugin_properties\" (\"plugin_id\", \"properties\")
+            r#"
+            INSERT INTO "plugin_properties" ("plugin_id", "properties")
             VALUES (?, ?)
-            ON CONFLICT (\"plugin_id\")
-            DO UPDATE SET \"properties\" = excluded.\"properties\"
-        ",
+            ON CONFLICT ("plugin_id")
+            DO UPDATE SET "properties" = excluded."properties"
+        "#,
         )
         .bind(plugin_id.0)
         .bind(serde_json::Value::Object(properties))
@@ -33,7 +33,7 @@ impl PluginPropertiesModel {
         db: &DbPool,
         plugin_id: PluginId,
     ) -> DbResult<Option<PluginPropertiesModel>> {
-        sqlx::query_as("SELECT * FROM \"plugin_properties\" WHERE \"plugin_id\" = ?")
+        sqlx::query_as(r#"SELECT * FROM "plugin_properties" WHERE "plugin_id" = ?"#)
             .bind(plugin_id.0)
             .fetch_optional(db)
             .await
@@ -41,7 +41,7 @@ impl PluginPropertiesModel {
 
     #[allow(unused)]
     pub async fn delete(db: &DbPool, plugin_id: PluginId) -> DbResult<()> {
-        sqlx::query("DELETE FROM \"plugin_properties\" WHERE \"plugin_id\" = ?")
+        sqlx::query(r#"DELETE FROM "plugin_properties" WHERE "plugin_id" = ?"#)
             .bind(plugin_id.0)
             .execute(db)
             .await?;

@@ -41,10 +41,10 @@ impl ProfileModel {
             serde_json::to_value(&model.config).map_err(|err| DbErr::Encode(err.into()))?;
 
         sqlx::query(
-            "
-            INSERT INTO \"profiles\" (\"id\", \"name\", \"default\", \"config\", \"order\")
+            r#"
+            INSERT INTO "profiles" ("id", "name", "default", "config", "order")
             VALUES (?, ?, ?, ?, ?)
-        ",
+        "#,
         )
         .bind(model.id)
         .bind(model.name.clone())
@@ -62,7 +62,7 @@ impl ProfileModel {
     }
 
     pub async fn get_by_id(db: &DbPool, id: ProfileId) -> DbResult<Option<ProfileModel>> {
-        sqlx::query_as("SELECT * FROM \"profiles\" WHERE \"id\" = ?")
+        sqlx::query_as(r#"SELECT * FROM "profiles" WHERE "id" = ?"#)
             .bind(id)
             .fetch_optional(db)
             .await
@@ -70,7 +70,7 @@ impl ProfileModel {
 
     /// Update the name of the profile
     pub async fn set_name(mut self, db: &DbPool, name: String) -> DbResult<ProfileModel> {
-        sqlx::query("UPDATE \"profiles\" SET \"name\" = ? WHERE \"id\" = ?")
+        sqlx::query(r#"UPDATE "profiles" SET "name" = ? WHERE "id" = ?"#)
             .bind(&name)
             .bind(self.id)
             .execute(db)
@@ -84,7 +84,7 @@ impl ProfileModel {
     /// Set this profile as the default profile
     pub async fn set_default(mut self, db: &DbPool) -> DbResult<ProfileModel> {
         sqlx::query(
-            "UPDATE \"profiles\" SET \"default\" = CASE WHEN \"id\" = ? THEN TRUE ELSE FALSE END",
+            r#"UPDATE "profiles" SET "default" = CASE WHEN "id" = ? THEN TRUE ELSE FALSE END"#,
         )
         .bind(self.id)
         .execute(db)
@@ -97,19 +97,19 @@ impl ProfileModel {
 
     /// Get the first profile marked as default
     pub async fn get_default_profile(db: &DbPool) -> DbResult<Option<ProfileModel>> {
-        sqlx::query_as("SELECT * FROM \"profiles\" WHERE \"default\" = TRUE")
+        sqlx::query_as(r#"SELECT * FROM "profiles" WHERE "default" = TRUE"#)
             .fetch_optional(db)
             .await
     }
 
     pub async fn all(db: &DbPool) -> DbResult<Vec<ProfileModel>> {
-        sqlx::query_as("SELECT * FROM \"profiles\" ORDER BY \"order\" ASC")
+        sqlx::query_as(r#"SELECT * FROM "profiles" ORDER BY "order" ASC"#)
             .fetch_all(db)
             .await
     }
 
     pub async fn delete(db: &DbPool, profile_id: ProfileId) -> DbResult<()> {
-        sqlx::query("DELETE FROM \"profiles\" WHERE \"id\" = ? AND \"default\" = FALSE")
+        sqlx::query(r#"DELETE FROM "profiles" WHERE "id" = ? AND "default" = FALSE"#)
             .bind(profile_id)
             .execute(db)
             .await?;

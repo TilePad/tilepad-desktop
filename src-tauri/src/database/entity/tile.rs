@@ -220,10 +220,10 @@ impl TileModel {
         let properties = serde_json::Value::Object(Default::default());
 
         sqlx::query(
-            "
-            INSERT INTO \"tiles\" (\"id\", \"config\", \"properties\", \"folder_id\", \"plugin_id\", \"action_id\", \"position\")
+            r#"
+            INSERT INTO "tiles" ("id", "config", "properties", "folder_id", "plugin_id", "action_id", "position")
             VALUES (?, ?, ?, ?, ?, ?, ?)
-        ",
+        "#,
         )
         .bind(model.id)
         .bind(config)
@@ -256,7 +256,7 @@ impl TileModel {
             properties
         };
 
-        sqlx::query("UPDATE \"tiles\" SET \"properties\" = ? WHERE \"id\" = ?")
+        sqlx::query(r#"UPDATE "tiles" SET "properties" = ? WHERE "id" = ?"#)
             .bind(serde_json::Value::Object(properties.clone()))
             .bind(self.id)
             .execute(db)
@@ -269,7 +269,7 @@ impl TileModel {
     pub async fn update_config(mut self, db: &DbPool, config: TileConfig) -> DbResult<TileModel> {
         let config_json = serde_json::to_value(&config).map_err(|err| DbErr::Encode(err.into()))?;
 
-        sqlx::query("UPDATE \"tiles\" SET \"config\" = ? WHERE \"id\" = ?")
+        sqlx::query(r#"UPDATE "tiles" SET "config" = ? WHERE "id" = ?"#)
             .bind(config_json)
             .bind(self.id)
             .execute(db)
@@ -287,7 +287,7 @@ impl TileModel {
         let position_value =
             serde_json::to_value(&position).map_err(|err| DbErr::Encode(err.into()))?;
 
-        sqlx::query("UPDATE \"tiles\" SET \"position\" = ? WHERE \"id\" = ?")
+        sqlx::query(r#"UPDATE "tiles" SET "position" = ? WHERE "id" = ?"#)
             .bind(position_value)
             .bind(self.id)
             .execute(db)
@@ -361,7 +361,7 @@ impl TileModel {
     }
 
     pub async fn get_by_folder(db: &DbPool, folder_id: FolderId) -> DbResult<Vec<TileModel>> {
-        sqlx::query_as("SELECT * FROM \"tiles\" WHERE \"folder_id\" = ?")
+        sqlx::query_as(r#"SELECT * FROM "tiles" WHERE "folder_id" = ?"#)
             .bind(folder_id)
             .fetch_all(db)
             .await
@@ -401,14 +401,14 @@ impl TileModel {
     }
 
     pub async fn get_by_id(db: &DbPool, tile_id: TileId) -> DbResult<Option<TileModel>> {
-        sqlx::query_as("SELECT * FROM \"tiles\" WHERE \"id\" = ?")
+        sqlx::query_as(r#"SELECT * FROM "tiles" WHERE "id" = ?"#)
             .bind(tile_id)
             .fetch_optional(db)
             .await
     }
 
     pub async fn delete(db: &DbPool, tile_id: TileId) -> DbResult<()> {
-        sqlx::query("DELETE FROM \"tiles\" WHERE \"id\" = ?")
+        sqlx::query(r#"DELETE FROM "tiles" WHERE "id" = ?"#)
             .bind(tile_id)
             .execute(db)
             .await?;
