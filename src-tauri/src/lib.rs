@@ -38,10 +38,10 @@ pub fn run() {
     };
 
     tauri::Builder::default()
-        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_single_instance::init(
             handle_duplicate_instance,
         ))
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_opener::init())
         .setup(setup)
@@ -349,18 +349,16 @@ fn debug_core_resources_path() -> PathBuf {
 /// Handle initialization of a second app instance, focuses the main
 /// window instead of allowing multiple instances
 fn handle_duplicate_instance(app: &AppHandle, _args: Vec<String>, _cwd: String) {
-    let _ = app
-        .get_webview_window("main")
-        .expect("no main window")
-        .set_focus();
+    if let Some(window) = app.get_webview_window("main") {
+        _ = window.set_focus();
+    }
 }
 
 /// Closes the main app window
 fn close_app_window(app: &AppHandle) {
-    let _ = app
-        .get_webview_window("main")
-        .expect("no main window")
-        .close();
+    if let Some(window) = app.get_webview_window("main") {
+        _ = window.close();
+    }
 }
 
 /// Handles app events, used for the minimize to tray event
