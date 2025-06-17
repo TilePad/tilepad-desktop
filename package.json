@@ -64,7 +64,8 @@
   "overrides": {
     "@sveltejs/kit": {
       "cookie": "^0.7.0"
-    }
+    },
+    "esbuild": "^0.25.2"
   },
   "npm": {
     "overrides": {
