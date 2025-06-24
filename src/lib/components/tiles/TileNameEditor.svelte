@@ -141,9 +141,7 @@
   <Tooltip title={$t("label_options_tooltip")}>
     {#snippet trigger({ props })}
       <PopoverButton triggerProps={props}>
-        {#snippet children()}
-          <SolarTextBoldDuotone width="1.5rem" height="1.5rem" />
-        {/snippet}
+        <SolarTextBoldDuotone width="1.5rem" height="1.5rem" />
 
         {#snippet content()}
           <FontSelector value={label.font} onChangeValue={onChangeFont} />

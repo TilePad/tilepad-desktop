@@ -42,81 +42,79 @@
 </script>
 
 <Dialog {...restProps}>
-  {#snippet children()}
-    <div class="content">
-      {#if $iconRegistryQuery.isLoading || $iconPacksQuery.isLoading}
-        <SkeletonList style="padding: 1rem" />
-      {:else if $iconRegistryQuery.isError}
-        <Aside severity="error" style="margin: 1rem;">
-          {$t("community_icons_error", {
-            values: { error: getErrorMessage($iconRegistryQuery.error) },
-          })}
-        </Aside>
-      {:else if $iconPacksQuery.isError}
-        <Aside severity="error" style="margin: 1rem;">
-          {$t("icon_packs_installed_error", {
-            values: { error: getErrorMessage($iconPacksQuery.error) },
-          })}
-        </Aside>
-      {:else if $iconRegistryQuery.isSuccess && $iconPacksQuery.isSuccess}
-        <div class="split">
-          <div class="plugins">
-            <div class="titlebar">
-              <div class="titlebar__text">
-                <h2>{$t("community_icons")}</h2>
-                <p class="total">
-                  {$t("count_icon_packs", {
-                    values: { count: filteredRegistry.length },
-                  })}
-                </p>
-              </div>
-
-              <DialogCloseButton buttonLabel={{ text: $t("close") }} />
+  <div class="content">
+    {#if $iconRegistryQuery.isLoading || $iconPacksQuery.isLoading}
+      <SkeletonList style="padding: 1rem" />
+    {:else if $iconRegistryQuery.isError}
+      <Aside severity="error" style="margin: 1rem;">
+        {$t("community_icons_error", {
+          values: { error: getErrorMessage($iconRegistryQuery.error) },
+        })}
+      </Aside>
+    {:else if $iconPacksQuery.isError}
+      <Aside severity="error" style="margin: 1rem;">
+        {$t("icon_packs_installed_error", {
+          values: { error: getErrorMessage($iconPacksQuery.error) },
+        })}
+      </Aside>
+    {:else if $iconRegistryQuery.isSuccess && $iconPacksQuery.isSuccess}
+      <div class="split">
+        <div class="plugins">
+          <div class="titlebar">
+            <div class="titlebar__text">
+              <h2>{$t("community_icons")}</h2>
+              <p class="total">
+                {$t("count_icon_packs", {
+                  values: { count: filteredRegistry.length },
+                })}
+              </p>
             </div>
 
-            <input
-              bind:value={search}
-              class="search"
-              type="text"
-              placeholder={$t("search_placeholder")}
-            />
-
-            <div class="plugins-list">
-              {#each filteredRegistry as item}
-                <IconsRegistryItem
-                  {item}
-                  onClick={() => {
-                    if (active !== undefined && active.id === item.id) {
-                      active = undefined;
-                    } else {
-                      active = item;
-                    }
-                  }}
-                  installed={$iconPacksQuery.data.find(
-                    (plugin) => plugin.manifest.icons.id === item.id,
-                  ) !== undefined}
-                  selected={active !== undefined && active.id === item.id}
-                />
-              {:else}
-                {$t("community_icons_none")}
-              {/each}
-            </div>
+            <DialogCloseButton buttonLabel={{ text: $t("close") }} />
           </div>
 
-          <div class="viewer">
-            {#if active}
-              <IconsRegistryViewer
-                item={active}
+          <input
+            bind:value={search}
+            class="search"
+            type="text"
+            placeholder={$t("search_placeholder")}
+          />
+
+          <div class="plugins-list">
+            {#each filteredRegistry as item (item.id)}
+              <IconsRegistryItem
+                {item}
+                onClick={() => {
+                  if (active !== undefined && active.id === item.id) {
+                    active = undefined;
+                  } else {
+                    active = item;
+                  }
+                }}
                 installed={$iconPacksQuery.data.find(
-                  (plugin) => plugin.manifest.icons.id === active!.id,
+                  (plugin) => plugin.manifest.icons.id === item.id,
                 ) !== undefined}
+                selected={active !== undefined && active.id === item.id}
               />
-            {/if}
+            {:else}
+              {$t("community_icons_none")}
+            {/each}
           </div>
         </div>
-      {/if}
-    </div>
-  {/snippet}
+
+        <div class="viewer">
+          {#if active}
+            <IconsRegistryViewer
+              item={active}
+              installed={$iconPacksQuery.data.find(
+                (plugin) => plugin.manifest.icons.id === active!.id,
+              ) !== undefined}
+            />
+          {/if}
+        </div>
+      </div>
+    {/if}
+  </div>
 </Dialog>
 
 <style>

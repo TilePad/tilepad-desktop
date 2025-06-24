@@ -59,25 +59,23 @@
     {$t("edit_folder")}
   {/snippet}
 
-  {#snippet children()}
-    <form onsubmit={onSave}>
-      <div class="content">
-        <input
-          autocomplete="off"
-          bind:value={name}
-          required
-          minlength="1"
-          class="input"
-          placeholder={$t("name")}
-        />
-      </div>
+  <form onsubmit={onSave}>
+    <div class="content">
+      <input
+        autocomplete="off"
+        bind:value={name}
+        required
+        minlength="1"
+        class="input"
+        placeholder={$t("name")}
+      />
+    </div>
 
-      <div class="actions">
-        <DialogCloseButton buttonLabel={{ text: $t("close") }} />
-        <Button type="submit">{$t("save")}</Button>
-      </div>
-    </form>
-  {/snippet}
+    <div class="actions">
+      <DialogCloseButton buttonLabel={{ text: $t("close") }} />
+      <Button type="submit">{$t("save")}</Button>
+    </div>
+  </form>
 </Dialog>
 
 <style>

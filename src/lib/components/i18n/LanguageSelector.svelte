@@ -74,7 +74,7 @@
               class="content"
               transition:slide={{ duration: 100 }}
             >
-              {#each languages as language}
+              {#each languages as language (language.value)}
                 <Select.Item value={language.value} label={language.label}>
                   {#snippet child({ props, selected, highlighted })}
                     <div

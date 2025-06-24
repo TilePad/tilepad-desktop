@@ -11,7 +11,7 @@
 </script>
 
 <section class="list action-list">
-  {#each actions as action}
+  {#each actions as action (action.plugin_id + action.action_id)}
     <ActionItem {action} />
   {/each}
 </section>

@@ -64,28 +64,26 @@
         {$t("create_profile")}
       {/snippet}
 
-      {#snippet children()}
-        <form onsubmit={onCreate}>
-          <div class="content">
-            <input
-              required
-              minlength="1"
-              class="input"
-              bind:value={name}
-              placeholder={$t("name")}
-            />
-          </div>
+      <form onsubmit={onCreate}>
+        <div class="content">
+          <input
+            required
+            minlength="1"
+            class="input"
+            bind:value={name}
+            placeholder={$t("name")}
+          />
+        </div>
 
-          <div class="actions">
-            <DialogCloseButton buttonLabel={{ text: $t("close") }} />
-            <DialogCloseButton
-              buttonLabel={{ text: $t("create") }}
-              onclick={onCreate}
-              type="submit"
-            />
-          </div>
-        </form>
-      {/snippet}
+        <div class="actions">
+          <DialogCloseButton buttonLabel={{ text: $t("close") }} />
+          <DialogCloseButton
+            buttonLabel={{ text: $t("create") }}
+            onclick={onCreate}
+            type="submit"
+          />
+        </div>
+      </form>
     </Dialog>
   {/snippet}
 </Tooltip>

@@ -38,7 +38,7 @@
 
     <div class="plugins-wrapper">
       <div class="plugins">
-        {#each $iconPacksQuery.data as pack}
+        {#each $iconPacksQuery.data as pack, index (index)}
           <IconPackCard {pack} />
         {/each}
       </div>

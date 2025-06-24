@@ -42,81 +42,79 @@
 </script>
 
 <Dialog {...restProps}>
-  {#snippet children()}
-    <div class="content">
-      {#if $pluginRegistryQuery.isLoading || $pluginsQuery.isLoading}
-        <SkeletonList style="padding: 1rem" />
-      {:else if $pluginRegistryQuery.isError}
-        <Aside severity="error" style="margin: 1rem;">
-          {$t("community_plugins_error", {
-            values: { error: getErrorMessage($pluginRegistryQuery.error) },
-          })}
-        </Aside>
-      {:else if $pluginsQuery.isError}
-        <Aside severity="error" style="margin: 1rem;">
-          {$t("plugins_installed_error", {
-            values: { error: getErrorMessage($pluginsQuery.error) },
-          })}
-        </Aside>
-      {:else if $pluginRegistryQuery.isSuccess && $pluginsQuery.isSuccess}
-        <div class="split">
-          <div class="plugins">
-            <div class="titlebar">
-              <div class="titlebar__text">
-                <h2>{$t("community_plugins")}</h2>
-                <p class="total">
-                  {$t("count_plugins", {
-                    values: { count: filteredRegistry.length },
-                  })}
-                </p>
-              </div>
-
-              <DialogCloseButton buttonLabel={{ text: $t("close") }} />
+  <div class="content">
+    {#if $pluginRegistryQuery.isLoading || $pluginsQuery.isLoading}
+      <SkeletonList style="padding: 1rem" />
+    {:else if $pluginRegistryQuery.isError}
+      <Aside severity="error" style="margin: 1rem;">
+        {$t("community_plugins_error", {
+          values: { error: getErrorMessage($pluginRegistryQuery.error) },
+        })}
+      </Aside>
+    {:else if $pluginsQuery.isError}
+      <Aside severity="error" style="margin: 1rem;">
+        {$t("plugins_installed_error", {
+          values: { error: getErrorMessage($pluginsQuery.error) },
+        })}
+      </Aside>
+    {:else if $pluginRegistryQuery.isSuccess && $pluginsQuery.isSuccess}
+      <div class="split">
+        <div class="plugins">
+          <div class="titlebar">
+            <div class="titlebar__text">
+              <h2>{$t("community_plugins")}</h2>
+              <p class="total">
+                {$t("count_plugins", {
+                  values: { count: filteredRegistry.length },
+                })}
+              </p>
             </div>
 
-            <input
-              bind:value={search}
-              class="search"
-              type="text"
-              placeholder={$t("search_placeholder")}
-            />
-
-            <div class="plugins-list">
-              {#each filteredRegistry as item}
-                <PluginsRegistryItem
-                  {item}
-                  onClick={() => {
-                    if (active !== undefined && active.id === item.id) {
-                      active = undefined;
-                    } else {
-                      active = item;
-                    }
-                  }}
-                  installed={$pluginsQuery.data.find(
-                    (plugin) => plugin.manifest.plugin.id === item.id,
-                  ) !== undefined}
-                  selected={active !== undefined && active.id === item.id}
-                />
-              {:else}
-                {$t("community_plugins_none")}
-              {/each}
-            </div>
+            <DialogCloseButton buttonLabel={{ text: $t("close") }} />
           </div>
 
-          <div class="viewer">
-            {#if active}
-              <PluginRegistryViewer
-                item={active}
+          <input
+            bind:value={search}
+            class="search"
+            type="text"
+            placeholder={$t("search_placeholder")}
+          />
+
+          <div class="plugins-list">
+            {#each filteredRegistry as item (item.id)}
+              <PluginsRegistryItem
+                {item}
+                onClick={() => {
+                  if (active !== undefined && active.id === item.id) {
+                    active = undefined;
+                  } else {
+                    active = item;
+                  }
+                }}
                 installed={$pluginsQuery.data.find(
-                  (plugin) => plugin.manifest.plugin.id === active!.id,
-                )?.manifest}
+                  (plugin) => plugin.manifest.plugin.id === item.id,
+                ) !== undefined}
+                selected={active !== undefined && active.id === item.id}
               />
-            {/if}
+            {:else}
+              {$t("community_plugins_none")}
+            {/each}
           </div>
         </div>
-      {/if}
-    </div>
-  {/snippet}
+
+        <div class="viewer">
+          {#if active}
+            <PluginRegistryViewer
+              item={active}
+              installed={$pluginsQuery.data.find(
+                (plugin) => plugin.manifest.plugin.id === active!.id,
+              )?.manifest}
+            />
+          {/if}
+        </div>
+      </div>
+    {/if}
+  </div>
 </Dialog>
 
 <style>

@@ -29,7 +29,7 @@
     </div>
 
     <ul class="interfaces">
-      {#each connectInfo.interfaces as int}
+      {#each connectInfo.interfaces as int, index (index)}
         <li class="interface">
           <b class="interface__name">{int.name}</b>
           <span class="interface__addr">{int.addr}</span>

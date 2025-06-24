@@ -72,7 +72,7 @@
               class="content"
               transition:slide={{ duration: 100 }}
             >
-              {#each folders as value}
+              {#each folders as value (value.id)}
                 <Select.Item value={value.id} label={value.name}>
                   {#snippet child({ props, selected, highlighted })}
                     <div

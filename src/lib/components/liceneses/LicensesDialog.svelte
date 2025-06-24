@@ -17,28 +17,26 @@
 </script>
 
 <Dialog {...restProps}>
-  {#snippet children()}
-    <div class="content">
-      <div class="header">
-        <h2>{$t("third_party_licenses")}</h2>
-        <DialogCloseButton buttonLabel={{ text: $t("close") }} />
-      </div>
-
-      <div class="viewer">
-        {#await getLicenses()}
-          <SkeletonList />
-        {:then markdown}
-          <Markdown source={markdown} />
-        {:catch error}
-          <Aside severity="error" style="margin: 1rem;">
-            {$t("readme_error", {
-              values: { error: getErrorMessage(error) },
-            })}
-          </Aside>
-        {/await}
-      </div>
+  <div class="content">
+    <div class="header">
+      <h2>{$t("third_party_licenses")}</h2>
+      <DialogCloseButton buttonLabel={{ text: $t("close") }} />
     </div>
-  {/snippet}
+
+    <div class="viewer">
+      {#await getLicenses()}
+        <SkeletonList />
+      {:then markdown}
+        <Markdown source={markdown} />
+      {:catch error}
+        <Aside severity="error" style="margin: 1rem;">
+          {$t("readme_error", {
+            values: { error: getErrorMessage(error) },
+          })}
+        </Aside>
+      {/await}
+    </div>
+  </div>
 </Dialog>
 
 <style>

@@ -111,7 +111,7 @@
         })}
       </Aside>
     {:else if $actionsQuery.isSuccess}
-      {#each filteredCategories as category}
+      {#each filteredCategories as category (category.plugin_id)}
         <ActionsSidebarCategory
           {category}
           expanded={isCategoryExpanded(category.plugin_id)}

@@ -63,7 +63,7 @@
     />
 
     <div class="categories">
-      {#each filteredPacks as pack}
+      {#each filteredPacks as pack (pack.manifest.icons.id)}
         <IconPackCategory
           onClickIcon={(icon) => onClickIcon(pack.manifest.icons.id, icon)}
           {pack}

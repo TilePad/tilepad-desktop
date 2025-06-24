@@ -64,7 +64,7 @@
               class="content"
               transition:slide={{ duration: 100 }}
             >
-              {#each profiles as value}
+              {#each profiles as value (value.id)}
                 <Select.Item value={value.id} label={value.name}>
                   {#snippet child({ props, selected, highlighted })}
                     <div

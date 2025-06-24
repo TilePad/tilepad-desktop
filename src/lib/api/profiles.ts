@@ -1,12 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import { createQuery, createMutation } from "@tanstack/svelte-query";
 
-import type {
-  ProfileId,
-  ProfileModel,
-  CreateProfile,
-  UpdateProfile,
-} from "./types/profiles";
+import type { ProfileId, ProfileModel, CreateProfile } from "./types/profiles";
 
 import { queryClient } from "./client";
 import { runeStore } from "./utils/svelte.svelte";

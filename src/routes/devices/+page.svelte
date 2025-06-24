@@ -38,7 +38,7 @@
 
       <div class="devices-wrapper">
         <div class="devices">
-          {#each $devices.data as device}
+          {#each $devices.data as device (device.id)}
             {@const connected = isDeviceConnected(device.id)}
             <DeviceCard {device} {connected} />
           {:else}

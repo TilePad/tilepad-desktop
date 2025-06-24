@@ -67,7 +67,7 @@
               </Select.Item>
 
               {#if $fontsQuery.isSuccess}
-                {#each $fontsQuery.data as font}
+                {#each $fontsQuery.data as font, index (index)}
                   <Select.Item value={font} label={font}>
                     {#snippet child({ props, selected, highlighted })}
                       <div
