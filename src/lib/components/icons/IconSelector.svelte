@@ -82,8 +82,8 @@
 
           <ColorPicker
             hex={iconOptions.background_color}
-            on:input={(event) => {
-              if (event.detail.hex) onChangeBackgroundColor(event.detail.hex);
+            onInput={(color) => {
+              if (color.hex) onChangeBackgroundColor(color.hex);
             }}
             position="responsive"
             label={$t("background_color")}
@@ -91,8 +91,8 @@
 
           <ColorPicker
             hex={iconOptions.border_color}
-            on:input={(event) => {
-              if (event.detail.hex) onChangeBorderColor(event.detail.hex);
+            onInput={(color) => {
+              if (color.hex) onChangeBorderColor(color.hex);
             }}
             position="responsive"
             label={$t("border_color")}

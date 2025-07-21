@@ -194,16 +194,16 @@
 
           <ColorPicker
             hex={label.color}
-            on:input={(event) => {
-              if (event.detail.hex) onChangeColor(event.detail.hex);
+            onInput={(color) => {
+              if (color.hex) onChangeColor(color.hex);
             }}
             position="responsive"
             label={$t("text_color")}
           />
           <ColorPicker
             hex={label.outline_color}
-            on:input={(event) => {
-              if (event.detail.hex) onChangeOutlineColor(event.detail.hex);
+            onInput={(color) => {
+              if (color.hex) onChangeOutlineColor(color.hex);
             }}
             position="responsive"
             label={$t("text_outline_color")}
