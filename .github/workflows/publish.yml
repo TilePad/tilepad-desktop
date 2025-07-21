@@ -60,14 +60,6 @@ jobs:
       - name: install problematic dependencies
         run: npm install --save-dev @tauri-apps/cli rollup
 
-      - name: install inspector dependencies
-        run: npm install
-        working-directory: inspector
-
-      - name: install display dependencies
-        run: npm install
-        working-directory: display
-
       - name: generate THIRD_PARTY_LICENSES.md
         run: npm run make:licenses
 

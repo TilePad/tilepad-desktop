@@ -3,13 +3,17 @@
   "version": "0.0.1",
   "description": "",
   "type": "module",
+  "workspaces": [
+    "display",
+    "inspector"
+  ],
   "scripts": {
     "dev": "vite dev",
     "build": "npm run prebuild && vite build",
     "prebuild": "npm run build:inspector && npm run build:display",
     "preview": "vite preview",
-    "build:inspector": "cd inspector && npm run build",
-    "build:display": "cd display && npm run build",
+    "build:inspector": "npm run build --workspace inspector",
+    "build:display": "npm run build --workspace display",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "tauri": "tauri",
@@ -20,6 +24,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@castlenine/svelte-qrcode": "2.3.0",
     "@fontsource-variable/roboto": "5.2.6",
     "@tanstack/svelte-query": "5.83.0",
     "@tanstack/svelte-query-devtools": "5.83.0",
@@ -35,8 +40,7 @@
     "semver-ts": "1.0.3",
     "svelte-awesome-color-picker": "4.0.2",
     "svelte-i18n": "4.0.1",
-    "svelte-sonner": "1.0.5",
-    "@castlenine/svelte-qrcode": "2.3.0"
+    "svelte-sonner": "1.0.5"
   },
   "devDependencies": {
     "@eslint/js": "9.31.0",
@@ -47,7 +51,6 @@
     "@sveltejs/vite-plugin-svelte": "6.1.0",
     "@tanstack/eslint-plugin-query": "5.81.2",
     "@tauri-apps/cli": "2.7.0",
-    "esbuild": "0.25.8",
     "eslint": "9.31.0",
     "eslint-plugin-perfectionist": "4.15.0",
     "eslint-plugin-svelte": "3.11.0",

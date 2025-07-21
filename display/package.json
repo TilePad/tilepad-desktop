@@ -1,5 +1,5 @@
 {
-  "name": "tilepad-inspector",
+  "name": "tilepad-display",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -10,6 +10,6 @@
   "license": "MIT",
   "description": "",
   "devDependencies": {
-    "esbuild": "^0.25.4"
+    "esbuild": "0.25.8"
   }
 }
