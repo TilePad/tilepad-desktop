@@ -1,8 +1,7 @@
 <script lang="ts">
-  import "$lib/styles/app.css";
-  import "@fontsource-variable/roboto";
   import { Tooltip } from "bits-ui";
   import { queryClient } from "$lib/api/client";
+  import RootLayout from "$lib/layouts/RootLayout.svelte";
   import Header from "$lib/components/layout/Header.svelte";
   import AppToaster from "$lib/components/AppToaster.svelte";
   import { QueryClientProvider } from "@tanstack/svelte-query";
@@ -16,30 +15,32 @@
   let { children } = $props();
 </script>
 
-<Tooltip.Provider>
-  <QueryClientProvider client={queryClient}>
-    <SettingsProvider>
-      <I18nProvider>
-        <InternalServerProvider>
-          <div class="layout">
-            <Header />
+<RootLayout>
+  <Tooltip.Provider>
+    <QueryClientProvider client={queryClient}>
+      <SettingsProvider>
+        <I18nProvider>
+          <InternalServerProvider>
+            <div class="layout">
+              <Header />
 
-            <main class="main">
-              {@render children()}
+              <main class="main">
+                {@render children()}
 
-              <DeviceRequests />
-            </main>
-          </div>
+                <DeviceRequests />
+              </main>
+            </div>
 
-          <AppToaster />
-          <UpdateNotification />
-        </InternalServerProvider>
-      </I18nProvider>
-    </SettingsProvider>
+            <AppToaster />
+            <UpdateNotification />
+          </InternalServerProvider>
+        </I18nProvider>
+      </SettingsProvider>
 
-    <SvelteQueryDevtools buttonPosition="bottom-left" position="bottom" />
-  </QueryClientProvider>
-</Tooltip.Provider>
+      <SvelteQueryDevtools buttonPosition="bottom-left" position="bottom" />
+    </QueryClientProvider>
+  </Tooltip.Provider>
+</RootLayout>
 
 <style>
   .layout {
