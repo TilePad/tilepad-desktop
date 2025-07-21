@@ -1,6 +1,12 @@
 <script lang="ts">
   import { t } from "svelte-i18n";
-  import { getVersion } from "@tauri-apps/api/app";
+  import jacobAvatar from "$lib/assets/avatar-64x64.png";
+
+  type Props = {
+    version?: string;
+  };
+
+  const { version }: Props = $props();
 </script>
 
 <div class="block">
@@ -8,7 +14,7 @@
     class="avatar"
     width="64"
     height="64"
-    src="/avatar-64x64.png"
+    src={jacobAvatar}
     alt="Jacob Avatar"
   />
   <div class="creator-text">
@@ -18,12 +24,13 @@
         Jacobtread
       </a>
     </p>
-    <p class="version">
-      {$t("version")}:
-      {#await getVersion() then version}
+
+    {#if version}
+      <p class="version">
+        {$t("version")}:
         {version}
-      {/await}
-    </p>
+      </p>
+    {/if}
   </div>
 </div>
 

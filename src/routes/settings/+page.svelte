@@ -2,7 +2,8 @@
   import type { SettingsConfig } from "$lib/api/types/settings";
 
   import { t } from "svelte-i18n";
-  import { watch, useDebounce } from "runed";
+  import { getVersion } from "@tauri-apps/api/app";
+  import { watch, resource, useDebounce } from "runed";
   import { createSetSettingsMutation } from "$lib/api/settings";
   import TextInput from "$lib/components/input/TextInput.svelte";
   import CreatorSection from "$lib/components/CreatorSection.svelte";
@@ -16,6 +17,11 @@
   const settingsContext = getSettingsContext();
   const currentSettings = $derived.by(settingsContext.settings);
   const setSettings = createSetSettingsMutation();
+
+  const version = resource(
+    () => getVersion(),
+    (promise) => promise,
+  );
 
   // (Initial value of settings used for initial state)
   const defaultSettings = settingsContext.settings();
@@ -224,7 +230,7 @@
       </div>
     </div>
 
-    <CreatorSection />
+    <CreatorSection version={version.current} />
   </div>
 </div>
 

@@ -21,18 +21,13 @@
   import { isLoading, locale as svelteLocale } from "svelte-i18n";
 
   import SkeletonList from "../skeleton/SkeletonList.svelte";
-  import { getSettingsContext } from "../SettingsProvider.svelte";
 
   type Props = {
+    locale: string;
     children?: Snippet;
   };
 
-  const settingsContext = getSettingsContext();
-  const settings = $derived.by(settingsContext.settings);
-
-  const locale = $derived(settings.language);
-
-  const { children }: Props = $props();
+  const { locale, children }: Props = $props();
 
   $effect(() => {
     svelteLocale.set(locale);
