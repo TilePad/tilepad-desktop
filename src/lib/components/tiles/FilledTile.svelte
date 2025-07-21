@@ -124,12 +124,11 @@
     debounceUpdatePosition(position);
   }
 
-  function handleResizeVerticalTop(event: CustomEvent<ResizeEventDetail>) {
+  function handleResizeVerticalTop(detail: ResizeEventDetail) {
     resizing = true;
     const newStart =
-      lastPosition.row +
-      Math.min(event.detail.scaleY, lastPosition.row_span - 1);
-    const newSpan = Math.max(lastPosition.row_span - event.detail.scaleY, 1);
+      lastPosition.row + Math.min(detail.scaleY, lastPosition.row_span - 1);
+    const newSpan = Math.max(lastPosition.row_span - detail.scaleY, 1);
 
     // Prevent overlapping
     if (
@@ -146,15 +145,15 @@
 
     position = { ...position, row: newStart, row_span: newSpan };
 
-    if (event.detail.commit) {
+    if (detail.commit) {
       persistPosition(position);
       resizing = false;
     }
   }
 
-  function handleResizeVerticalBottom(event: CustomEvent<ResizeEventDetail>) {
+  function handleResizeVerticalBottom(detail: ResizeEventDetail) {
     resizing = true;
-    const newSpan = Math.max(lastPosition.row_span + event.detail.scaleY, 1);
+    const newSpan = Math.max(lastPosition.row_span + detail.scaleY, 1);
 
     // Prevent overlapping
     if (
@@ -171,18 +170,18 @@
 
     position = { ...position, row_span: newSpan };
 
-    if (event.detail.commit) {
+    if (detail.commit) {
       persistPosition(position);
       resizing = false;
     }
   }
 
-  function handleResizeHorizontalLeft(event: CustomEvent<ResizeEventDetail>) {
+  function handleResizeHorizontalLeft(detail: ResizeEventDetail) {
     resizing = true;
     const newStart =
       lastPosition.column +
-      Math.min(event.detail.scaleX, lastPosition.column_span - 1);
-    const newSpan = Math.max(lastPosition.column_span - event.detail.scaleX, 1);
+      Math.min(detail.scaleX, lastPosition.column_span - 1);
+    const newSpan = Math.max(lastPosition.column_span - detail.scaleX, 1);
 
     // Prevent overlapping
     if (
@@ -199,15 +198,15 @@
 
     position = { ...position, column: newStart, column_span: newSpan };
 
-    if (event.detail.commit) {
+    if (detail.commit) {
       persistPosition(position);
       resizing = false;
     }
   }
 
-  function handleResizeHorizontalRight(event: CustomEvent<ResizeEventDetail>) {
+  function handleResizeHorizontalRight(detail: ResizeEventDetail) {
     resizing = true;
-    const newSpan = Math.max(lastPosition.column_span + event.detail.scaleX, 1);
+    const newSpan = Math.max(lastPosition.column_span + detail.scaleX, 1);
 
     // Prevent overlapping
     if (
@@ -224,21 +223,19 @@
 
     position = { ...position, column_span: newSpan };
 
-    if (event.detail.commit) {
+    if (detail.commit) {
       persistPosition(position);
       resizing = false;
     }
   }
 
-  function considerResizeDiagonalLeftTop(
-    event: CustomEvent<ResizeEventDetail>,
-  ) {
-    let commit = event.detail.commit;
-    event.detail.commit = false;
+  function considerResizeDiagonalLeftTop(detail: ResizeEventDetail) {
+    let commit = detail.commit;
+    detail.commit = false;
     resizing = true;
 
-    handleResizeHorizontalLeft(event);
-    handleResizeVerticalTop(event);
+    handleResizeHorizontalLeft(detail);
+    handleResizeVerticalTop(detail);
 
     if (commit) {
       persistPosition(position);
@@ -246,15 +243,13 @@
     }
   }
 
-  function considerResizeDiagonalLeftBottom(
-    event: CustomEvent<ResizeEventDetail>,
-  ) {
-    let commit = event.detail.commit;
-    event.detail.commit = false;
+  function considerResizeDiagonalLeftBottom(detail: ResizeEventDetail) {
+    let commit = detail.commit;
+    detail.commit = false;
     resizing = true;
 
-    handleResizeHorizontalLeft(event);
-    handleResizeVerticalBottom(event);
+    handleResizeHorizontalLeft(detail);
+    handleResizeVerticalBottom(detail);
 
     if (commit) {
       persistPosition(position);
@@ -262,15 +257,13 @@
     }
   }
 
-  function considerResizeDiagonalRightBottom(
-    event: CustomEvent<ResizeEventDetail>,
-  ) {
-    let commit = event.detail.commit;
-    event.detail.commit = false;
+  function considerResizeDiagonalRightBottom(detail: ResizeEventDetail) {
+    let commit = detail.commit;
+    detail.commit = false;
     resizing = true;
 
-    handleResizeHorizontalRight(event);
-    handleResizeVerticalBottom(event);
+    handleResizeHorizontalRight(detail);
+    handleResizeVerticalBottom(detail);
 
     if (commit) {
       persistPosition(position);
@@ -278,15 +271,13 @@
     }
   }
 
-  function considerResizeDiagonalRightTop(
-    event: CustomEvent<ResizeEventDetail>,
-  ) {
-    let commit = event.detail.commit;
-    event.detail.commit = false;
+  function considerResizeDiagonalRightTop(detail: ResizeEventDetail) {
+    let commit = detail.commit;
+    detail.commit = false;
     resizing = true;
 
-    handleResizeHorizontalRight(event);
-    handleResizeVerticalTop(event);
+    handleResizeHorizontalRight(detail);
+    handleResizeVerticalTop(detail);
 
     if (commit) {
       persistPosition(position);
@@ -335,8 +326,8 @@
     use:resizeHandle={{
       direction: ResizeDirection.VERTICAL,
       distanceThreshold,
+      onResize: handleResizeVerticalTop,
     }}
-    onresize={handleResizeVerticalTop}
   ></span>
 
   <span
@@ -344,8 +335,8 @@
     use:resizeHandle={{
       direction: ResizeDirection.VERTICAL,
       distanceThreshold,
+      onResize: handleResizeVerticalBottom,
     }}
-    onresize={handleResizeVerticalBottom}
   ></span>
 
   <span
@@ -353,8 +344,8 @@
     use:resizeHandle={{
       direction: ResizeDirection.HORIZONTAL,
       distanceThreshold,
+      onResize: handleResizeHorizontalLeft,
     }}
-    onresize={handleResizeHorizontalLeft}
   ></span>
 
   <span
@@ -362,8 +353,8 @@
     use:resizeHandle={{
       direction: ResizeDirection.DIAGONAL,
       distanceThreshold,
+      onResize: considerResizeDiagonalLeftTop,
     }}
-    onresize={considerResizeDiagonalLeftTop}
   ></span>
 
   <span
@@ -371,8 +362,8 @@
     use:resizeHandle={{
       direction: ResizeDirection.DIAGONAL,
       distanceThreshold,
+      onResize: considerResizeDiagonalLeftBottom,
     }}
-    onresize={considerResizeDiagonalLeftBottom}
   ></span>
 
   <span
@@ -380,8 +371,8 @@
     use:resizeHandle={{
       direction: ResizeDirection.HORIZONTAL,
       distanceThreshold,
+      onResize: handleResizeHorizontalRight,
     }}
-    onresize={handleResizeHorizontalRight}
   ></span>
 
   <span
@@ -389,16 +380,16 @@
     use:resizeHandle={{
       direction: ResizeDirection.DIAGONAL,
       distanceThreshold,
+      onResize: considerResizeDiagonalRightTop,
     }}
-    onresize={considerResizeDiagonalRightTop}
   ></span>
   <span
     class="handle handle--corner handle--corner-bottom-right"
     use:resizeHandle={{
       direction: ResizeDirection.DIAGONAL,
       distanceThreshold,
+      onResize: considerResizeDiagonalRightBottom,
     }}
-    onresize={considerResizeDiagonalRightBottom}
   ></span>
 </div>
 

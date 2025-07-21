@@ -3,6 +3,7 @@ import type { Action } from "svelte/action";
 export type ResizableOptions = {
   direction: ResizeDirection;
   distanceThreshold: number;
+  onResize: (detail: ResizeEventDetail) => void;
 };
 
 export type ResizeEventDetail = {
@@ -60,20 +61,14 @@ export const resizeHandle: Action<HTMLElement, ResizableOptions> = (
 
   const handlePointerMove = (event: PointerEvent) => {
     const scale = getScale(event);
-    node.dispatchEvent(
-      new CustomEvent("resize", {
-        detail: { ...scale, commit: false },
-      }),
-    );
+    options.onResize({ ...scale, commit: false });
   };
 
   const handlePointerUp = (event: PointerEvent) => {
     const scale = getScale(event);
     node.removeEventListener("pointermove", handlePointerMove);
     node.removeEventListener("pointerup", handlePointerUp);
-    node.dispatchEvent(
-      new CustomEvent("resize", { detail: { ...scale, commit: true } }),
-    );
+    options.onResize({ ...scale, commit: true });
   };
 
   node.addEventListener("pointerdown", handlePointerDown);
