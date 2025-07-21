@@ -10,9 +10,9 @@
   import SolarTrashBin2BoldDuotone from "~icons/solar/trash-bin-2-bold-duotone";
   import SolarTranslationBoldDuotone from "~icons/solar/translation-bold-duotone";
   import {
-    revokeDevice,
-    setDeviceFolder,
-    setDeviceProfile,
+    createSetDeviceFolderMutation,
+    createSetDeviceProfileMutation,
+    createRevokeDeviceFolderMutation,
   } from "$lib/api/devices";
 
   import Button from "../input/Button.svelte";
@@ -25,8 +25,14 @@
 
   const { device, connected }: Props = $props();
 
+  const setDeviceProfileMutation = createSetDeviceProfileMutation();
+  const setDeviceFolderMutation = createSetDeviceFolderMutation();
+  const revokeDeviceMutation = createRevokeDeviceFolderMutation();
+
   function handleRevoke() {
-    const revokePromise = revokeDevice(device.id);
+    const revokePromise = $revokeDeviceMutation.mutateAsync({
+      deviceId: device.id,
+    });
 
     toast.promise(revokePromise, {
       loading: $t("device_revoking"),
@@ -36,11 +42,11 @@
   }
 
   function onChangeProfile(profileId: ProfileId) {
-    setDeviceProfile(device.id, profileId);
+    $setDeviceProfileMutation.mutate({ deviceId: device.id, profileId });
   }
 
   function onChangeFolder(folderId: FolderId) {
-    setDeviceFolder(device.id, folderId);
+    $setDeviceFolderMutation.mutate({ deviceId: device.id, folderId });
   }
 </script>
 

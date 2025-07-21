@@ -1,3 +1,13 @@
+import { createMutation } from "@tanstack/svelte-query";
+
+import type { PluginId } from "../types/plugin";
+
+import { getPluginBundle } from "./plugins_registry.requests";
+import {
+  uninstallPlugin,
+  installPluginBuffer,
+} from "../plugins/plugins.requests";
+
 export function createInstallPluginFromRegistry() {
   return createMutation({
     mutationFn: async ({

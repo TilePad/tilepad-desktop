@@ -6,7 +6,10 @@
   import { mergeProps } from "bits-ui";
   import { queryClient } from "$lib/api/client";
   import SolarSettingsBold from "~icons/solar/settings-bold";
-  import { foldersKeys, setFolderConfig } from "$lib/api/folders";
+  import {
+    updateFolderRows,
+    createSetFolderConfigMutation,
+  } from "$lib/api/folders";
 
   import Tooltip from "../Tooltip.svelte";
   import NumberInput from "../input/NumberInput.svelte";
@@ -20,36 +23,29 @@
 
   const { folder }: Props = $props();
 
+  const setFolderConfigMutation = createSetFolderConfigMutation();
+
   const debounceUpdateFolder = useDebounce(({ rows, columns }) => {
-    setFolderConfig(folder.id, {
-      ...folder.config,
-      rows,
-      columns,
+    $setFolderConfigMutation.mutateAsync({
+      folderId: folder.id,
+      config: {
+        ...folder.config,
+        rows,
+        columns,
+      },
     });
   }, 100);
 
   function onChangeRows(rows: number) {
     // Update the data on the UI ahead of time
-    queryClient.setQueryData<FolderModel>(
-      foldersKeys.specific(folder.profile_id, folder.id),
-      (data) => {
-        if (data === undefined) return data;
-        return { ...data, config: { ...data.config, rows } };
-      },
-    );
+    updateFolderRows(queryClient, folder.profile_id, folder.id, rows);
 
     debounceUpdateFolder({ rows, columns: folder.config.columns });
   }
 
   function onChangeColumns(columns: number) {
     // Update the data on the UI ahead of time
-    queryClient.setQueryData<FolderModel>(
-      foldersKeys.specific(folder.profile_id, folder.id),
-      (data) => {
-        if (data === undefined) return data;
-        return { ...data, config: { ...data.config, columns } };
-      },
-    );
+    updateFolderRows(queryClient, folder.profile_id, folder.id, columns);
 
     debounceUpdateFolder({ rows: folder.config.rows, columns });
   }

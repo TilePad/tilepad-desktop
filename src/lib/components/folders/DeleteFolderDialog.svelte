@@ -3,8 +3,8 @@
 
   import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
-  import { deleteFolder } from "$lib/api/folders";
   import { toastErrorMessage } from "$lib/api/utils/error";
+  import { createDeleteFolderMutation } from "$lib/api/folders";
 
   import type { DialogProps } from "../dialog/Dialog.svelte";
 
@@ -23,12 +23,17 @@
 
   const currentProfile = $derived.by(profile);
 
+  const deleteFolderMutation = createDeleteFolderMutation();
+
   let open = $state(false);
 
   async function onDelete(event: Event) {
     event.preventDefault();
 
-    const createPromise = deleteFolder(currentProfile.id, folder.id);
+    const createPromise = $deleteFolderMutation.mutateAsync({
+      profileId: currentProfile.id,
+      folderId: folder.id,
+    });
 
     toast.promise(createPromise, {
       loading: $t("folder_deleting"),

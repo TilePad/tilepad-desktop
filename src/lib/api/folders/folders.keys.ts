@@ -1,3 +1,6 @@
+import type { FolderId } from "../types/folders";
+import type { ProfileId } from "../types/profiles";
+
 export const foldersKeys = {
   root: ["folders"],
   list: (profileId: ProfileId) => ["folders", "profile", profileId, "list"],

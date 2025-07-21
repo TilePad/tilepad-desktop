@@ -4,8 +4,8 @@
   import { watch } from "runed";
   import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
-  import { setFolderName } from "$lib/api/folders";
   import { toastErrorMessage } from "$lib/api/utils/error";
+  import { createSetFolderNameMutation } from "$lib/api/folders";
 
   import type { DialogProps } from "../dialog/Dialog.svelte";
 
@@ -22,10 +22,15 @@
   let open = $state(false);
   let name = $state(folder.name);
 
+  const setFolderNameMutation = createSetFolderNameMutation();
+
   async function onSave(event: Event) {
     event.preventDefault();
 
-    const updatePromise = setFolderName(folder.id, name);
+    const updatePromise = $setFolderNameMutation.mutateAsync({
+      folderId: folder.id,
+      name,
+    });
 
     toast.promise(updatePromise, {
       loading: $t("folder_updating"),

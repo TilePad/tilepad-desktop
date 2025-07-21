@@ -30,10 +30,8 @@ export async function uploadUserIcon(file: File): Promise<string> {
   });
 }
 
-export async function uninstallIconPack(packId: IconPackId) {
-  await invoke<void>("icons_uninstall_icon_pack", {
+export function uninstallIconPack(packId: IconPackId) {
+  return invoke<void>("icons_uninstall_icon_pack", {
     packId,
   });
-
-  invalidateIconPacksQuery(queryClient);
 }

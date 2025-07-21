@@ -1,9 +1,9 @@
 <script lang="ts">
   import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
-  import { createFolder } from "$lib/api/folders";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import SolarAddFolderBold from "~icons/solar/add-folder-bold";
+  import { createCreateFolderMutation } from "$lib/api/folders";
 
   import type { DialogProps } from "../dialog/Dialog.svelte";
 
@@ -26,6 +26,8 @@
   const currentProfile = $derived.by(profile);
   const currentFolder = $derived.by(folder);
 
+  const createFolderMutation = createCreateFolderMutation();
+
   let open = $state(false);
   let name = $state("");
 
@@ -33,15 +35,17 @@
     event.preventDefault();
     if (name.length < 1) return;
 
-    const createPromise = createFolder({
-      name,
-      default: false,
-      config: {
-        rows: currentFolder.config.rows,
-        columns: currentFolder.config.columns,
+    const createPromise = $createFolderMutation.mutateAsync({
+      create: {
+        name,
+        default: false,
+        config: {
+          rows: currentFolder.config.rows,
+          columns: currentFolder.config.columns,
+        },
+        profile_id: currentProfile.id,
+        order,
       },
-      profile_id: currentProfile.id,
-      order,
     });
 
     toast.promise(createPromise, {

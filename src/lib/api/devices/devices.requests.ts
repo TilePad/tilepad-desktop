@@ -10,8 +10,6 @@ import type {
   DeviceRequestId,
 } from "../types/devices";
 
-import { invalidateDevices } from "./devices.mutators";
-
 export function getDeviceRequests() {
   return invoke<DeviceRequest[]>("devices_get_requests");
 }
@@ -36,15 +34,10 @@ export function revokeDevice(deviceId: DeviceId) {
   return invoke<void>("devices_revoke_device", { deviceId });
 }
 
-export async function setDeviceProfile(
-  deviceId: DeviceId,
-  profileId: ProfileId,
-) {
-  await invoke<void>("devices_set_device_profile", { deviceId, profileId });
-  invalidateDevices();
+export function setDeviceProfile(deviceId: DeviceId, profileId: ProfileId) {
+  return invoke<void>("devices_set_device_profile", { deviceId, profileId });
 }
 
-export async function setDeviceFolder(deviceId: DeviceId, folderId: FolderId) {
-  await invoke<void>("devices_set_device_folder", { deviceId, folderId });
-  invalidateDevices();
+export function setDeviceFolder(deviceId: DeviceId, folderId: FolderId) {
+  return invoke<void>("devices_set_device_folder", { deviceId, folderId });
 }

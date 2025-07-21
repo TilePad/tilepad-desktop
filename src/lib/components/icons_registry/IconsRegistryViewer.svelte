@@ -3,7 +3,7 @@
 
   import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
-  import { uninstallIconPack } from "$lib/api/icons";
+  import { createUninstallIconPackMutation } from "$lib/api/icons";
   import { replaceMarkdownRelativeUrls } from "$lib/utils/markdown";
   import { getErrorMessage, toastErrorMessage } from "$lib/api/utils/error";
   import {
@@ -28,6 +28,7 @@
   const readmeQuery = createIconPackReadmeQuery(() => item.repo);
 
   const install = createInstallIconPackFromRegistry();
+  const uninstallMutation = createUninstallIconPackMutation();
 
   async function onInstall() {
     const manifest = $manifestQuery.data;
@@ -50,9 +51,11 @@
   }
 
   function handleUninstall() {
-    const revokePromise = uninstallIconPack(item.id);
+    const uninstallPromise = $uninstallMutation.mutateAsync({
+      packId: item.id,
+    });
 
-    toast.promise(revokePromise, {
+    toast.promise(uninstallPromise, {
       loading: $t("icon_packs_uninstalling"),
       success: $t("icon_packs_uninstalled"),
       error: toastErrorMessage($t("icon_packs_uninstall_error")),
