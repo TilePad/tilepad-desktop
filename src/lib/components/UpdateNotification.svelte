@@ -45,7 +45,7 @@
         },
       }),
       success: $t("update_downloaded"),
-      error: toastErrorMessage($t("udpate_download_error")),
+      error: toastErrorMessage($t("update_download_error")),
     });
 
     await updatePromise;
