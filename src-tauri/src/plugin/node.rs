@@ -38,24 +38,15 @@ pub async fn get_node_versions(client: &reqwest::Client) -> anyhow::Result<Vec<N
 /// https://nodejs.org/dist/v22.13.1/node-v22.13.1-win-x64.zip
 fn node_download_url(version: &str, os: OperatingSystem, arch: Arch) -> String {
     match os {
-        OperatingSystem::Windows => format!(
-            "{base_url}/v{version}/node-v{version}-win-{arch}.zip",
-            base_url = NODE_DIST_BASE_URL,
-            version = version,
-            arch = arch
-        ),
-        OperatingSystem::MacOs => format!(
-            "{base_url}/v{version}/node-v{version}-darwin-{arch}.zip",
-            base_url = NODE_DIST_BASE_URL,
-            version = version,
-            arch = arch
-        ),
-        OperatingSystem::Linux => format!(
-            "{base_url}/v{version}/node-v{version}-linux-{arch}.zip",
-            base_url = NODE_DIST_BASE_URL,
-            version = version,
-            arch = arch
-        ),
+        OperatingSystem::Windows => {
+            format!("{NODE_DIST_BASE_URL}/v{version}/node-v{version}-win-{arch}.zip")
+        }
+        OperatingSystem::MacOs => {
+            format!("{NODE_DIST_BASE_URL}/v{version}/node-v{version}-darwin-{arch}.zip")
+        }
+        OperatingSystem::Linux => {
+            format!("{NODE_DIST_BASE_URL}/v{version}/node-v{version}-linux-{arch}.zip")
+        }
     }
 }
 

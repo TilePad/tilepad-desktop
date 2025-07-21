@@ -18,7 +18,7 @@ use super::{
 };
 
 pub async fn process_events(app_handle: AppHandle, db: DbPool, mut event_rx: AppEventReceiver) {
-    let mut futures = FuturesUnordered::new();
+    let futures = FuturesUnordered::new();
     let mut futures = std::pin::pin!(futures);
 
     poll_fn::<(), _>(|cx| {
