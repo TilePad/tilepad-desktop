@@ -1,31 +1,14 @@
 import { invoke } from "@tauri-apps/api/core";
-import { listen } from "@tauri-apps/api/event";
-import { createQuery, createMutation } from "@tanstack/svelte-query";
 
 import type {
   PluginId,
   DisplayContext,
   PluginWithState,
   InspectorContext,
-} from "./types/plugin";
+} from "../types/plugin";
 
-import { queryClient } from "./client";
-
-export const pluginsKey = {
-  root: ["plugins"],
-  list: ["plugins", "list"],
-  specific: {
-    asset: (pluginId: PluginId | null, asset: string | null) => [
-      "plugins",
-      "specific",
-      pluginId,
-      "asset",
-      asset,
-    ],
-  },
-};
-
-// [REQUESTS] ------------------------------------------------------
+import { queryClient } from "../client";
+import { invalidatePluginsQuery } from "./plugins.mutators";
 
 export function getPluginsWithState() {
   return invoke<PluginWithState[]>("plugins_get_plugins");
@@ -81,7 +64,7 @@ export async function stopPluginTask(pluginId: PluginId) {
     pluginId,
   });
 
-  invalidatePluginsQuery();
+  invalidatePluginsQuery(queryClient);
 }
 
 export async function startPluginTask(pluginId: PluginId) {
@@ -89,7 +72,7 @@ export async function startPluginTask(pluginId: PluginId) {
     pluginId,
   });
 
-  invalidatePluginsQuery();
+  invalidatePluginsQuery(queryClient);
 }
 
 export async function restartPluginTask(pluginId: PluginId) {
@@ -97,7 +80,7 @@ export async function restartPluginTask(pluginId: PluginId) {
     pluginId,
   });
 
-  invalidatePluginsQuery();
+  invalidatePluginsQuery(queryClient);
 }
 
 export async function reloadPlugin(pluginId: PluginId) {
@@ -105,7 +88,7 @@ export async function reloadPlugin(pluginId: PluginId) {
     pluginId,
   });
 
-  invalidatePluginsQuery();
+  invalidatePluginsQuery(queryClient);
 }
 
 export async function installPlugin(file: File) {
@@ -118,7 +101,7 @@ export async function installPluginBuffer(data: ArrayBuffer) {
     data,
   });
 
-  invalidatePluginsQuery();
+  invalidatePluginsQuery(queryClient);
 }
 
 export async function uninstallPlugin(pluginId: PluginId) {
@@ -126,49 +109,5 @@ export async function uninstallPlugin(pluginId: PluginId) {
     pluginId,
   });
 
-  invalidatePluginsQuery();
+  invalidatePluginsQuery(queryClient);
 }
-
-// [QUERIES] ------------------------------------------------------
-
-export function createPluginsQuery() {
-  return createQuery({
-    queryKey: pluginsKey.list,
-    queryFn: getPluginsWithState,
-  });
-}
-
-// [MUTATIONS] ------------------------------------------------------
-
-export function createUninstallPlugin() {
-  return createMutation({
-    mutationFn: ({ pluginId }: { pluginId: PluginId }) =>
-      uninstallPlugin(pluginId),
-  });
-}
-
-// [MUTATORS] ------------------------------------------------------
-
-function invalidatePluginsQuery() {
-  queryClient.invalidateQueries({
-    queryKey: pluginsKey.root,
-    exact: false,
-  });
-}
-
-// [LISTENERS] ------------------------------------------------------
-
-listen<PluginId>("plugins:loaded", ({ payload: plugin_id }) => {
-  invalidatePluginsQuery();
-});
-
-listen<PluginId>("plugins:unloaded", ({ payload: plugin_id }) => {
-  invalidatePluginsQuery();
-});
-
-listen<{ plugin_id: PluginId; state: string }>(
-  "plugins:task_state_changed",
-  ({ payload: { plugin_id, state } }) => {
-    invalidatePluginsQuery();
-  },
-);
