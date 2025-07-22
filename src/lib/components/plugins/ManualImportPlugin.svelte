@@ -1,3 +1,4 @@
+<!-- Button to allow manually importing a plugin -->
 <script lang="ts">
   import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
@@ -9,7 +10,7 @@
 
   let inputElm: HTMLInputElement | undefined = $state();
 
-  async function onChangeFile() {
+  function onChangeFile() {
     if (!inputElm) return;
 
     const files = inputElm.files;

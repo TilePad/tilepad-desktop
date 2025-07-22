@@ -1,25 +1,34 @@
 <script lang="ts">
-  import type { IconRegistryEntry } from "$lib/api/types/icons_registry";
-
   import { t } from "svelte-i18n";
 
   type Props = {
-    item: IconRegistryEntry;
+    name: string;
+    authors: string[];
+    description: string;
+    repo: string;
     selected: boolean;
     installed: boolean;
     onClick: VoidFunction;
   };
 
-  const { item, selected, installed, onClick }: Props = $props();
+  const {
+    name,
+    authors,
+    description,
+    repo,
+    selected,
+    installed,
+    onClick,
+  }: Props = $props();
 </script>
 
 <button onclick={onClick} class="item" class:item--selected={selected}>
-  <p class="name">{item.name}</p>
-  <p class="description">{item.description}</p>
+  <p class="name">{name}</p>
+  <p class="description">{description}</p>
 
-  <p class="authors">{item.authors.join(", ")}</p>
+  <p class="authors">{authors.join(", ")}</p>
 
-  <p class="repo">{item.repo}</p>
+  <p class="repo">{repo}</p>
 
   {#if installed}
     <p class="installed">{$t("installed")}</p>

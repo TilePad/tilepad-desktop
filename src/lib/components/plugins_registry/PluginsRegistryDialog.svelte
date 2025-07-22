@@ -83,7 +83,10 @@
           <div class="plugins-list">
             {#each filteredRegistry as item (item.id)}
               <PluginsRegistryItem
-                {item}
+                name={item.name}
+                authors={item.authors}
+                description={item.description}
+                repo={item.repo}
                 onClick={() => {
                   if (active !== undefined && active.id === item.id) {
                     active = undefined;

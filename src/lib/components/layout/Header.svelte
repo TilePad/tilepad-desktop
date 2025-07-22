@@ -1,5 +1,6 @@
 <script lang="ts">
   import { t } from "svelte-i18n";
+  import tilepadLogo from "$lib/assets/tilepad-logo.svg";
   import SolarDevicesBoldDuotone from "~icons/solar/devices-bold-duotone";
   import SolarSettingsBoldDuotone from "~icons/solar/settings-bold-duotone";
   import SolarPlugCircleBoldDuotone from "~icons/solar/plug-circle-bold-duotone";
@@ -10,7 +11,7 @@
 </script>
 
 <header class="header">
-  <img class="logo" src="/tilepad-logo.svg" alt="Logo" />
+  <img class="logo" src={tilepadLogo} alt="Logo" />
   <nav class="nav">
     <NavButton
       icon={SolarLayersMinimalisticBoldDuotone}
