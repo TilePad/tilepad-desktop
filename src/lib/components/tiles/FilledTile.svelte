@@ -318,7 +318,7 @@
       icon={config.icon}
       iconOptions={config.icon_options}
     />
-    <TileLabelElm label={config.label} />
+    <TileLabelElm {...config.label} />
   </button>
 
   <span

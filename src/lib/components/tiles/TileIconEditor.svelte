@@ -132,7 +132,7 @@
 >
   <div class="tile">
     <TileIcon ctx={displayCtx} icon={config.icon} {iconOptions} />
-    <TileLabel label={config.label} />
+    <TileLabel {...config.label} />
   </div>
 </div>
 

@@ -1,25 +1,47 @@
 <script lang="ts">
-  import type { TileLabel } from "$lib/api/types/tiles";
+  import type { LabelAlign } from "$lib/api/types/tiles";
 
   type Props = {
-    label: TileLabel;
+    enabled: boolean;
+    label: string;
+    align: LabelAlign;
+    font: string;
+    font_size: number;
+    bold: boolean;
+    italic: boolean;
+    underline: boolean;
+    outline: boolean;
+    color: string;
+    outline_color: string;
   };
 
-  const { label }: Props = $props();
+  const {
+    enabled,
+    label,
+    align,
+    font,
+    font_size,
+    bold,
+    italic,
+    underline,
+    outline,
+    color,
+    outline_color,
+  }: Props = $props();
 </script>
 
-{#if label.enabled && label.label.length > 0}
-  <div class="label-container" data-align={label.align}>
+{#if enabled && label.length > 0}
+  <div class="label-container" data-align={align}>
     <p
       class="label"
-      style="font-size: calc({label.font_size}pt * var(--tile-size-adjustment)); font-family: {label.font}, 'Roboto'; color: {label.color}; --outline-color: {label.outline_color};"
-      data-align={label.align}
-      class:label--bold={label.bold}
-      class:label--italic={label.italic}
-      class:label--underline={label.underline}
-      class:label--outline={label.outline}
+      style="font-size: calc({font_size}pt * var(--tile-size-adjustment)); font-family: {font}, 'Roboto'; color: {color}; --outline-color: {outline_color};"
+      data-align={align}
+      class:label--bold={bold}
+      class:label--italic={italic}
+      class:label--underline={underline}
+      class:label--outline={outline}
     >
-      {label.label}
+      {label}
     </p>
   </div>
 {/if}
