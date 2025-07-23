@@ -30,18 +30,24 @@
 
 <style>
   .button {
-    display: block;
-    padding: 0.5rem;
+    padding: 0 var(--tp-btn-padding-x-md);
+    height: var(--tp-btn-height-md);
+
     border: 1px solid #2f2f2f;
-    text-decoration: none;
     background-color: #322e38;
-    border-radius: 0.5rem;
-    display: flex;
-    gap: 0.75rem;
-    align-items: center;
+
     transition:
       background-color 0.25s ease,
       transform 0.15s ease;
+
+    display: flex;
+    gap: var(--tp-space-3);
+    align-items: center;
+
+    border-radius: var(--tp-radius-lg);
+
+    font-size: var(--tp-text-base);
+    text-decoration: none;
   }
 
   .button:active {

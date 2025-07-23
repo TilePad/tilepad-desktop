@@ -44,23 +44,28 @@
 
 <style>
   .btn {
-    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+
     background-color: #544d5e;
     border: none;
     color: #fff;
-    border-radius: 0.25rem;
-    align-items: center;
-    display: flex;
-    gap: 0.5rem;
+    border-radius: var(--tp-radius-base);
+
     cursor: pointer;
-    font-size: 1em;
     text-decoration: none;
     position: relative;
+
+    font-size: var(--tp-text-base);
+    gap: var(--tp-space-2);
+    padding: 0 var(--tp-btn-padding-x-md);
+    height: var(--tp-btn-height-md);
   }
 
   .btn[data-size="small"] {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.9rem;
+    padding: 0 var(--tp-btn-padding-x-sm);
+    height: var(--tp-btn-height-sm);
+    font-size: var(--tp-text-sm);
   }
 
   .btn[data-variant="warning"] {
