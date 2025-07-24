@@ -14,6 +14,8 @@
   import type { Snippet } from "svelte";
   import type { HTMLButtonAttributes } from "svelte/elements";
 
+  import LoadingSpinner from "../loading/LoadingSpinner.svelte";
+
   const {
     variant = "default",
     transparent,
@@ -36,7 +38,7 @@
   data-variant={variant}
 >
   {#if loading}
-    <span class="loading-spinner"></span>
+    <LoadingSpinner size={size === "small" ? 15 : 20} />
   {/if}
 
   {@render children?.()}
@@ -104,44 +106,5 @@
     background-color: transparent !important;
     color: #ffffff;
     border-color: transparent !important;
-  }
-
-  .btn--loading {
-    position: relative;
-    padding-left: 40px !important;
-  }
-
-  .btn--loading.btn[data-size="small"] {
-    padding-left: 35px !important;
-  }
-
-  .btn--loading.btn[data-size="small"] .loading-spinner {
-    left: 10px;
-    width: 15px;
-    height: 15px;
-  }
-
-  .btn--loading .loading-spinner {
-    display: inline-block;
-  }
-
-  .loading-spinner {
-    display: none;
-    width: 20px;
-    height: 20px;
-    border: 2px solid #777;
-    border-radius: 50%;
-    border-top-color: white;
-    animation: spin 1s ease-in-out infinite;
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-
-  @keyframes spin {
-    to {
-      transform: translateY(-50%) rotate(360deg);
-    }
   }
 </style>

@@ -13,11 +13,11 @@
   import PluginCard from "$lib/components/plugins/PluginCard.svelte";
   import SkeletonList from "$lib/components/skeleton/SkeletonList.svelte";
   import ManualImportPlugin from "$lib/components/plugins/ManualImportPlugin.svelte";
+  import PluginsRegistryDialog from "$lib/components/plugins_registry/PluginsRegistryDialog.svelte";
   import {
     fetchPluginManifest,
     fetchPluginRegistry,
   } from "$lib/api/plugins_registry";
-  import PluginsRegistryDialog from "$lib/components/plugins_registry/PluginsRegistryDialog.svelte";
 
   const pluginsQuery = createPluginsQuery();
 
