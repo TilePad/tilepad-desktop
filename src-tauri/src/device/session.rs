@@ -12,8 +12,9 @@ use uuid::Uuid;
 use x25519_dalek::PublicKey;
 
 use crate::{
-    database::entity::device::DeviceId,
+    database::entity::{device::DeviceId, folder::FolderModel, tile::TileModel},
     device::protocol::{ClientDeviceMessageEncrypted, ServerDeviceMessageEncrypted},
+    events::DisplayContext,
     utils::{
         error::try_cast_error,
         ws::{WebSocketFuture, WsTx},
@@ -134,11 +135,13 @@ impl DeviceSession {
         }
     }
 
-    pub fn send_message(&self, msg: ServerDeviceMessage) -> bool {
+    /// Send a plain-text message
+    fn send_message(&self, msg: ServerDeviceMessage) -> bool {
         self.tx.send(msg).is_ok()
     }
 
-    pub fn send_encrypted_message(&self, msg: ServerDeviceMessageEncrypted) -> bool {
+    /// Send a message using the current encryption cipher
+    fn send_encrypted_message(&self, msg: ServerDeviceMessageEncrypted) -> bool {
         let state = self.state.read();
         let cipher = match &*state {
             DeviceSessionState::AwaitingApproval { cipher } => cipher,
@@ -162,8 +165,6 @@ impl DeviceSession {
         let encrypted_message = match cipher.encrypt(&nonce, encoded_message.as_slice()) {
             Ok(value) => value,
             Err(err) => {
-                // TODO: Disconnect client
-
                 tracing::error!(?err, "failed to encrypt message");
                 self.send_message(ServerDeviceMessage::Error {
                     message: "failed to encrypt message".to_string(),
@@ -180,18 +181,38 @@ impl DeviceSession {
             .is_ok()
     }
 
-    pub fn reset_state(&self) {
-        *self.state.write() = DeviceSessionState::Initial
-    }
-
     pub fn revoke(&self) {
         self.send_encrypted_message(ServerDeviceMessageEncrypted::Revoked);
-        self.reset_state();
+        *self.state.write() = Default::default();
     }
 
     pub fn decline(&self) {
         self.send_encrypted_message(ServerDeviceMessageEncrypted::Declined);
-        self.reset_state();
+        *self.state.write() = Default::default();
+    }
+
+    pub fn on_approved(&self, device_id: DeviceId) {
+        {
+            let state = &mut *self.state.write();
+            let cipher = match state {
+                DeviceSessionState::AwaitingApproval { cipher } => cipher.clone(),
+                _ => return,
+            };
+
+            // Authenticate the device session
+            *state = DeviceSessionState::Authenticated { cipher, device_id };
+        };
+
+        self.send_encrypted_message(ServerDeviceMessageEncrypted::Approved { device_id });
+        self.send_encrypted_message(ServerDeviceMessageEncrypted::Authenticated { device_id });
+    }
+
+    pub fn on_plugin_message(&self, ctx: DisplayContext, message: serde_json::Value) {
+        self.send_encrypted_message(ServerDeviceMessageEncrypted::RecvFromPlugin { ctx, message });
+    }
+
+    pub fn on_tiles(&self, tiles: Vec<TileModel>, folder: FolderModel) {
+        self.send_encrypted_message(ServerDeviceMessageEncrypted::Tiles { tiles, folder });
     }
 
     /// Handles the initiation of a handshake
@@ -216,17 +237,13 @@ impl DeviceSession {
             }
         };
 
-        // Generate a random challenge bytes
-        let mut challenge = [0u8; 128];
-        OsRng.fill_bytes(&mut challenge);
-
-        // Encrypt challenge
-        let nonce = XChaCha20Poly1305::generate_nonce(&mut OsRng);
-        let encrypted_challenge = match cipher.encrypt(&nonce, challenge.as_slice()) {
+        let EncryptedChallenge {
+            challenge,
+            encrypted_challenge,
+            nonce,
+        } = match generate_encrypted_challenge(&cipher) {
             Ok(value) => value,
             Err(err) => {
-                // TODO: Disconnect client
-
                 tracing::error!(?err, "failed to create challenge");
                 self.send_message(ServerDeviceMessage::Error {
                     message: "failed to create challenge".to_string(),
@@ -235,11 +252,11 @@ impl DeviceSession {
             }
         };
 
-        // Move to challenge state
         {
+            // Move to challenge state
             *self.state.write() = DeviceSessionState::Challenge {
                 cipher,
-                challenge: challenge.to_vec(),
+                challenge,
                 client_name: name,
                 client_public_key: client_public_key.to_bytes(),
             };
@@ -249,24 +266,8 @@ impl DeviceSession {
         self.send_message(ServerDeviceMessage::AuthenticateChallenge {
             server_public_key: self.devices.server_key_pair.public_key.to_bytes(),
             challenge: encrypted_challenge,
-            nonce: nonce.into(),
+            nonce,
         });
-    }
-
-    pub fn on_approved(&self, device_id: DeviceId) {
-        {
-            let state = &mut *self.state.write();
-            let cipher = match state {
-                DeviceSessionState::AwaitingApproval { cipher } => cipher.clone(),
-                _ => return,
-            };
-
-            // Authenticate the device session
-            *state = DeviceSessionState::Authenticated { cipher, device_id };
-        };
-
-        self.send_encrypted_message(ServerDeviceMessageEncrypted::Approved { device_id });
-        self.send_encrypted_message(ServerDeviceMessageEncrypted::Authenticated { device_id });
     }
 
     async fn handle_challenge_response(
@@ -284,8 +285,6 @@ impl DeviceSession {
         let client_challenge = match cipher.decrypt(&client_nonce, client_challenge.as_slice()) {
             Ok(value) => value,
             Err(err) => {
-                // TODO: Disconnect client
-
                 tracing::error!(?err, "failed to decrypt challenge");
                 self.send_message(ServerDeviceMessage::Error {
                     message: "failed to decrypt challenge".to_string(),
@@ -296,7 +295,6 @@ impl DeviceSession {
 
         // Challenge didn't match
         if client_challenge != server_challenge {
-            // TODO: Disconnect client
             tracing::error!("incorrect challenge");
             self.send_message(ServerDeviceMessage::Error {
                 message: "challenge does not match".to_string(),
@@ -311,7 +309,6 @@ impl DeviceSession {
         {
             // Public key is known and authenticated with an existing device
             Ok(Some(device_id)) => {
-                tracing::debug!("auth complete");
                 {
                     // Authenticate the device session
                     *self.state.write() = DeviceSessionState::Authenticated { cipher, device_id };
@@ -323,8 +320,6 @@ impl DeviceSession {
             }
             // Public key is not known or approved yet add approval request
             Ok(None) => {
-                tracing::debug!("auth need approval");
-
                 {
                     // Awaiting approval
                     *self.state.write() = DeviceSessionState::AwaitingApproval { cipher }
@@ -349,7 +344,7 @@ impl DeviceSession {
     }
 
     /// Handle messages from the socket
-    pub async fn handle_message(&self, message: ClientDeviceMessage) {
+    async fn handle_message(&self, message: ClientDeviceMessage) {
         let state = { self.state.read().clone() };
 
         match state {
@@ -396,7 +391,6 @@ impl DeviceSession {
                         let message = match cipher.decrypt(&nonce, message.as_slice()) {
                             Ok(value) => value,
                             Err(err) => {
-                                // TODO: Disconnect client
                                 tracing::error!(?err, "failed to decrypt message");
                                 self.send_message(ServerDeviceMessage::Error {
                                     message: "failed to decrypt message".to_string(),
@@ -409,7 +403,6 @@ impl DeviceSession {
                             match serde_json::from_slice(&message) {
                                 Ok(value) => value,
                                 Err(err) => {
-                                    // TODO: Disconnect client
                                     tracing::error!(?err, "failed to decode message");
                                     self.send_message(ServerDeviceMessage::Error {
                                         message: "failed to decode message".to_string(),
@@ -429,7 +422,7 @@ impl DeviceSession {
     }
 
     /// Handle message when authenticated as `device_id`
-    pub async fn handle_message_authenticated(
+    async fn handle_message_authenticated(
         &self,
         device_id: DeviceId,
         message: ClientDeviceMessageEncrypted,
@@ -470,4 +463,28 @@ impl DeviceSession {
             }
         }
     }
+}
+
+struct EncryptedChallenge {
+    challenge: Vec<u8>,
+    encrypted_challenge: Vec<u8>,
+    nonce: [u8; 24],
+}
+
+fn generate_encrypted_challenge(cipher: &XChaCha20Poly1305) -> anyhow::Result<EncryptedChallenge> {
+    // Generate a random challenge bytes
+    let mut challenge = [0u8; 128];
+    OsRng.fill_bytes(&mut challenge);
+
+    // Encrypt challenge
+    let nonce = XChaCha20Poly1305::generate_nonce(&mut OsRng);
+    let encrypted_challenge = cipher
+        .encrypt(&nonce, challenge.as_slice())
+        .map_err(|_| anyhow::anyhow!("failed to encrypt challenge"))?;
+
+    Ok(EncryptedChallenge {
+        challenge: challenge.to_vec(),
+        encrypted_challenge,
+        nonce: nonce.into(),
+    })
 }

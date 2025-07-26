@@ -347,7 +347,7 @@ impl Devices {
         device.set_profile(db, profile_id, folder.id).await?;
 
         if let Some(session) = self.get_session_by_device(device_id) {
-            session.send_encrypted_message(ServerDeviceMessageEncrypted::Tiles { tiles, folder });
+            session.on_tiles(tiles, folder);
         }
 
         Ok(())
@@ -374,7 +374,7 @@ impl Devices {
 
         // Inform the device of its new tile set
         if let Some(session) = self.get_session_by_device(device_id) {
-            session.send_encrypted_message(ServerDeviceMessageEncrypted::Tiles { tiles, folder });
+            session.on_tiles(tiles, folder);
         }
 
         Ok(())
@@ -409,10 +409,7 @@ impl Devices {
             .iter()
             .filter_map(|device| self.get_session_by_device(device.id))
             .for_each(|session| {
-                _ = session.send_encrypted_message(ServerDeviceMessageEncrypted::Tiles {
-                    tiles: tiles.clone(),
-                    folder: folder.clone(),
-                });
+                session.on_tiles(tiles.clone(), folder.clone());
             });
 
         Ok(())
@@ -425,10 +422,7 @@ impl Devices {
         message: serde_json::Value,
     ) -> anyhow::Result<()> {
         if let Some(session) = self.get_session_by_device(ctx.device_id) {
-            _ = session.send_encrypted_message(ServerDeviceMessageEncrypted::RecvFromPlugin {
-                ctx: ctx.clone(),
-                message: message.clone(),
-            });
+            session.on_plugin_message(ctx, message);
         }
 
         Ok(())
