@@ -17,7 +17,7 @@ use crate::{
     events::DisplayContext,
     utils::{
         error::try_cast_error,
-        ws::{WebSocketFuture, WsTx},
+        ws_msgpack::{WebSocketMpFuture, WsMpTx},
     },
 };
 
@@ -40,7 +40,7 @@ pub struct DeviceSession {
     state: RwLock<DeviceSessionState>,
 
     /// Channel to send messages to the session
-    tx: WsTx<ServerDeviceMessage>,
+    tx: WsMpTx<ServerDeviceMessage>,
 
     /// Access to the devices registry the session is apart of
     devices: Arc<Devices>,
@@ -85,7 +85,7 @@ impl DeviceSession {
 
         // Create and spawn a future for the websocket
         let (ws_future, ws_rx, ws_tx) =
-            WebSocketFuture::<ServerDeviceMessage, ClientDeviceMessage>::new(socket);
+            WebSocketMpFuture::<ServerDeviceMessage, ClientDeviceMessage>::new(socket);
 
         spawn(async move {
             if let Err(cause) = ws_future.await {

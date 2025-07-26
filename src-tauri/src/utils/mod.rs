@@ -6,4 +6,5 @@ pub mod file;
 pub mod inspector;
 pub mod tracing;
 pub mod ws;
+pub mod ws_msgpack;
 pub mod zip;
