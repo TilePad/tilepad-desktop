@@ -34,6 +34,12 @@
       error: toastErrorMessage($t("device_decline_error")),
     });
   }
+
+  async function fingerprint(keyBytes: Uint8Array) {
+    const hash = await crypto.subtle.digest("SHA-256", keyBytes);
+    const hashArray = Array.from(new Uint8Array(hash));
+    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join(":");
+  }
 </script>
 
 <div class="device">
@@ -44,6 +50,10 @@
     {request.device_name}
   </h3>
   <span class="device__id">Address: {request.socket_addr}</span>
+
+  {#await fingerprint(new Uint8Array(request.client_public_key)) then print}
+    <p class="device__print">Fingerprint:<br />{print}</p>
+  {/await}
 
   <div class="actions">
     <Button variant="error" onclick={handleDecline}>
@@ -87,5 +97,14 @@
 
   .device__name {
     font-size: 1.2rem;
+  }
+
+  .device__print {
+    word-break: break-all;
+    white-space: pre-wrap;
+    font-family: monospace;
+    padding: 0.5rem;
+    max-width: 100%;
+    overflow-wrap: break-word;
   }
 </style>

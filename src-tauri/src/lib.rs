@@ -18,6 +18,9 @@ use tile::Tiles;
 use tilepad_manifest::plugin::PluginId;
 use tokio::{fs::create_dir_all, sync::mpsc};
 use utils::tracing::setup_main_subscriber;
+use x25519_dalek::PublicKey;
+
+use crate::utils::encryption::{self, ServerKeyPair};
 
 mod commands;
 mod database;
@@ -167,6 +170,22 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
     let user_icons = app_data_path.join("icons");
     let uploaded_icons = app_data_path.join("uploaded_icons");
 
+    let private_key = match block_on(encryption::setup_private_key(
+        &app_data_path.join("private_key.bin"),
+    )) {
+        Ok(value) => value,
+        Err(cause) => {
+            tracing::error!(?cause, "failed to load database");
+            std::process::exit(1);
+        }
+    };
+
+    let public_key = PublicKey::from(&private_key);
+    let server_key_pair = ServerKeyPair {
+        private_key,
+        public_key,
+    };
+
     let db = match block_on(database::connect_database(app_data_path.join("app.db"))) {
         Ok(value) => value,
         Err(cause) => {
@@ -203,6 +222,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         app_event_tx.clone(),
         db.clone(),
         plugins.clone(),
+        server_key_pair,
     ));
     let tiles = Arc::new(Tiles::new(db.clone(), icons.clone(), devices.clone()));
     let fonts = Arc::new(Fonts::new());

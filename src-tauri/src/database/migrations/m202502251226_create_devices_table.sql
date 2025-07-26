@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS "devices" (
 	"id"	uuid_text NOT NULL,
 	"name"	varchar NOT NULL,
-	"access_token"	varchar NOT NULL,
+	"public_key"	blob NOT NULL,
 	"config"	jsonb_text NOT NULL,
 	"order"	integer NOT NULL DEFAULT 0,
 	"profile_id"	integer NOT NULL,
