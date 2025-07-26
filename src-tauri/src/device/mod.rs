@@ -8,7 +8,6 @@ use crate::{
             tile::{TileId, TileModel},
         },
     },
-    device::protocol::ServerDeviceMessageEncrypted,
     events::{
         AppEvent, AppEventSender, DeviceAppEvent, DeviceRequestAppEvent, DisplayContext,
         TileInteractionContext,
