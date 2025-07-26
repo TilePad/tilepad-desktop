@@ -16,6 +16,7 @@
   import SkeletonList from "../skeleton/SkeletonList.svelte";
   import ProfileSelector from "../profiles/ProfileSelector.svelte";
   import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
+  import { fly } from "svelte/transition";
 
   const { profile } = getProfileContext();
   const { folder } = getFolderContext();
@@ -58,19 +59,27 @@
       <SolarAltArrowRightLinear />
       <FolderSelector />
     </div>
-    <div class="content">
-      <TileGrid
-        tiles={$tilesQuery.data}
-        rows={currentFolder.config.rows}
-        columns={currentFolder.config.columns}
-        onClickTile={(tile) => {
-          if (activeTileId === tile.id) {
-            activeTileId = null;
-          } else {
-            activeTileId = tile.id;
-          }
-        }}
-      ></TileGrid>
+    <div class="content__wrapper">
+      {#key currentFolderId}
+        <div
+          class="content"
+          in:fly={{ x: -50, duration: 300, opacity: 0 }}
+          out:fly={{ x: 50, duration: 300, opacity: 0 }}
+        >
+          <TileGrid
+            tiles={$tilesQuery.data}
+            rows={currentFolder.config.rows}
+            columns={currentFolder.config.columns}
+            onClickTile={(tile) => {
+              if (activeTileId === tile.id) {
+                activeTileId = null;
+              } else {
+                activeTileId = tile.id;
+              }
+            }}
+          ></TileGrid>
+        </div>
+      {/key}
     </div>
 
     <!-- Bottom segment that pops up to edit a tile -->
@@ -101,8 +110,19 @@
   }
 
   .content {
-    flex: auto;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    overflow: hidden;
     padding: 1rem;
+  }
+
+  .content__wrapper {
+    position: relative;
+    flex: auto;
     overflow: hidden;
   }
 </style>
