@@ -46,6 +46,38 @@ The community icon packs registry has a large number of automatically generated 
 
 ![alt text](assets/image-7.png)
 
+## 🔒 Security
+
+Although Tilepad is primarily designed for local use, it implements measures to ensure that all communication is handled securely where appropriate.
+
+### 🔐 Secure Content
+
+The following content is **securely transmitted** using **Diffie-Hellman key exchange over Curve25519**, with **XChaCha20-Poly1305** encryption over WebSocket:
+
+- Device approval and connection processes  
+- Triggering tile actions  
+- Communication between **Inspector ↔ Device ↔ Plugin**  
+- Communication between **Display ↔ Device ↔ Plugin**  
+- Loading of tiles  
+
+### 📄 Plain Text Content
+
+The following content is **transmitted in plain text**:
+
+- Icon pack icons
+- Fonts
+- Plugin assets
+  - This includes iframes, displays, inspectors, and other plugin resources  
+  - **Note:** Plugin-to-device communication is **not** included here and is transmitted securely  
+- Plugin ↔ Inspector communication (local-only via loopback; does not leave the device)  
+
+Due to current technical limitations, the above assets cannot be served over an encrypted socket:
+
+- Tauri WebView does not accept self-signed certificates
+- Loading plugin content via `srcDoc` breaks relative paths within iframes, as iframe resources rely on the original origin and file paths to serve relative resources such as plugin stylesheets
+
+Because of these constraints, plugin assets must be loaded in plain text. However, these resources are **not considered sensitive**, and their exposure does **not pose a security risk**.
+
 ## Linux notes
 
 To build on linux you must follow the [Enigo Runtime Dependencies](https://github.com/enigo-rs/enigo?tab=readme-ov-file#runtime-dependencies) instructions for your distribution (They are "Runtime Dependencies" but are also required while building otherwise linking will fail)
