@@ -13,6 +13,7 @@ export interface DeviceRequest {
   socket_addr: string;
   session_id: DeviceSessionId;
   device_name: string;
+  client_public_key: number[];
 }
 
 export interface DeviceModel {
@@ -24,6 +25,7 @@ export interface DeviceModel {
   folder_id: FolderId;
   created_at: string;
   last_connected_at: string;
+  public_key: number[];
 }
 
 export type DeviceConfig = object;

@@ -10,20 +10,68 @@ use crate::{
 #[derive(Debug, Deserialize)]
 #[serde(tag = "type")]
 pub enum ClientDeviceMessage {
-    /// Requests an access token and approval for a device
-    RequestApproval {
+    /// Authenticate using a device access token
+    InitiateHandshake {
         /// Name of the device
         name: String,
+
+        /// Client public key to authenticate using
+        public_key: [u8; 32],
     },
 
+    /// Response to an authentication challenge
+    AuthenticateChallengeResponse {
+        /// Challenge value encrypted using the clients private key
+        challenge: Vec<u8>,
+        /// Nonce for the message
+        nonce: [u8; 24],
+    },
+
+    /// Encrypted message
+    Encrypted {
+        /// Encrypted message
+        message: Vec<u8>,
+
+        /// Nonce for the message
+        nonce: [u8; 24],
+    },
+}
+
+/// Device message coming from the server side
+#[derive(Debug, Serialize)]
+#[serde(tag = "type")]
+pub enum ServerDeviceMessage {
+    /// Post "InitiateHandshake" the server will send back
+    /// a challenge to ensure the client actually owns the private key to the
+    /// public key it specified
+    AuthenticateChallenge {
+        /// Public key of the server
+        server_public_key: [u8; 32],
+
+        /// Encrypted challenge
+        challenge: Vec<u8>,
+
+        /// Nonce for the message
+        nonce: [u8; 24],
+    },
+
+    /// Encrypted message from the server
+    EncryptedMessage {
+        /// The encrypted message
+        message: Vec<u8>,
+        /// Nonce for the message
+        nonce: [u8; 24],
+    },
+
+    /// Error occurred
+    Error { message: String },
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(tag = "type")]
+pub enum ClientDeviceMessageEncrypted {
     /// Request the current tiles
     RequestTiles,
-
-    /// Authenticate using a device access token
-    Authenticate {
-        /// Access token for making requests from a device
-        access_token: String,
-    },
 
     /// User has clicked a tile
     TileClicked {
@@ -38,10 +86,12 @@ pub enum ClientDeviceMessage {
     },
 }
 
-/// Device message coming from the server side
 #[derive(Debug, Serialize)]
 #[serde(tag = "type")]
-pub enum ServerDeviceMessage {
+pub enum ServerDeviceMessageEncrypted {
+    /// Device is not yet approved and approval has been requested
+    ApprovalRequested,
+
     /// Device access was denied
     Declined,
 
@@ -49,8 +99,6 @@ pub enum ServerDeviceMessage {
     Approved {
         /// Unique ID of the device
         device_id: Uuid,
-        /// Device access token for future requests
-        access_token: String,
     },
 
     /// Access was revoked
@@ -58,9 +106,6 @@ pub enum ServerDeviceMessage {
 
     /// Device is authenticated
     Authenticated { device_id: Uuid },
-
-    /// Provided access token was invalid
-    InvalidAccessToken,
 
     /// Update the current tiles list
     Tiles {

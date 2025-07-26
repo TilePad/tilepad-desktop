@@ -10,14 +10,23 @@ pub type DeviceId = Uuid;
 #[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct DeviceModel {
     pub id: DeviceId,
+
+    /// Name of the device
     pub name: String,
-    /// Access token should not be serialized
-    #[serde(skip)]
-    pub access_token: String,
+
+    /// Client public key
+    pub public_key: Vec<u8>,
+
+    /// Device configuration
     #[sqlx(json)]
     pub config: DeviceConfig,
+
+    /// Active device profile
     pub profile_id: ProfileId,
+
+    /// Active device folder
     pub folder_id: FolderId,
+
     pub order: u32,
     pub created_at: DateTime<Utc>,
     pub last_connected_at: DateTime<Utc>,
@@ -28,7 +37,7 @@ pub struct DeviceConfig {}
 
 pub struct CreateDevice {
     pub name: String,
-    pub access_token: String,
+    pub public_key: Vec<u8>,
     pub config: DeviceConfig,
     pub profile_id: ProfileId,
     pub folder_id: FolderId,
@@ -39,7 +48,7 @@ impl DeviceModel {
         let model = DeviceModel {
             id: Uuid::new_v4(),
             name: create.name,
-            access_token: create.access_token,
+            public_key: create.public_key,
             config: create.config,
             order: 0,
             profile_id: create.profile_id,
@@ -56,7 +65,7 @@ impl DeviceModel {
             INSERT INTO "devices" (
                 "id", 
                 "name", 
-                "access_token", 
+                "public_key", 
                 "config", 
                 "order", 
                 "profile_id", 
@@ -69,7 +78,7 @@ impl DeviceModel {
         )
         .bind(model.id)
         .bind(model.name.clone())
-        .bind(model.access_token.clone())
+        .bind(model.public_key.as_slice())
         .bind(config)
         .bind(model.order)
         .bind(model.profile_id)
@@ -113,13 +122,13 @@ impl DeviceModel {
         Ok(())
     }
 
-    /// Get a device using its access token
-    pub async fn get_by_access_token(
+    /// Get a device using its public key
+    pub async fn get_by_public_key(
         db: &DbPool,
-        access_token: &str,
+        public_key: &[u8],
     ) -> DbResult<Option<DeviceModel>> {
-        sqlx::query_as(r#"SELECT * FROM "devices" WHERE "access_token" = ?"#)
-            .bind(access_token)
+        sqlx::query_as(r#"SELECT * FROM "devices" WHERE "public_key" = ?"#)
+            .bind(public_key)
             .fetch_optional(db)
             .await
     }

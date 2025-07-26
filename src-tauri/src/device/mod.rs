@@ -1,12 +1,3 @@
-use std::{collections::HashMap, net::SocketAddr, sync::Arc};
-
-use anyhow::Context;
-use parking_lot::RwLock;
-use protocol::ServerDeviceMessage;
-use serde::{Deserialize, Serialize};
-use session::{DeviceSessionId, DeviceSessionRef};
-use uuid::Uuid;
-
 use crate::{
     database::{
         DbPool,
@@ -22,8 +13,14 @@ use crate::{
         TileInteractionContext,
     },
     plugin::Plugins,
-    utils::random::generate_access_token,
+    utils::encryption::ServerKeyPair,
 };
+use anyhow::Context;
+use parking_lot::RwLock;
+use serde::{Deserialize, Serialize};
+use session::{DeviceSessionId, DeviceSessionRef};
+use std::{collections::HashMap, net::SocketAddr, sync::Arc};
+use uuid::Uuid;
 
 pub mod protocol;
 pub mod session;
@@ -46,6 +43,9 @@ pub struct Devices {
 
     /// Current requests for authorization from devices
     requests: RwLock<Vec<DeviceRequest>>,
+
+    /// Server key pair
+    server_key_pair: ServerKeyPair,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -64,16 +64,22 @@ pub struct DeviceRequest {
     session_id: DeviceSessionId,
     /// Name of the device requesting approval
     device_name: String,
+    /// Client public key
+    client_public_key: [u8; 32],
 }
 
-const DEVICES_TOKEN_LENGTH: usize = 32;
-
 impl Devices {
-    pub fn new(event_tx: AppEventSender, db: DbPool, plugins: Arc<Plugins>) -> Self {
+    pub fn new(
+        event_tx: AppEventSender,
+        db: DbPool,
+        plugins: Arc<Plugins>,
+        server_key_pair: ServerKeyPair,
+    ) -> Self {
         Self {
             event_tx,
             db,
             plugins,
+            server_key_pair,
 
             sessions: Default::default(),
             requests: Default::default(),
@@ -163,6 +169,7 @@ impl Devices {
         session_id: DeviceSessionId,
         socket_addr: SocketAddr,
         device_name: String,
+        client_public_key: [u8; 32],
     ) {
         self.remove_session_device_requests(session_id);
 
@@ -172,6 +179,7 @@ impl Devices {
             socket_addr,
             session_id,
             device_name,
+            client_public_key,
         });
 
         _ = self
@@ -202,13 +210,11 @@ impl Devices {
             .get_session(&request.session_id)
             .context("session not found")?;
 
-        let access_token = generate_access_token(DEVICES_TOKEN_LENGTH);
-
         let device = DeviceModel::create(
             db,
             CreateDevice {
                 name: request.device_name,
-                access_token: access_token.to_string(),
+                public_key: request.client_public_key.to_vec(),
                 config: DeviceConfig {},
                 profile_id: default_folder.profile_id,
                 folder_id: default_folder.id,
@@ -216,15 +222,19 @@ impl Devices {
         )
         .await?;
 
-        session.send_message(ServerDeviceMessage::Approved {
-            device_id: device.id,
-            access_token,
-        });
+        session.on_approved(device.id);
 
+        // Notify frontend
         _ = self
             .event_tx
             .send(AppEvent::DeviceRequest(DeviceRequestAppEvent::Accepted {
                 request_id,
+            }));
+
+        _ = self
+            .event_tx
+            .send(AppEvent::Device(DeviceAppEvent::Authenticated {
+                device_id: device.id,
             }));
 
         Ok(())
@@ -265,11 +275,12 @@ impl Devices {
     /// Attempt to authenticate a session using a access token
     pub async fn attempt_authenticate_device(
         &self,
-        access_token: String,
-    ) -> anyhow::Result<DeviceId> {
-        let mut device = DeviceModel::get_by_access_token(&self.db, &access_token)
-            .await?
-            .context("access token not found")?;
+        public_key: &[u8],
+    ) -> anyhow::Result<Option<DeviceId>> {
+        let mut device = match DeviceModel::get_by_public_key(&self.db, public_key).await? {
+            Some(value) => value,
+            None => return Ok(None),
+        };
 
         // Update last connected
         device.set_connected_now(&self.db).await?;
@@ -281,7 +292,7 @@ impl Devices {
                 device_id: device.id,
             }));
 
-        Ok(device.id)
+        Ok(Some(device.id))
     }
 
     /// Revoke access for a device
@@ -335,7 +346,7 @@ impl Devices {
         device.set_profile(db, profile_id, folder.id).await?;
 
         if let Some(session) = self.get_session_by_device(device_id) {
-            session.send_message(ServerDeviceMessage::Tiles { tiles, folder });
+            session.on_tiles(tiles, folder);
         }
 
         Ok(())
@@ -362,7 +373,7 @@ impl Devices {
 
         // Inform the device of its new tile set
         if let Some(session) = self.get_session_by_device(device_id) {
-            session.send_message(ServerDeviceMessage::Tiles { tiles, folder });
+            session.on_tiles(tiles, folder);
         }
 
         Ok(())
@@ -397,10 +408,7 @@ impl Devices {
             .iter()
             .filter_map(|device| self.get_session_by_device(device.id))
             .for_each(|session| {
-                _ = session.send_message(ServerDeviceMessage::Tiles {
-                    tiles: tiles.clone(),
-                    folder: folder.clone(),
-                });
+                session.on_tiles(tiles.clone(), folder.clone());
             });
 
         Ok(())
@@ -413,10 +421,7 @@ impl Devices {
         message: serde_json::Value,
     ) -> anyhow::Result<()> {
         if let Some(session) = self.get_session_by_device(ctx.device_id) {
-            _ = session.send_message(ServerDeviceMessage::RecvFromPlugin {
-                ctx: ctx.clone(),
-                message: message.clone(),
-            });
+            session.on_plugin_message(ctx, message);
         }
 
         Ok(())
