@@ -4,7 +4,7 @@
   import TextInput from "./TextInput.svelte";
 
   const { Story } = defineMeta({
-    title: "Custom/TextInput",
+    title: "Input/TextInput",
     component: TextInput,
     tags: ["autodocs"],
     argTypes: {},

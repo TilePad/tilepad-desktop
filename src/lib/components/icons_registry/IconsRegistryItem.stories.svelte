@@ -4,7 +4,7 @@
   import IconsRegistryItem from "./IconsRegistryItem.svelte";
 
   const { Story } = defineMeta({
-    title: "Custom/IconsRegistryItem",
+    title: "IconsRegistry/IconsRegistryItem",
     component: IconsRegistryItem,
     tags: ["autodocs"],
     argTypes: {},

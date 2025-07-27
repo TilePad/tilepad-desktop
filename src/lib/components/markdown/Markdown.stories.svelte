@@ -4,7 +4,7 @@
   import Markdown from "./Markdown.svelte";
 
   const { Story } = defineMeta({
-    title: "Custom/Markdown",
+    title: "Markdown/Markdown",
     component: Markdown,
     tags: ["autodocs"],
     argTypes: {},

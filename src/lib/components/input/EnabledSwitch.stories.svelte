@@ -4,7 +4,7 @@
   import EnabledSwitch from "./EnabledSwitch.svelte";
 
   const { Story } = defineMeta({
-    title: "Custom/EnabledSwitch",
+    title: "Input/EnabledSwitch",
     component: EnabledSwitch,
     tags: ["autodocs"],
     argTypes: {},

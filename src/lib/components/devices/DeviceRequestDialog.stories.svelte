@@ -4,7 +4,7 @@
   import DeviceRequestDialog from "./DeviceRequestDialog.svelte";
 
   const { Story } = defineMeta({
-    title: "Custom/DeviceRequestDialog",
+    title: "Devices/DeviceRequestDialog",
     component: DeviceRequestDialog,
     tags: ["autodocs"],
     argTypes: {},

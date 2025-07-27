@@ -4,7 +4,7 @@
   import DeviceCard from "./DeviceCard.svelte";
 
   const { Story } = defineMeta({
-    title: "Custom/DeviceCard",
+    title: "Devices/DeviceCard",
     component: DeviceCard,
     tags: ["autodocs"],
     argTypes: {},

@@ -6,7 +6,7 @@
   import ToggleButton from "./ToggleButton.svelte";
 
   const { Story } = defineMeta({
-    title: "Custom/ToggleButton",
+    title: "Input/ToggleButton",
     component: ToggleButton,
     tags: ["autodocs"],
     argTypes: {},

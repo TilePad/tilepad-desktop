@@ -4,7 +4,7 @@
   import LinkButton from "./LinkButton.svelte";
 
   const { Story } = defineMeta({
-    title: "Custom/LinkButton",
+    title: "Input/LinkButton",
     component: LinkButton,
     tags: ["autodocs"],
     argTypes: {},

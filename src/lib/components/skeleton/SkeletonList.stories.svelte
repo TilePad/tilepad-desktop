@@ -4,7 +4,7 @@
   import SkeletonList from "./SkeletonList.svelte";
 
   const { Story } = defineMeta({
-    title: "Custom/SkeletonList",
+    title: "Skeleton/SkeletonList",
     component: SkeletonList,
     tags: ["autodocs"],
     argTypes: {},

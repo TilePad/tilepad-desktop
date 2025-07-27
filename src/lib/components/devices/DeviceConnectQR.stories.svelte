@@ -4,7 +4,7 @@
   import DeviceConnectQR from "./DeviceConnectQR.svelte";
 
   const { Story } = defineMeta({
-    title: "Custom/DeviceConnectQR",
+    title: "Devices/DeviceConnectQR",
     component: DeviceConnectQR,
     tags: ["autodocs"],
     argTypes: {},

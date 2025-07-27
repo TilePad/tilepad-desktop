@@ -4,7 +4,7 @@
   import Header from "./Header.svelte";
 
   const { Story } = defineMeta({
-    title: "Custom/Header",
+    title: "Layout/Header",
     component: Header,
     tags: ["autodocs"],
     argTypes: {},

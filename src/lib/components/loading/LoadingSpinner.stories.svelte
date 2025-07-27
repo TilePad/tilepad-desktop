@@ -4,7 +4,7 @@
   import LoadingSpinner from "./LoadingSpinner.svelte";
 
   const { Story } = defineMeta({
-    title: "Custom/LoadingSpinner",
+    title: "Loading/LoadingSpinner",
     component: LoadingSpinner,
     tags: ["autodocs"],
     argTypes: {},

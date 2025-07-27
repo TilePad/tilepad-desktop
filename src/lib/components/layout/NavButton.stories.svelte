@@ -5,7 +5,7 @@
   import NavButton from "./NavButton.svelte";
 
   const { Story } = defineMeta({
-    title: "Custom/NavButton",
+    title: "Layout/NavButton",
     component: NavButton,
     tags: ["autodocs"],
     argTypes: {},

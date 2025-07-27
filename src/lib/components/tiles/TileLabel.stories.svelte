@@ -9,7 +9,7 @@
   import TestTileContainer from "./TestTileContainer.svelte";
 
   const { Story } = defineMeta({
-    title: "Custom/TileLabel",
+    title: "Tiles/TileLabel",
     component: TileLabel,
     tags: ["autodocs"],
     argTypes: {},

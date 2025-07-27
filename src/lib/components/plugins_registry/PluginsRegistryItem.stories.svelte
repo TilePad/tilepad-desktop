@@ -4,7 +4,7 @@
   import PluginsRegistryItem from "./PluginsRegistryItem.svelte";
 
   const { Story } = defineMeta({
-    title: "Custom/PluginsRegistryItem",
+    title: "PluginsRegistry/PluginsRegistryItem",
     component: PluginsRegistryItem,
     tags: ["autodocs"],
     argTypes: {},

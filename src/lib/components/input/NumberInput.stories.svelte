@@ -4,7 +4,7 @@
   import NumberInput from "./NumberInput.svelte";
 
   const { Story } = defineMeta({
-    title: "Custom/NumberInput",
+    title: "Input/NumberInput",
     component: NumberInput,
     tags: ["autodocs"],
     argTypes: {},
