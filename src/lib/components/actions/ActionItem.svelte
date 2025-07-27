@@ -1,41 +1,47 @@
+<script lang="ts" module>
+  export interface ActionItemData {
+    pluginId: PluginId;
+    actionId: ActionId;
+
+    label: string;
+    icon?: string;
+  }
+</script>
+
 <script lang="ts">
-  import type { Action } from "$lib/api/types/actions";
+  import type { PluginId } from "$lib/api/types/plugin";
+  import type { ActionId } from "$lib/api/types/actions";
 
-  import { getPluginAssetPath } from "$lib/api/utils/url";
-
-  import { getServerContext } from "../ServerProvider.svelte";
   import { getDraggingContext } from "../tiles/TileDraggingProvider.svelte";
 
-  type Props = {
-    action: Action;
-  };
+  type Props = ActionItemData;
 
-  const { action }: Props = $props();
+  const { pluginId, actionId, label, icon }: Props = $props();
   const { onStartDragging } = getDraggingContext();
-  const serverContext = getServerContext();
+
   let button: HTMLDivElement | undefined = $state();
 
   function onPointerDown(event: PointerEvent) {
     if (!button) return;
-    onStartDragging(event, { type: "action", ...action }, button);
+    onStartDragging(
+      event,
+      {
+        type: "action",
+        actionId,
+        pluginId,
+      },
+      button,
+    );
   }
 </script>
 
 <div class="action" bind:this={button} onpointerdown={onPointerDown}>
-  {#if action.icon !== null}
-    <img
-      class="icon"
-      src={getPluginAssetPath(
-        serverContext.serverURL,
-        action.plugin_id,
-        action.icon,
-      )}
-      alt="Action Icon"
-    />
+  {#if icon}
+    <img class="icon" src={icon} alt="Action Icon" />
   {/if}
 
   <div class="action__text">
-    <span class="label">{action.label}</span>
+    <span class="label">{label}</span>
   </div>
 </div>
 

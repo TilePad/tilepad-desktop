@@ -1,9 +1,7 @@
 <script lang="ts">
   import type { PluginId } from "$lib/api/types/plugin";
-  import type { ActionCategory } from "$lib/api/types/actions";
 
   import { t } from "svelte-i18n";
-  import { createActionsQuery } from "$lib/api/actions";
   import { getErrorMessage } from "$lib/api/utils/error";
   import { persistedState } from "$lib/utils/localStorage.svelte";
   import SolarAltArrowLeftOutline from "~icons/solar/alt-arrow-left-outline";
@@ -11,14 +9,22 @@
 
   import Aside from "../Aside.svelte";
   import SkeletonList from "../skeleton/SkeletonList.svelte";
-  import ActionsSidebarCategory from "./ActionCategory.svelte";
+  import ActionsSidebarCategory, {
+    type ActionCategoryData,
+  } from "./ActionCategory.svelte";
+
+  type Props = {
+    actions: ActionCategoryData[];
+    actionsLoading: boolean;
+    actionsError: Error | null;
+  };
 
   type ActionSidebarState = {
     expanded?: boolean;
     expandedCategories?: Partial<Record<PluginId, boolean>>;
   };
 
-  const actionsQuery = createActionsQuery();
+  const { actions, actionsError, actionsLoading }: Props = $props();
 
   const actionSidebarState = persistedState<ActionSidebarState>(
     "actionSidebarState",
@@ -30,17 +36,16 @@
   let search = $state("");
 
   const filteredCategories = $derived.by(() => {
-    const data = $actionsQuery.data ?? [];
     const query = search.trim();
 
     if (query.length < 1) {
-      return data;
+      return actions;
     }
 
-    return filterCategories(data, query);
+    return filterCategories(actions, query);
   });
 
-  function filterCategories(categories: ActionCategory[], query: string) {
+  function filterCategories(categories: ActionCategoryData[], query: string) {
     query = query.toLowerCase();
 
     return categories
@@ -102,20 +107,23 @@
   </div>
 
   <div class="content">
-    {#if $actionsQuery.isLoading}
+    {#if actionsLoading}
       <SkeletonList style="margin: 1rem" />
-    {:else if $actionsQuery.isError}
+    {:else if actionsError}
       <Aside severity="error" style="margin: 1rem;">
         {$t("actions_error", {
-          values: { error: getErrorMessage($actionsQuery.error) },
+          values: { error: getErrorMessage(actionsError) },
         })}
       </Aside>
-    {:else if $actionsQuery.isSuccess}
-      {#each filteredCategories as category (category.plugin_id)}
+    {:else}
+      {#each filteredCategories as category (category.pluginId)}
         <ActionsSidebarCategory
-          {category}
-          expanded={isCategoryExpanded(category.plugin_id)}
-          onToggleExpanded={() => onToggleCategoryExpanded(category.plugin_id)}
+          pluginId={category.pluginId}
+          icon={category.icon}
+          label={category.label}
+          actions={category.actions}
+          expanded={isCategoryExpanded(category.pluginId)}
+          onToggleExpanded={() => onToggleCategoryExpanded(category.pluginId)}
         />
       {:else}
         <p class="none">

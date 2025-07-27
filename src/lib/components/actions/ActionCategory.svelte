@@ -1,24 +1,31 @@
-<script lang="ts">
-  import type { ActionCategory } from "$lib/api/types/actions";
+<script lang="ts" module>
+  import type { PluginId } from "$lib/api/types/plugin";
 
+  import type { ActionItemData } from "./ActionItem.svelte";
+
+  export interface ActionCategoryData {
+    pluginId: PluginId;
+
+    label: string;
+    icon?: string;
+    actions: ActionItemData[];
+  }
+</script>
+
+<script lang="ts">
   import { t } from "svelte-i18n";
   import { slide } from "svelte/transition";
-  import { getPluginAssetPath } from "$lib/api/utils/url";
   import SolarAltArrowDownOutline from "~icons/solar/alt-arrow-down-outline";
   import SolarAltArrowRightOutline from "~icons/solar/alt-arrow-right-outline";
 
   import ActionsSidebarList from "./ActionList.svelte";
-  import { getServerContext } from "../ServerProvider.svelte";
 
-  type Props = {
-    category: ActionCategory;
+  type Props = ActionCategoryData & {
     expanded: boolean;
     onToggleExpanded: VoidFunction;
   };
 
-  const { category, expanded, onToggleExpanded }: Props = $props();
-
-  const serverContext = getServerContext();
+  const { label, icon, actions, expanded, onToggleExpanded }: Props = $props();
 </script>
 
 <div class="section">
@@ -29,28 +36,20 @@
       <SolarAltArrowRightOutline />
     {/if}
 
-    {#if category.icon !== null}
-      <img
-        class="icon"
-        src={getPluginAssetPath(
-          serverContext.serverURL,
-          category.plugin_id,
-          category.icon,
-        )}
-        alt={$t("action_icon")}
-      />
+    {#if icon}
+      <img class="icon" src={icon} alt={$t("action_icon")} />
     {/if}
 
-    {category.label}
+    {label}
   </button>
 
   {#if expanded}
     <div
       class="content"
-      style="height: {40 * category.actions.length}px;"
+      style="height: {40 * actions.length}px;"
       transition:slide={{ axis: "y", duration: 200 }}
     >
-      <ActionsSidebarList actions={category.actions} />
+      <ActionsSidebarList {actions} />
     </div>
   {/if}
 </div>

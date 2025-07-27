@@ -1,18 +1,16 @@
 <script lang="ts">
-  import type { Action } from "$lib/api/types/actions";
-
-  import ActionItem from "./ActionItem.svelte";
+  import ActionItem, { type ActionItemData } from "./ActionItem.svelte";
 
   type Props = {
-    actions: Action[];
+    actions: ActionItemData[];
   };
 
   const { actions }: Props = $props();
 </script>
 
 <section class="list action-list">
-  {#each actions as action (action.plugin_id + action.action_id)}
-    <ActionItem {action} />
+  {#each actions as action (action.pluginId + action.actionId)}
+    <ActionItem {...action} />
   {/each}
 </section>
 

@@ -1,17 +1,13 @@
 <script lang="ts" module>
-  import type { Action } from "$lib/api/types/actions";
+  import type { ActionId } from "$lib/api/types/actions";
 
-  import {
-    TileIconType,
-    type TileIcon,
-    type TileModel,
-  } from "$lib/api/types/tiles";
+  import { type TileId } from "$lib/api/types/tiles";
 
   const tileDraggingContextKey = Symbol("TILE_DRAGGING_CONTEXT");
 
   type DraggingData =
-    | ({ type: "tile" } & TileModel)
-    | ({ type: "action" } & Action);
+    | { type: "tile"; tileId: TileId }
+    | { type: "action"; pluginId: PluginId; actionId: ActionId };
 
   type DraggingState = {
     // Current dragged element
@@ -52,28 +48,23 @@
 </script>
 
 <script lang="ts">
-  import { t } from "svelte-i18n";
-  import { toast } from "svelte-sonner";
-  import { toastErrorMessage } from "$lib/api/utils/error";
-  import { getContext, setContext, type Snippet } from "svelte";
-  import {
-    createCreateTileMutation,
-    createUpdateTilePositionMutation,
-  } from "$lib/api/tiles";
+  import type { PluginId } from "$lib/api/types/plugin";
 
-  import { getFolderContext } from "../folders/FolderProvider.svelte";
+  import { getContext, setContext, type Snippet } from "svelte";
 
   type Props = {
+    onMoveTile: (tileId: TileId, row: number, column: number) => void;
+    onPlaceTile: (
+      pluginId: PluginId,
+      actionId: ActionId,
+      row: number,
+      column: number,
+    ) => void;
+
     children?: Snippet;
   };
 
-  const { folder } = getFolderContext();
-  const currentFolder = $derived.by(folder);
-
-  const createTile = createCreateTileMutation();
-  const updateTilePosition = createUpdateTilePositionMutation();
-
-  const { children }: Props = $props();
+  const { onMoveTile, onPlaceTile, children }: Props = $props();
 
   let dropZoneTarget: DropZoneTarget | null = $state(null);
   let draggingState: DraggingState | null = $state(null);
@@ -195,57 +186,11 @@
       const { row, column } = dropZoneTarget;
 
       if (draggingState.data.type === "tile") {
-        const model = draggingState.data as TileModel;
-        $updateTilePosition.mutateAsync({
-          tileId: model.id,
-          position: {
-            row,
-            column,
-            // Reset spanning on move
-            row_span: 1,
-            column_span: 1,
-          },
-        });
+        const { data } = draggingState;
+        onMoveTile(data.tileId, row, column);
       } else if (draggingState.data.type === "action") {
-        const action = draggingState.data as Action;
-
-        let icon: TileIcon = { type: TileIconType.None };
-        if (action.display) {
-          icon = { type: TileIconType.Display, path: action.display };
-        } else if (action.icon) {
-          icon = {
-            type: TileIconType.PluginIcon,
-            plugin_id: action.plugin_id,
-            icon: action.icon,
-          };
-        }
-
-        const createPromise = $createTile.mutateAsync({
-          create: {
-            position: {
-              row,
-              column,
-              row_span: 1,
-              column_span: 1,
-            },
-            folder_id: currentFolder.id,
-            action_id: action.action_id,
-            plugin_id: action.plugin_id,
-            config: {
-              icon,
-              icon_options: action.icon_options
-                ? action.icon_options
-                : undefined,
-            },
-            properties: {},
-          },
-        });
-
-        toast.promise(createPromise, {
-          loading: $t("tile_creating"),
-          success: $t("tile_created"),
-          error: toastErrorMessage($t("tile_create_error")),
-        });
+        const { data } = draggingState;
+        onPlaceTile(data.pluginId, data.actionId, row, column);
       }
     }
 

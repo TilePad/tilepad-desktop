@@ -88,7 +88,7 @@
   const dragging = $derived.by(() => {
     const target = draggingState();
     if (target === null) return false;
-    return target.data.type === "tile" && target.data.id === tile.id;
+    return target.data.type === "tile" && target.data.tileId === tile.id;
   });
   const distanceThreshold = $derived(tileSize + gap);
 
@@ -101,7 +101,7 @@
     touchTimeout = setTimeout(() => {
       if (!button) return;
       touchTimeout = undefined;
-      onStartDragging(event, { type: "tile", ...tile }, button);
+      onStartDragging(event, { type: "tile", tileId: tile.id }, button);
     }, 100);
   }
 
