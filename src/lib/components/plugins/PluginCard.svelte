@@ -67,24 +67,32 @@
   }
 </script>
 
-<div class="plugin">
-  <div class="top">
-    <span class="plugin__version">
-      {manifest.plugin.version}
+<div class="card">
+  <div class="head">
+    <div class="head__text">
+      <span class="version">
+        {manifest.plugin.version}
 
-      {#if latestManifest}
-        <span class="new-version">
-          New: {latestManifest.manifest.plugin.version}
-        </span>
+        {#if latestManifest}
+          <span class="version__new">
+            New: {latestManifest.manifest.plugin.version}
+          </span>
+        {/if}
+      </span>
+
+      {#if settings.developer_mode && !manifest.plugin.internal}
+        <span class="state">{state}</span>
       {/if}
-    </span>
-
-    <div class="plugin__actions"></div>
+    </div>
   </div>
 
-  <h2 class="plugin__name">
+  <h2 class="name">
     {manifest.plugin.name}
   </h2>
+
+  <p class="description">
+    {manifest.plugin.description}.
+  </p>
 
   {#if manifest.plugin.authors.length > 0}
     <span class="authors">
@@ -92,23 +100,21 @@
     </span>
   {/if}
 
-  <p class="plugin__description">
-    {manifest.plugin.description}.
-  </p>
-
-  {#if settings.developer_mode && !manifest.plugin.internal}
-    <span class="state">{state}</span>
-  {/if}
-
-  <div class="plugin__actions">
+  <div class="actions">
     {#if settings.developer_mode}
-      <Button title={$t("Reload")} size="small" onclick={handleReload}>
+      <Button
+        variant="secondary"
+        title={$t("Reload")}
+        size="small"
+        onclick={handleReload}
+      >
         <SolarRefreshLinear />
       </Button>
     {/if}
 
     {#if latestManifest}
       <Button
+        variant="secondary"
         size="small"
         onclick={handleUpdate}
         loading={$update.isPending}
@@ -120,6 +126,7 @@
 
     {#if !plugin.manifest.plugin.internal}
       <Button
+        variant="secondary"
         size="small"
         onclick={handleUninstall}
         loading={$uninstall.isPending}
@@ -132,66 +139,75 @@
 </div>
 
 <style>
-  .top {
+  .card {
+    display: flex;
+    flex-flow: column;
+    gap: var(--tp-space-2);
+    align-items: flex-start;
+
+    padding: var(--tp-space-3);
+    border-radius: var(--tp-radius-md);
+    background-color: var(--tp-bg-secondary);
+    border: 1px solid var(--tp-border-secondary);
+  }
+
+  .head {
     display: flex;
     flex-flow: row;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    gap: var(--tp-space-2);
+
     width: 100%;
   }
 
-  .plugin {
+  .head__text {
     display: flex;
-    flex-flow: column;
-    gap: 0.5rem;
-    align-items: flex-start;
-
-    padding: 1rem;
-    border-radius: 0.5rem;
-    background-color: #2f2c36;
+    flex-flow: row;
+    align-items: center;
+    gap: var(--tp-space-2);
   }
 
-  .plugin__description {
-    color: #ccc;
-    font-size: 0.8rem;
-    max-width: 100%;
+  .version {
+    color: var(--tp-text-tertiary);
+    font-size: var(--tp-text-xs);
   }
 
-  .plugin__version {
-    color: #ccc;
-    font-size: 0.8rem;
-  }
-
-  .new-version {
+  .version__new {
     display: inline-block;
     padding: 0.25rem 0.5rem;
     background-color: #6d5c92;
-    margin-left: 0.5rem;
-    color: #fff;
-    border-radius: 0.5rem;
+
+    margin-left: var(--tp-space-2);
+    color: var(--tp-text-primary);
+    border-radius: var(--tp-radius-lg);
   }
 
-  .plugin__name {
-    font-size: 1.2rem;
-    margin-bottom: 0;
-    line-height: 1;
+  .description {
+    color: var(--tp-text-secondary);
+    font-size: var(--tp-text-xs);
+    max-width: 100%;
   }
 
-  .plugin__actions {
+  .name {
+    font-size: var(--tp-text-lg);
+    line-height: var(--tp-leading-tight);
+  }
+
+  .actions {
     display: flex;
-    gap: 0.75rem;
+    gap: var(--tp-space-2);
+    flex-shrink: 0;
   }
 
   .state {
-    display: inline-flex;
-    gap: 0.5rem;
-    font-size: 0.8rem;
     vertical-align: middle;
-    color: #999;
+    font-size: var(--tp-text-xs);
+    color: var(--tp-text-tertiary);
   }
 
   .authors {
-    font-size: 0.9rem;
-    color: #999;
+    font-size: var(--tp-text-xs);
+    color: var(--tp-text-tertiary);
   }
 </style>

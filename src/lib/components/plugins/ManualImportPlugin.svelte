@@ -30,6 +30,7 @@
 </script>
 
 <Button
+  variant="secondary"
   type="button"
   onclick={() => {
     inputElm?.click();

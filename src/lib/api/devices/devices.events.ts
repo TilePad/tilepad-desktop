@@ -1,3 +1,4 @@
+import { toast } from "svelte-sonner";
 import { listen } from "@tauri-apps/api/event";
 
 import type { DeviceId, DeviceRequestId } from "../types/devices";
@@ -27,10 +28,12 @@ listen<DeviceRequestId>("device_requests:declined", () => {
 
 listen<DeviceId>("device:authenticated", () => {
   invalidateConnectedDevices();
+  toast.success("Device connected");
 });
 
 listen<DeviceId>("device:disconnected", () => {
   invalidateConnectedDevices();
+  toast.error("Device disconnected");
 });
 
 listen<DeviceId>("device:revoked", () => {

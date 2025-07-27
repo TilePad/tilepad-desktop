@@ -71,9 +71,11 @@
   {#snippet trigger({ props: triggerProps })}
     <Dialog {triggerProps} bind:open>
       {#snippet button({ props })}
-        <button type="button" {...props} class="button">
-          <SolarAddFolderBold />
-        </button>
+        <div class="wrapper">
+          <Button variant="secondary" {...props} class="button">
+            <SolarAddFolderBold width="1.25rem" height="1.25rem" />
+          </Button>
+        </div>
       {/snippet}
 
       {#snippet title()}
@@ -131,19 +133,8 @@
     gap: 0.5rem;
   }
 
-  .button {
-    padding: 0rem 0.5rem;
-    border: none;
-    background-color: #141316;
-    color: #fff;
-    align-items: center;
-    display: flex;
-    gap: 0.5rem;
-    cursor: pointer;
-    font-size: 1em;
-    text-decoration: none;
-    border-top-right-radius: 0.25rem;
-    border-bottom-right-radius: 0.25rem;
-    justify-content: space-between;
+  .wrapper:global(> .button) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
   }
 </style>

@@ -3,11 +3,11 @@
   import { Select } from "bits-ui";
   import { slide } from "svelte/transition";
   import { createFoldersQuery } from "$lib/api/folders";
+  import DownArrow from "~icons/solar/alt-arrow-down-bold";
   import { type FolderModel } from "$lib/api/types/folders";
-  import SolarAltArrowUpBold from "~icons/solar/alt-arrow-up-bold";
-  import SolarAltArrowDownBold from "~icons/solar/alt-arrow-down-bold";
   import SolarFolder2BoldDuotone from "~icons/solar/folder-2-bold-duotone";
 
+  import Button from "../input/Button.svelte";
   import { getFolderContext } from "./FolderProvider.svelte";
   import CreateFolderDialog from "./CreateFolderDialog.svelte";
   import FolderSelectorSettings from "./FolderSelectorSettings.svelte";
@@ -44,17 +44,13 @@
 >
   <Select.Trigger>
     {#snippet child({ props })}
-      <div class="trigger-wrapper">
-        <button class="trigger" {...props}>
+      <div class="wrapper" data-open={open}>
+        <Button variant="secondary" class="trigger" {...props}>
           <SolarFolder2BoldDuotone />
           {currentFolder.name}
 
-          {#if open}
-            <SolarAltArrowUpBold />
-          {:else}
-            <SolarAltArrowDownBold />
-          {/if}
-        </button>
+          <DownArrow class="trigger__icon" />
+        </Button>
 
         <FolderSelectorSettings folder={currentFolder} />
         <CreateFolderDialog order={folders.length} />
@@ -133,28 +129,28 @@
     outline: 1px solid white;
   }
 
-  .trigger {
-    padding: 0.5rem;
-    border: none;
-    background-color: #1f1d22;
-    color: #fff;
-    border-radius: 0.25rem;
-    align-items: center;
-    display: flex;
-    gap: 0.5rem;
-    cursor: pointer;
-    font-size: 1em;
-    text-decoration: none;
-    justify-content: space-between;
-  }
-
-  .trigger-wrapper {
-    display: flex;
-  }
-
   .default-label {
     padding: 0.25rem 0.5rem;
     background-color: #141316;
     border-radius: 0.25rem;
+  }
+
+  .wrapper {
+    display: flex;
+  }
+
+  .wrapper:global(> .trigger) {
+    justify-content: space-between;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .wrapper:global(> .trigger > .trigger__icon) {
+    transition: all var(--tp-transition-fast);
+    transform-origin: center;
+  }
+
+  .wrapper[data-open="true"]:global(> .trigger > .trigger__icon) {
+    transform: rotate(-180deg);
   }
 </style>

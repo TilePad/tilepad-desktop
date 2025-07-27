@@ -6,6 +6,7 @@
 
   import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
+  import { fingerprint } from "$lib/utils/fingerprint";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import SolarTrashBin2BoldDuotone from "~icons/solar/trash-bin-2-bold-duotone";
   import SolarTranslationBoldDuotone from "~icons/solar/translation-bold-duotone";
@@ -50,13 +51,11 @@
   }
 </script>
 
-<div class="device">
-  <span class="device__id">{device.id}</span>
+<div class="card">
+  <div class="head">
+    <span class="identifier">{device.id}</span>
 
-  <h2 class="device__name">
-    {device.name}
-
-    <span class="state" data-connected={connected}>
+    <p class="state" data-connected={connected}>
       {#if connected}
         <SolarTranslationBoldDuotone />
         {$t("connected")}
@@ -64,60 +63,99 @@
         <SolarTranslationBoldDuotone />
         {$t("not_connected")}
       {/if}
-    </span>
+    </p>
+  </div>
+
+  <h2 class="name">
+    {device.name}
   </h2>
 
-  <DeviceProfileSelector
-    profileId={device.profile_id}
-    setProfileId={onChangeProfile}
-  />
+  {#await fingerprint(new Uint8Array(device.public_key)) then print}
+    <p class="fingerprint">{print}</p>
+  {/await}
 
-  <DeviceFolderSelector
-    profileId={device.profile_id}
-    folderId={device.folder_id}
-    setFolderId={onChangeFolder}
-  />
+  <div class="actions">
+    <DeviceProfileSelector
+      profileId={device.profile_id}
+      setProfileId={onChangeProfile}
+    />
 
-  <Button variant="error" onclick={handleRevoke} style="margin-top: 0.5rem">
-    <SolarTrashBin2BoldDuotone />
-    {$t("revoke")}
-  </Button>
+    <DeviceFolderSelector
+      profileId={device.profile_id}
+      folderId={device.folder_id}
+      setFolderId={onChangeFolder}
+    />
+
+    <Button variant="error" onclick={handleRevoke}>
+      <SolarTrashBin2BoldDuotone />
+      {$t("revoke")}
+    </Button>
+  </div>
 </div>
 
 <style>
-  .device {
+  .card {
     display: flex;
     flex-flow: column;
-    gap: 0.5rem;
+    gap: var(--tp-space-3);
     align-items: flex-start;
 
-    padding: 1rem;
-    border-radius: 0.5rem;
-    background-color: #2f2c36;
+    padding: var(--tp-space-4);
+    border-radius: var(--tp-radius-md);
+    background-color: var(--tp-bg-secondary);
+    border: 1px solid var(--tp-border-secondary);
   }
 
-  .device__id {
-    color: #ccc;
-    font-size: 0.8rem;
+  .head {
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--tp-space-2);
+
+    width: 100%;
   }
 
-  .device__name {
-    font-size: 1.2rem;
+  .identifier {
+    color: var(--tp-text-secondary);
+    font-size: var(--tp-text-xs);
+  }
+
+  .name {
+    font-size: var(--tp-text-lg);
+    line-height: var(--tp-leading-tight);
   }
 
   .state {
-    padding: 0.5rem;
     display: inline-flex;
-    gap: 0.5rem;
-    font-size: 0.8rem;
+    align-items: center;
+    gap: var(--tp-space-2);
+    font-size: var(--tp-text-sm);
     vertical-align: middle;
   }
 
   .state[data-connected="false"] {
-    color: #da7070;
+    color: var(--tp-error-500);
   }
 
   .state[data-connected="true"] {
-    color: #81e668;
+    color: var(--tp-success-500);
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: var(--tp-space-2);
+    justify-content: flex-start;
+  }
+
+  .actions:global(> .wrapper) {
+    max-width: 200px;
+  }
+
+  .fingerprint {
+    color: var(--tp-text-secondary);
+    font-size: var(--tp-text-xs);
   }
 </style>

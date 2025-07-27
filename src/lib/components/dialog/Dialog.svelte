@@ -38,7 +38,7 @@
       {#if button}
         {@render button({ props })}
       {:else if buttonLabel}
-        <Button {...props} type="button">
+        <Button variant="secondary" {...props} type="button">
           {#if buttonLabel.icon}
             <buttonLabel.icon width="1.5rem" height="1.5rem" />
           {/if}

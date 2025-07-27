@@ -32,10 +32,6 @@
         })}
       </Aside>
     {:else if $devices.isSuccess}
-      <div class="header">
-        <h2>{$t("devices")}</h2>
-      </div>
-
       <div class="devices-wrapper">
         <div class="devices">
           {#each $devices.data as device (device.id)}
@@ -60,18 +56,6 @@
     height: 100%;
   }
 
-  .header {
-    display: flex;
-    flex-flow: row;
-    flex-shrink: 0;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.5rem;
-    border-bottom: 1px solid #333;
-    background-color: #29262e;
-  }
-
   .layout__devices {
     flex: auto;
 
@@ -94,8 +78,8 @@
   .devices {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-    padding: 1rem;
+    grid-template-rows: 1f;
+    gap: var(--tp-space-4);
+    padding: var(--tp-space-4);
   }
 </style>

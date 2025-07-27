@@ -83,12 +83,6 @@
 </script>
 
 <div class="layout">
-  <div class="header">
-    <h2>{$t("settings")}</h2>
-
-    <div class="actions"></div>
-  </div>
-
   <div class="settings">
     <div class="grid">
       <div class="card">
@@ -243,41 +237,29 @@
     flex-flow: column;
   }
 
-  .header {
-    display: flex;
-    flex-flow: row;
-    flex-shrink: 0;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.5rem;
-    border-bottom: 1px solid #333;
-    background-color: #29262e;
-  }
-
   .tile-item {
-    padding: 8px;
+    padding: var(--tp-space-1);
   }
 
   .tile-label {
     display: block;
     font-weight: 600;
-    color: #ddd;
+    color: var(--tp-text-primary);
     font-weight: bold;
     margin-bottom: 2px;
   }
 
   .tile-description {
     display: block;
-    font-size: 12px;
-    color: #aaa;
-    margin-top: 4px;
+    font-size: var(--tp-text-sm);
+    color: var(--tp-text-secondary);
+    margin-top: var(--tp-space-1);
   }
 
   .settings {
     display: flex;
     flex-flow: column;
-    gap: 1rem;
+    gap: var(--tp-space-4);
     padding: 1rem;
     flex: auto;
     overflow: auto;
@@ -285,26 +267,28 @@
 
   .dev-row {
     display: flex;
-    gap: 1rem;
+    gap: var(--tp-space-4);
     align-items: center;
     width: 100%;
     justify-content: space-between;
-    padding-right: 1rem;
+    padding-right: var(--tp-space-2);
   }
 
   .grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    gap: var(--tp-space-4);
   }
 
   .card {
     display: flex;
     flex-flow: column;
-    gap: 0.5rem;
+    gap: var(--tp-space-2);
+    align-items: flex-start;
 
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    background-color: #2f2c36;
+    padding: var(--tp-space-2);
+    border-radius: var(--tp-radius-md);
+    background-color: var(--tp-bg-secondary);
+    border: 1px solid var(--tp-border-secondary);
   }
 </style>

@@ -27,12 +27,8 @@
 </script>
 
 <div class="card">
-  <div class="top">
+  <div class="head">
     <span class="version">{manifest.icons.version}</span>
-
-    <div class="actions">
-      <Button size="small" onclick={handleUninstall}>{$t("uninstall")}</Button>
-    </div>
   </div>
 
   <h2 class="name">
@@ -40,44 +36,67 @@
   </h2>
 
   <p class="description">{manifest.icons.description}</p>
+
+  {#if manifest.icons.authors.length > 0}
+    <span class="authors">
+      By {manifest.icons.authors.join(", ")}
+    </span>
+  {/if}
+
+  <div class="actions">
+    <Button variant="secondary" size="small" onclick={handleUninstall}>
+      {$t("uninstall")}
+    </Button>
+  </div>
 </div>
 
 <style>
-  .top {
-    display: flex;
-    flex-flow: row;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-  }
-
   .card {
     display: flex;
     flex-flow: column;
-    gap: 0.5rem;
+    gap: var(--tp-space-2);
     align-items: flex-start;
 
-    padding: 1rem;
-    border-radius: 0.5rem;
-    background-color: #2f2c36;
+    padding: var(--tp-space-3);
+    border-radius: var(--tp-radius-md);
+    background-color: var(--tp-bg-secondary);
+    border: 1px solid var(--tp-border-secondary);
+  }
+
+  .head {
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--tp-space-2);
+
+    width: 100%;
   }
 
   .description {
-    color: #ccc;
-    font-size: 0.8rem;
+    color: var(--tp-text-secondary);
+    font-size: var(--tp-text-xs);
+    max-width: 100%;
   }
 
   .version {
-    color: #ccc;
-    font-size: 0.8rem;
+    color: var(--tp-text-tertiary);
+    font-size: var(--tp-text-xs);
   }
 
   .name {
-    font-size: 1.2rem;
+    font-size: var(--tp-text-lg);
+    line-height: var(--tp-leading-tight);
   }
 
   .actions {
     display: flex;
-    gap: 1rem;
+    gap: var(--tp-space-3);
+    flex-shrink: 0;
+  }
+
+  .authors {
+    font-size: var(--tp-text-xs);
+    color: var(--tp-text-tertiary);
   }
 </style>

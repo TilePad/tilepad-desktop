@@ -1,6 +1,6 @@
 <script module lang="ts">
   export type ButtonProps = {
-    variant?: "default" | "warning" | "error";
+    variant?: "default" | "warning" | "error" | "secondary";
     transparent?: boolean;
     children?: Snippet;
     size?: ButtonSize;
@@ -46,22 +46,35 @@
 
 <style>
   .btn {
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
+    gap: var(--tp-space-2);
+    height: var(--tp-btn-height-md);
+    padding: 0 var(--tp-btn-padding-x-md);
+    font-size: var(--tp-text-base);
+    font-weight: var(--tp-font-weight-medium);
+    border-radius: var(--tp-radius-md);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all var(--tp-transition-fast);
 
     background-color: #544d5e;
-    border: none;
     color: #fff;
-    border-radius: var(--tp-radius-base);
 
-    cursor: pointer;
     text-decoration: none;
-    position: relative;
+    white-space: nowrap;
+  }
 
-    font-size: var(--tp-text-base);
-    gap: var(--tp-space-2);
-    padding: 0 var(--tp-btn-padding-x-md);
-    height: var(--tp-btn-height-md);
+  .btn[data-variant="secondary"] {
+    background: var(--tp-bg-tertiary);
+    color: var(--tp-text-primary);
+    border-color: var(--tp-border-primary);
+  }
+
+  .btn[data-variant="secondary"]:hover {
+    background: var(--tp-bg-quaternary);
+    border-color: var(--tp-border-hover);
   }
 
   .btn[data-size="small"] {

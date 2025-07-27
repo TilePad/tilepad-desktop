@@ -5,8 +5,8 @@
   import { Select } from "bits-ui";
   import { slide } from "svelte/transition";
   import { createProfilesQuery } from "$lib/api/profiles";
-  import SolarAltArrowUpBold from "~icons/solar/alt-arrow-up-bold";
-  import SolarAltArrowDownBold from "~icons/solar/alt-arrow-down-bold";
+  import DownArrow from "~icons/solar/alt-arrow-down-bold";
+  import Button from "$lib/components/input/Button.svelte";
 
   type Props = {
     profileId: string;
@@ -38,19 +38,17 @@
 >
   <Select.Trigger>
     {#snippet child({ props })}
-      <button class="trigger" {...props}>
-        {#if currentProfile}
-          {currentProfile.name}
-        {:else}
-          {$t("choose_profile")}
-        {/if}
+      <div class="wrapper" data-open={open}>
+        <Button class="trigger" variant="secondary" {...props}>
+          {#if currentProfile}
+            {currentProfile.name}
+          {:else}
+            {$t("choose_profile")}
+          {/if}
 
-        {#if open}
-          <SolarAltArrowUpBold />
-        {:else}
-          <SolarAltArrowDownBold />
-        {/if}
-      </button>
+          <DownArrow class="trigger__icon" />
+        </Button>
+      </div>
     {/snippet}
   </Select.Trigger>
 
@@ -122,19 +120,21 @@
     outline: 1px solid white;
   }
 
-  .trigger {
-    padding: 0.9rem;
-    border: none;
-    background-color: #1f1d22;
-    color: #fff;
-    border-radius: 0.25rem;
-    align-items: center;
-    display: flex;
-    gap: 0.5rem;
-    cursor: pointer;
-    font-size: 1em;
-    text-decoration: none;
+  .wrapper {
+    width: 100%;
+  }
+
+  .wrapper:global(> .trigger) {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .wrapper:global(> .trigger > .trigger__icon) {
+    transition: all var(--tp-transition-fast);
+    transform-origin: center;
+  }
+
+  .wrapper[data-open="true"]:global(> .trigger > .trigger__icon) {
+    transform: rotate(-180deg);
   }
 </style>

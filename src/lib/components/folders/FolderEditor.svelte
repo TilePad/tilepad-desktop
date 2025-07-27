@@ -4,6 +4,7 @@
 
   import { watch } from "runed";
   import { t } from "svelte-i18n";
+  import { fly } from "svelte/transition";
   import { createTilesQuery } from "$lib/api/tiles";
   import { getErrorMessage } from "$lib/api/utils/error";
   import TileGrid from "$lib/components/tiles/TileGrid.svelte";
@@ -16,7 +17,6 @@
   import SkeletonList from "../skeleton/SkeletonList.svelte";
   import ProfileSelector from "../profiles/ProfileSelector.svelte";
   import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
-  import { fly } from "svelte/transition";
 
   const { profile } = getProfileContext();
   const { folder } = getFolderContext();
@@ -99,10 +99,8 @@
   }
 
   .header {
-    padding: 0.5rem;
-    border-bottom: 1px solid #333;
+    padding: var(--tp-space-4);
     overflow: hidden;
-    background-color: #29262e;
 
     display: flex;
     gap: 0.5rem;
@@ -118,6 +116,7 @@
 
     overflow: hidden;
     padding: 1rem;
+    padding-top: 0;
   }
 
   .content__wrapper {

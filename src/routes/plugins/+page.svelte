@@ -85,9 +85,9 @@
     </Aside>
   {:else if $pluginsQuery.isSuccess}
     <div class="header">
-      <h2>{$t("plugins")}</h2>
       <div class="actions">
         <Button
+          variant="secondary"
           onclick={() => {
             $checkUpdatesMutation.mutate({ plugins: $pluginsQuery.data });
           }}
@@ -138,15 +138,7 @@
   }
 
   .header {
-    display: flex;
-    flex-flow: row;
-    flex-shrink: 0;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.5rem;
-    border-bottom: 1px solid #333;
-    background-color: #29262e;
+    padding: var(--tp-space-4);
   }
 
   .plugins-wrapper {
@@ -161,12 +153,13 @@
       auto-fit,
       minmax(min(400px, max(200px, 100%)), 1fr)
     );
-    gap: 1rem;
-    padding: 1rem;
+    gap: var(--tp-space-4);
+    padding: var(--tp-space-4);
+    padding-top: 0;
   }
 
   .actions {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--tp-space-3);
   }
 </style>

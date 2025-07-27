@@ -14,17 +14,30 @@ body {
   --cp-input-color: #524b5c;
   --cp-button-hover-color: #777;
 
+  --tp-bg-primary: #0d1117; /* Main app background */
+  --tp-bg-secondary: #27252d; /* Cards, panels */
+  --tp-bg-tertiary: #312d35; /* Elevated surfaces */
+  --tp-bg-quaternary: #453f4a; /* Hover states */
+  --tp-bg-elevated: #1c2128; /* Modal overlays */
+
+  /* Text colors */
+  --tp-text-primary: #e6edf3;
+  --tp-text-secondary: #7d8590;
+  --tp-text-tertiary: #656d76;
+  --tp-text-inverse: #0d1117;
+  --tp-text-accent: #58a6ff;
+
   /* Semantic colors */
-  --tp-success-500: #28a745;
-  --tp-success-600: #1e7e34;
+  --tp-success-500: #81e668;
+  --tp-success-600: #74e358;
   --tp-success-bg: rgba(40, 167, 69, 0.1);
 
   --tp-warning-500: #ffc107;
   --tp-warning-600: #e0a800;
   --tp-warning-bg: rgba(255, 193, 7, 0.1);
 
-  --tp-error-500: #dc3545;
-  --tp-error-600: #c82333;
+  --tp-error-500: #da7070;
+  --tp-error-600: #db5858;
   --tp-error-bg: rgba(220, 53, 69, 0.1);
 
   --tp-info-500: #17a2b8;
@@ -33,7 +46,7 @@ body {
 
   /* Border color */
   --tp-border-primary: #30363d;
-  --tp-border-secondary: #21262d;
+  --tp-border-secondary: rgb(53, 57, 62);
   --tp-border-focus: #388bfd;
   --tp-border-hover: #484f58;
 

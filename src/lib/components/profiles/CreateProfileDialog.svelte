@@ -8,6 +8,7 @@
   import type { DialogProps } from "../dialog/Dialog.svelte";
 
   import Tooltip from "../Tooltip.svelte";
+  import Button from "../input/Button.svelte";
   import Dialog from "../dialog/Dialog.svelte";
   import { getProfileContext } from "./ProfilesProvider.svelte";
   import DialogCloseButton from "../dialog/DialogCloseButton.svelte";
@@ -55,9 +56,11 @@
   {#snippet trigger({ props: triggerProps })}
     <Dialog {triggerProps} {...restProps} bind:open>
       {#snippet button({ props })}
-        <button {...props} class="button">
-          <SolarUserPlusBold width="1.5rem" height="1.5rem" />
-        </button>
+        <div class="wrapper">
+          <Button variant="secondary" {...props} class="button">
+            <SolarUserPlusBold width="1.5rem" height="1.5rem" />
+          </Button>
+        </div>
       {/snippet}
 
       {#snippet title()}
@@ -118,19 +121,8 @@
     gap: 0.5rem;
   }
 
-  .button {
-    padding: 0rem 0.5rem;
-    border: none;
-    background-color: #141316;
-    color: #fff;
-    align-items: center;
-    display: flex;
-    gap: 0.5rem;
-    cursor: pointer;
-    font-size: 1em;
-    text-decoration: none;
-    border-top-right-radius: 0.25rem;
-    border-bottom-right-radius: 0.25rem;
-    justify-content: space-between;
+  .wrapper:global(> .button) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
   }
 </style>

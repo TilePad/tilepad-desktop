@@ -4,6 +4,7 @@
 
   import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
+  import { fingerprint } from "$lib/utils/fingerprint";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import { approveDeviceRequest, declineDeviceRequest } from "$lib/api/devices";
 
@@ -33,12 +34,6 @@
       success: $t("device_declined"),
       error: toastErrorMessage($t("device_decline_error")),
     });
-  }
-
-  async function fingerprint(keyBytes: Uint8Array) {
-    const hash = await crypto.subtle.digest("SHA-256", keyBytes);
-    const hashArray = Array.from(new Uint8Array(hash));
-    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join(":");
   }
 </script>
 
