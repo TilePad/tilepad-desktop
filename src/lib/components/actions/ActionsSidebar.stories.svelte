@@ -7,7 +7,7 @@
   import TileDraggingProvider from "../tiles/TileDraggingProvider.svelte";
 
   const { Story } = defineMeta({
-    title: "Custom/ActionsSidebar",
+    title: "Action/ActionsSidebar",
     component: ActionsSidebar,
     render: template,
     tags: ["autodocs"],
