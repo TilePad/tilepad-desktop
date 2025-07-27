@@ -1,35 +1,33 @@
 <script lang="ts" module>
-  export interface FolderOption {
-    id: FolderId;
+  export interface Option {
+    value: string;
     name: string;
   }
 </script>
 
 <script lang="ts">
-  import type { FolderId } from "$lib/api/types/folders";
-
-  import { t } from "svelte-i18n";
   import { Select } from "bits-ui";
   import { slide } from "svelte/transition";
   import DownArrow from "~icons/solar/alt-arrow-down-bold";
   import Button from "$lib/components/input/Button.svelte";
 
   type Props = {
-    options: FolderOption[];
-    folderId: FolderId | null;
-    setFolderId: (folderId: FolderId) => void;
+    options: Option[];
+    value: string | null;
+    onChangeValue: (value: string) => void;
+    placeholder?: string;
   };
 
-  const { options, folderId, setFolderId }: Props = $props();
+  const { options, value, onChangeValue, placeholder }: Props = $props();
 
-  const currentFolder = $derived(
-    options.find((folder) => folder.id === folderId),
+  const currentOption = $derived(
+    options.find((folder) => folder.value === value),
   );
 
   let open = $state(false);
 </script>
 
-{#snippet item(folder: FolderOption)}
+{#snippet item(folder: Option)}
   <span>{folder.name} </span>
 {/snippet}
 
@@ -37,17 +35,17 @@
   allowDeselect={false}
   type="single"
   onOpenChange={(value) => (open = value)}
-  value={currentFolder?.id}
-  onValueChange={(value) => setFolderId(value)}
+  value={currentOption?.value}
+  onValueChange={(value) => onChangeValue(value)}
 >
   <Select.Trigger>
     {#snippet child({ props })}
       <div class="wrapper" data-open={open}>
         <Button class="trigger" variant="secondary" {...props}>
-          {#if currentFolder}
-            {currentFolder.name}
+          {#if currentOption}
+            {currentOption.name}
           {:else}
-            {$t("choose_folder")}
+            {placeholder ?? "Select option"}
           {/if}
           <DownArrow class="trigger__icon" />
         </Button>
@@ -65,8 +63,8 @@
               class="content"
               transition:slide={{ duration: 100 }}
             >
-              {#each options as value (value.id)}
-                <Select.Item value={value.id} label={value.name}>
+              {#each options as value (value.value)}
+                <Select.Item value={value.value} label={value.name}>
                   {#snippet child({ props, selected, highlighted })}
                     <div
                       {...props}

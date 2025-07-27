@@ -1,82 +1,177 @@
-<!-- Card for a device that is requesting to connect -->
 <script lang="ts">
-  import type { DeviceRequest } from "$lib/api/types/devices";
-
+  import { tick } from "svelte";
   import { t } from "svelte-i18n";
-  import { toast } from "svelte-sonner";
+  import { Dialog } from "bits-ui";
+  import { fade, slide } from "svelte/transition";
   import { fingerprint } from "$lib/utils/fingerprint";
-  import { toastErrorMessage } from "$lib/api/utils/error";
-  import { approveDeviceRequest, declineDeviceRequest } from "$lib/api/devices";
+  import SolarKeyBoldDuotone from "~icons/solar/key-bold-duotone";
+  import SolarRoutingBoldDuotone from "~icons/solar/routing-bold-duotone";
+  import SolarMonitorBoldDuotone from "~icons/solar/monitor-bold-duotone";
+  import SolarSmartphoneBoldDuotone from "~icons/solar/smartphone-bold-duotone";
 
   import Button from "../input/Button.svelte";
 
   type Props = {
-    request: DeviceRequest;
+    deviceName: string;
+    address: string;
+    clientPublicKey: number[];
+
+    onApprove: VoidFunction;
+    onDecline: VoidFunction;
   };
 
-  const { request }: Props = $props();
+  const { deviceName, address, clientPublicKey, onApprove, onDecline }: Props =
+    $props();
 
-  function handleApprove() {
-    const approvePromise = approveDeviceRequest(request.id);
+  const fingerprintPromise = $derived(
+    fingerprint(new Uint8Array(clientPublicKey)),
+  );
 
-    toast.promise(approvePromise, {
-      loading: $t("device_approving"),
-      success: $t("device_approved"),
-      error: toastErrorMessage($t("device_approve_error")),
+  // Delayed open state till next tick to play dialog animations
+  let open = $state(false);
+
+  $effect(() => {
+    tick().then(() => {
+      open = true;
     });
-  }
-
-  function handleDecline() {
-    const declinePromise = declineDeviceRequest(request.id);
-
-    toast.promise(declinePromise, {
-      loading: $t("device_declining"),
-      success: $t("device_declined"),
-      error: toastErrorMessage($t("device_decline_error")),
-    });
-  }
+  });
 </script>
 
-<div class="device">
-  <h2>{$t("device_approval_request")}</h2>
-  <p>{$t("device_approval_request_desc")}</p>
+<Dialog.Root {open}>
+  <Dialog.Portal>
+    <Dialog.Overlay forceMount>
+      {#snippet child({ props, open })}
+        {#if open}
+          <div
+            {...props}
+            class="overlay"
+            transition:fade={{ duration: 150 }}
+          ></div>
+        {/if}
+      {/snippet}
+    </Dialog.Overlay>
+    <Dialog.Content forceMount interactOutsideBehavior="ignore">
+      {#snippet child({ props, open })}
+        {#if open}
+          <div
+            {...props}
+            class="content"
+            transition:slide={{ axis: "y", duration: 250 }}
+          >
+            <div class="graphic">
+              <SolarSmartphoneBoldDuotone width="3rem" height="3rem" />
+              <SolarRoutingBoldDuotone
+                class="graphic__line"
+                width="3rem"
+                height="3rem"
+              />
+              <SolarMonitorBoldDuotone width="3rem" height="3rem" />
+            </div>
 
-  <h3 class="device__name">
-    {request.device_name}
-  </h3>
-  <span class="device__id">Address: {request.socket_addr}</span>
+            <h2 class="title">{$t("device_approval_request")}</h2>
+            <p class="description">{$t("device_approval_request_desc")}</p>
 
-  {#await fingerprint(new Uint8Array(request.client_public_key)) then print}
-    <p class="device__print">Fingerprint:<br />{print}</p>
-  {/await}
+            <h3 class="name">
+              {deviceName}
+            </h3>
 
-  <div class="actions">
-    <Button variant="error" onclick={handleDecline}>
-      {$t("decline")}
-    </Button>
-    <Button onclick={handleApprove}>
-      {$t("approve")}
-    </Button>
-  </div>
-</div>
+            <span class="address">Address: {address}</span>
+
+            {#await fingerprintPromise then print}
+              <div class="fingerprint">
+                <p class="fingerprint__label">
+                  <SolarKeyBoldDuotone
+                    style="display: inline; vertical-align: middle;"
+                  />
+                  Fingerprint:
+                </p>
+                <p class="fingerprint__value">
+                  {print}
+                </p>
+              </div>
+            {/await}
+
+            <div class="actions">
+              <Button variant="error" onclick={onDecline}>
+                {$t("decline")}
+              </Button>
+              <Button onclick={onApprove}>
+                {$t("approve")}
+              </Button>
+            </div>
+          </div>
+        {/if}
+      {/snippet}
+    </Dialog.Content>
+  </Dialog.Portal>
+</Dialog.Root>
 
 <style>
-  .device {
+  .overlay {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #f4f6f8;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 19;
+    backdrop-filter: blur(4px);
+  }
+
+  .graphic {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin: var(--tp-space-4) 0;
+  }
+
+  .graphic:global(> .graphic__line) {
+    animation: blink forwards infinite 2000ms;
+  }
+
+  @keyframes blink {
+    0%,
+    100% {
+      opacity: 0.5;
+      color: #fff;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .content {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 25rem;
+
+    overflow: hidden;
+
+    background-color: #18161b;
+    border: 1px solid #222;
+    border-radius: 0.25rem;
+
+    z-index: 20;
+
     display: flex;
     flex-flow: column;
-    gap: 0.5rem;
-    align-items: flex-start;
 
-    padding: 1rem;
-    border-radius: 0.5rem;
     overflow: hidden;
-    width: 100%;
+
+    width: 25rem;
+    height: 28rem;
+    padding: var(--tp-space-6);
+    align-items: flex-start;
+    gap: var(--tp-space-2);
   }
 
   .actions {
     display: flex;
     gap: 1rem;
-    margin-top: 0.5rem;
+    margin-top: 1rem;
     flex: auto;
     width: 100%;
   }
@@ -85,16 +180,30 @@
     flex: auto;
   }
 
-  .device__id {
-    color: #ccc;
-    font-size: 0.8rem;
+  .description {
+    color: var(--tp-text-secondary);
+    font-size: var(--tp-text-md);
   }
 
-  .device__name {
-    font-size: 1.2rem;
+  .address {
+    color: var(--tp-text-secondary);
+    font-size: var(--tp-text-sm);
   }
 
-  .device__print {
+  .name {
+    color: var(--tp-text-primary);
+    font-size: var(--tp-text-lg);
+  }
+
+  .fingerprint__label {
+    color: var(--tp-text-primary);
+    display: flex;
+    gap: var(--tp-space-2);
+    align-items: center;
+  }
+
+  .fingerprint__value {
+    color: var(--tp-text-secondary);
     word-break: break-all;
     white-space: pre-wrap;
     font-family: monospace;

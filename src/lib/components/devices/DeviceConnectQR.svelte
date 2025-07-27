@@ -3,40 +3,39 @@
 
   import { t } from "svelte-i18n";
   import QRCode from "@castlenine/svelte-qrcode";
-  import { getConnectionInfo } from "$lib/api/server";
 
-  import SkeletonList from "../skeleton/SkeletonList.svelte";
+  type Props = {
+    connectInfo: ServerConnectionInfo;
+  };
 
-  function encodeInterfaces(info: ServerConnectionInfo) {
-    return {
-      addr: info.interfaces.map((it) => it.addr),
-      port: info.port,
-    };
-  }
+  const { connectInfo }: Props = $props();
+
+  const encodedInterfaces = $derived(
+    JSON.stringify({
+      addr: connectInfo.interfaces.map((it) => it.addr),
+      port: connectInfo.port,
+    }),
+  );
 </script>
 
 <div class="column">
-  {#await getConnectionInfo()}
-    <SkeletonList />
-  {:then connectInfo}
-    <div class="qr">
-      <QRCode size={250} data={JSON.stringify(encodeInterfaces(connectInfo))} />
-    </div>
+  <div class="qr">
+    <QRCode size={250} data={encodedInterfaces} />
+  </div>
 
-    <div class="port">
-      <b>{$t("port")}</b>
-      {connectInfo.port}
-    </div>
+  <div class="port">
+    <b>{$t("port")}</b>
+    {connectInfo.port}
+  </div>
 
-    <ul class="interfaces">
-      {#each connectInfo.interfaces as int, index (index)}
-        <li class="interface">
-          <b class="interface__name">{int.name}</b>
-          <span class="interface__addr">{int.addr}</span>
-        </li>
-      {/each}
-    </ul>
-  {/await}
+  <ul class="interfaces">
+    {#each connectInfo.interfaces as int, index (index)}
+      <li class="interface">
+        <b class="interface__name">{int.name}</b>
+        <span class="interface__addr">{int.addr}</span>
+      </li>
+    {/each}
+  </ul>
 </div>
 
 <style>

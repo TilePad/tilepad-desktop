@@ -10,12 +10,7 @@
   import SolarTranslationBoldDuotone from "~icons/solar/translation-bold-duotone";
 
   import Button from "../input/Button.svelte";
-  import DeviceFolderSelector, {
-    type FolderOption,
-  } from "./DeviceFolderSelector.svelte";
-  import DeviceProfileSelector, {
-    type ProfileOption,
-  } from "./DeviceProfileSelector.svelte";
+  import Select, { type Option } from "../input/Select.svelte";
 
   type Props = {
     id: DeviceId;
@@ -25,8 +20,8 @@
     folderId: FolderId | null;
     connected: boolean;
 
-    profiles: ProfileOption[];
-    folders: FolderOption[];
+    profiles: Option[];
+    folders: Option[];
 
     onRevoke: VoidFunction;
     onChangeProfile: (profileId: ProfileId) => void;
@@ -76,16 +71,18 @@
   {/await}
 
   <div class="actions">
-    <DeviceProfileSelector
+    <Select
+      value={profileId}
       options={profiles}
-      {profileId}
-      setProfileId={onChangeProfile}
+      onChangeValue={onChangeProfile}
+      placeholder={$t("choose_profile")}
     />
 
-    <DeviceFolderSelector
+    <Select
+      value={folderId}
       options={folders}
-      {folderId}
-      setFolderId={onChangeFolder}
+      onChangeValue={onChangeFolder}
+      placeholder={$t("choose_folder")}
     />
 
     <Button variant="error" onclick={onRevoke}>

@@ -5,12 +5,13 @@
   import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import Aside from "$lib/components/Aside.svelte";
+  import { getConnectionInfo } from "$lib/api/server";
   import { createProfilesQuery } from "$lib/api/profiles";
   import DeviceCard from "$lib/components/devices/DeviceCard.svelte";
   import SkeletonList from "$lib/components/skeleton/SkeletonList.svelte";
-  import ConnectInfo from "$lib/components/devices/DeviceConnectQR.svelte";
   import FoldersLoader from "$lib/components/folders/FoldersLoader.svelte";
   import { getErrorMessage, toastErrorMessage } from "$lib/api/utils/error";
+  import DeviceConnectQR from "$lib/components/devices/DeviceConnectQR.svelte";
   import {
     devicesQuery,
     connectedDevicesQuery,
@@ -24,6 +25,8 @@
 
   const profilesQuery = createProfilesQuery();
   const profiles = $derived($profilesQuery.data ?? []);
+
+  const connectInfoPromise = getConnectionInfo();
 
   const setDeviceProfileMutation = createSetDeviceProfileMutation();
   const setDeviceFolderMutation = createSetDeviceFolderMutation();
@@ -84,8 +87,14 @@
                   profileId={device.profile_id}
                   folderId={device.folder_id}
                   {connected}
-                  {profiles}
-                  {folders}
+                  profiles={profiles.map((profile) => ({
+                    value: profile.id,
+                    name: profile.name,
+                  }))}
+                  folders={folders.map((folder) => ({
+                    value: folder.id,
+                    name: folder.name,
+                  }))}
                   onRevoke={() => onRevoke(device.id)}
                   onChangeProfile={(profileId) =>
                     onChangeProfile(device.id, profileId)}
@@ -103,7 +112,11 @@
   </div>
 
   <div class="layout__connect">
-    <ConnectInfo />
+    {#await connectInfoPromise}
+      <SkeletonList />
+    {:then connectInfo}
+      <DeviceConnectQR {connectInfo} />
+    {/await}
   </div>
 </div>
 
