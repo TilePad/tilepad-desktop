@@ -1,35 +1,41 @@
+<script lang="ts" module>
+  export interface ProfileOption {
+    id: ProfileId;
+    name: string;
+  }
+</script>
+
 <script lang="ts">
-  import type { ProfileModel } from "$lib/api/types/profiles";
+  import type { ProfileId } from "$lib/api/types/profiles";
 
   import { t } from "svelte-i18n";
   import { Select } from "bits-ui";
   import { slide } from "svelte/transition";
-  import { createProfilesQuery } from "$lib/api/profiles";
   import DownArrow from "~icons/solar/alt-arrow-down-bold";
   import Button from "$lib/components/input/Button.svelte";
 
   type Props = {
-    profileId: string;
-    setProfileId: (profileId: string) => void;
+    options: ProfileOption[];
+
+    profileId: ProfileId;
+    setProfileId: (profileId: ProfileId) => void;
   };
 
-  const { profileId, setProfileId }: Props = $props();
-
-  const profilesQuery = createProfilesQuery();
-  const profiles = $derived($profilesQuery.data ?? []);
+  const { options, profileId, setProfileId }: Props = $props();
 
   const currentProfile = $derived(
-    profiles.find((profile) => profile.id === profileId),
+    options.find((profile) => profile.id === profileId),
   );
 
   let open = $state(false);
 </script>
 
-{#snippet item(profile: ProfileModel)}
+{#snippet item(profile: ProfileOption)}
   <span>{profile.name} </span>
 {/snippet}
 
 <Select.Root
+  bind:open
   allowDeselect={false}
   type="single"
   onOpenChange={(value) => (open = value)}
@@ -62,7 +68,7 @@
               class="content"
               transition:slide={{ duration: 100 }}
             >
-              {#each profiles as value (value.id)}
+              {#each options as value (value.id)}
                 <Select.Item value={value.id} label={value.name}>
                   {#snippet child({ props, selected, highlighted })}
                     <div

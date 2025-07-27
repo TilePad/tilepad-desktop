@@ -1,59 +1,60 @@
 <!-- Card for a known device -->
 <script lang="ts">
+  import type { DeviceId } from "$lib/api/types/devices";
   import type { FolderId } from "$lib/api/types/folders";
   import type { ProfileId } from "$lib/api/types/profiles";
-  import type { DeviceModel } from "$lib/api/types/devices";
 
   import { t } from "svelte-i18n";
-  import { toast } from "svelte-sonner";
   import { fingerprint } from "$lib/utils/fingerprint";
-  import { toastErrorMessage } from "$lib/api/utils/error";
   import SolarTrashBin2BoldDuotone from "~icons/solar/trash-bin-2-bold-duotone";
   import SolarTranslationBoldDuotone from "~icons/solar/translation-bold-duotone";
-  import {
-    createSetDeviceFolderMutation,
-    createSetDeviceProfileMutation,
-    createRevokeDeviceFolderMutation,
-  } from "$lib/api/devices";
 
   import Button from "../input/Button.svelte";
-  import DeviceFolderSelector from "./DeviceFolderSelector.svelte";
-  import DeviceProfileSelector from "./DeviceProfileSelector.svelte";
+  import DeviceFolderSelector, {
+    type FolderOption,
+  } from "./DeviceFolderSelector.svelte";
+  import DeviceProfileSelector, {
+    type ProfileOption,
+  } from "./DeviceProfileSelector.svelte";
+
   type Props = {
-    device: DeviceModel;
+    id: DeviceId;
+    name: string;
+    publicKey: number[];
+    profileId: ProfileId;
+    folderId: FolderId | null;
     connected: boolean;
+
+    profiles: ProfileOption[];
+    folders: FolderOption[];
+
+    onRevoke: VoidFunction;
+    onChangeProfile: (profileId: ProfileId) => void;
+    onChangeFolder: (folderId: FolderId) => void;
   };
 
-  const { device, connected }: Props = $props();
+  const {
+    id,
+    name,
+    publicKey,
+    profileId,
+    folderId,
+    connected,
 
-  const setDeviceProfileMutation = createSetDeviceProfileMutation();
-  const setDeviceFolderMutation = createSetDeviceFolderMutation();
-  const revokeDeviceMutation = createRevokeDeviceFolderMutation();
+    profiles,
+    folders,
 
-  function handleRevoke() {
-    const revokePromise = $revokeDeviceMutation.mutateAsync({
-      deviceId: device.id,
-    });
+    onRevoke,
+    onChangeProfile,
+    onChangeFolder,
+  }: Props = $props();
 
-    toast.promise(revokePromise, {
-      loading: $t("device_revoking"),
-      success: $t("device_revoked"),
-      error: toastErrorMessage($t("device_revoke_error")),
-    });
-  }
-
-  function onChangeProfile(profileId: ProfileId) {
-    $setDeviceProfileMutation.mutate({ deviceId: device.id, profileId });
-  }
-
-  function onChangeFolder(folderId: FolderId) {
-    $setDeviceFolderMutation.mutate({ deviceId: device.id, folderId });
-  }
+  const fingerprintPromise = $derived(fingerprint(new Uint8Array(publicKey)));
 </script>
 
 <div class="card">
   <div class="head">
-    <span class="identifier">{device.id}</span>
+    <span class="identifier">{id}</span>
 
     <p class="state" data-connected={connected}>
       {#if connected}
@@ -67,26 +68,27 @@
   </div>
 
   <h2 class="name">
-    {device.name}
+    {name}
   </h2>
 
-  {#await fingerprint(new Uint8Array(device.public_key)) then print}
+  {#await fingerprintPromise then print}
     <p class="fingerprint">{print}</p>
   {/await}
 
   <div class="actions">
     <DeviceProfileSelector
-      profileId={device.profile_id}
+      options={profiles}
+      {profileId}
       setProfileId={onChangeProfile}
     />
 
     <DeviceFolderSelector
-      profileId={device.profile_id}
-      folderId={device.folder_id}
+      options={folders}
+      {folderId}
       setFolderId={onChangeFolder}
     />
 
-    <Button variant="error" onclick={handleRevoke}>
+    <Button variant="error" onclick={onRevoke}>
       <SolarTrashBin2BoldDuotone />
       {$t("revoke")}
     </Button>

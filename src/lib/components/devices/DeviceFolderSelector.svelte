@@ -1,33 +1,36 @@
+<script lang="ts" module>
+  export interface FolderOption {
+    id: FolderId;
+    name: string;
+  }
+</script>
+
 <script lang="ts">
-  import type { ProfileModel } from "$lib/api/types/profiles";
+  import type { FolderId } from "$lib/api/types/folders";
 
   import { t } from "svelte-i18n";
   import { Select } from "bits-ui";
   import { slide } from "svelte/transition";
-  import { createFoldersQuery } from "$lib/api/folders";
   import DownArrow from "~icons/solar/alt-arrow-down-bold";
   import Button from "$lib/components/input/Button.svelte";
 
   type Props = {
-    profileId: string;
-    folderId: string | null;
-    setFolderId: (folderId: string) => void;
+    options: FolderOption[];
+    folderId: FolderId | null;
+    setFolderId: (folderId: FolderId) => void;
   };
 
-  const { profileId, folderId, setFolderId }: Props = $props();
-
-  const foldersQuery = createFoldersQuery(() => profileId);
-  const folders = $derived($foldersQuery.data ?? []);
+  const { options, folderId, setFolderId }: Props = $props();
 
   const currentFolder = $derived(
-    folders.find((folder) => folder.id === folderId),
+    options.find((folder) => folder.id === folderId),
   );
 
   let open = $state(false);
 </script>
 
-{#snippet item(profile: ProfileModel)}
-  <span>{profile.name} </span>
+{#snippet item(folder: FolderOption)}
+  <span>{folder.name} </span>
 {/snippet}
 
 <Select.Root
@@ -62,7 +65,7 @@
               class="content"
               transition:slide={{ duration: 100 }}
             >
-              {#each folders as value (value.id)}
+              {#each options as value (value.id)}
                 <Select.Item value={value.id} label={value.name}>
                   {#snippet child({ props, selected, highlighted })}
                     <div

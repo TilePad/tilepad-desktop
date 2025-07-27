@@ -1,14 +1,33 @@
 <script lang="ts">
+  import type { FolderId } from "$lib/api/types/folders";
+  import type { ProfileId } from "$lib/api/types/profiles";
+
   import { t } from "svelte-i18n";
+  import { toast } from "svelte-sonner";
   import Aside from "$lib/components/Aside.svelte";
-  import { getErrorMessage } from "$lib/api/utils/error";
+  import { createProfilesQuery } from "$lib/api/profiles";
   import DeviceCard from "$lib/components/devices/DeviceCard.svelte";
-  import { devicesQuery, connectedDevicesQuery } from "$lib/api/devices";
   import SkeletonList from "$lib/components/skeleton/SkeletonList.svelte";
   import ConnectInfo from "$lib/components/devices/DeviceConnectQR.svelte";
+  import FoldersLoader from "$lib/components/folders/FoldersLoader.svelte";
+  import { getErrorMessage, toastErrorMessage } from "$lib/api/utils/error";
+  import {
+    devicesQuery,
+    connectedDevicesQuery,
+    createSetDeviceFolderMutation,
+    createSetDeviceProfileMutation,
+    createRevokeDeviceFolderMutation,
+  } from "$lib/api/devices";
 
   const devices = devicesQuery();
   const connectedDevices = connectedDevicesQuery();
+
+  const profilesQuery = createProfilesQuery();
+  const profiles = $derived($profilesQuery.data ?? []);
+
+  const setDeviceProfileMutation = createSetDeviceProfileMutation();
+  const setDeviceFolderMutation = createSetDeviceFolderMutation();
+  const revokeDeviceMutation = createRevokeDeviceFolderMutation();
 
   const connectedDeviceIds = $derived.by(() => {
     const data = $connectedDevices.data;
@@ -18,6 +37,26 @@
 
   function isDeviceConnected(deviceId: string) {
     return connectedDeviceIds.includes(deviceId);
+  }
+
+  function onRevoke(deviceId: string) {
+    const revokePromise = $revokeDeviceMutation.mutateAsync({
+      deviceId,
+    });
+
+    toast.promise(revokePromise, {
+      loading: $t("device_revoking"),
+      success: $t("device_revoked"),
+      error: toastErrorMessage($t("device_revoke_error")),
+    });
+  }
+
+  function onChangeProfile(deviceId: string, profileId: ProfileId) {
+    $setDeviceProfileMutation.mutate({ deviceId, profileId });
+  }
+
+  function onChangeFolder(deviceId: string, folderId: FolderId) {
+    $setDeviceFolderMutation.mutate({ deviceId, folderId });
   }
 </script>
 
@@ -36,7 +75,25 @@
         <div class="devices">
           {#each $devices.data as device (device.id)}
             {@const connected = isDeviceConnected(device.id)}
-            <DeviceCard {device} {connected} />
+            <FoldersLoader profileId={device.profile_id}>
+              {#snippet content({ folders })}
+                <DeviceCard
+                  id={device.id}
+                  name={device.name}
+                  publicKey={device.public_key}
+                  profileId={device.profile_id}
+                  folderId={device.folder_id}
+                  {connected}
+                  {profiles}
+                  {folders}
+                  onRevoke={() => onRevoke(device.id)}
+                  onChangeProfile={(profileId) =>
+                    onChangeProfile(device.id, profileId)}
+                  onChangeFolder={(folderId) =>
+                    onChangeFolder(device.id, folderId)}
+                />
+              {/snippet}
+            </FoldersLoader>
           {:else}
             {$t("devices_none")}
           {/each}
