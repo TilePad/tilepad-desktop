@@ -53,7 +53,7 @@
       rootProps={{ open, onOpenChange: (value) => (open = value) }}
     >
       {#snippet button({ props })}
-        <Button {...props}>
+        <Button size="icon" {...props}>
           <SolarGalleryEditBoldDuotone width="1.65rem" height="1.65rem" />
         </Button>
       {/snippet}

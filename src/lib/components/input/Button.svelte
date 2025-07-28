@@ -7,7 +7,7 @@
     loading?: boolean;
   } & HTMLButtonAttributes;
 
-  export type ButtonSize = "default" | "small";
+  export type ButtonSize = "default" | "small" | "icon";
 </script>
 
 <script lang="ts">
@@ -64,6 +64,10 @@
 
     text-decoration: none;
     white-space: nowrap;
+  }
+
+  .btn[data-size="icon"] {
+    padding: 0.25rem;
   }
 
   .btn[data-variant="secondary"] {

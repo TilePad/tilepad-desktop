@@ -11,7 +11,7 @@
     type PopoverTriggerProps,
   } from "bits-ui";
 
-  import Button from "../input/Button.svelte";
+  import Button, { type ButtonSize } from "../input/Button.svelte";
 
   type Props = {
     button?: PopoverTriggerProps["child"];
@@ -22,6 +22,7 @@
     rootProps?: PopoverRootProps;
     triggerProps?: Omit<PopoverTriggerProps, "asChild">;
     contentProps?: Omit<PopoverContentProps, "asChild">;
+    size?: ButtonSize;
   } & HTMLButtonAttributes;
 
   const {

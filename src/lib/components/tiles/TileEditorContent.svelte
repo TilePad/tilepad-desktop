@@ -67,7 +67,7 @@
     <div class="header-actions">
       <DeleteTileDialog {tile} {onClose} />
 
-      <Button transparent onclick={onClose}>
+      <Button transparent onclick={onClose} size="icon">
         <SolarCloseCircleBold width={24} height={24} />
       </Button>
     </div>

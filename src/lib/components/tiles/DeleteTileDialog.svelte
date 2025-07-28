@@ -45,7 +45,7 @@
 
 <Dialog bind:open>
   {#snippet button({ props })}
-    <Button transparent variant="error" {...props}>
+    <Button transparent variant="error" size="icon" {...props}>
       <SolarTrashBinTrashBoldDuotone width={24} height={24} />
     </Button>
   {/snippet}

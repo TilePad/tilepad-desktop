@@ -129,7 +129,7 @@
 
   <Tooltip title={$t("toggle_label_tooltip")}>
     {#snippet trigger({ props })}
-      <Button {...props} onclick={onToggleEnabled}>
+      <Button {...props} onclick={onToggleEnabled} size="icon">
         {#if label.enabled}
           <SolarEyeBold width="1.5rem" height="1.5rem" />
         {:else}
@@ -141,7 +141,7 @@
 
   <Tooltip title={$t("label_options_tooltip")}>
     {#snippet trigger({ props })}
-      <PopoverButton triggerProps={props}>
+      <PopoverButton triggerProps={{ ...props }} size="icon">
         <SolarTextBoldDuotone width="1.5rem" height="1.5rem" />
 
         {#snippet content()}
