@@ -1,5 +1,9 @@
 import fs from 'fs';
+import { promisify } from 'util';
 import { exec } from 'child_process';
+
+const execAsync = promisify(exec);
+
 
 /**
  * Creates the markdown output
@@ -28,26 +32,72 @@ function createLicenseMarkdown(jsonData) {
         markdown += `- ${license}\n`;
     }
 
+    markdown += '\n---\n\n'
+
     // Create individual license type sections
     for (const [license, packages] of Object.entries(groups)) {
         markdown += `## ${license}\n\n`;
         packages.forEach(pkg => {
             markdown += `- [${pkg.name}](${pkg.repository}) - ${pkg.version}\n`
         });
-        markdown += "\n---\n";
+        markdown += "\n---\n\n";
     }
 
     return markdown;
 };
 
-exec('cargo license --json', (error, stdout, stderr) => {
-    if (error) {
-        console.error("Failed to get license data", stderr ?? error.message);
-        return;
+async function getNpmLicenses() {
+    const { stdout } = await execAsync('npm ls --json --long');
+    const data = JSON.parse(stdout);
+
+    const result = [];
+
+    function collectDependencies(deps) {
+        if (!deps) return;
+        for (const [name, info] of Object.entries(deps)) {
+            if (info && info.version) {
+                result.push({
+                    name,
+                    version: info.version,
+                    license: info.license ?? 'Unknown',
+                    repository: info.repository?.url?.replace(/^git\+/, '').replace(/\.git$/, '') ?? ''
+                });
+                collectDependencies(info.dependencies);
+            }
+        }
     }
 
-    const json = JSON.parse(stdout);
-    const markdown = createLicenseMarkdown(json);
-    fs.writeFileSync('THIRD_PARTY_LICENSES.md', markdown, 'utf8');
-    console.log("generated THIRD_PARTY_LICENSES.md")
-});
+    collectDependencies(data.dependencies);
+    return result;
+}
+
+async function getCargoLicenses() {
+    const { stdout } = await execAsync('cargo license --json');
+    const data = JSON.parse(stdout);
+
+    return data.map(pkg => ({
+        name: pkg.name,
+        version: pkg.version,
+        license: pkg.license ?? 'Unknown',
+        repository: pkg.repository ?? ''
+    }));
+}
+
+
+async function main() {
+    try {
+        const [npmLicenses, cargoLicenses] = await Promise.all([
+            getNpmLicenses(),
+            getCargoLicenses()
+        ]);
+
+        const allLicenses = [...npmLicenses, ...cargoLicenses];
+        const markdown = createLicenseMarkdown(allLicenses);
+        fs.writeFileSync('THIRD_PARTY_LICENSES.md', markdown, 'utf8');
+        console.log("Generated THIRD_PARTY_LICENSES.md");
+    } catch (err) {
+        console.error("Failed to collect license data:", err);
+    }
+}
+
+main();
