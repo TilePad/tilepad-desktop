@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { TileId, TileModel, TilePosition } from "$lib/api/types/tiles";
 
-  import { useDebounce } from "runed";
+  import { watch, useDebounce } from "runed";
   import { createUpdateTilePositionMutation } from "$lib/api/tiles";
   import {
     type DisplayContext,
@@ -49,6 +49,14 @@
 
   let lastPosition: TilePosition = $state(tile.position);
   let position: TilePosition = $state(tile.position);
+
+  watch(
+    () => tile.position,
+    (newPosition) => {
+      lastPosition = newPosition;
+      position = newPosition;
+    },
+  );
 
   const { tileX, tileY, tileZ, tileWidth, tileHeight, sizeAdjust } =
     $derived.by(() => {
@@ -124,165 +132,98 @@
     debounceUpdatePosition(position);
   }
 
-  function handleResizeVerticalTop(detail: ResizeEventDetail) {
-    resizing = true;
-    const newStart =
-      lastPosition.row + Math.min(detail.scaleY, lastPosition.row_span - 1);
-    const newSpan = Math.max(lastPosition.row_span - detail.scaleY, 1);
+  type ResizeSide = "top" | "bottom" | "left" | "right";
 
-    // Prevent overlapping
-    if (
-      !isAllowedWithin(
-        position.column,
-        position.column_span,
-        newStart,
-        newSpan,
-        tile.id,
-      )
-    ) {
+  function handleResize(detail: ResizeEventDetail, side: ResizeSide) {
+    resizing = true;
+
+    let col = position.column;
+    let row = position.row;
+
+    let colSpan = position.column_span;
+    let rowSpan = position.row_span;
+
+    if (side === "top") {
+      row =
+        lastPosition.row + Math.min(detail.scaleY, lastPosition.row_span - 1);
+      rowSpan = Math.max(lastPosition.row_span - detail.scaleY, 1);
+    } else if (side === "bottom") {
+      rowSpan = Math.max(lastPosition.row_span + detail.scaleY, 1);
+    } else if (side === "left") {
+      col =
+        lastPosition.column +
+        Math.min(detail.scaleX, lastPosition.column_span - 1);
+      colSpan = Math.max(lastPosition.column_span - detail.scaleX, 1);
+    } else if (side === "right") {
+      colSpan = Math.max(lastPosition.column_span + detail.scaleX, 1);
+    }
+
+    if (!isAllowedWithin(col, colSpan, row, rowSpan, tile.id)) {
       return;
     }
 
-    position = { ...position, row: newStart, row_span: newSpan };
+    // Update position changes
+    position = {
+      column: col,
+      column_span: colSpan,
+      row: row,
+      row_span: rowSpan,
+    };
 
     if (detail.commit) {
       persistPosition(position);
       resizing = false;
     }
+  }
+
+  function handleResizeDiagonal(
+    detail: ResizeEventDetail,
+    sides: ResizeSide[],
+  ) {
+    const commit = detail.commit;
+    detail.commit = false;
+    resizing = true;
+
+    for (const side of sides) {
+      handleResize(detail, side);
+    }
+
+    if (commit) {
+      persistPosition(position);
+      resizing = false;
+    }
+  }
+
+  function handleResizeVerticalTop(detail: ResizeEventDetail) {
+    handleResize(detail, "top");
   }
 
   function handleResizeVerticalBottom(detail: ResizeEventDetail) {
-    resizing = true;
-    const newSpan = Math.max(lastPosition.row_span + detail.scaleY, 1);
-
-    // Prevent overlapping
-    if (
-      !isAllowedWithin(
-        position.column,
-        position.column_span,
-        position.row,
-        newSpan,
-        tile.id,
-      )
-    ) {
-      return;
-    }
-
-    position = { ...position, row_span: newSpan };
-
-    if (detail.commit) {
-      persistPosition(position);
-      resizing = false;
-    }
+    handleResize(detail, "bottom");
   }
 
   function handleResizeHorizontalLeft(detail: ResizeEventDetail) {
-    resizing = true;
-    const newStart =
-      lastPosition.column +
-      Math.min(detail.scaleX, lastPosition.column_span - 1);
-    const newSpan = Math.max(lastPosition.column_span - detail.scaleX, 1);
-
-    // Prevent overlapping
-    if (
-      !isAllowedWithin(
-        newStart,
-        newSpan,
-        position.row,
-        position.row_span,
-        tile.id,
-      )
-    ) {
-      return;
-    }
-
-    position = { ...position, column: newStart, column_span: newSpan };
-
-    if (detail.commit) {
-      persistPosition(position);
-      resizing = false;
-    }
+    handleResize(detail, "left");
   }
 
   function handleResizeHorizontalRight(detail: ResizeEventDetail) {
-    resizing = true;
-    const newSpan = Math.max(lastPosition.column_span + detail.scaleX, 1);
-
-    // Prevent overlapping
-    if (
-      !isAllowedWithin(
-        position.column,
-        newSpan,
-        position.row,
-        position.row_span,
-        tile.id,
-      )
-    ) {
-      return;
-    }
-
-    position = { ...position, column_span: newSpan };
-
-    if (detail.commit) {
-      persistPosition(position);
-      resizing = false;
-    }
+    handleResize(detail, "right");
   }
 
   function considerResizeDiagonalLeftTop(detail: ResizeEventDetail) {
-    let commit = detail.commit;
-    detail.commit = false;
-    resizing = true;
-
-    handleResizeHorizontalLeft(detail);
-    handleResizeVerticalTop(detail);
-
-    if (commit) {
-      persistPosition(position);
-      resizing = false;
-    }
+    handleResizeDiagonal(detail, ["left", "top"]);
   }
 
   function considerResizeDiagonalLeftBottom(detail: ResizeEventDetail) {
-    let commit = detail.commit;
-    detail.commit = false;
-    resizing = true;
-
-    handleResizeHorizontalLeft(detail);
-    handleResizeVerticalBottom(detail);
-
-    if (commit) {
-      persistPosition(position);
-      resizing = false;
-    }
+    handleResizeDiagonal(detail, ["left", "bottom"]);
   }
 
   function considerResizeDiagonalRightBottom(detail: ResizeEventDetail) {
-    let commit = detail.commit;
-    detail.commit = false;
-    resizing = true;
-
-    handleResizeHorizontalRight(detail);
-    handleResizeVerticalBottom(detail);
-
-    if (commit) {
-      persistPosition(position);
-      resizing = false;
-    }
+    handleResizeDiagonal(detail, ["right", "bottom"]);
   }
 
   function considerResizeDiagonalRightTop(detail: ResizeEventDetail) {
-    let commit = detail.commit;
-    detail.commit = false;
-    resizing = true;
-
-    handleResizeHorizontalRight(detail);
-    handleResizeVerticalTop(detail);
-
-    if (commit) {
-      persistPosition(position);
-      resizing = false;
-    }
+    handleResizeDiagonal(detail, ["right", "top"]);
   }
 </script>
 
