@@ -5,19 +5,25 @@ This page lists the licenses of third party dependencies used by this project
 - MIT
 - OFL-1.1
 - CC-BY-4.0
+- (MIT OR CC0-1.0)
+- 0BSD
+- Apache-2.0
 - Apache-2.0 OR MIT
 - MIT OR Apache-2.0
+- Unknown
+- BSD-2-Clause
 - ISC
-- Apache-2.0
+- BSD-3-Clause
+- Python-2.0
+- (MPL-2.0 OR Apache-2.0)
+- MIT-0
 - 0BSD OR Apache-2.0 OR MIT
 - MIT OR Unlicense
-- BSD-3-Clause
 - BSD-3-Clause AND MIT
 - BSD-3-Clause OR MIT
 - Apache-2.0 OR MIT OR Zlib
 - BSL-1.0
 - MPL-2.0
-- Unknown
 - Apache-2.0 AND MIT
 - Apache-2.0 OR CC0-1.0 OR MIT-0
 - (Apache-2.0 OR MIT) AND BSD-3-Clause
@@ -44,39 +50,548 @@ This page lists the licenses of third party dependencies used by this project
 ## MIT
 
 - [@castlenine/svelte-qrcode](https://github.com/castlenine/svelte-qrcode) - 2.3.0
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
 - [@eslint/js](https://github.com/eslint/eslint) - 9.31.0
+- [@iconify/types](https://github.com/iconify/iconify) - 2.0.0
+- [@iconify/types](https://github.com/iconify/iconify) - 2.0.0
 - [@storybook/addon-svelte-csf](https://github.com/storybookjs/addon-svelte-csf) - 5.0.7
+- [@storybook/csf](https://github.com/ComponentDriven/csf) - 0.1.13
+- [@storybook/svelte](https://github.com/storybookjs/storybook) - 9.0.17
+- [storybook](https://github.com/storybookjs/storybook) - 9.0.17
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [ts-dedent](https://github.com/tamino-martinius/node-ts-dedent) - 2.2.0
+- [@sveltejs/vite-plugin-svelte](https://github.com/sveltejs/vite-plugin-svelte) - 6.1.0
+- [dedent](https://github.com/dmnd/dedent) - 1.6.0
+- [es-toolkit](https://github.com/toss/es-toolkit) - 1.39.7
+- [esrap](https://github.com/sveltejs/esrap) - 1.4.9
+- [@jridgewell/sourcemap-codec](https://github.com/jridgewell/sourcemaps) - 1.5.4
+- [magic-string]() - 0.30.17
+- [@jridgewell/sourcemap-codec](https://github.com/jridgewell/sourcemaps) - 1.5.4
+- [storybook](https://github.com/storybookjs/storybook) - 9.0.17
+- [svelte-ast-print](https://github.com/xeho91/svelte-ast-print) - 0.4.2
+- [esrap](https://github.com/Rich-Harris/esrap) - 1.2.2
+- [@jridgewell/sourcemap-codec](https://github.com/jridgewell/sourcemaps) - 1.5.4
+- [@types/estree](https://github.com/DefinitelyTyped/DefinitelyTyped) - 1.0.8
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [zimmerframe](https://github.com/Rich-Harris/zimmerframe) - 1.1.2
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [vite](https://github.com/vitejs/vite) - 6.3.5
+- [zimmerframe](https://github.com/Rich-Harris/zimmerframe) - 1.1.2
 - [@storybook/sveltekit](https://github.com/storybookjs/storybook) - 9.0.17
+- [@storybook/builder-vite](https://github.com/storybookjs/storybook) - 9.0.17
+- [@storybook/csf-plugin](https://github.com/storybookjs/storybook) - 9.0.17
+- [storybook](https://github.com/storybookjs/storybook) - 9.0.17
+- [unplugin](https://github.com/unjs/unplugin) - 1.16.1
+- [acorn](https://github.com/acornjs/acorn) - 8.15.0
+- [webpack-virtual-modules](https://github.com/sysgears/webpack-virtual-modules) - 0.6.2
+- [storybook](https://github.com/storybookjs/storybook) - 9.0.17
+- [ts-dedent](https://github.com/tamino-martinius/node-ts-dedent) - 2.2.0
+- [vite](https://github.com/vitejs/vite) - 6.3.5
+- [@storybook/svelte-vite](https://github.com/storybookjs/storybook) - 9.0.17
+- [@storybook/builder-vite](https://github.com/storybookjs/storybook) - 9.0.17
+- [@storybook/svelte](https://github.com/storybookjs/storybook) - 9.0.17
+- [@sveltejs/vite-plugin-svelte](https://github.com/sveltejs/vite-plugin-svelte) - 5.1.1
+- [@sveltejs/vite-plugin-svelte-inspector](https://github.com/sveltejs/vite-plugin-svelte) - 4.0.1
+- [@sveltejs/vite-plugin-svelte](https://github.com/sveltejs/vite-plugin-svelte) - 5.1.1
+- [debug](git://github.com/debug-js/debug) - 4.4.1
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [vite](https://github.com/vitejs/vite) - 6.3.5
+- [debug](git://github.com/debug-js/debug) - 4.4.1
+- [deepmerge](git://github.com/TehShrike/deepmerge) - 4.3.1
+- [kleur]() - 4.1.5
+- [magic-string]() - 0.30.17
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [vite](https://github.com/vitejs/vite) - 6.3.5
+- [vitefu](https://github.com/svitejs/vitefu) - 1.1.1
+- [magic-string]() - 0.30.17
+- [storybook](https://github.com/storybookjs/storybook) - 9.0.17
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [svelte2tsx](https://github.com/sveltejs/language-tools/tree/master/packages/svelte2tsx) - 0.7.41
+- [dedent-js](https://github.com/MartinKolarik/dedent-js) - 1.0.1
+- [pascal-case](git://github.com/blakeembrey/change-case) - 3.1.2
+- [no-case](git://github.com/blakeembrey/change-case) - 3.0.4
+- [lower-case](git://github.com/blakeembrey/change-case) - 2.0.2
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [vite](https://github.com/vitejs/vite) - 6.3.5
+- [@storybook/svelte](https://github.com/storybookjs/storybook) - 9.0.17
+- [storybook](https://github.com/storybookjs/storybook) - 9.0.17
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [vite](https://github.com/vitejs/vite) - 6.3.5
 - [@sveltejs/adapter-static](https://github.com/sveltejs/kit) - 3.0.8
 - [@sveltejs/kit](https://github.com/sveltejs/kit) - 2.25.1
+- [@sveltejs/kit](https://github.com/sveltejs/kit) - 2.25.1
+- [@sveltejs/acorn-typescript](https://github.com/sveltejs/acorn-typescript) - 1.0.5
+- [acorn](https://github.com/acornjs/acorn) - 8.15.0
 - [@sveltejs/vite-plugin-svelte](https://github.com/sveltejs/vite-plugin-svelte) - 6.1.0
+- [@types/cookie](https://github.com/DefinitelyTyped/DefinitelyTyped) - 0.6.0
+- [acorn](https://github.com/acornjs/acorn) - 8.15.0
+- [cookie]() - 0.7.2
+- [devalue]() - 5.1.1
+- [esm-env](https://github.com/benmccann/esm-env) - 1.2.2
+- [kleur]() - 4.1.5
+- [magic-string]() - 0.30.17
+- [mrmime]() - 2.0.1
+- [sade]() - 1.8.1
+- [mri]() - 1.2.0
+- [set-cookie-parser]() - 2.7.1
+- [sirv]() - 3.0.1
+- [@polka/url]() - 1.0.0-next.29
+- [mrmime]() - 2.0.1
+- [totalist]() - 3.0.1
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [vite](https://github.com/vitejs/vite) - 6.3.5
+- [@sveltejs/vite-plugin-svelte](https://github.com/sveltejs/vite-plugin-svelte) - 6.1.0
+- [@sveltejs/vite-plugin-svelte-inspector](https://github.com/sveltejs/vite-plugin-svelte) - 5.0.0
+- [@sveltejs/vite-plugin-svelte](https://github.com/sveltejs/vite-plugin-svelte) - 6.1.0
+- [debug](git://github.com/debug-js/debug) - 4.4.1
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [vite](https://github.com/vitejs/vite) - 6.3.5
+- [debug](git://github.com/debug-js/debug) - 4.4.1
+- [ms]() - 2.1.3
+- [deepmerge](git://github.com/TehShrike/deepmerge) - 4.3.1
+- [kleur]() - 4.1.5
+- [magic-string]() - 0.30.17
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [vite](https://github.com/vitejs/vite) - 6.3.5
+- [vitefu](https://github.com/svitejs/vitefu) - 1.1.1
+- [vite](https://github.com/vitejs/vite) - 6.3.5
 - [@tanstack/eslint-plugin-query](https://github.com/TanStack/query) - 5.81.2
-- [@tanstack/svelte-query-devtools](https://github.com/TanStack/query) - 5.83.0
-- [@tanstack/svelte-query](https://github.com/TanStack/query) - 5.83.0
-- [bits-ui]() - 2.8.11
-- [eslint-plugin-perfectionist]() - 4.15.0
-- [eslint-plugin-storybook](https://github.com/storybookjs/storybook) - 9.0.17
-- [eslint-plugin-svelte]() - 3.11.0
-- [eslint-plugin-unused-imports](https://github.com/sweepline/eslint-plugin-unused-imports) - 4.1.4
+- [@typescript-eslint/utils](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@eslint-community/eslint-utils](https://github.com/eslint-community/eslint-utils) - 4.7.0
+- [@typescript-eslint/scope-manager](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/types](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/visitor-keys](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/types](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/typescript-estree](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
 - [eslint]() - 9.31.0
+- [eslint]() - 9.31.0
+- [@tanstack/svelte-query-devtools](https://github.com/TanStack/query) - 5.83.0
+- [@tanstack/query-devtools](https://github.com/TanStack/query) - 5.81.2
+- [@tanstack/svelte-query](https://github.com/TanStack/query) - 5.83.0
+- [esm-env](https://github.com/benmccann/esm-env) - 1.2.2
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [@tanstack/svelte-query](https://github.com/TanStack/query) - 5.83.0
+- [@tanstack/query-core](https://github.com/TanStack/query) - 5.83.0
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [bits-ui]() - 2.8.11
+- [@floating-ui/core](https://github.com/floating-ui/floating-ui) - 1.7.2
+- [@floating-ui/utils](https://github.com/floating-ui/floating-ui) - 0.2.10
+- [@floating-ui/dom](https://github.com/floating-ui/floating-ui) - 1.7.2
+- [@floating-ui/core](https://github.com/floating-ui/floating-ui) - 1.7.2
+- [@floating-ui/utils](https://github.com/floating-ui/floating-ui) - 0.2.10
+- [esm-env](https://github.com/benmccann/esm-env) - 1.2.2
+- [runed](https://github.com/svecosystem/runed) - 0.29.2
+- [esm-env](https://github.com/benmccann/esm-env) - 1.2.2
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [clsx]() - 2.1.1
+- [runed](https://github.com/svecosystem/runed) - 0.29.2
+- [esm-env](https://github.com/benmccann/esm-env) - 1.2.2
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [style-to-object](https://github.com/remarkablemark/style-to-object) - 1.0.9
+- [inline-style-parser](https://github.com/remarkablemark/inline-style-parser) - 0.2.4
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [tabbable](https://github.com/focus-trap/tabbable) - 6.2.0
+- [eslint-plugin-perfectionist]() - 4.15.0
+- [@typescript-eslint/types](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/utils](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [eslint]() - 9.31.0
+- [natural-orderby](https://github.com/yobacca/natural-orderby) - 5.0.0
+- [eslint-plugin-storybook](https://github.com/storybookjs/storybook) - 9.0.17
+- [@typescript-eslint/utils](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [eslint]() - 9.31.0
+- [storybook](https://github.com/storybookjs/storybook) - 9.0.17
+- [eslint-plugin-svelte]() - 3.11.0
+- [@eslint-community/eslint-utils](https://github.com/eslint-community/eslint-utils) - 4.7.0
+- [eslint]() - 9.31.0
+- [@jridgewell/sourcemap-codec](https://github.com/jridgewell/sourcemaps) - 1.5.4
+- [eslint]() - 9.31.0
+- [globals]() - 16.3.0
+- [known-css-properties]() - 0.37.0
+- [postcss-load-config]() - 3.1.4
+- [lilconfig](https://github.com/antonk52/lilconfig) - 2.1.0
+- [postcss]() - 8.5.6
+- [postcss-safe-parser]() - 7.0.1
+- [postcss]() - 8.5.6
+- [postcss]() - 8.5.6
+- [nanoid]() - 3.3.11
+- [svelte-eslint-parser]() - 1.3.0
+- [postcss-scss]() - 4.0.9
+- [postcss]() - 8.5.6
+- [postcss-selector-parser]() - 7.1.0
+- [cssesc](https://github.com/mathiasbynens/cssesc) - 3.0.0
+- [util-deprecate](git://github.com/TooTallNate/util-deprecate) - 1.0.2
+- [postcss]() - 8.5.6
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [eslint-plugin-unused-imports](https://github.com/sweepline/eslint-plugin-unused-imports) - 4.1.4
+- [@typescript-eslint/eslint-plugin](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@eslint-community/regexpp](https://github.com/eslint-community/regexpp) - 4.12.1
+- [@typescript-eslint/parser](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/scope-manager](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/type-utils](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/types](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/typescript-estree](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/utils](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [debug](git://github.com/debug-js/debug) - 4.4.1
+- [eslint]() - 9.31.0
+- [ts-api-utils](https://github.com/JoshuaKGoldberg/ts-api-utils) - 2.1.0
+- [@typescript-eslint/utils](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/visitor-keys](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/types](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [eslint]() - 9.31.0
+- [graphemer](https://github.com/flmnt/graphemer) - 1.4.0
+- [ignore](git@github.com:kaelzhang/node-ignore) - 7.0.5
+- [natural-compare]() - 1.4.0
+- [ts-api-utils](https://github.com/JoshuaKGoldberg/ts-api-utils) - 2.1.0
+- [eslint]() - 9.31.0
+- [eslint]() - 9.31.0
+- [@eslint-community/eslint-utils](https://github.com/eslint-community/eslint-utils) - 4.7.0
+- [@eslint-community/regexpp](https://github.com/eslint-community/regexpp) - 4.12.1
+- [debug](git://github.com/debug-js/debug) - 4.4.1
+- [brace-expansion](git://github.com/juliangruber/brace-expansion) - 1.1.12
+- [balanced-match](git://github.com/juliangruber/balanced-match) - 1.0.2
+- [concat-map](git://github.com/substack/node-concat-map) - 0.0.1
+- [@types/json-schema](https://github.com/DefinitelyTyped/DefinitelyTyped) - 7.0.15
+- [@eslint/eslintrc]() - 3.3.1
+- [ajv](https://github.com/ajv-validator/ajv) - 6.12.6
+- [debug](git://github.com/debug-js/debug) - 4.4.1
+- [globals]() - 14.0.0
+- [ignore](git@github.com:kaelzhang/node-ignore) - 5.3.2
+- [import-fresh]() - 3.3.1
+- [parent-module]() - 1.0.1
+- [callsites]() - 3.1.0
+- [resolve-from]() - 4.0.0
+- [js-yaml]() - 4.1.0
+- [brace-expansion](git://github.com/juliangruber/brace-expansion) - 1.1.12
+- [balanced-match](git://github.com/juliangruber/balanced-match) - 1.0.2
+- [concat-map](git://github.com/substack/node-concat-map) - 0.0.1
+- [strip-json-comments]() - 3.1.1
+- [@eslint/js](https://github.com/eslint/eslint) - 9.31.0
+- [levn](git://github.com/gkz/levn) - 0.4.1
+- [prelude-ls](git://github.com/gkz/prelude-ls) - 1.2.1
+- [type-check](git://github.com/gkz/type-check) - 0.4.0
+- [@types/estree](https://github.com/DefinitelyTyped/DefinitelyTyped) - 1.0.8
+- [@types/json-schema](https://github.com/DefinitelyTyped/DefinitelyTyped) - 7.0.15
+- [ajv](https://github.com/ajv-validator/ajv) - 6.12.6
+- [fast-deep-equal](https://github.com/epoberezkin/fast-deep-equal) - 3.1.3
+- [fast-json-stable-stringify](git://github.com/epoberezkin/fast-json-stable-stringify) - 2.1.0
+- [json-schema-traverse](https://github.com/epoberezkin/json-schema-traverse) - 0.4.1
+- [punycode](https://github.com/mathiasbynens/punycode.js) - 2.3.1
+- [chalk]() - 4.1.2
+- [ansi-styles]() - 4.3.0
+- [color-convert]() - 2.0.1
+- [color-name](git@github.com:colorjs/color-name) - 1.1.4
+- [supports-color]() - 7.2.0
+- [has-flag]() - 4.0.0
+- [cross-spawn](git@github.com:moxystudio/node-cross-spawn) - 7.0.6
+- [path-key]() - 3.1.1
+- [shebang-command]() - 2.0.0
+- [shebang-regex]() - 3.0.0
+- [debug](git://github.com/debug-js/debug) - 4.4.1
+- [escape-string-regexp]() - 4.0.0
+- [acorn-jsx](https://github.com/acornjs/acorn-jsx) - 5.3.2
+- [acorn](https://github.com/acornjs/acorn) - 8.15.0
+- [acorn](https://github.com/acornjs/acorn) - 8.15.0
+- [fast-deep-equal](https://github.com/epoberezkin/fast-deep-equal) - 3.1.3
+- [file-entry-cache]() - 8.0.0
+- [flat-cache]() - 4.0.1
+- [keyv](https://github.com/jaredwray/keyv) - 4.5.4
+- [json-buffer](git://github.com/dominictarr/json-buffer) - 3.0.1
+- [find-up]() - 5.0.0
+- [locate-path]() - 6.0.0
+- [p-locate]() - 5.0.0
+- [p-limit]() - 3.1.0
+- [yocto-queue]() - 0.1.0
+- [path-exists]() - 4.0.0
+- [is-glob]() - 4.0.3
+- [ignore](git@github.com:kaelzhang/node-ignore) - 5.3.2
+- [imurmurhash](https://github.com/jensyt/imurmurhash-js) - 0.1.4
+- [is-glob]() - 4.0.3
+- [is-extglob]() - 2.1.1
+- [json-stable-stringify-without-jsonify](git://github.com/samn/json-stable-stringify) - 1.0.1
+- [lodash.merge]() - 4.6.2
+- [brace-expansion](git://github.com/juliangruber/brace-expansion) - 1.1.12
+- [balanced-match](git://github.com/juliangruber/balanced-match) - 1.0.2
+- [concat-map](git://github.com/substack/node-concat-map) - 0.0.1
+- [natural-compare]() - 1.4.0
+- [optionator](git://github.com/gkz/optionator) - 0.9.4
+- [deep-is](http://github.com/thlorenz/deep-is) - 0.1.4
+- [fast-levenshtein](https://github.com/hiddentao/fast-levenshtein) - 2.0.6
+- [levn](git://github.com/gkz/levn) - 0.4.1
+- [prelude-ls](git://github.com/gkz/prelude-ls) - 1.2.1
+- [type-check](git://github.com/gkz/type-check) - 0.4.0
+- [prelude-ls](git://github.com/gkz/prelude-ls) - 1.2.1
+- [word-wrap]() - 1.2.5
 - [isomorphic-dompurify]() - 2.26.0
+- [@types/trusted-types](https://github.com/DefinitelyTyped/DefinitelyTyped) - 2.0.7
+- [jsdom](https://github.com/jsdom/jsdom) - 26.1.0
+- [cssstyle]() - 4.6.0
+- [@asamuzakjp/css-color](https://github.com/asamuzaK/cssColor) - 3.2.0
+- [@csstools/css-calc](https://github.com/csstools/postcss-plugins) - 2.1.4
+- [@csstools/css-parser-algorithms](https://github.com/csstools/postcss-plugins) - 3.0.5
+- [@csstools/css-tokenizer](https://github.com/csstools/postcss-plugins) - 3.0.4
+- [@csstools/css-color-parser](https://github.com/csstools/postcss-plugins) - 3.0.10
+- [@csstools/css-calc](https://github.com/csstools/postcss-plugins) - 2.1.4
+- [@csstools/css-parser-algorithms](https://github.com/csstools/postcss-plugins) - 3.0.5
+- [@csstools/css-tokenizer](https://github.com/csstools/postcss-plugins) - 3.0.4
+- [@csstools/css-parser-algorithms](https://github.com/csstools/postcss-plugins) - 3.0.5
+- [@csstools/css-tokenizer](https://github.com/csstools/postcss-plugins) - 3.0.4
+- [@csstools/css-tokenizer](https://github.com/csstools/postcss-plugins) - 3.0.4
+- [rrweb-cssom]() - 0.8.0
+- [data-urls]() - 5.0.0
+- [whatwg-mimetype]() - 4.0.0
+- [whatwg-url]() - 14.2.0
+- [decimal.js](https://github.com/MikeMcl/decimal.js) - 10.6.0
+- [html-encoding-sniffer]() - 4.0.0
+- [whatwg-encoding]() - 3.1.1
+- [http-proxy-agent](https://github.com/TooTallNate/proxy-agents) - 7.0.2
+- [agent-base](https://github.com/TooTallNate/proxy-agents) - 7.1.4
+- [debug](git://github.com/debug-js/debug) - 4.4.1
+- [https-proxy-agent](https://github.com/TooTallNate/proxy-agents) - 7.0.6
+- [agent-base](https://github.com/TooTallNate/proxy-agents) - 7.1.4
+- [debug](git://github.com/debug-js/debug) - 4.4.1
+- [is-potential-custom-element-name](https://github.com/mathiasbynens/is-potential-custom-element-name) - 1.0.1
+- [nwsapi](git://github.com/dperini/nwsapi) - 2.2.20
+- [parse5](git://github.com/inikulin/parse5) - 7.3.0
+- [rrweb-cssom]() - 0.8.0
+- [xmlchars]() - 2.2.0
+- [symbol-tree](https://github.com/jsdom/js-symbol-tree) - 3.2.4
+- [tldts](ssh://git@github.com/remusao/tldts) - 6.1.86
+- [tldts-core](ssh://git@github.com/remusao/tldts) - 6.1.86
+- [w3c-xmlserializer]() - 5.0.0
+- [whatwg-encoding]() - 3.1.1
+- [iconv-lite](git://github.com/ashtuchkin/iconv-lite) - 0.6.3
+- [safer-buffer](https://github.com/ChALkeR/safer-buffer) - 2.1.2
+- [whatwg-mimetype]() - 4.0.0
+- [whatwg-url]() - 14.2.0
+- [tr46]() - 5.1.1
+- [punycode](https://github.com/mathiasbynens/punycode.js) - 2.3.1
+- [ws](https://github.com/websockets/ws) - 8.18.3
 - [marked](git://github.com/markedjs/marked) - 16.1.1
 - [prettier-plugin-svelte](https://github.com/sveltejs/prettier-plugin-svelte) - 3.4.0
 - [prettier]() - 3.6.2
-- [runed](https://github.com/svecosystem/runed) - 0.31.0
-- [storybook](https://github.com/storybookjs/storybook) - 9.0.17
-- [svelte-awesome-color-picker](https://github.com/Ennoriel/svelte-awesome-color-picker) - 4.0.2
-- [svelte-check](https://github.com/sveltejs/language-tools) - 4.3.0
-- [svelte-i18n]() - 4.0.1
-- [svelte-sonner](https://github.com/wobsoriano/svelte-sonner) - 1.0.5
 - [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [prettier]() - 3.6.2
+- [runed](https://github.com/svecosystem/runed) - 0.31.0
+- [esm-env](https://github.com/benmccann/esm-env) - 1.2.2
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [storybook](https://github.com/storybookjs/storybook) - 9.0.17
+- [@storybook/global]() - 5.0.0
+- [@testing-library/jest-dom](https://github.com/testing-library/jest-dom) - 6.6.3
+- [@adobe/css-tools](https://github.com/adobe/css-tools) - 4.4.3
+- [chalk]() - 3.0.0
+- [ansi-styles]() - 4.3.0
+- [supports-color]() - 7.2.0
+- [css.escape](https://github.com/mathiasbynens/CSS.escape) - 1.5.1
+- [dom-accessibility-api](https://github.com/eps1lon/dom-accessibility-api) - 0.6.3
+- [lodash]() - 4.17.21
+- [redent]() - 3.0.0
+- [indent-string]() - 4.0.0
+- [strip-indent]() - 3.0.0
+- [min-indent]() - 1.0.1
+- [@testing-library/user-event](https://github.com/testing-library/user-event) - 14.6.1
+- [@testing-library/dom](https://github.com/testing-library/dom-testing-library) - 10.4.0
+- [@babel/code-frame](https://github.com/babel/babel) - 7.27.1
+- [@babel/helper-validator-identifier](https://github.com/babel/babel) - 7.27.1
+- [js-tokens]() - 4.0.0
+- [@babel/runtime](https://github.com/babel/babel) - 7.27.6
+- [@types/aria-query](https://github.com/DefinitelyTyped/DefinitelyTyped) - 5.0.4
+- [dequal]() - 2.0.3
+- [chalk]() - 4.1.2
+- [dom-accessibility-api](https://github.com/eps1lon/dom-accessibility-api) - 0.5.16
+- [lz-string](https://github.com/pieroxy/lz-string) - 1.5.0
+- [pretty-format](https://github.com/facebook/jest) - 27.5.1
+- [ansi-regex]() - 5.0.1
+- [ansi-styles]() - 5.2.0
+- [react-is](https://github.com/facebook/react) - 17.0.2
+- [@vitest/expect](https://github.com/vitest-dev/vitest) - 3.2.4
+- [@types/chai](https://github.com/DefinitelyTyped/DefinitelyTyped) - 5.2.2
+- [@types/deep-eql](https://github.com/DefinitelyTyped/DefinitelyTyped) - 4.0.2
+- [@vitest/spy](https://github.com/vitest-dev/vitest) - 3.2.4
+- [@vitest/utils](https://github.com/vitest-dev/vitest) - 3.2.4
+- [@vitest/pretty-format](https://github.com/vitest-dev/vitest) - 3.2.4
+- [tinyrainbow](https://github.com/tinylibs/tinyrainbow) - 2.0.0
+- [loupe](https://github.com/chaijs/loupe) - 3.1.4
+- [tinyrainbow](https://github.com/tinylibs/tinyrainbow) - 2.0.0
+- [chai](https://github.com/chaijs/chai) - 5.2.1
+- [assertion-error](git@github.com:chaijs/assertion-error) - 2.0.1
+- [check-error](ssh://git@github.com/chaijs/check-error) - 2.1.1
+- [deep-eql](git@github.com:chaijs/deep-eql) - 5.0.2
+- [loupe](https://github.com/chaijs/loupe) - 3.1.4
+- [pathval](ssh://git@github.com/chaijs/pathval) - 2.0.1
+- [tinyrainbow](https://github.com/tinylibs/tinyrainbow) - 2.0.0
+- [@vitest/spy](https://github.com/vitest-dev/vitest) - 3.2.4
+- [tinyspy](https://github.com/tinylibs/tinyspy) - 4.0.3
+- [better-opn](https://github.com/ExiaSR/better-opn) - 3.0.2
+- [open]() - 8.4.2
+- [define-lazy-prop]() - 2.0.0
+- [is-docker]() - 2.2.1
+- [is-wsl]() - 2.2.0
+- [is-docker]() - 2.2.1
+- [esbuild-register]() - 3.6.0
+- [debug](git://github.com/debug-js/debug) - 4.4.1
+- [esbuild](https://github.com/evanw/esbuild) - 0.25.8
+- [esbuild](https://github.com/evanw/esbuild) - 0.25.8
+- [@esbuild/win32-x64](https://github.com/evanw/esbuild) - 0.25.8
+- [prettier]() - 3.6.2
+- [recast](git://github.com/benjamn/recast) - 0.23.11
+- [ast-types](git://github.com/benjamn/ast-types) - 0.16.1
+- [tiny-invariant](https://github.com/alexreardon/tiny-invariant) - 1.3.3
+- [ws](https://github.com/websockets/ws) - 8.18.3
+- [svelte-awesome-color-picker](https://github.com/Ennoriel/svelte-awesome-color-picker) - 4.0.2
+- [colord]() - 2.9.3
+- [svelte-awesome-slider](https://github.com/Ennoriel/svelte-awesome-slider) - 2.0.0
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [svelte-check](https://github.com/sveltejs/language-tools) - 4.3.0
+- [@jridgewell/trace-mapping](https://github.com/jridgewell/sourcemaps) - 0.3.29
+- [@jridgewell/resolve-uri]() - 3.1.2
+- [@jridgewell/sourcemap-codec](https://github.com/jridgewell/sourcemaps) - 1.5.4
+- [chokidar](https://github.com/paulmillr/chokidar) - 4.0.3
+- [readdirp](git://github.com/paulmillr/readdirp) - 4.1.2
+- [fdir](https://github.com/thecodrr/fdir) - 6.4.6
+- [picomatch]() - 4.0.3
+- [sade]() - 1.8.1
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [svelte-i18n]() - 4.0.1
+- [es6-iterator](git://github.com/medikoo/es6-iterator) - 2.0.3
+- [event-emitter](git://github.com/medikoo/event-emitter) - 0.3.5
+- [es6-iterator](git://github.com/medikoo/es6-iterator) - 2.0.3
+- [es6-iterator](git://github.com/medikoo/es6-iterator) - 2.0.3
+- [event-emitter](git://github.com/medikoo/event-emitter) - 0.3.5
+- [is-promise](https://github.com/then/is-promise) - 2.2.2
+- [lru-queue](git://github.com/medikoo/lru-queue) - 0.1.0
+- [deepmerge](git://github.com/TehShrike/deepmerge) - 4.3.1
+- [esbuild](https://github.com/evanw/esbuild) - 0.25.8
+- [estree-walker](https://github.com/Rich-Harris/estree-walker) - 2.0.2
+- [@formatjs/ecma402-abstract]() - 2.3.4
+- [@formatjs/fast-memoize]() - 2.2.7
+- [@formatjs/intl-localematcher]() - 0.6.1
+- [decimal.js](https://github.com/MikeMcl/decimal.js) - 10.6.0
+- [@formatjs/fast-memoize]() - 2.2.7
+- [@formatjs/icu-messageformat-parser](https://github.com/formatjs/formatjs) - 2.11.2
+- [@formatjs/ecma402-abstract]() - 2.3.4
+- [@formatjs/icu-skeleton-parser](https://github.com/formatjs/formatjs) - 1.8.14
+- [@formatjs/ecma402-abstract]() - 2.3.4
+- [sade]() - 1.8.1
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [tiny-glob]() - 0.2.9
+- [globalyzer](https://github.com/terkelg/globalyzer) - 0.1.0
+- [globrex](https://github.com/terkelg/globrex) - 0.1.2
+- [svelte-sonner](https://github.com/wobsoriano/svelte-sonner) - 1.0.5
+- [runed](https://github.com/svecosystem/runed) - 0.28.0
+- [esm-env](https://github.com/benmccann/esm-env) - 1.2.2
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [@jridgewell/gen-mapping](https://github.com/jridgewell/sourcemaps) - 0.3.12
+- [@jridgewell/sourcemap-codec](https://github.com/jridgewell/sourcemaps) - 1.5.4
+- [@jridgewell/trace-mapping](https://github.com/jridgewell/sourcemaps) - 0.3.29
+- [@jridgewell/trace-mapping](https://github.com/jridgewell/sourcemaps) - 0.3.29
+- [@jridgewell/sourcemap-codec](https://github.com/jridgewell/sourcemaps) - 1.5.4
+- [@sveltejs/acorn-typescript](https://github.com/sveltejs/acorn-typescript) - 1.0.5
+- [@types/estree](https://github.com/DefinitelyTyped/DefinitelyTyped) - 1.0.8
+- [acorn](https://github.com/acornjs/acorn) - 8.15.0
+- [clsx]() - 2.1.1
+- [esm-env](https://github.com/benmccann/esm-env) - 1.2.2
+- [esrap](https://github.com/sveltejs/esrap) - 2.1.0
+- [@jridgewell/sourcemap-codec](https://github.com/jridgewell/sourcemaps) - 1.5.4
+- [is-reference](https://github.com/Rich-Harris/is-reference) - 3.0.3
+- [@types/estree](https://github.com/DefinitelyTyped/DefinitelyTyped) - 1.0.8
+- [locate-character](https://gitlab.com/Rich-Harris/locate-character) - 3.0.0
+- [magic-string]() - 0.30.17
+- [zimmerframe](https://github.com/Rich-Harris/zimmerframe) - 1.1.2
 - [tilepad-display]() - 1.0.0
 - [esbuild](https://github.com/evanw/esbuild) - 0.25.8
 - [tilepad-inspector]() - 1.0.0
 - [esbuild](https://github.com/evanw/esbuild) - 0.25.8
 - [typescript-eslint](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/eslint-plugin](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/parser](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/scope-manager](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/types](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/typescript-estree](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/visitor-keys](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [debug](git://github.com/debug-js/debug) - 4.4.1
+- [eslint]() - 9.31.0
+- [@typescript-eslint/typescript-estree](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/project-service](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/tsconfig-utils](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/types](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [debug](git://github.com/debug-js/debug) - 4.4.1
+- [@typescript-eslint/tsconfig-utils](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/types](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [@typescript-eslint/visitor-keys](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [debug](git://github.com/debug-js/debug) - 4.4.1
+- [fast-glob]() - 3.3.3
+- [@nodelib/fs.stat]() - 2.0.5
+- [@nodelib/fs.walk]() - 1.2.8
+- [@nodelib/fs.scandir]() - 2.1.5
+- [@nodelib/fs.stat]() - 2.0.5
+- [run-parallel](git://github.com/feross/run-parallel) - 1.2.0
+- [queue-microtask](git://github.com/feross/queue-microtask) - 1.2.3
+- [reusify](https://github.com/mcollina/reusify) - 1.1.0
+- [is-glob]() - 4.0.3
+- [merge2](git@github.com:teambition/merge2) - 1.4.1
+- [micromatch]() - 4.0.8
+- [braces]() - 3.0.3
+- [fill-range]() - 7.1.1
+- [to-regex-range]() - 5.0.1
+- [is-number]() - 7.0.0
+- [picomatch]() - 2.3.1
+- [is-glob]() - 4.0.3
+- [brace-expansion](git://github.com/juliangruber/brace-expansion) - 2.0.2
+- [balanced-match](git://github.com/juliangruber/balanced-match) - 1.0.2
+- [ts-api-utils](https://github.com/JoshuaKGoldberg/ts-api-utils) - 2.1.0
+- [@typescript-eslint/utils](https://github.com/typescript-eslint/typescript-eslint) - 8.37.0
+- [eslint]() - 9.31.0
 - [unplugin-icons](https://github.com/unplugin/unplugin-icons) - 22.1.0
+- [@antfu/install-pkg](https://github.com/antfu/install-pkg) - 1.1.0
+- [package-manager-detector](https://github.com/antfu-collective/package-manager-detector) - 1.3.0
+- [tinyexec](https://github.com/tinylibs/tinyexec) - 1.0.1
+- [@iconify/utils](https://github.com/iconify/iconify) - 2.3.0
+- [@antfu/install-pkg](https://github.com/antfu/install-pkg) - 1.1.0
+- [@antfu/utils](https://github.com/antfu/utils) - 8.1.1
+- [@iconify/types](https://github.com/iconify/iconify) - 2.0.0
+- [debug](git://github.com/debug-js/debug) - 4.4.1
+- [globals]() - 15.15.0
+- [kolorist](https://github.com/marvinhagemeister/kolorist) - 1.8.0
+- [local-pkg](https://github.com/antfu/local-pkg) - 1.1.1
+- [mlly]() - 1.7.4
+- [acorn](https://github.com/acornjs/acorn) - 8.15.0
+- [pathe]() - 2.0.3
+- [pkg-types]() - 1.3.1
+- [confbox]() - 0.1.8
+- [mlly]() - 1.7.4
+- [pathe]() - 2.0.3
+- [ufo]() - 1.6.1
+- [debug](git://github.com/debug-js/debug) - 4.4.1
+- [local-pkg](https://github.com/antfu/local-pkg) - 1.1.1
+- [mlly]() - 1.7.4
+- [pkg-types]() - 2.2.0
+- [confbox]() - 0.2.2
+- [exsolve]() - 1.0.7
+- [pathe]() - 2.0.3
+- [quansync](https://github.com/quansync-dev/quansync) - 0.2.10
+- [svelte](https://github.com/sveltejs/svelte) - 5.36.12
+- [unplugin](https://github.com/unjs/unplugin) - 2.3.5
+- [acorn](https://github.com/acornjs/acorn) - 8.15.0
+- [picomatch]() - 4.0.3
+- [webpack-virtual-modules](https://github.com/sysgears/webpack-virtual-modules) - 0.6.2
 - [vite](https://github.com/vitejs/vite) - 6.3.5
+- [esbuild](https://github.com/evanw/esbuild) - 0.25.8
+- [fdir](https://github.com/thecodrr/fdir) - 6.4.6
+- [picomatch]() - 4.0.3
+- [picomatch]() - 4.0.3
+- [postcss]() - 8.5.6
+- [rollup]() - 4.45.1
+- [@rollup/rollup-win32-x64-msvc]() - 4.45.1
+- [@types/estree](https://github.com/DefinitelyTyped/DefinitelyTyped) - 1.0.8
+- [tinyglobby](https://github.com/SuperchupuDev/tinyglobby) - 0.2.14
+- [fdir](https://github.com/thecodrr/fdir) - 6.4.6
+- [picomatch]() - 4.0.3
+- [picomatch]() - 4.0.3
 - [ashpd](https://github.com/bilelmoussaoui/ashpd) - 0.11.0
 - [async_zip](https://github.com/Majored/rs-async-zip) - 0.0.17
 - [atk](https://github.com/gtk-rs/gtk3-rs) - 0.18.2
@@ -281,10 +796,90 @@ This page lists the licenses of third party dependencies used by this project
 
 ---
 
+## (MIT OR CC0-1.0)
+
+- [type-fest]() - 2.19.0
+- [type-fest]() - 2.19.0
+
+---
+
+## 0BSD
+
+- [tslib](https://github.com/Microsoft/tslib) - 2.8.1
+- [tslib](https://github.com/Microsoft/tslib) - 2.8.1
+- [tslib](https://github.com/Microsoft/tslib) - 2.8.1
+- [tslib](https://github.com/Microsoft/tslib) - 2.8.1
+- [tslib](https://github.com/Microsoft/tslib) - 2.8.1
+- [tslib](https://github.com/Microsoft/tslib) - 2.8.1
+- [tslib](https://github.com/Microsoft/tslib) - 2.8.1
+- [tslib](https://github.com/Microsoft/tslib) - 2.8.1
+- [tslib](https://github.com/Microsoft/tslib) - 2.8.1
+- [tslib](https://github.com/Microsoft/tslib) - 2.8.1
+- [tslib](https://github.com/Microsoft/tslib) - 2.8.1
+- [tslib](https://github.com/Microsoft/tslib) - 2.8.1
+
+---
+
+## Apache-2.0
+
+- [typescript](https://github.com/microsoft/TypeScript) - 5.8.3
+- [typescript](https://github.com/microsoft/TypeScript) - 5.8.3
+- [typescript](https://github.com/microsoft/TypeScript) - 5.8.3
+- [@internationalized/date](https://github.com/adobe/react-spectrum/tree/main/packages/@internationalized/date) - 3.8.2
+- [@swc/helpers](https://github.com/swc-project/swc) - 0.5.17
+- [eslint-visitor-keys]() - 3.4.3
+- [eslint-visitor-keys](https://github.com/eslint/js) - 4.2.1
+- [typescript](https://github.com/microsoft/TypeScript) - 5.8.3
+- [eslint-visitor-keys](https://github.com/eslint/js) - 4.2.1
+- [typescript](https://github.com/microsoft/TypeScript) - 5.8.3
+- [typescript](https://github.com/microsoft/TypeScript) - 5.8.3
+- [@eslint/config-array](https://github.com/eslint/rewrite) - 0.21.0
+- [@eslint/object-schema](https://github.com/eslint/rewrite) - 2.1.6
+- [@eslint/config-helpers](https://github.com/eslint/rewrite) - 0.3.0
+- [@eslint/core](https://github.com/eslint/rewrite) - 0.15.1
+- [@eslint/plugin-kit](https://github.com/eslint/rewrite) - 0.3.3
+- [@eslint/core](https://github.com/eslint/rewrite) - 0.15.1
+- [@humanfs/node](https://github.com/humanwhocodes/humanfs) - 0.16.6
+- [@humanfs/core](https://github.com/humanwhocodes/humanfs) - 0.19.1
+- [@humanwhocodes/retry](https://github.com/humanwhocodes/retry) - 0.3.1
+- [@humanwhocodes/module-importer](https://github.com/humanwhocodes/module-importer) - 1.0.1
+- [@humanwhocodes/retry](https://github.com/humanwhocodes/retry) - 0.4.3
+- [eslint-visitor-keys](https://github.com/eslint/js) - 4.2.1
+- [eslint-visitor-keys](https://github.com/eslint/js) - 4.2.1
+- [xml-name-validator]() - 5.0.0
+- [xml-name-validator]() - 5.0.0
+- [aria-query](https://github.com/A11yance/aria-query) - 5.3.2
+- [aria-query](https://github.com/A11yance/aria-query) - 5.3.0
+- [typescript](https://github.com/microsoft/TypeScript) - 5.8.3
+- [@ampproject/remapping](https://github.com/ampproject/remapping) - 2.3.0
+- [aria-query](https://github.com/A11yance/aria-query) - 5.3.2
+- [axobject-query](https://github.com/A11yance/axobject-query) - 4.1.0
+- [typescript](https://github.com/microsoft/TypeScript) - 5.8.3
+- [typescript](https://github.com/microsoft/TypeScript) - 5.8.3
+- [typescript](https://github.com/microsoft/TypeScript) - 5.8.3
+- [typescript](https://github.com/microsoft/TypeScript) - 5.8.3
+- [typescript](https://github.com/microsoft/TypeScript) - 5.8.3
+- [typescript](https://github.com/microsoft/TypeScript) - 5.8.3
+- [gethostname](https://github.com/swsnr/gethostname.rs.git) - 0.4.3
+- [miette](https://github.com/zkat/miette) - 7.6.0
+- [miette-derive](https://github.com/zkat/miette) - 7.6.0
+- [node-semver](https://github.com/felipesere/node-semver-rs) - 2.2.0
+- [openssl](https://github.com/sfackler/rust-openssl) - 0.10.73
+- [phonenumber](https://github.com/whisperfish/rust-phonenumber) - 0.3.7+8.13.52
+- [sync_wrapper](https://github.com/Actyx/sync_wrapper) - 1.0.2
+- [tao](https://github.com/tauri-apps/tao) - 0.33.0
+
+---
+
 ## Apache-2.0 OR MIT
 
 - [@tauri-apps/api](https://github.com/tauri-apps/tauri) - 2.7.0
 - [@tauri-apps/cli](https://github.com/tauri-apps/tauri) - 2.7.0
+- [@tauri-apps/cli-win32-x64-msvc](https://github.com/tauri-apps/tauri) - 2.7.0
+- [@tauri-apps/api](https://github.com/tauri-apps/tauri) - 2.7.0
+- [@tauri-apps/api](https://github.com/tauri-apps/tauri) - 2.7.0
+- [@tauri-apps/api](https://github.com/tauri-apps/tauri) - 2.7.0
+- [@tauri-apps/api](https://github.com/tauri-apps/tauri) - 2.7.0
 - [addr2line](https://github.com/gimli-rs/addr2line) - 0.24.2
 - [aead](https://github.com/RustCrypto/traits) - 0.5.2
 - [allocator-api2](https://github.com/zakarumych/allocator-api2) - 0.2.21
@@ -724,26 +1319,127 @@ This page lists the licenses of third party dependencies used by this project
 
 ---
 
+## Unknown
+
+- [svelte-toolbelt]() - 0.9.3
+- [dlopen2_derive](https://github.com/OpenByteDev/dlopen2) - 0.4.1
+
+---
+
+## BSD-2-Clause
+
+- [esutils](http://github.com/estools/esutils) - 2.0.3
+- [eslint-scope](https://github.com/eslint/js) - 8.4.0
+- [espree](https://github.com/eslint/js) - 10.4.0
+- [espree](https://github.com/eslint/js) - 10.4.0
+- [uri-js](http://github.com/garycourt/uri-js) - 4.4.1
+- [eslint-scope](https://github.com/eslint/js) - 8.4.0
+- [esrecurse](https://github.com/estools/esrecurse) - 4.3.0
+- [estraverse](http://github.com/estools/estraverse) - 5.3.0
+- [estraverse](http://github.com/estools/estraverse) - 5.3.0
+- [espree](https://github.com/eslint/js) - 10.4.0
+- [estraverse](http://github.com/estools/estraverse) - 5.3.0
+- [esutils](http://github.com/estools/esutils) - 2.0.3
+- [entities](git://github.com/fb55/entities) - 6.0.1
+- [webidl-conversions]() - 7.0.0
+- [webidl-conversions]() - 7.0.0
+- [esprima](https://github.com/jquery/esprima) - 4.0.1
+
+---
+
 ## ISC
 
+- [yaml]() - 1.10.2
+- [picocolors]() - 1.1.1
+- [semver](https://github.com/npm/node-semver) - 7.7.2
+- [minimatch](git://github.com/isaacs/minimatch) - 3.1.2
+- [minimatch](git://github.com/isaacs/minimatch) - 3.1.2
+- [which](git://github.com/isaacs/node-which) - 2.0.2
+- [isexe](https://github.com/isaacs/isexe) - 2.0.0
+- [flatted](https://github.com/WebReflection/flatted) - 3.3.3
+- [glob-parent]() - 6.0.2
+- [minimatch](git://github.com/isaacs/minimatch) - 3.1.2
+- [lru-cache](git://github.com/isaacs/node-lru-cache) - 10.4.3
+- [saxes]() - 6.0.0
 - [semver-ts](https://github.com/tomchen/semver-ts) - 1.0.3
+- [picocolors]() - 1.1.1
+- [semver](https://github.com/npm/node-semver) - 7.7.2
+- [picocolors]() - 1.1.1
+- [cli-color]() - 2.0.4
+- [d]() - 1.0.2
+- [es5-ext]() - 0.10.64
+- [type]() - 2.7.3
+- [es5-ext]() - 0.10.64
+- [es6-symbol]() - 3.1.4
+- [d]() - 1.0.2
+- [ext](https://github.com/medikoo/es5-ext#ext) - 1.7.0
+- [type]() - 2.7.3
+- [esniff]() - 2.0.1
+- [d]() - 1.0.2
+- [es5-ext]() - 0.10.64
+- [type]() - 2.7.3
+- [next-tick](git://github.com/medikoo/next-tick) - 1.1.0
+- [d]() - 1.0.2
+- [es5-ext]() - 0.10.64
+- [es6-symbol]() - 3.1.4
+- [memoizee]() - 0.4.17
+- [d]() - 1.0.2
+- [es5-ext]() - 0.10.64
+- [es6-weak-map](git://github.com/medikoo/es6-weak-map) - 2.0.3
+- [d]() - 1.0.2
+- [es5-ext]() - 0.10.64
+- [es6-symbol]() - 3.1.4
+- [d]() - 1.0.2
+- [es5-ext]() - 0.10.64
+- [es5-ext]() - 0.10.64
+- [next-tick](git://github.com/medikoo/next-tick) - 1.1.0
+- [timers-ext]() - 0.1.8
+- [timers-ext]() - 0.1.8
+- [es5-ext]() - 0.10.64
+- [next-tick](git://github.com/medikoo/next-tick) - 1.1.0
+- [fastq](https://github.com/mcollina/fastq) - 1.19.1
+- [glob-parent]() - 5.1.2
+- [minimatch](git://github.com/isaacs/minimatch) - 9.0.5
+- [semver](https://github.com/npm/node-semver) - 7.7.2
+- [yaml]() - 2.8.0
 - [libloading](https://github.com/nagisa/rust_libloading/) - 0.7.4
 - [rustls-webpki](https://github.com/rustls/webpki) - 0.103.3
 - [untrusted](https://github.com/briansmith/untrusted) - 0.9.0
 
 ---
 
-## Apache-2.0
+## BSD-3-Clause
 
-- [typescript](https://github.com/microsoft/TypeScript) - 5.8.3
-- [gethostname](https://github.com/swsnr/gethostname.rs.git) - 0.4.3
-- [miette](https://github.com/zkat/miette) - 7.6.0
-- [miette-derive](https://github.com/zkat/miette) - 7.6.0
-- [node-semver](https://github.com/felipesere/node-semver-rs) - 2.2.0
-- [openssl](https://github.com/sfackler/rust-openssl) - 0.10.73
-- [phonenumber](https://github.com/whisperfish/rust-phonenumber) - 0.3.7+8.13.52
-- [sync_wrapper](https://github.com/Actyx/sync_wrapper) - 1.0.2
-- [tao](https://github.com/tauri-apps/tao) - 0.33.0
+- [source-map-js]() - 1.2.1
+- [esquery](https://github.com/estools/esquery) - 1.6.0
+- [tough-cookie](git://github.com/salesforce/tough-cookie) - 5.1.2
+- [source-map](http://github.com/mozilla/source-map) - 0.6.1
+- [intl-messageformat]() - 10.7.16
+- [alloc-no-stdlib](https://github.com/dropbox/rust-alloc-no-stdlib) - 2.0.4
+- [alloc-stdlib](https://github.com/dropbox/rust-alloc-no-stdlib) - 0.2.2
+- [curve25519-dalek](https://github.com/dalek-cryptography/curve25519-dalek/tree/main/curve25519-dalek) - 4.1.3
+- [neli](https://github.com/jbaublitz/neli) - 0.6.5
+- [neli-proc-macros](https://github.com/jbaublitz/neli) - 0.1.4
+- [subtle](https://github.com/dalek-cryptography/subtle) - 2.6.1
+- [x25519-dalek](https://github.com/dalek-cryptography/curve25519-dalek/tree/main/x25519-dalek) - 2.0.1
+
+---
+
+## Python-2.0
+
+- [argparse]() - 2.0.1
+
+---
+
+## (MPL-2.0 OR Apache-2.0)
+
+- [dompurify](git://github.com/cure53/DOMPurify) - 3.2.6
+
+---
+
+## MIT-0
+
+- [@csstools/color-helpers](https://github.com/csstools/postcss-plugins) - 5.0.2
 
 ---
 
@@ -763,18 +1459,6 @@ This page lists the licenses of third party dependencies used by this project
 - [same-file](https://github.com/BurntSushi/same-file) - 1.0.6
 - [walkdir](https://github.com/BurntSushi/walkdir) - 2.5.0
 - [winapi-util](https://github.com/BurntSushi/winapi-util) - 0.1.9
-
----
-
-## BSD-3-Clause
-
-- [alloc-no-stdlib](https://github.com/dropbox/rust-alloc-no-stdlib) - 2.0.4
-- [alloc-stdlib](https://github.com/dropbox/rust-alloc-no-stdlib) - 0.2.2
-- [curve25519-dalek](https://github.com/dalek-cryptography/curve25519-dalek/tree/main/curve25519-dalek) - 4.1.3
-- [neli](https://github.com/jbaublitz/neli) - 0.6.5
-- [neli-proc-macros](https://github.com/jbaublitz/neli) - 0.1.4
-- [subtle](https://github.com/dalek-cryptography/subtle) - 2.6.1
-- [x25519-dalek](https://github.com/dalek-cryptography/curve25519-dalek/tree/main/x25519-dalek) - 2.0.1
 
 ---
 
@@ -832,12 +1516,6 @@ This page lists the licenses of third party dependencies used by this project
 - [option-ext](https://github.com/soc/option-ext.git) - 0.2.0
 - [selectors](https://github.com/servo/servo) - 0.22.0
 - [thin-slice](https://github.com/heycam/thin-slice) - 0.1.1
-
----
-
-## Unknown
-
-- [dlopen2_derive](https://github.com/OpenByteDev/dlopen2) - 0.4.1
 
 ---
 
