@@ -28,6 +28,7 @@
   import ToggleButton from "../input/ToggleButton.svelte";
   import FontSelector from "../fonts/FontSelector.svelte";
   import PopoverButton from "../popover/PopoverButton.svelte";
+
   type Props = {
     tileId: TileId;
     config: TileConfig;
