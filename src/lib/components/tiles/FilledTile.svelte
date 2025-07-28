@@ -383,6 +383,7 @@
       onResize: considerResizeDiagonalRightTop,
     }}
   ></span>
+
   <span
     class="handle handle--corner handle--corner-bottom-right"
     use:resizeHandle={{
