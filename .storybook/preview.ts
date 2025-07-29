@@ -1,5 +1,7 @@
 import type { Preview } from "@storybook/sveltekit";
 
+import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
+
 import RootLayout from "../src/lib/layouts/RootLayout.svelte";
 import I18nProvider from "../src/lib/components/i18n/I18nProvider.svelte";
 
@@ -18,6 +20,12 @@ const preview: Preview = {
       Component: I18nProvider,
       props: {
         locale: "en",
+      },
+    }),
+    () => ({
+      Component: QueryClientProvider,
+      props: {
+        client: new QueryClient(),
       },
     }),
   ],

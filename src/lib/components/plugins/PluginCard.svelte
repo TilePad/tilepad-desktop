@@ -1,36 +1,49 @@
 <script lang="ts">
+  import type { PluginId, PluginTaskState } from "$lib/api/types/plugin";
   import type { PluginRegistryEntry } from "$lib/api/types/plugins_registry";
-  import type { PluginManifest, PluginWithState } from "$lib/api/types/plugin";
 
   import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import SolarRefreshLinear from "~icons/solar/refresh-linear";
   import { createUpdatePlugin } from "$lib/api/plugins_registry";
-  import { reloadPlugin, createUninstallPlugin } from "$lib/api/plugins";
+  import { reloadPlugin } from "$lib/api/plugins/plugins.requests";
+  import { createUninstallPlugin } from "$lib/api/plugins/plugins.mutations";
 
   import Button from "../input/Button.svelte";
-  import { getSettingsContext } from "../SettingsProvider.svelte";
 
   type Props = {
-    plugin: PluginWithState;
-    latestManifest?: {
-      manifest: PluginManifest;
+    id: PluginId;
+    name: string;
+    description: string | null;
+    version: string;
+    internal: boolean;
+    authors: string[];
+    state: PluginTaskState;
+    latestVersion?: {
+      version: string;
       remotePlugin: PluginRegistryEntry;
     };
+    developerMode?: boolean;
   };
 
-  const { plugin, latestManifest }: Props = $props();
-  const { manifest, state } = plugin;
-
-  const settingsContext = getSettingsContext();
-  const settings = $derived.by(settingsContext.settings);
+  const {
+    id,
+    name,
+    description,
+    version,
+    internal,
+    authors,
+    state,
+    latestVersion,
+    developerMode,
+  }: Props = $props();
 
   const uninstall = createUninstallPlugin();
   const update = createUpdatePlugin();
 
   function handleReload() {
-    const reloadPromise = reloadPlugin(manifest.plugin.id);
+    const reloadPromise = reloadPlugin(id);
 
     toast.promise(reloadPromise, {
       loading: $t("plugin_reloading"),
@@ -41,7 +54,7 @@
 
   function handleUninstall() {
     const uninstallPromise = $uninstall.mutateAsync({
-      pluginId: manifest.plugin.id,
+      pluginId: id,
     });
 
     toast.promise(uninstallPromise, {
@@ -52,12 +65,12 @@
   }
 
   async function handleUpdate() {
-    if (!latestManifest) return;
+    if (!latestVersion) return;
 
     const updatePromise = $update.mutateAsync({
-      repo: latestManifest.remotePlugin.repo,
-      version: latestManifest.manifest.plugin.version,
-      pluginId: latestManifest.manifest.plugin.id,
+      repo: latestVersion.remotePlugin.repo,
+      version: latestVersion.version,
+      pluginId: id,
     });
     toast.promise(updatePromise, {
       loading: $t("plugin_updating"),
@@ -71,37 +84,39 @@
   <div class="head">
     <div class="head__text">
       <span class="version">
-        {manifest.plugin.version}
+        {version}
 
-        {#if latestManifest}
+        {#if latestVersion}
           <span class="version__new">
-            New: {latestManifest.manifest.plugin.version}
+            New: {latestVersion.version}
           </span>
         {/if}
       </span>
 
-      {#if settings.developer_mode && !manifest.plugin.internal}
+      {#if developerMode && !internal}
         <span class="state">{state}</span>
       {/if}
     </div>
   </div>
 
   <h2 class="name">
-    {manifest.plugin.name}
+    {name}
   </h2>
 
-  <p class="description">
-    {manifest.plugin.description}.
-  </p>
+  {#if description}
+    <p class="description">
+      {description}
+    </p>
+  {/if}
 
-  {#if manifest.plugin.authors.length > 0}
+  {#if authors.length > 0}
     <span class="authors">
-      By {manifest.plugin.authors.join(", ")}
+      By {authors.join(", ")}
     </span>
   {/if}
 
   <div class="actions">
-    {#if settings.developer_mode}
+    {#if developerMode}
       <Button
         variant="secondary"
         title={$t("Reload")}
@@ -112,7 +127,7 @@
       </Button>
     {/if}
 
-    {#if latestManifest}
+    {#if latestVersion}
       <Button
         variant="secondary"
         size="small"
@@ -124,7 +139,7 @@
       </Button>
     {/if}
 
-    {#if !plugin.manifest.plugin.internal}
+    {#if !internal}
       <Button
         variant="secondary"
         size="small"

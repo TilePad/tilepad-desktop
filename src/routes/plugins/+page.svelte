@@ -12,12 +12,16 @@
   import SolarShopBoldDuotone from "~icons/solar/shop-bold-duotone";
   import PluginCard from "$lib/components/plugins/PluginCard.svelte";
   import SkeletonList from "$lib/components/skeleton/SkeletonList.svelte";
+  import { getSettingsContext } from "$lib/components/SettingsProvider.svelte";
   import ManualImportPlugin from "$lib/components/plugins/ManualImportPlugin.svelte";
   import PluginsRegistryDialog from "$lib/components/plugins_registry/PluginsRegistryDialog.svelte";
   import {
     fetchPluginManifest,
     fetchPluginRegistry,
   } from "$lib/api/plugins_registry";
+
+  const settingsContext = getSettingsContext();
+  const settings = $derived.by(settingsContext.settings);
 
   const pluginsQuery = createPluginsQuery();
 
@@ -109,15 +113,30 @@
       <div class="plugins">
         {#each $pluginsQuery.data as plugin (plugin.manifest.plugin.id)}
           {#if !plugin.manifest.plugin.internal || import.meta.env.DEV}
+            {@const latestManifest = $checkUpdatesMutation.data?.find(
+              (entry) =>
+                entry.manifest.plugin.id === plugin.manifest.plugin.id &&
+                // Ignore if version already matches
+                entry.manifest.plugin.version !==
+                  plugin.manifest.plugin.version,
+            )}
+            {@const manifest = plugin.manifest.plugin}
+
             <PluginCard
-              {plugin}
-              latestManifest={$checkUpdatesMutation.data?.find(
-                (entry) =>
-                  entry.manifest.plugin.id === plugin.manifest.plugin.id &&
-                  // Ignore if version already matches
-                  entry.manifest.plugin.version !==
-                    plugin.manifest.plugin.version,
-              )}
+              id={manifest.id}
+              name={manifest.name}
+              description={manifest.description}
+              version={manifest.version}
+              internal={manifest.internal ?? false}
+              authors={manifest.authors}
+              state={plugin.state}
+              latestVersion={latestManifest
+                ? {
+                    version: latestManifest.manifest.plugin.version,
+                    remotePlugin: latestManifest.remotePlugin,
+                  }
+                : undefined}
+              developerMode={settings.developer_mode}
             />
           {/if}
         {:else}
