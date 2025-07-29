@@ -35,9 +35,9 @@
 </script>
 
 <Select.Root
+  bind:open
   allowDeselect={false}
   type="single"
-  onOpenChange={(value) => (open = value)}
   {value}
   onValueChange={(value) => onChangeValue(value)}
 >
