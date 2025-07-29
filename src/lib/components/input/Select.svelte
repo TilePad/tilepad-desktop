@@ -6,6 +6,8 @@
 </script>
 
 <script lang="ts">
+  import type { Snippet } from "svelte";
+
   import { Select } from "bits-ui";
   import { slide } from "svelte/transition";
   import DownArrow from "~icons/solar/alt-arrow-down-bold";
@@ -16,9 +18,16 @@
     value: string | null;
     onChangeValue: (value: string) => void;
     placeholder?: string;
+    item?: Snippet<[{ option: Option }]>;
   };
 
-  const { options, value, onChangeValue, placeholder }: Props = $props();
+  const {
+    options,
+    value,
+    onChangeValue,
+    placeholder,
+    item = defaultItem,
+  }: Props = $props();
 
   const currentOption = $derived(
     options.find((folder) => folder.value === value),
@@ -27,8 +36,8 @@
   let open = $state(false);
 </script>
 
-{#snippet item(folder: Option)}
-  <span>{folder.name} </span>
+{#snippet defaultItem({ option }: { option: Option })}
+  <span>{option.name}</span>
 {/snippet}
 
 <Select.Root
@@ -63,8 +72,8 @@
               class="content"
               transition:slide={{ duration: 100 }}
             >
-              {#each options as value (value.value)}
-                <Select.Item value={value.value} label={value.name}>
+              {#each options as option (option.value)}
+                <Select.Item value={option.value} label={option.name}>
                   {#snippet child({ props, selected, highlighted })}
                     <div
                       {...props}
@@ -72,7 +81,7 @@
                       class:item--selected={selected}
                       class:item--highlighted={highlighted}
                     >
-                      {@render item(value)}
+                      {@render item({ option })}
                     </div>
                   {/snippet}
                 </Select.Item>
@@ -137,5 +146,9 @@
 
   .wrapper[data-open="true"]:global(> .trigger > .trigger__icon) {
     transform: rotate(-180deg);
+  }
+
+  .content-wrapper {
+    z-index: 999 !important;
   }
 </style>

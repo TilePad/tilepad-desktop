@@ -16,6 +16,7 @@
 <Story
   name="Default"
   args={{
+    fonts: [],
     font: "Arial",
     onChangeFont: () => {},
 

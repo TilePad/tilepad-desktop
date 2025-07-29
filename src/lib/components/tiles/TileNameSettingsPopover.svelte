@@ -18,6 +18,7 @@
   import PopoverButton from "../popover/PopoverButton.svelte";
 
   type Props = {
+    fonts: string[];
     font: string;
     onChangeFont: (font: string) => void;
     //
@@ -47,6 +48,7 @@
   };
 
   const {
+    fonts,
     font,
     onChangeFont,
     //
@@ -82,7 +84,7 @@
       <SolarTextBoldDuotone width="1.5rem" height="1.5rem" />
 
       {#snippet content()}
-        <FontSelector value={font} onChangeValue={onChangeFont} />
+        <FontSelector {fonts} value={font} onChangeValue={onChangeFont} />
 
         <div>
           {$t("font_size")}

@@ -2,6 +2,7 @@
   import { t } from "svelte-i18n";
   import { watch, useDebounce } from "runed";
   import SolarEyeBold from "~icons/solar/eye-bold";
+  import { createFontsQuery } from "$lib/api/fonts";
   import SolarEyeClosedBold from "~icons/solar/eye-closed-bold";
   import { createUpdateTileLabelMutation } from "$lib/api/tiles";
   import {
@@ -24,6 +25,8 @@
 
   const { tileId, config }: Props = $props();
 
+  const fontsQuery = createFontsQuery();
+  const fonts = $derived($fontsQuery.data ?? []);
   const updateTileLabel = createUpdateTileLabelMutation();
 
   // Last persisted update
@@ -122,6 +125,7 @@
   </Tooltip>
 
   <TileNameSettingsPopover
+    {fonts}
     font={label.font}
     {onChangeFont}
     fontSize={label.font_size}
