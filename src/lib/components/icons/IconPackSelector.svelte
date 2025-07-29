@@ -40,7 +40,7 @@
       icons: item.icons.map((icon) => ({
         name: icon.name,
         path: icon.path,
-        src: getIconAssetPath(serverURL, item.manifest.icons.id, item.path),
+        src: getIconAssetPath(serverURL, item.manifest.icons.id, icon.path),
       })),
     })),
   );
