@@ -3,13 +3,13 @@
   import { toast } from "svelte-sonner";
   import { installIconPack } from "$lib/api/icons";
   import { toastErrorMessage } from "$lib/api/utils/error";
-  import SolarImportBoldDuotone from "~icons/solar/import-bold-duotone";
+  import ImportIcon from "~icons/solar/import-bold-duotone";
 
   import Button from "../input/Button.svelte";
 
   let inputElm: HTMLInputElement | undefined = $state();
 
-  async function onChangeFile() {
+  function onChangeFile() {
     if (!inputElm) return;
 
     const files = inputElm.files;
@@ -35,7 +35,7 @@
     inputElm?.click();
   }}
 >
-  <SolarImportBoldDuotone width="1.5rem" height="1.5rem" />
+  <ImportIcon width="1.5rem" height="1.5rem" />
   {$t("import_pack")}
 </Button>
 

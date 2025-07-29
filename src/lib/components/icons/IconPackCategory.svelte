@@ -1,17 +1,19 @@
 <script lang="ts">
-  import type { Icon, IconPack } from "$lib/api/types/icons";
+  import type { Icon } from "$lib/api/types/icons";
 
-  import SolarAltArrowDownOutline from "~icons/solar/alt-arrow-down-outline";
-  import SolarAltArrowRightOutline from "~icons/solar/alt-arrow-right-outline";
+  import ArrowDownIcon from "~icons/solar/alt-arrow-down-outline";
+  import ArrowRightIcon from "~icons/solar/alt-arrow-right-outline";
 
-  import IconsGrid from "./IconsGrid.svelte";
+  import IconsGrid, { type IconGridItem } from "./IconsGrid.svelte";
 
   type Props = {
-    pack: IconPack;
+    name: string;
+    icons: IconGridItem[];
+
     onClickIcon: (icon: Icon) => void;
   };
 
-  const { pack, onClickIcon }: Props = $props();
+  const { name, icons, onClickIcon }: Props = $props();
 
   let expanded = $state(false);
 
@@ -21,24 +23,18 @@
 <div class="section">
   <button class="header" onclick={onToggleCollapsed}>
     {#if expanded}
-      <SolarAltArrowDownOutline />
+      <ArrowDownIcon />
     {:else}
-      <SolarAltArrowRightOutline />
+      <ArrowRightIcon />
     {/if}
 
-    {pack.manifest.icons.name}
-    {pack.icons.length}
+    {name}
+    {icons.length}
   </button>
 
   {#if expanded}
     <div class="content">
-      <IconsGrid
-        {onClickIcon}
-        {pack}
-        items={pack.icons}
-        columns={6}
-        itemHeight={64}
-      />
+      <IconsGrid {onClickIcon} items={icons} columns={6} itemHeight={64} />
     </div>
   {/if}
 </div>

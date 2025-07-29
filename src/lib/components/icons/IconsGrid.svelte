@@ -1,24 +1,29 @@
-<script lang="ts">
-  import type { Icon, IconPack } from "$lib/api/types/icons";
+<script lang="ts" module>
+  export interface IconGridItem {
+    name: string;
+    path: string;
+    src: string;
+  }
+</script>
 
-  import { getIconAssetPath } from "$lib/api/utils/url";
+<script lang="ts">
   import { createVirtualizer } from "$lib/utils/virtualization.svelte";
 
-  import { getServerContext } from "../ServerProvider.svelte";
-
   type Props = {
-    pack: IconPack;
-    // Available items for the grid
-    items: Icon[];
+    /** Available items for the grid */
+    items: IconGridItem[];
     itemHeight: number;
     columns: number;
-    onClickIcon: (icon: Icon) => void;
+    onClickIcon: (icon: IconGridItem) => void;
   };
 
-  const { pack, items, itemHeight, columns, onClickIcon }: Props = $props();
+  type VirtualItem = {
+    index: number;
+    icon: IconGridItem;
+    style: string;
+  };
 
-  const serverContext = getServerContext();
-  const serverURL = $derived(serverContext.serverURL);
+  const { items, itemHeight, columns, onClickIcon }: Props = $props();
 
   let wrapper: HTMLDivElement | undefined = $state();
 
@@ -35,20 +40,21 @@
   // Compute width of each column (Percent)
   const columnWidth = $derived((1 / columns) * 100);
 
+  let styleCache: Record<number, string> = {};
+
   function getRowStyle(index: number) {
+    const cached = styleCache[index];
+    if (cached) return cached;
+
     const row = Math.floor(index / columns);
     const column = Math.floor(index % columns);
     const rowOffset = row * itemHeight;
     const columnOffset = column * columnWidth;
 
-    return `left:${columnOffset}%;width:${columnWidth}%;height:${itemHeight}px;transform:translateY(${rowOffset}px)`;
+    const style = `left:${columnOffset}%;width:${columnWidth}%;height:${itemHeight}px;transform:translateY(${rowOffset}px)`;
+    styleCache[index] = style;
+    return style;
   }
-
-  type VirtualItem = {
-    index: number;
-    icon: Icon;
-    style: string;
-  };
 
   const renderItems = $derived.by(() => {
     let renderItems: VirtualItem[] = [];
@@ -82,11 +88,7 @@
       >
         <img
           class="item__image"
-          src={getIconAssetPath(
-            serverURL,
-            pack.manifest.icons.id,
-            item.icon.path,
-          )}
+          src={item.icon.src}
           alt={item.icon.name}
           width="64px"
           height="64px"

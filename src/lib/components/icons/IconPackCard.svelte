@@ -1,50 +1,38 @@
 <script lang="ts">
-  import type { IconPack } from "$lib/api/types/icons";
-
   import { t } from "svelte-i18n";
-  import { toast } from "svelte-sonner";
-  import { uninstallIconPack } from "$lib/api/icons";
-  import { toastErrorMessage } from "$lib/api/utils/error";
 
   import Button from "../input/Button.svelte";
 
   type Props = {
-    pack: IconPack;
+    version: string;
+    name: string;
+    description: string | null;
+    authors: string[];
+    onUninstall: VoidFunction;
   };
 
-  const { pack }: Props = $props();
-  const manifest = $derived(pack.manifest);
-
-  function handleUninstall() {
-    const revokePromise = uninstallIconPack(manifest.icons.id);
-
-    toast.promise(revokePromise, {
-      loading: $t("icon_packs_uninstalling"),
-      success: $t("icon_packs_uninstalled"),
-      error: toastErrorMessage($t("icon_packs_uninstall_error")),
-    });
-  }
+  const { version, name, description, authors, onUninstall }: Props = $props();
 </script>
 
 <div class="card">
   <div class="head">
-    <span class="version">{manifest.icons.version}</span>
+    <span class="version">{version}</span>
   </div>
 
   <h2 class="name">
-    {manifest.icons.name}
+    {name}
   </h2>
 
-  <p class="description">{manifest.icons.description}</p>
+  <p class="description">{description}</p>
 
-  {#if manifest.icons.authors.length > 0}
+  {#if authors.length > 0}
     <span class="authors">
-      By {manifest.icons.authors.join(", ")}
+      By {authors.join(", ")}
     </span>
   {/if}
 
   <div class="actions">
-    <Button variant="secondary" size="small" onclick={handleUninstall}>
+    <Button variant="secondary" size="small" onclick={onUninstall}>
       {$t("uninstall")}
     </Button>
   </div>

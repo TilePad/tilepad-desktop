@@ -1,34 +1,61 @@
 <script lang="ts">
-  import type { Icon, IconPack, IconPackId } from "$lib/api/types/icons";
+  import type { Icon, IconPackId } from "$lib/api/types/icons";
 
   import { t } from "svelte-i18n";
   import { createIconPacksQuery } from "$lib/api/icons";
+  import { getIconAssetPath } from "$lib/api/utils/url";
   import { getErrorMessage } from "$lib/api/utils/error";
+
+  import type { IconGridItem } from "./IconsGrid.svelte";
 
   import Aside from "../Aside.svelte";
   import TextInput from "../input/TextInput.svelte";
   import IconPackCategory from "./IconPackCategory.svelte";
   import SkeletonList from "../skeleton/SkeletonList.svelte";
+  import { getServerContext } from "../ServerProvider.svelte";
 
-  type Props = { onClickIcon: (packId: IconPackId, icon: Icon) => void };
+  type IconPackData = {
+    id: string;
+    name: string;
+    icons: IconGridItem[];
+  };
+
+  type Props = {
+    onClickIcon: (packId: IconPackId, icon: Icon) => void;
+  };
 
   const { onClickIcon }: Props = $props();
 
   const iconPacksQuery = createIconPacksQuery();
 
+  const serverContext = getServerContext();
+  const serverURL = $derived(serverContext.serverURL);
+
   let search = $state("");
+
+  const iconPackData = $derived(
+    ($iconPacksQuery.data ?? []).map((item) => ({
+      id: item.manifest.icons.id,
+      name: item.manifest.icons.name,
+      icons: item.icons.map((icon) => ({
+        name: icon.name,
+        path: icon.path,
+        src: getIconAssetPath(serverURL, item.manifest.icons.id, item.path),
+      })),
+    })),
+  );
+
   const filteredPacks = $derived.by(() => {
-    const data = $iconPacksQuery.data ?? [];
     const query = search.trim();
 
     if (query.length < 1) {
-      return data;
+      return iconPackData;
     }
 
-    return filterIconPacks(data, query);
+    return filterIconPacks(iconPackData, query);
   });
 
-  function filterIconPacks(packs: IconPack[], query: string) {
+  function filterIconPacks(packs: IconPackData[], query: string) {
     query = query.toLowerCase();
 
     return packs
@@ -63,10 +90,11 @@
     />
 
     <div class="categories">
-      {#each filteredPacks as pack (pack.manifest.icons.id)}
+      {#each filteredPacks as pack (pack.id)}
         <IconPackCategory
-          onClickIcon={(icon) => onClickIcon(pack.manifest.icons.id, icon)}
-          {pack}
+          name={pack.name}
+          icons={pack.icons}
+          onClickIcon={(icon) => onClickIcon(pack.id, icon)}
         />
       {/each}
     </div>

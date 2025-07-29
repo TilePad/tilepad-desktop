@@ -1,15 +1,28 @@
 <script lang="ts">
+  import type { IconPackId } from "$lib/api/types/icons";
+
   import { t } from "svelte-i18n";
+  import { toast } from "svelte-sonner";
   import Aside from "$lib/components/Aside.svelte";
-  import { createIconPacksQuery } from "$lib/api/icons";
-  import { getErrorMessage } from "$lib/api/utils/error";
   import SolarShopBoldDuotone from "~icons/solar/shop-bold-duotone";
   import IconPackCard from "$lib/components/icons/IconPackCard.svelte";
   import SkeletonList from "$lib/components/skeleton/SkeletonList.svelte";
+  import { uninstallIconPack, createIconPacksQuery } from "$lib/api/icons";
+  import { getErrorMessage, toastErrorMessage } from "$lib/api/utils/error";
   import ManualImportIconPack from "$lib/components/icons/ManualImportIconPack.svelte";
   import IconsRegistryDialog from "$lib/components/icons_registry/IconsRegistryDialog.svelte";
 
   const iconPacksQuery = createIconPacksQuery();
+
+  function handleUninstall(iconPackId: IconPackId) {
+    const revokePromise = uninstallIconPack(iconPackId);
+
+    toast.promise(revokePromise, {
+      loading: $t("icon_packs_uninstalling"),
+      success: $t("icon_packs_uninstalled"),
+      error: toastErrorMessage($t("icon_packs_uninstall_error")),
+    });
+  }
 </script>
 
 <div class="layout">
@@ -37,7 +50,15 @@
     <div class="plugins-wrapper">
       <div class="plugins">
         {#each $iconPacksQuery.data as pack, index (index)}
-          <IconPackCard {pack} />
+          {@const manifest = pack.manifest.icons}
+
+          <IconPackCard
+            version={manifest.version}
+            name={manifest.name}
+            description={manifest.description}
+            authors={manifest.authors}
+            onUninstall={() => handleUninstall(manifest.id)}
+          />
         {/each}
       </div>
     </div>
