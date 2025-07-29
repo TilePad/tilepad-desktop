@@ -10,6 +10,7 @@
   import Tooltip from "../Tooltip.svelte";
   import Button from "../input/Button.svelte";
   import Dialog from "../dialog/Dialog.svelte";
+  import TextInput from "../input/TextInput.svelte";
   import { getFolderContext } from "./FolderProvider.svelte";
   import DialogCloseButton from "../dialog/DialogCloseButton.svelte";
   import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
@@ -84,11 +85,11 @@
 
       <form onsubmit={onCreate}>
         <div class="content">
-          <input
+          <TextInput
             autocomplete="off"
             bind:value={name}
             required
-            minlength="1"
+            minlength={1}
             class="input"
             placeholder={$t("name")}
           />
@@ -120,17 +121,6 @@
     gap: 1rem;
     padding: 1rem;
     justify-content: flex-end;
-  }
-
-  .input {
-    padding: 0.5rem;
-    background-color: #000;
-    border: 1px solid #666;
-    color: #fff;
-    border-radius: 0.25rem;
-    align-items: center;
-    display: flex;
-    gap: 0.5rem;
   }
 
   .wrapper:global(> .button) {

@@ -11,36 +11,41 @@
 
   import Button from "../input/Button.svelte";
   import Dialog from "../dialog/Dialog.svelte";
+  import TextInput from "../input/TextInput.svelte";
   import DialogCloseButton from "../dialog/DialogCloseButton.svelte";
 
   type Props = DialogProps & {
     folder: FolderModel;
   };
 
-  let { folder }: Props = $props();
+  const { folder }: Props = $props();
+
+  const setFolderNameMutation = createSetFolderNameMutation();
 
   let open = $state(false);
   let name = $state(folder.name);
 
-  const setFolderNameMutation = createSetFolderNameMutation();
-
-  async function onSave(event: Event) {
+  function onSave(event: Event) {
     event.preventDefault();
 
-    const updatePromise = $setFolderNameMutation.mutateAsync({
-      folderId: folder.id,
-      name,
-    });
+    const updatePromise = $setFolderNameMutation.mutateAsync(
+      {
+        folderId: folder.id,
+        name,
+      },
+      {
+        onSettled: () => {
+          open = false;
+          reset();
+        },
+      },
+    );
 
     toast.promise(updatePromise, {
       loading: $t("folder_updating"),
       success: $t("folder_updated"),
       error: toastErrorMessage($t("folder_update_error")),
     });
-
-    open = false;
-
-    reset();
   }
 
   function reset() {
@@ -66,11 +71,11 @@
 
   <form onsubmit={onSave}>
     <div class="content">
-      <input
+      <TextInput
         autocomplete="off"
         bind:value={name}
         required
-        minlength="1"
+        minlength={1}
         class="input"
         placeholder={$t("name")}
       />
@@ -78,7 +83,9 @@
 
     <div class="actions">
       <DialogCloseButton buttonLabel={{ text: $t("close") }} />
-      <Button type="submit">{$t("save")}</Button>
+      <Button type="submit" loading={$setFolderNameMutation.isPending}>
+        {$t("save")}
+      </Button>
     </div>
   </form>
 </Dialog>
@@ -100,16 +107,5 @@
     gap: 1rem;
     padding: 1rem;
     justify-content: flex-end;
-  }
-
-  .input {
-    padding: 0.5rem;
-    background-color: #000;
-    border: 1px solid #666;
-    color: #fff;
-    border-radius: 0.25rem;
-    align-items: center;
-    display: flex;
-    gap: 0.5rem;
   }
 </style>

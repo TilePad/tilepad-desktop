@@ -8,8 +8,9 @@
   import { createTilesQuery } from "$lib/api/tiles";
   import { createFoldersQuery } from "$lib/api/folders";
   import { getErrorMessage } from "$lib/api/utils/error";
+  import { createProfilesQuery } from "$lib/api/profiles";
   import TileGrid from "$lib/components/tiles/TileGrid.svelte";
-  import SolarAltArrowRightLinear from "~icons/solar/alt-arrow-right-linear";
+  import RightArrowIcon from "~icons/solar/alt-arrow-right-linear";
 
   import Aside from "../Aside.svelte";
   import TileEditor from "../tiles/TileEditor.svelte";
@@ -20,8 +21,10 @@
   import ProfileSelector from "../profiles/ProfileSelector.svelte";
   import FolderSelectorSettings from "./FolderSelectorSettings.svelte";
   import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
+  import CreateProfileDialog from "../profiles/CreateProfileDialog.svelte";
+  import ProfileSelectorSettings from "../profiles/ProfileSelectorSettings.svelte";
 
-  const { profile } = getProfileContext();
+  const { profile, setProfileId } = getProfileContext();
   const { folder, setFolderId } = getFolderContext();
 
   const currentFolder = $derived.by(folder);
@@ -29,6 +32,9 @@
 
   const currentFolderId = $derived(currentFolder.id);
   const currentProfileId = $derived(currentProfile.id);
+
+  const profilesQuery = createProfilesQuery();
+  const profiles = $derived($profilesQuery.data ?? []);
 
   const foldersQuery = createFoldersQuery(() => currentProfile.id);
   const folders = $derived($foldersQuery.data ?? []);
@@ -61,8 +67,18 @@
     </div>
   {:else if $tilesQuery.isSuccess}
     <div class="header">
-      <ProfileSelector />
-      <SolarAltArrowRightLinear />
+      <div class="profile-options-group">
+        <ProfileSelector
+          options={profiles}
+          value={currentProfileId}
+          onChangeValue={setProfileId}
+        />
+
+        <ProfileSelectorSettings profile={currentProfile} />
+        <CreateProfileDialog order={profiles.length} />
+      </div>
+
+      <RightArrowIcon />
 
       <div class="folder-options-group">
         <FolderSelector
@@ -70,10 +86,7 @@
           value={currentFolderId}
           onChangeValue={setFolderId}
         />
-        {#if currentFolder}
-          <FolderSelectorSettings folder={currentFolder} />
-        {/if}
-
+        <FolderSelectorSettings folder={currentFolder} />
         <CreateFolderDialog order={folders.length} />
       </div>
     </div>
@@ -143,7 +156,8 @@
     overflow: hidden;
   }
 
-  .folder-options-group {
+  .folder-options-group,
+  .profile-options-group {
     display: flex;
   }
 </style>

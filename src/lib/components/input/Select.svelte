@@ -17,6 +17,7 @@
     options: T[];
     value: string | null;
     onChangeValue: (value: string) => void;
+    icon?: Snippet;
     placeholder?: string;
     item?: Snippet<[ItemSlotProps]>;
     trigger?: Snippet<[TriggerProps]>;
@@ -36,6 +37,7 @@
     options,
     value,
     onChangeValue,
+    icon,
     placeholder,
     item = defaultItem,
     trigger = defaultTrigger,
@@ -51,6 +53,8 @@
 {#snippet defaultTrigger({ currentOption, open, props }: TriggerProps)}
   <div class="wrapper" data-open={open}>
     <Button class="trigger" variant="secondary" {...props}>
+      {@render icon?.()}
+
       {#if currentOption}
         {currentOption.name}
       {:else}

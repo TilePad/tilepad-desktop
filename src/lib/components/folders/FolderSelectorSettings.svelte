@@ -5,7 +5,7 @@
   import { useDebounce } from "runed";
   import { mergeProps } from "bits-ui";
   import { queryClient } from "$lib/api/client";
-  import SolarSettingsBold from "~icons/solar/settings-bold";
+  import SettingsIcon from "~icons/solar/settings-bold";
   import {
     updateFolderRows,
     createSetFolderConfigMutation,
@@ -62,7 +62,7 @@
             {...mergeProps(triggerProps, props)}
             class="button"
           >
-            <SolarSettingsBold width="1.25rem" height="1.25rem" />
+            <SettingsIcon width="1.25rem" height="1.25rem" />
           </Button>
         </div>
       {/snippet}

@@ -27,21 +27,26 @@
 
   let open = $state(false);
 
-  async function onDelete(event: Event) {
+  function onDelete(event: Event) {
     event.preventDefault();
 
-    const createPromise = $deleteFolderMutation.mutateAsync({
-      profileId: currentProfile.id,
-      folderId: folder.id,
-    });
+    const createPromise = $deleteFolderMutation.mutateAsync(
+      {
+        profileId: currentProfile.id,
+        folderId: folder.id,
+      },
+      {
+        onSettled() {
+          open = false;
+        },
+      },
+    );
 
     toast.promise(createPromise, {
       loading: $t("folder_deleting"),
       success: $t("folder_deleted"),
       error: toastErrorMessage($t("folder_delete_error")),
     });
-
-    open = false;
   }
 </script>
 
