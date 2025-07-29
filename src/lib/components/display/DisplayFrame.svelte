@@ -1,5 +1,6 @@
 <script lang="ts">
   import { getPluginAssetPath } from "$lib/api/utils/url";
+  import { SvelteURLSearchParams } from "svelte/reactivity";
   import {
     type DisplayContext,
     encodeDisplayContext,
@@ -24,7 +25,7 @@
   const serverContext = getServerContext();
 
   const inspectorSrc = $derived.by(() => {
-    const params = new URLSearchParams();
+    const params = new SvelteURLSearchParams();
     params.append("ctx", encodeDisplayContext(ctx));
 
     const baseSrc = getPluginAssetPath(
@@ -56,8 +57,8 @@
 
 <svelte:window onmessage={onMessage} />
 
-<iframe class="frame" bind:this={iframe} title="Inspector" src={inspectorSrc}
-></iframe>
+<iframe class="frame" bind:this={iframe} title="Inspector" src={inspectorSrc}>
+</iframe>
 
 <style>
   .frame {

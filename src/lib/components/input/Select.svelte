@@ -5,7 +5,7 @@
   }
 </script>
 
-<script lang="ts">
+<script lang="ts" generics="T extends Option">
   import type { Snippet } from "svelte";
 
   import { Select } from "bits-ui";
@@ -14,11 +14,22 @@
   import Button from "$lib/components/input/Button.svelte";
 
   type Props = {
-    options: Option[];
+    options: T[];
     value: string | null;
     onChangeValue: (value: string) => void;
     placeholder?: string;
-    item?: Snippet<[{ option: Option }]>;
+    item?: Snippet<[ItemSlotProps]>;
+    trigger?: Snippet<[TriggerProps]>;
+  };
+
+  type ItemSlotProps = {
+    option: T;
+  };
+
+  type TriggerProps = {
+    currentOption: T | undefined;
+    props: Record<string, unknown>;
+    open: boolean;
   };
 
   const {
@@ -27,38 +38,43 @@
     onChangeValue,
     placeholder,
     item = defaultItem,
+    trigger = defaultTrigger,
   }: Props = $props();
 
   const currentOption = $derived(
-    options.find((folder) => folder.value === value),
+    options.find((option) => option.value === value),
   );
 
   let open = $state(false);
 </script>
+
+{#snippet defaultTrigger({ currentOption, open, props }: TriggerProps)}
+  <div class="wrapper" data-open={open}>
+    <Button class="trigger" variant="secondary" {...props}>
+      {#if currentOption}
+        {currentOption.name}
+      {:else}
+        {placeholder ?? "Select option"}
+      {/if}
+      <DownArrow class="trigger__icon" />
+    </Button>
+  </div>
+{/snippet}
 
 {#snippet defaultItem({ option }: { option: Option })}
   <span>{option.name}</span>
 {/snippet}
 
 <Select.Root
+  bind:open
   allowDeselect={false}
   type="single"
-  onOpenChange={(value) => (open = value)}
   value={currentOption?.value}
   onValueChange={(value) => onChangeValue(value)}
 >
   <Select.Trigger>
     {#snippet child({ props })}
-      <div class="wrapper" data-open={open}>
-        <Button class="trigger" variant="secondary" {...props}>
-          {#if currentOption}
-            {currentOption.name}
-          {:else}
-            {placeholder ?? "Select option"}
-          {/if}
-          <DownArrow class="trigger__icon" />
-        </Button>
-      </div>
+      {@render trigger({ currentOption, props, open })}
     {/snippet}
   </Select.Trigger>
 

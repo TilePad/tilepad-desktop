@@ -6,6 +6,7 @@
   import { t } from "svelte-i18n";
   import { fly } from "svelte/transition";
   import { createTilesQuery } from "$lib/api/tiles";
+  import { createFoldersQuery } from "$lib/api/folders";
   import { getErrorMessage } from "$lib/api/utils/error";
   import TileGrid from "$lib/components/tiles/TileGrid.svelte";
   import SolarAltArrowRightLinear from "~icons/solar/alt-arrow-right-linear";
@@ -15,17 +16,22 @@
   import FolderSelector from "./FolderSelector.svelte";
   import { getFolderContext } from "./FolderProvider.svelte";
   import SkeletonList from "../skeleton/SkeletonList.svelte";
+  import CreateFolderDialog from "./CreateFolderDialog.svelte";
   import ProfileSelector from "../profiles/ProfileSelector.svelte";
+  import FolderSelectorSettings from "./FolderSelectorSettings.svelte";
   import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
 
   const { profile } = getProfileContext();
-  const { folder } = getFolderContext();
+  const { folder, setFolderId } = getFolderContext();
 
   const currentFolder = $derived.by(folder);
   const currentProfile = $derived.by(profile);
 
   const currentFolderId = $derived(currentFolder.id);
   const currentProfileId = $derived(currentProfile.id);
+
+  const foldersQuery = createFoldersQuery(() => currentProfile.id);
+  const folders = $derived($foldersQuery.data ?? []);
 
   const tilesQuery = createTilesQuery(() => currentFolderId);
 
@@ -57,7 +63,19 @@
     <div class="header">
       <ProfileSelector />
       <SolarAltArrowRightLinear />
-      <FolderSelector />
+
+      <div class="folder-options-group">
+        <FolderSelector
+          options={folders}
+          value={currentFolderId}
+          onChangeValue={setFolderId}
+        />
+        {#if currentFolder}
+          <FolderSelectorSettings folder={currentFolder} />
+        {/if}
+
+        <CreateFolderDialog order={folders.length} />
+      </div>
     </div>
     <div class="content__wrapper">
       {#key currentFolderId}
@@ -123,5 +141,9 @@
     position: relative;
     flex: auto;
     overflow: hidden;
+  }
+
+  .folder-options-group {
+    display: flex;
   }
 </style>

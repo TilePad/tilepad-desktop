@@ -12,6 +12,7 @@
 
   interface ProfileContext {
     profile(): ProfileModel;
+    profileId(): ProfileId;
     setProfileId: (value: ProfileId) => void;
   }
 
@@ -62,6 +63,7 @@
 
   setContext(PROFILE_STORE_KEY, {
     profile: () => profile!,
+    profileId: () => profileId!,
     setProfileId: (value: string) => {
       profileId = value;
       setPersistedProfileId(value);

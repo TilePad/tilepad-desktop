@@ -23,16 +23,10 @@
 
   const { tileId, onClose }: Props = $props();
 
-  const { profile } = getProfileContext();
-  const { folder } = getFolderContext();
+  const { profileId } = getProfileContext();
+  const { folderId } = getFolderContext();
 
-  const currentProfile = $derived.by(profile);
-  const currentFolder = $derived.by(folder);
-
-  const tileQuery = createTileQuery(
-    () => currentFolder.id,
-    () => tileId,
-  );
+  const tileQuery = createTileQuery(folderId, () => tileId);
 
   const tile = $derived($tileQuery.data);
 
@@ -45,7 +39,7 @@
 {#if $tileQuery.isSuccess && $tileQuery.data}
   {@const tile = $tileQuery.data}
   {@const ctx = {
-    profile_id: currentProfile.id,
+    profile_id: profileId(),
     folder_id: tile.folder_id,
     plugin_id: tile.plugin_id,
     action_id: tile.action_id,
