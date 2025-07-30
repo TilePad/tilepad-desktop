@@ -47,36 +47,43 @@ pub struct DeviceSession {
 }
 
 #[derive(Default, Clone)]
-pub enum DeviceSessionState {
+enum DeviceSessionState {
     // Unauthenticated, no session
     #[default]
     Initial,
 
     /// Device has been challenged
-    Challenge {
-        /// Cipher for encrypted communication
-        cipher: XChaCha20Poly1305,
-        /// Challenge bytes
-        challenge: Vec<u8>,
-
-        /// Name of the client
-        client_name: String,
-        /// Client public key
-        client_public_key: [u8; 32],
-    },
+    Challenge(DeviceSessionChallengeState),
 
     /// Awaiting approval
-    AwaitingApproval {
-        /// Cipher for encrypted communication
-        cipher: XChaCha20Poly1305,
-    },
+    AwaitingApproval(DeviceSessionAwaitingApprovalState),
 
     // Authenticated
-    Authenticated {
-        /// Cipher for encrypted communication
-        cipher: XChaCha20Poly1305,
-        device_id: DeviceId,
-    },
+    Authenticated(DeviceSessionAuthenticatedState),
+}
+
+#[derive(Clone)]
+struct DeviceSessionChallengeState {
+    /// Cipher for encrypted communication
+    cipher: XChaCha20Poly1305,
+    /// Challenge bytes
+    challenge: Vec<u8>,
+    /// Name of the client
+    client_name: String,
+    /// Client public key
+    client_public_key: [u8; 32],
+}
+
+#[derive(Clone)]
+struct DeviceSessionAwaitingApprovalState {
+    /// Cipher for encrypted communication
+    cipher: XChaCha20Poly1305,
+}
+#[derive(Clone)]
+struct DeviceSessionAuthenticatedState {
+    /// Cipher for encrypted communication
+    cipher: XChaCha20Poly1305,
+    device_id: DeviceId,
 }
 
 impl DeviceSession {
@@ -129,8 +136,8 @@ impl DeviceSession {
 
     /// Get the current device ID
     pub fn get_device_id(&self) -> Option<DeviceId> {
-        match *self.state.read() {
-            DeviceSessionState::Authenticated { device_id, .. } => Some(device_id),
+        match &*self.state.read() {
+            DeviceSessionState::Authenticated(state) => Some(state.device_id),
             _ => None,
         }
     }
@@ -144,8 +151,8 @@ impl DeviceSession {
     fn send_encrypted_message(&self, msg: ServerDeviceMessageEncrypted) -> bool {
         let state = self.state.read();
         let cipher = match &*state {
-            DeviceSessionState::AwaitingApproval { cipher } => cipher,
-            DeviceSessionState::Authenticated { cipher, .. } => cipher,
+            DeviceSessionState::AwaitingApproval(state) => &state.cipher,
+            DeviceSessionState::Authenticated(state) => &state.cipher,
             _ => {
                 tracing::error!("encrypted state not active");
                 return false;
@@ -195,12 +202,15 @@ impl DeviceSession {
         {
             let state = &mut *self.state.write();
             let cipher = match state {
-                DeviceSessionState::AwaitingApproval { cipher } => cipher.clone(),
+                DeviceSessionState::AwaitingApproval(state) => state.cipher.clone(),
                 _ => return,
             };
 
             // Authenticate the device session
-            *state = DeviceSessionState::Authenticated { cipher, device_id };
+            *state = DeviceSessionState::Authenticated(DeviceSessionAuthenticatedState {
+                cipher,
+                device_id,
+            });
         };
 
         self.send_encrypted_message(ServerDeviceMessageEncrypted::Approved { device_id });
@@ -213,6 +223,34 @@ impl DeviceSession {
 
     pub fn on_tiles(&self, tiles: Vec<TileModel>, folder: FolderModel) {
         self.send_encrypted_message(ServerDeviceMessageEncrypted::Tiles { tiles, folder });
+    }
+
+    /// Handle messages from the socket
+    async fn handle_message(&self, message: ClientDeviceMessage) {
+        let state = { self.state.read().clone() };
+
+        match state {
+            DeviceSessionState::Initial => self.handle_message_initial(message),
+            DeviceSessionState::Challenge(state) => {
+                self.handle_message_challenge(state, message).await
+            }
+            DeviceSessionState::AwaitingApproval(_) => {
+                tracing::warn!(?message, "got unexpected message from unauthorized device");
+            }
+            DeviceSessionState::Authenticated(state) => {
+                self.handle_message_authenticated(state, message).await
+            }
+        };
+    }
+
+    fn handle_message_initial(&self, message: ClientDeviceMessage) {
+        match message {
+            ClientDeviceMessage::InitiateHandshake { name, public_key } => {
+                self.handle_initiate_handshake(name, public_key)
+            }
+
+            _ => tracing::warn!(?message, "got unexpected message from unauthorized device"),
+        }
     }
 
     /// Handles the initiation of a handshake
@@ -254,12 +292,12 @@ impl DeviceSession {
 
         {
             // Move to challenge state
-            *self.state.write() = DeviceSessionState::Challenge {
+            *self.state.write() = DeviceSessionState::Challenge(DeviceSessionChallengeState {
                 cipher,
                 challenge,
                 client_name: name,
                 client_public_key: client_public_key.to_bytes(),
-            };
+            });
         }
 
         // Notify device of challenge
@@ -272,17 +310,16 @@ impl DeviceSession {
 
     async fn handle_challenge_response(
         &self,
-        cipher: XChaCha20Poly1305,
-        server_challenge: Vec<u8>,
+        state: DeviceSessionChallengeState,
         //
         client_challenge: Vec<u8>,
         client_nonce: [u8; 24],
-        //
-        client_name: String,
-        client_public_key: [u8; 32],
     ) {
         let client_nonce = XNonce::from(client_nonce);
-        let client_challenge = match cipher.decrypt(&client_nonce, client_challenge.as_slice()) {
+        let client_challenge = match state
+            .cipher
+            .decrypt(&client_nonce, client_challenge.as_slice())
+        {
             Ok(value) => value,
             Err(err) => {
                 tracing::error!(?err, "failed to decrypt challenge");
@@ -294,7 +331,7 @@ impl DeviceSession {
         };
 
         // Challenge didn't match
-        if client_challenge != server_challenge {
+        if client_challenge != state.challenge {
             tracing::error!("incorrect challenge");
             self.send_message(ServerDeviceMessage::Error {
                 message: "challenge does not match".to_string(),
@@ -304,14 +341,18 @@ impl DeviceSession {
 
         match self
             .devices
-            .attempt_authenticate_device(&client_public_key)
+            .attempt_authenticate_device(&state.client_public_key)
             .await
         {
             // Public key is known and authenticated with an existing device
             Ok(Some(device_id)) => {
                 {
                     // Authenticate the device session
-                    *self.state.write() = DeviceSessionState::Authenticated { cipher, device_id };
+                    *self.state.write() =
+                        DeviceSessionState::Authenticated(DeviceSessionAuthenticatedState {
+                            cipher: state.cipher,
+                            device_id,
+                        });
                 };
 
                 self.send_encrypted_message(ServerDeviceMessageEncrypted::Authenticated {
@@ -322,14 +363,17 @@ impl DeviceSession {
             Ok(None) => {
                 {
                     // Awaiting approval
-                    *self.state.write() = DeviceSessionState::AwaitingApproval { cipher }
+                    *self.state.write() =
+                        DeviceSessionState::AwaitingApproval(DeviceSessionAwaitingApprovalState {
+                            cipher: state.cipher,
+                        });
                 }
 
                 self.devices.add_device_request(
                     self.id,
                     self.socket_addr,
-                    client_name,
-                    client_public_key,
+                    state.client_name,
+                    state.client_public_key,
                 );
 
                 self.send_encrypted_message(ServerDeviceMessageEncrypted::ApprovalRequested);
@@ -343,86 +387,66 @@ impl DeviceSession {
         }
     }
 
-    /// Handle messages from the socket
-    async fn handle_message(&self, message: ClientDeviceMessage) {
-        let state = { self.state.read().clone() };
-
-        match state {
-            DeviceSessionState::Initial => match message {
-                ClientDeviceMessage::InitiateHandshake { name, public_key } => {
-                    self.handle_initiate_handshake(name, public_key)
-                }
-
-                _ => {
-                    tracing::warn!(?message, "got unexpected message from unauthorized device");
-                }
-            },
-            DeviceSessionState::Challenge {
-                challenge: server_challenge,
-                cipher,
-                client_name,
-                client_public_key,
-            } => match message {
-                ClientDeviceMessage::AuthenticateChallengeResponse {
-                    challenge: client_challenge,
-                    nonce,
-                } => {
-                    self.handle_challenge_response(
-                        cipher,
-                        server_challenge,
-                        client_challenge,
-                        nonce,
-                        client_name,
-                        client_public_key,
-                    )
+    async fn handle_message_challenge(
+        &self,
+        state: DeviceSessionChallengeState,
+        message: ClientDeviceMessage,
+    ) {
+        match message {
+            ClientDeviceMessage::AuthenticateChallengeResponse {
+                challenge: client_challenge,
+                nonce,
+            } => {
+                self.handle_challenge_response(state, client_challenge, nonce)
                     .await;
-                }
-                _ => {
-                    tracing::warn!(?message, "got unexpected message from unauthorized device");
-                }
-            },
-            DeviceSessionState::AwaitingApproval { .. } => {
-                tracing::warn!(?message, "got unexpected message from unauthorized device");
             }
-            DeviceSessionState::Authenticated { device_id, cipher } => {
-                match message {
-                    ClientDeviceMessage::Encrypted { message, nonce } => {
-                        let nonce = XNonce::from(nonce);
-                        let message = match cipher.decrypt(&nonce, message.as_slice()) {
-                            Ok(value) => value,
-                            Err(err) => {
-                                tracing::error!(?err, "failed to decrypt message");
-                                self.send_message(ServerDeviceMessage::Error {
-                                    message: "failed to decrypt message".to_string(),
-                                });
-                                return;
-                            }
-                        };
 
-                        let msg: ClientDeviceMessageEncrypted =
-                            match serde_json::from_slice(&message) {
-                                Ok(value) => value,
-                                Err(err) => {
-                                    tracing::error!(?err, "failed to decode message");
-                                    self.send_message(ServerDeviceMessage::Error {
-                                        message: "failed to decode message".to_string(),
-                                    });
-                                    return;
-                                }
-                            };
+            _ => tracing::warn!(?message, "got unexpected message from unauthorized device"),
+        }
+    }
 
-                        self.handle_message_authenticated(device_id, msg).await
-                    }
-                    _ => {
-                        tracing::warn!(?message, "got unexpected message from device");
-                    }
-                };
+    async fn handle_message_authenticated(
+        &self,
+        state: DeviceSessionAuthenticatedState,
+        message: ClientDeviceMessage,
+    ) {
+        let (message, nonce) = match message {
+            ClientDeviceMessage::Encrypted { message, nonce } => (message, nonce),
+
+            _ => {
+                tracing::warn!(?message, "got unexpected message from device");
+                return;
             }
         };
+
+        let nonce = XNonce::from(nonce);
+        let message = match state.cipher.decrypt(&nonce, message.as_slice()) {
+            Ok(value) => value,
+            Err(err) => {
+                tracing::error!(?err, "failed to decrypt message");
+                self.send_message(ServerDeviceMessage::Error {
+                    message: "failed to decrypt message".to_string(),
+                });
+                return;
+            }
+        };
+
+        let msg: ClientDeviceMessageEncrypted = match serde_json::from_slice(&message) {
+            Ok(value) => value,
+            Err(err) => {
+                tracing::error!(?err, "failed to decode message");
+                self.send_message(ServerDeviceMessage::Error {
+                    message: "failed to decode message".to_string(),
+                });
+                return;
+            }
+        };
+
+        self.handle_message_encrypted(state.device_id, msg).await
     }
 
     /// Handle message when authenticated as `device_id`
-    async fn handle_message_authenticated(
+    async fn handle_message_encrypted(
         &self,
         device_id: DeviceId,
         message: ClientDeviceMessageEncrypted,
