@@ -1,6 +1,5 @@
 <script lang="ts">
   import { t } from "svelte-i18n";
-  import { getLicenses } from "$lib/api/server";
   import { getErrorMessage } from "$lib/api/utils/error";
 
   import type { DialogProps } from "../dialog/Dialog.svelte";
@@ -14,6 +13,10 @@
   type Props = DialogProps & {};
 
   const { ...restProps }: Props = $props();
+
+  const licenseMarkdownPromise = import(
+    "../../../../THIRD_PARTY_LICENSES.md?raw"
+  );
 </script>
 
 <Dialog {...restProps}>
@@ -24,10 +27,10 @@
     </div>
 
     <div class="viewer">
-      {#await getLicenses()}
+      {#await licenseMarkdownPromise}
         <SkeletonList />
       {:then markdown}
-        <Markdown source={markdown} />
+        <Markdown source={markdown.default} />
       {:catch error}
         <Aside severity="error" style="margin: 1rem;">
           {$t("readme_error", {

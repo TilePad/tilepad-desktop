@@ -60,7 +60,6 @@ pub fn run() {
             devices::devices_set_device_folder,
             // Server
             server::server_get_connection_info,
-            server::server_get_licenses,
             server::server_get_port,
             // Profiles
             profiles::profiles_get_profiles,

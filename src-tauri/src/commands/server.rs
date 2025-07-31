@@ -43,14 +43,6 @@ pub fn server_get_connection_info(
     Ok(ServerConnectionInfo { interfaces, port })
 }
 
-/// Get the third party licenses file
-#[tauri::command]
-pub async fn server_get_licenses(app: AppHandle) -> CmdResult<String> {
-    let file = app.path().resource_dir()?.join("THIRD_PARTY_LICENSES.md");
-    let contents = tokio::fs::read_to_string(file).await?;
-    Ok(contents)
-}
-
 /// Get the current HTTP server port
 #[tauri::command]
 pub fn server_get_port(port_state: State<'_, ServerPort>) -> CmdResult<u16> {

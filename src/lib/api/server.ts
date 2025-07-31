@@ -6,10 +6,6 @@ export function getConnectionInfo() {
   return invoke<ServerConnectionInfo>("server_get_connection_info");
 }
 
-export function getLicenses() {
-  return invoke<string>("server_get_licenses");
-}
-
 export function getServerPort() {
   return invoke<number>("server_get_port");
 }
