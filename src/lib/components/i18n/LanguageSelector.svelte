@@ -149,10 +149,6 @@
     gap: 0.5rem;
   }
 
-  .trigger-wrapper {
-    display: flex;
-  }
-
   .auto-label {
     padding: 0.25rem 0.5rem;
     background-color: #141316;

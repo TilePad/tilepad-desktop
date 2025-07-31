@@ -40,7 +40,11 @@
       {:else if buttonLabel}
         <Button variant="secondary" {...props} type="button">
           {#if buttonLabel.icon}
-            <buttonLabel.icon width="1.5rem" height="1.5rem" />
+            <buttonLabel.icon
+              width="1.5rem"
+              height="1.5rem"
+              style="flex-shrink: 0"
+            />
           {/if}
 
           {buttonLabel.text}

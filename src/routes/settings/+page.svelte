@@ -239,6 +239,7 @@
 
   .tile-item {
     padding: var(--tp-space-1);
+    width: 100%;
   }
 
   .tile-label {
@@ -247,6 +248,7 @@
     color: var(--tp-text-primary);
     font-weight: bold;
     margin-bottom: 2px;
+    margin-bottom: var(--tp-space-1);
   }
 
   .tile-description {
