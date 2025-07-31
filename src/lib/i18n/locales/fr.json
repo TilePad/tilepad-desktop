@@ -171,5 +171,6 @@
   "plugin_updated": "Plugin mis à jour",
   "plugin_update_error": "Échec de la mise à jour du plugin",
   "updates_found_count": "{count, plural, =0 {Aucune mise à jour disponible.} one {{count, number} mise à jour disponible.} other {{count, number} mises à jour disponibles.}}",
-  "installing": "Installation"
+  "installing": "Installation",
+  "no_interfaces": "Aucune interface disponible pour se connecter"
 }

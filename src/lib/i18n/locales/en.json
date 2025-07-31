@@ -173,5 +173,6 @@
   "updates_found_count": "{count, plural, =0 {No available updates.} one {{count, number} update available.} other {{count, number} updates available.}}",
   "installing": "Installing",
   "server_port": "Server Port",
-  "server_port_description": "Port the internal server will run from, this must be unique for the app to run properly. Will be applied after a restart of TilePad"
+  "server_port_description": "Port the internal server will run from, this must be unique for the app to run properly. Will be applied after a restart of TilePad",
+  "no_interfaces": "No interfaces available to connect from"
 }

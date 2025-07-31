@@ -171,5 +171,6 @@
   "plugin_updated": "Plugin wurde aktualisiert",
   "plugin_update_error": "Plugin konnte nicht aktualisiert werden",
   "updates_found_count": "{count, plural, =0 {Keine verfügbaren Updates.} one {{count, number} verfügbares Update.} other {{count, number} verfügbare Updates.}}",
-  "installing": "Wird installiert"
+  "installing": "Wird installiert",
+  "no_interfaces": "Keine Schnittstellen verfügbar, um eine Verbindung herzustellen"
 }

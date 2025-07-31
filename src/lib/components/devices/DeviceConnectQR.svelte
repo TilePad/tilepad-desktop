@@ -3,6 +3,7 @@
 
   import { t } from "svelte-i18n";
   import QRCode from "@castlenine/svelte-qrcode";
+  import Aside from "$lib/components/Aside.svelte";
 
   type Props = {
     connectInfo: ServerConnectionInfo;
@@ -19,23 +20,29 @@
 </script>
 
 <div class="column">
-  <div class="qr">
-    <QRCode size={250} data={encodedInterfaces} />
-  </div>
+  {#if connectInfo.interfaces.length > 0}
+    <div class="qr">
+      <QRCode size={250} data={encodedInterfaces} />
+    </div>
 
-  <div class="port">
-    <b>{$t("port")}</b>
-    {connectInfo.port}
-  </div>
+    <div class="port">
+      <b>{$t("port")}</b>
+      {connectInfo.port}
+    </div>
 
-  <ul class="interfaces">
-    {#each connectInfo.interfaces as int, index (index)}
-      <li class="interface">
-        <b class="interface__name">{int.name}</b>
-        <span class="interface__addr">{int.addr}</span>
-      </li>
-    {/each}
-  </ul>
+    <ul class="interfaces">
+      {#each connectInfo.interfaces as int, index (index)}
+        <li class="interface">
+          <b class="interface__name">{int.name}</b>
+          <span class="interface__addr">{int.addr}</span>
+        </li>
+      {/each}
+    </ul>
+  {:else}
+    <Aside severity="error" style="margin: 1rem;">
+      {$t("no_interfaces")}
+    </Aside>
+  {/if}
 </div>
 
 <style>
