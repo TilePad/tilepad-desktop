@@ -1,6 +1,9 @@
 <script lang="ts">
   import "$lib/styles/app.css";
-  import "@fontsource-variable/roboto";
+  import "@fontsource/roboto/400.css";
+  import "@fontsource/roboto/500.css";
+  import "@fontsource/roboto/600.css";
+  import "@fontsource/roboto/700.css";
   import type { Snippet } from "svelte";
 
   type Props = {

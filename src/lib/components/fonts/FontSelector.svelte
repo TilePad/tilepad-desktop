@@ -20,6 +20,6 @@
 
 <Select {options} {value} {onChangeValue} placeholder={$t("select_font")}>
   {#snippet item({ option })}
-    <span style="font-family: Roboto;">{option.name}</span>
+    <span style="font-family: {option.value};">{option.name}</span>
   {/snippet}
 </Select>
