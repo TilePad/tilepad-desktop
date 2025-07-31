@@ -172,5 +172,7 @@
   "plugin_update_error": "Nepodařilo se aktualizovat plugin",
   "updates_found_count": "{count, plural, =0 {Žádné dostupné aktualizace.} one {{count, number} dostupná aktualizace.} other {{count, number} dostupných aktualizací.}}",
   "installing": "Instaluje se",
-  "no_interfaces": "Nejsou k dispozici žádná rozhraní pro připojení"
+  "no_interfaces": "Nejsou k dispozici žádná rozhraní pro připojení",
+  "ip_address": "IP adresa",
+  "fingerprint": "Otisk veřejného klíče"
 }

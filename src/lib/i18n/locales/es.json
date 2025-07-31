@@ -172,5 +172,7 @@
   "plugin_update_error": "Error al actualizar el plugin",
   "updates_found_count": "{count, plural, =0 {No hay actualizaciones disponibles.} one {{count, number} actualización disponible.} other {{count, number} actualizaciones disponibles.}}",
   "installing": "Instalando",
-  "no_interfaces": "No hay interfaces disponibles desde las que conectarse"
+  "no_interfaces": "No hay interfaces disponibles desde las que conectarse",
+  "ip_address": "Dirección IP",
+  "fingerprint": "Huella de la clave pública"
 }

@@ -174,5 +174,7 @@
   "installing": "Installing",
   "server_port": "Server Port",
   "server_port_description": "Port the internal server will run from, this must be unique for the app to run properly. Will be applied after a restart of TilePad",
-  "no_interfaces": "No interfaces available to connect from"
+  "no_interfaces": "No interfaces available to connect from",
+  "ip_address": "IP Address",
+  "fingerprint": "Fingerprint"
 }

@@ -172,5 +172,7 @@
   "plugin_update_error": "Plugin konnte nicht aktualisiert werden",
   "updates_found_count": "{count, plural, =0 {Keine verfügbaren Updates.} one {{count, number} verfügbares Update.} other {{count, number} verfügbare Updates.}}",
   "installing": "Wird installiert",
-  "no_interfaces": "Keine Schnittstellen verfügbar, um eine Verbindung herzustellen"
+  "no_interfaces": "Keine Schnittstellen verfügbar, um eine Verbindung herzustellen",
+  "ip_address": "IP-Adresse",
+  "fingerprint": "Fingerprint des öffentlichen Schlüssels"
 }

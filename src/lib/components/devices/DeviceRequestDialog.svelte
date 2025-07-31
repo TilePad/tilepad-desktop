@@ -75,7 +75,7 @@
               {deviceName}
             </h3>
 
-            <span class="address">Address: {address}</span>
+            <span class="address">{$t("ip_address")}: {address}</span>
 
             {#await fingerprintPromise then print}
               <div class="fingerprint">
@@ -83,7 +83,7 @@
                   <SolarKeyBoldDuotone
                     style="display: inline; vertical-align: middle;"
                   />
-                  Fingerprint:
+                  {$t("fingerprint")}:
                 </p>
                 <p class="fingerprint__value">
                   {print}
