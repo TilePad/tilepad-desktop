@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { ProfileId } from "$lib/api/types/profiles";
+
   import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { createProfile } from "$lib/api/profiles";
@@ -10,14 +12,14 @@
   import Tooltip from "../Tooltip.svelte";
   import Button from "../input/Button.svelte";
   import Dialog from "../dialog/Dialog.svelte";
-  import { getProfileContext } from "./ProfilesProvider.svelte";
   import DialogCloseButton from "../dialog/DialogCloseButton.svelte";
 
-  type Props = DialogProps & { order: number };
+  type Props = DialogProps & {
+    order: number;
+    onCreated: (profileId: ProfileId) => void;
+  };
 
-  let { order, ...restProps }: Props = $props();
-
-  const { setProfileId } = getProfileContext();
+  const { order, onCreated, ...restProps }: Props = $props();
 
   let open = $state(false);
   let name = $state("");
@@ -44,7 +46,7 @@
     open = false;
     reset();
 
-    setProfileId(promise.id);
+    onCreated(promise.id);
   }
 
   function reset() {

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { ProfileId } from "$lib/api/types/profiles";
   import type { FolderModel } from "$lib/api/types/folders";
 
   import { t } from "svelte-i18n";
@@ -19,10 +20,11 @@
   import DeleteFolderDialog from "./DeleteFolderDialog.svelte";
 
   type Props = {
+    profileId: ProfileId;
     folder: FolderModel;
   };
 
-  const { folder }: Props = $props();
+  const { profileId, folder }: Props = $props();
 
   const setFolderConfigMutation = createSetFolderConfigMutation();
 
@@ -93,7 +95,7 @@
 
         <EditFolderDialog {folder} />
         {#if !folder.default}
-          <DeleteFolderDialog {folder} />
+          <DeleteFolderDialog {profileId} {folder} />
         {/if}
       {/snippet}
     </PopoverButton>

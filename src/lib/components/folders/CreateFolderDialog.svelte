@@ -1,4 +1,7 @@
 <script lang="ts">
+  import type { ProfileId } from "$lib/api/types/profiles";
+  import type { FolderId, FolderConfig } from "$lib/api/types/folders";
+
   import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { toastErrorMessage } from "$lib/api/utils/error";
@@ -11,56 +14,61 @@
   import Button from "../input/Button.svelte";
   import Dialog from "../dialog/Dialog.svelte";
   import TextInput from "../input/TextInput.svelte";
-  import { getFolderContext } from "./FolderProvider.svelte";
   import DialogCloseButton from "../dialog/DialogCloseButton.svelte";
-  import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
 
   type Props = DialogProps & {
+    /** Current profile ID */
+    profileId: ProfileId;
+
+    /** Base current folder config to inherit from */
+    baseConfig: FolderConfig;
+
+    /** Order to insert the next folder as */
     order: number;
+
+    /** Handler for folder creation completed */
+    onCreated: (folderId: FolderId) => void;
   };
 
-  let { order }: Props = $props();
-
-  const { profile } = getProfileContext();
-  const { folder, setFolderId } = getFolderContext();
-
-  const currentProfile = $derived.by(profile);
-  const currentFolder = $derived.by(folder);
+  const { profileId, baseConfig, order, onCreated }: Props = $props();
 
   const createFolderMutation = createCreateFolderMutation();
 
   let open = $state(false);
   let name = $state("");
 
-  async function onCreate(event: Event) {
+  function onCreate(event: Event) {
     event.preventDefault();
     if (name.length < 1) return;
 
-    const createPromise = $createFolderMutation.mutateAsync({
-      create: {
-        name,
-        default: false,
-        config: {
-          rows: currentFolder.config.rows,
-          columns: currentFolder.config.columns,
+    const createPromise = $createFolderMutation.mutateAsync(
+      {
+        create: {
+          name,
+          default: false,
+          config: {
+            rows: baseConfig.rows,
+            columns: baseConfig.columns,
+          },
+          profile_id: profileId,
+          order,
         },
-        profile_id: currentProfile.id,
-        order,
       },
-    });
+      {
+        onSuccess: (folder) => {
+          reset();
+          open = false;
+
+          onCreated(folder.id);
+        },
+      },
+    );
 
     toast.promise(createPromise, {
       loading: $t("folder_creating"),
       success: $t("folder_created"),
       error: toastErrorMessage($t("folder_create_error")),
     });
-
-    const folder = await createPromise;
-
-    open = false;
-    reset();
-
-    setFolderId(folder.id);
   }
 
   function reset() {

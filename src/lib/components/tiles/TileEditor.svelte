@@ -1,5 +1,7 @@
 <script lang="ts">
   import type { TileId } from "$lib/api/types/tiles";
+  import type { FolderId } from "$lib/api/types/folders";
+  import type { ProfileId } from "$lib/api/types/profiles";
 
   import { Dialog } from "bits-ui";
   import { fade, slide } from "svelte/transition";
@@ -7,11 +9,13 @@
   import TileEditorContent from "./TileEditorContent.svelte";
 
   type Props = {
+    profileId: ProfileId;
+    folderId: FolderId;
     tileId: TileId | null;
     onClose: VoidFunction;
   };
 
-  const { tileId, onClose }: Props = $props();
+  const { profileId, folderId, tileId, onClose }: Props = $props();
 </script>
 
 <Dialog.Root
@@ -41,7 +45,7 @@
             transition:slide={{ axis: "x", duration: 150 }}
           >
             <div class="content-inner">
-              <TileEditorContent {tileId} {onClose} />
+              <TileEditorContent {profileId} {folderId} {tileId} {onClose} />
             </div>
           </div>
         {/if}

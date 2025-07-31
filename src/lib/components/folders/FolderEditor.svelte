@@ -75,7 +75,13 @@
         />
 
         <ProfileSelectorSettings profile={currentProfile} />
-        <CreateProfileDialog order={profiles.length} />
+        <CreateProfileDialog
+          order={profiles.length}
+          onCreated={(profileId) => {
+            // Switch to created profile
+            setProfileId(profileId);
+          }}
+        />
       </div>
 
       <RightArrowIcon />
@@ -86,8 +92,19 @@
           value={currentFolderId}
           onChangeValue={setFolderId}
         />
-        <FolderSelectorSettings folder={currentFolder} />
-        <CreateFolderDialog order={folders.length} />
+        <FolderSelectorSettings
+          profileId={currentProfileId}
+          folder={currentFolder}
+        />
+        <CreateFolderDialog
+          profileId={currentProfileId}
+          baseConfig={currentFolder.config}
+          order={folders.length}
+          onCreated={(folderId) => {
+            // Switch to created folder
+            setFolderId(folderId);
+          }}
+        />
       </div>
     </div>
     <div class="content__wrapper">
@@ -114,7 +131,12 @@
     </div>
 
     <!-- Bottom segment that pops up to edit a tile -->
-    <TileEditor tileId={activeTileId} onClose={() => (activeTileId = null)} />
+    <TileEditor
+      profileId={currentProfileId}
+      folderId={currentFolderId}
+      tileId={activeTileId}
+      onClose={() => (activeTileId = null)}
+    />
   {/if}
 </div>
 

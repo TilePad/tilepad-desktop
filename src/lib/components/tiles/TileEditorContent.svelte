@@ -1,5 +1,7 @@
 <script lang="ts">
   import type { TileId } from "$lib/api/types/tiles";
+  import type { FolderId } from "$lib/api/types/folders";
+  import type { ProfileId } from "$lib/api/types/profiles";
 
   import { t } from "svelte-i18n";
   import { createTileQuery } from "$lib/api/tiles";
@@ -12,21 +14,21 @@
   import TileIconEditor from "./TileIconEditor.svelte";
   import TileNameEditor from "./TileNameEditor.svelte";
   import DeleteTileDialog from "./DeleteTileDialog.svelte";
-  import { getFolderContext } from "../folders/FolderProvider.svelte";
   import PropertyInspector from "../property/PropertyInspector.svelte";
-  import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
 
   type Props = {
+    profileId: ProfileId;
+    folderId: FolderId;
     tileId: TileId;
     onClose: VoidFunction;
   };
 
-  const { tileId, onClose }: Props = $props();
+  const { profileId, folderId, tileId, onClose }: Props = $props();
 
-  const { profileId } = getProfileContext();
-  const { folderId } = getFolderContext();
-
-  const tileQuery = createTileQuery(folderId, () => tileId);
+  const tileQuery = createTileQuery(
+    () => folderId,
+    () => tileId,
+  );
 
   const tile = $derived($tileQuery.data);
 
@@ -39,7 +41,7 @@
 {#if $tileQuery.isSuccess && $tileQuery.data}
   {@const tile = $tileQuery.data}
   {@const ctx = {
-    profile_id: profileId(),
+    profile_id: profileId,
     folder_id: tile.folder_id,
     plugin_id: tile.plugin_id,
     action_id: tile.action_id,

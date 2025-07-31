@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { ProfileId } from "$lib/api/types/profiles";
   import type { FolderModel } from "$lib/api/types/folders";
 
   import { t } from "svelte-i18n";
@@ -11,17 +12,13 @@
   import Button from "../input/Button.svelte";
   import Dialog from "../dialog/Dialog.svelte";
   import DialogCloseButton from "../dialog/DialogCloseButton.svelte";
-  import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
 
   type Props = DialogProps & {
+    profileId: ProfileId;
     folder: FolderModel;
   };
 
-  let { folder }: Props = $props();
-
-  const { profile } = getProfileContext();
-
-  const currentProfile = $derived.by(profile);
+  const { profileId, folder }: Props = $props();
 
   const deleteFolderMutation = createDeleteFolderMutation();
 
@@ -32,7 +29,7 @@
 
     const createPromise = $deleteFolderMutation.mutateAsync(
       {
-        profileId: currentProfile.id,
+        profileId,
         folderId: folder.id,
       },
       {
