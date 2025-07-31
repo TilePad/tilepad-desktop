@@ -12,7 +12,9 @@
   const { fonts, value, onChangeValue }: Props = $props();
   const options = $derived([
     { value: "Roboto", name: "Roboto" },
-    ...fonts.map((font) => ({ value: font, name: font })),
+    ...fonts
+      .filter((font) => font !== "Roboto")
+      .map((font) => ({ value: font, name: font })),
   ]);
 </script>
 
