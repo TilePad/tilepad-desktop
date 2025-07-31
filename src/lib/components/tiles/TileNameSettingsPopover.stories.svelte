@@ -1,4 +1,7 @@
 <script lang="ts" module>
+  import type { ComponentProps } from "svelte";
+
+  import { Tooltip } from "bits-ui";
   import { LabelAlign } from "$lib/api/types/tiles";
   import { defineMeta } from "@storybook/addon-svelte-csf";
 
@@ -7,11 +10,18 @@
   const { Story } = defineMeta({
     title: "Tiles/TileNameSettingsPopover",
     component: TileNameSettingsPopover,
+    render: template,
     tags: ["autodocs"],
     argTypes: {},
     decorators: [],
   });
 </script>
+
+{#snippet template(args: ComponentProps<typeof TileNameSettingsPopover>)}
+  <Tooltip.Provider>
+    <TileNameSettingsPopover {...args} />
+  </Tooltip.Provider>
+{/snippet}
 
 <Story
   name="Default"
