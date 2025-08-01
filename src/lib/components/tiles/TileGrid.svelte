@@ -83,18 +83,21 @@
     }
 
     for (const tile of tiles) {
+      if (tile.id === exclude) continue;
+
       const { position } = tile;
 
       const tileRowEnd = position.row + position.row_span;
       const tileColEnd = position.column + position.column_span;
 
-      if (
-        tile.id !== exclude &&
-        position.row >= row &&
-        position.column >= col &&
-        tileRowEnd <= rowEnd &&
-        tileColEnd <= colEnd
-      ) {
+      const isOverlap = !(
+        tileRowEnd <= row || // tile is above
+        position.row >= rowEnd || // tile is below
+        tileColEnd <= col || // tile is left
+        position.column >= colEnd // tile is right
+      );
+
+      if (isOverlap) {
         return false;
       }
     }
@@ -123,7 +126,7 @@
           {isAllowedWithin}
         />
       {:else}
-        <EmptyTile row={item.row} column={item.column} width={tileSize} {gap} />
+        <EmptyTile row={item.row} column={item.column} {tileSize} {gap} />
       {/if}
     {/each}
   </div>

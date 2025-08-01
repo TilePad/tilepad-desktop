@@ -2,7 +2,7 @@
   import type { TileId, TileModel, TilePosition } from "$lib/api/types/tiles";
 
   import { watch, useDebounce } from "runed";
-  import { createUpdateTilePositionMutation } from "$lib/api/tiles";
+  import { createUpdateTilePositionMutation } from "$lib/api/tiles/tiles.mutations";
   import {
     type DisplayContext,
     CONTROLLER_DEVICE_ID,
@@ -16,7 +16,7 @@
   import TileIcon from "./TileIcon.svelte";
   import EmptyTile from "./EmptyTile.svelte";
   import TileLabelElm from "./TileLabel.svelte";
-  import { DESIRED_TILE_WIDTH } from "./TileGrid.svelte";
+  import TileContainer from "./TileContainer.svelte";
   import { getDraggingContext } from "./TileDraggingProvider.svelte";
 
   type Props = {
@@ -57,36 +57,6 @@
       position = newPosition;
     },
   );
-
-  const { tileX, tileY, tileZ, tileWidth, tileHeight, sizeAdjust } =
-    $derived.by(() => {
-      const tileWidth =
-        tileSize * position.column_span + gap * (position.column_span - 1);
-      const tileHeight =
-        tileSize * position.row_span + gap * (position.row_span - 1);
-
-      const ratioX = (tileWidth - DESIRED_TILE_WIDTH) / DESIRED_TILE_WIDTH;
-      const ratioY = (tileHeight - DESIRED_TILE_WIDTH) / DESIRED_TILE_WIDTH;
-
-      const sizeAdjustX = 1 + ratioX;
-      const sizeAdjustY = 1 + ratioY;
-      const sizeAdjust = Math.min(sizeAdjustX, sizeAdjustY);
-
-      const tileX = tileSize * position.column + gap * position.column;
-      const tileY = tileSize * position.row + gap * position.row;
-      const tileZ =
-        (position.row + position.row_span) *
-        (position.column + position.column_span);
-
-      return {
-        tileX,
-        tileY,
-        tileZ,
-        tileWidth,
-        tileHeight,
-        sizeAdjust,
-      };
-    });
 
   let touchTimeout: number | undefined;
   let button: HTMLButtonElement | undefined = $state();
@@ -231,16 +201,12 @@
   <EmptyTile
     row={lastPosition.row}
     column={lastPosition.column}
-    width={tileSize}
+    {tileSize}
     {gap}
   />
 {/if}
 
-<div
-  class:tile-container--resizing={resizing}
-  class="tile-container"
-  style="--tile-size-adjustment: {sizeAdjust}; --tile-width: {tileWidth}px; --tile-height: {tileHeight}px; --tile-x: {tileX}px; --tile-y: {tileY}px; --tile-z: {tileZ}"
->
+<TileContainer {position} {tileSize} {gap} {resizing}>
   <button
     onpointerdown={onPointerDown}
     onpointerup={onPointerUp}
@@ -333,28 +299,9 @@
       onResize: considerResizeDiagonalRightBottom,
     }}
   ></span>
-</div>
+</TileContainer>
 
 <style>
-  .tile-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-
-    transform: translate(var(--tile-x), var(--tile-y));
-    width: var(--tile-width);
-    height: var(--tile-height);
-    z-index: calc(var(--tile-z));
-  }
-
-  .tile-container--resizing {
-    transition: all 0.1s ease;
-  }
-
-  .tile-container--resizing .tile {
-    transition: all 0.1s ease;
-  }
-
   .tile {
     position: relative;
     border-radius: 5px;
@@ -372,6 +319,7 @@
 
     user-select: none;
     overflow: hidden;
+    transition: all 0.1s ease;
   }
 
   /* Disable pointer events for children to make dragging work properly */
