@@ -2,22 +2,19 @@
   import type { TileId, TileModel, TilePosition } from "$lib/api/types/tiles";
 
   import { watch, useDebounce } from "runed";
+  import { type ResizeEventDetail } from "$lib/utils/resizable";
   import { createUpdateTilePositionMutation } from "$lib/api/tiles/tiles.mutations";
   import {
     type DisplayContext,
     CONTROLLER_DEVICE_ID,
   } from "$lib/api/types/plugin";
-  import {
-    resizeHandle,
-    ResizeDirection,
-    type ResizeEventDetail,
-  } from "$lib/utils/resizable";
 
   import TileIcon from "./TileIcon.svelte";
   import EmptyTile from "./EmptyTile.svelte";
   import TileLabelElm from "./TileLabel.svelte";
   import TileContainer from "./TileContainer.svelte";
   import { getDraggingContext } from "./TileDraggingProvider.svelte";
+  import TileDragHandles, { type ResizeSide } from "./TileDragHandles.svelte";
 
   type Props = {
     tile: TileModel;
@@ -47,14 +44,17 @@
 
   const updateTilePosition = createUpdateTilePositionMutation();
 
-  let lastPosition: TilePosition = $state(tile.position);
-  let position: TilePosition = $state(tile.position);
+  /** Current persisted position of the tile */
+  let tilePosition: TilePosition = $state(tile.position);
+
+  /** Currently position of the tile (Affected by states such as dragging) */
+  let currentPosition: TilePosition = $state(tile.position);
 
   watch(
     () => tile.position,
     (newPosition) => {
-      lastPosition = newPosition;
-      position = newPosition;
+      tilePosition = newPosition;
+      currentPosition = newPosition;
     },
   );
 
@@ -98,34 +98,32 @@
   }, 100);
 
   function persistPosition(position: TilePosition) {
-    lastPosition = { ...position };
+    tilePosition = { ...position };
     debounceUpdatePosition(position);
   }
-
-  type ResizeSide = "top" | "bottom" | "left" | "right";
 
   function handleResize(detail: ResizeEventDetail, side: ResizeSide) {
     resizing = true;
 
-    let col = position.column;
-    let row = position.row;
+    let col = currentPosition.column;
+    let row = currentPosition.row;
 
-    let colSpan = position.column_span;
-    let rowSpan = position.row_span;
+    let colSpan = currentPosition.column_span;
+    let rowSpan = currentPosition.row_span;
 
     if (side === "top") {
       row =
-        lastPosition.row + Math.min(detail.scaleY, lastPosition.row_span - 1);
-      rowSpan = Math.max(lastPosition.row_span - detail.scaleY, 1);
+        tilePosition.row + Math.min(detail.scaleY, tilePosition.row_span - 1);
+      rowSpan = Math.max(tilePosition.row_span - detail.scaleY, 1);
     } else if (side === "bottom") {
-      rowSpan = Math.max(lastPosition.row_span + detail.scaleY, 1);
+      rowSpan = Math.max(tilePosition.row_span + detail.scaleY, 1);
     } else if (side === "left") {
       col =
-        lastPosition.column +
-        Math.min(detail.scaleX, lastPosition.column_span - 1);
-      colSpan = Math.max(lastPosition.column_span - detail.scaleX, 1);
+        tilePosition.column +
+        Math.min(detail.scaleX, tilePosition.column_span - 1);
+      colSpan = Math.max(tilePosition.column_span - detail.scaleX, 1);
     } else if (side === "right") {
-      colSpan = Math.max(lastPosition.column_span + detail.scaleX, 1);
+      colSpan = Math.max(tilePosition.column_span + detail.scaleX, 1);
     }
 
     if (!isAllowedWithin(col, colSpan, row, rowSpan, tile.id)) {
@@ -133,7 +131,7 @@
     }
 
     // Update position changes
-    position = {
+    currentPosition = {
       column: col,
       column_span: colSpan,
       row: row,
@@ -141,7 +139,7 @@
     };
 
     if (detail.commit) {
-      persistPosition(position);
+      persistPosition(currentPosition);
       resizing = false;
     }
   }
@@ -159,54 +157,22 @@
     }
 
     if (commit) {
-      persistPosition(position);
+      persistPosition(currentPosition);
       resizing = false;
     }
-  }
-
-  function handleResizeVerticalTop(detail: ResizeEventDetail) {
-    handleResize(detail, "top");
-  }
-
-  function handleResizeVerticalBottom(detail: ResizeEventDetail) {
-    handleResize(detail, "bottom");
-  }
-
-  function handleResizeHorizontalLeft(detail: ResizeEventDetail) {
-    handleResize(detail, "left");
-  }
-
-  function handleResizeHorizontalRight(detail: ResizeEventDetail) {
-    handleResize(detail, "right");
-  }
-
-  function considerResizeDiagonalLeftTop(detail: ResizeEventDetail) {
-    handleResizeDiagonal(detail, ["left", "top"]);
-  }
-
-  function considerResizeDiagonalLeftBottom(detail: ResizeEventDetail) {
-    handleResizeDiagonal(detail, ["left", "bottom"]);
-  }
-
-  function considerResizeDiagonalRightBottom(detail: ResizeEventDetail) {
-    handleResizeDiagonal(detail, ["right", "bottom"]);
-  }
-
-  function considerResizeDiagonalRightTop(detail: ResizeEventDetail) {
-    handleResizeDiagonal(detail, ["right", "top"]);
   }
 </script>
 
 {#if resizing}
   <EmptyTile
-    row={lastPosition.row}
-    column={lastPosition.column}
+    row={tilePosition.row}
+    column={tilePosition.column}
     {tileSize}
     {gap}
   />
 {/if}
 
-<TileContainer {position} {tileSize} {gap} {resizing}>
+<TileContainer position={currentPosition} {tileSize} {gap} {resizing}>
   <button
     onpointerdown={onPointerDown}
     onpointerup={onPointerUp}
@@ -228,77 +194,11 @@
     <TileLabelElm {...config.label} />
   </button>
 
-  <span
-    class="handle handle--vertical handle--top"
-    use:resizeHandle={{
-      direction: ResizeDirection.VERTICAL,
-      distanceThreshold,
-      onResize: handleResizeVerticalTop,
-    }}
-  ></span>
-
-  <span
-    class="handle handle--vertical handle--bottom"
-    use:resizeHandle={{
-      direction: ResizeDirection.VERTICAL,
-      distanceThreshold,
-      onResize: handleResizeVerticalBottom,
-    }}
-  ></span>
-
-  <span
-    class="handle handle--horizontal handle--left"
-    use:resizeHandle={{
-      direction: ResizeDirection.HORIZONTAL,
-      distanceThreshold,
-      onResize: handleResizeHorizontalLeft,
-    }}
-  ></span>
-
-  <span
-    class="handle handle--corner handle--corner-top-left"
-    use:resizeHandle={{
-      direction: ResizeDirection.DIAGONAL,
-      distanceThreshold,
-      onResize: considerResizeDiagonalLeftTop,
-    }}
-  ></span>
-
-  <span
-    class="handle handle--corner handle--corner-bottom-left"
-    use:resizeHandle={{
-      direction: ResizeDirection.DIAGONAL,
-      distanceThreshold,
-      onResize: considerResizeDiagonalLeftBottom,
-    }}
-  ></span>
-
-  <span
-    class="handle handle--horizontal handle--right"
-    use:resizeHandle={{
-      direction: ResizeDirection.HORIZONTAL,
-      distanceThreshold,
-      onResize: handleResizeHorizontalRight,
-    }}
-  ></span>
-
-  <span
-    class="handle handle--corner handle--corner-top-right"
-    use:resizeHandle={{
-      direction: ResizeDirection.DIAGONAL,
-      distanceThreshold,
-      onResize: considerResizeDiagonalRightTop,
-    }}
-  ></span>
-
-  <span
-    class="handle handle--corner handle--corner-bottom-right"
-    use:resizeHandle={{
-      direction: ResizeDirection.DIAGONAL,
-      distanceThreshold,
-      onResize: considerResizeDiagonalRightBottom,
-    }}
-  ></span>
+  <TileDragHandles
+    {distanceThreshold}
+    onResize={handleResize}
+    onResizeDiagonal={handleResizeDiagonal}
+  />
 </TileContainer>
 
 <style>
@@ -329,76 +229,5 @@
 
   .tile--dragging {
     opacity: 0.5;
-  }
-
-  .handle {
-    --handle-width: 1px;
-    --handle-offset: 1px;
-    --handle-corner-size: calc(var(--handle-width) * 2);
-
-    position: absolute;
-  }
-
-  .handle:hover {
-    background-color: #fff;
-  }
-
-  .handle--vertical {
-    left: var(--handle-corner-size);
-    height: var(--handle-width);
-    width: calc(100% - (var(--handle-corner-size) * 2) - var(--handle-offset));
-    cursor: row-resize;
-  }
-
-  .handle--top {
-    top: var(--handle-offset);
-  }
-
-  .handle--bottom {
-    bottom: var(--handle-offset);
-  }
-
-  .handle--horizontal {
-    height: calc(100% - (var(--handle-corner-size) * 2) - var(--handle-offset));
-    top: var(--handle-corner-size);
-    width: var(--handle-width);
-    cursor: col-resize;
-  }
-
-  .handle--left {
-    left: var(--handle-offset);
-  }
-
-  .handle--right {
-    right: var(--handle-offset);
-  }
-
-  .handle--corner {
-    height: var(--handle-corner-size);
-    width: var(--handle-corner-size);
-  }
-
-  .handle--corner-top-left {
-    top: var(--handle-offset);
-    left: var(--handle-offset);
-    cursor: nw-resize;
-  }
-
-  .handle--corner-bottom-left {
-    bottom: var(--handle-offset);
-    left: var(--handle-offset);
-    cursor: sw-resize;
-  }
-
-  .handle--corner-top-right {
-    top: var(--handle-offset);
-    right: var(--handle-offset);
-    cursor: ne-resize;
-  }
-
-  .handle--corner-bottom-right {
-    bottom: var(--handle-offset);
-    right: var(--handle-offset);
-    cursor: se-resize;
   }
 </style>
