@@ -25,7 +25,7 @@
 
   const pluginsQuery = createPluginsQuery();
 
-  const checkUpdatesMutation = createMutation({
+  const checkUpdatesMutation = createMutation(() => ({
     mutationFn: async ({ plugins }: { plugins: PluginWithState[] }) => {
       // Load remote available plugins
       const remotePlugins = await fetchPluginRegistry();
@@ -75,27 +75,27 @@
 
       return updates;
     },
-  });
+  }));
 </script>
 
 <div class="layout">
-  {#if $pluginsQuery.isLoading}
+  {#if pluginsQuery.isLoading}
     <SkeletonList style="margin: 1rem" />
-  {:else if $pluginsQuery.isError}
+  {:else if pluginsQuery.isError}
     <Aside severity="error" style="margin: 1rem">
       {$t("plugins_error", {
-        values: { error: getErrorMessage($pluginsQuery.error) },
+        values: { error: getErrorMessage(pluginsQuery.error) },
       })}
     </Aside>
-  {:else if $pluginsQuery.isSuccess}
+  {:else if pluginsQuery.isSuccess}
     <div class="header">
       <div class="actions">
         <Button
           variant="secondary"
           onclick={() => {
-            $checkUpdatesMutation.mutate({ plugins: $pluginsQuery.data });
+            checkUpdatesMutation.mutate({ plugins: pluginsQuery.data });
           }}
-          loading={$checkUpdatesMutation.isPending}
+          loading={checkUpdatesMutation.isPending}
         >
           Check for updates
         </Button>
@@ -111,9 +111,9 @@
 
     <div class="plugins-wrapper">
       <div class="plugins">
-        {#each $pluginsQuery.data as plugin (plugin.manifest.plugin.id)}
+        {#each pluginsQuery.data as plugin (plugin.manifest.plugin.id)}
           {#if !plugin.manifest.plugin.internal || import.meta.env.DEV}
-            {@const latestManifest = $checkUpdatesMutation.data?.find(
+            {@const latestManifest = checkUpdatesMutation.data?.find(
               (entry) =>
                 entry.manifest.plugin.id === plugin.manifest.plugin.id &&
                 // Ignore if version already matches

@@ -4,7 +4,7 @@ import { installIconPackBuffer } from "../icons";
 import { getIconPackBundle } from "./icons_registry.requests";
 
 export function createInstallIconPackFromRegistry() {
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: async ({
       repo,
       version,
@@ -17,5 +17,5 @@ export function createInstallIconPackFromRegistry() {
       const bundle = await getIconPackBundle(repo, version, fileName);
       await installIconPackBuffer(bundle);
     },
-  });
+  }));
 }

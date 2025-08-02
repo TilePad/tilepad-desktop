@@ -26,7 +26,7 @@
   const { tileId, config }: Props = $props();
 
   const fontsQuery = createFontsQuery();
-  const fonts = $derived($fontsQuery.data ?? []);
+  const fonts = $derived(fontsQuery.data ?? []);
   const updateTileLabel = createUpdateTileLabelMutation();
 
   // Last persisted update
@@ -36,7 +36,7 @@
   const updateLabelDebounced = useDebounce((label: TileLabel) => {
     lastUpdate = label;
 
-    $updateTileLabel.mutate({
+    updateTileLabel.mutate({
       tileId,
       label,
       kind: UpdateKind.User,

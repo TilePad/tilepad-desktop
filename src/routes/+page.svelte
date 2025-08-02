@@ -26,7 +26,7 @@
   } from "$lib/api/tiles";
 
   const actionsQuery = createActionsQuery();
-  const actions = $derived($actionsQuery.data ?? []);
+  const actions = $derived(actionsQuery.data ?? []);
 
   const createTile = createCreateTileMutation();
   const updateTilePosition = createUpdateTilePositionMutation();
@@ -78,7 +78,7 @@
   }
 
   function onMoveTile(tileId: TileId, row: number, column: number) {
-    $updateTilePosition.mutateAsync({
+    updateTilePosition.mutateAsync({
       tileId,
       position: {
         row,
@@ -111,7 +111,7 @@
       };
     }
 
-    const createPromise = $createTile.mutateAsync({
+    const createPromise = createTile.mutateAsync({
       create: {
         position: {
           row,
@@ -151,8 +151,8 @@
           <FolderEditor />
           <ActionsSidebar
             actions={actionCategoryData}
-            actionsLoading={$actionsQuery.isLoading}
-            actionsError={$actionsQuery.error}
+            actionsLoading={actionsQuery.isLoading}
+            actionsError={actionsQuery.error}
           />
         </div>
       </TileDraggingProvider>

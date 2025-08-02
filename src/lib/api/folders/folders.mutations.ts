@@ -15,7 +15,7 @@ import {
 export function createCreateFolderMutation() {
   const queryClient = getQueryClientContext();
 
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: ({ create }: { create: CreateFolder }) => createFolder(create),
     onSuccess(folder) {
       invalidateFoldersList(queryClient, folder.profile_id);
@@ -24,13 +24,13 @@ export function createCreateFolderMutation() {
         folder,
       );
     },
-  });
+  }));
 }
 
 export function createSetFolderNameMutation() {
   const queryClient = getQueryClientContext();
 
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: ({ folderId, name }: { folderId: FolderId; name: string }) =>
       setFolderName(folderId, name),
     onSuccess(folder) {
@@ -40,13 +40,13 @@ export function createSetFolderNameMutation() {
         folder,
       );
     },
-  });
+  }));
 }
 
 export function createSetFolderConfigMutation() {
   const queryClient = getQueryClientContext();
 
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: ({
       folderId,
       config,
@@ -61,17 +61,17 @@ export function createSetFolderConfigMutation() {
         folder,
       );
     },
-  });
+  }));
 }
 
 export function createDeleteFolderMutation() {
   const queryClient = getQueryClientContext();
 
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: ({ folderId }: { folderId: FolderId; profileId: ProfileId }) =>
       deleteFolder(folderId),
     onSuccess(_, { profileId }) {
       invalidateFoldersList(queryClient, profileId);
     },
-  });
+  }));
 }

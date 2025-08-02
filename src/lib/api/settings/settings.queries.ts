@@ -4,8 +4,8 @@ import { settingsKeys } from "./settings.keys";
 import { getSettings } from "./settings.requests";
 
 export function createSettingsQuery() {
-  return createQuery({
+  return createQuery(() => ({
     queryKey: settingsKeys.root,
     queryFn: getSettings,
-  });
+  }));
 }

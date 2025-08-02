@@ -26,7 +26,7 @@
   let search = $state("");
 
   const filteredRegistry = $derived(
-    filterIconPacks($pluginRegistryQuery.data ?? [], search),
+    filterIconPacks(pluginRegistryQuery.data ?? [], search),
   );
 
   function filterIconPacks(packs: PluginRegistryEntry[], query: string) {
@@ -43,21 +43,21 @@
 
 <Dialog {...restProps}>
   <div class="content">
-    {#if $pluginRegistryQuery.isLoading || $pluginsQuery.isLoading}
+    {#if pluginRegistryQuery.isLoading || pluginsQuery.isLoading}
       <SkeletonList style="padding: 1rem" />
-    {:else if $pluginRegistryQuery.isError}
+    {:else if pluginRegistryQuery.isError}
       <Aside severity="error" style="margin: 1rem;">
         {$t("community_plugins_error", {
-          values: { error: getErrorMessage($pluginRegistryQuery.error) },
+          values: { error: getErrorMessage(pluginRegistryQuery.error) },
         })}
       </Aside>
-    {:else if $pluginsQuery.isError}
+    {:else if pluginsQuery.isError}
       <Aside severity="error" style="margin: 1rem;">
         {$t("plugins_installed_error", {
-          values: { error: getErrorMessage($pluginsQuery.error) },
+          values: { error: getErrorMessage(pluginsQuery.error) },
         })}
       </Aside>
-    {:else if $pluginRegistryQuery.isSuccess && $pluginsQuery.isSuccess}
+    {:else if pluginRegistryQuery.isSuccess && pluginsQuery.isSuccess}
       <div class="split">
         <div class="plugins">
           <div class="titlebar">
@@ -94,7 +94,7 @@
                     active = item;
                   }
                 }}
-                installed={$pluginsQuery.data.find(
+                installed={pluginsQuery.data.find(
                   (plugin) => plugin.manifest.plugin.id === item.id,
                 ) !== undefined}
                 selected={active !== undefined && active.id === item.id}
@@ -109,7 +109,7 @@
           {#if active}
             <PluginRegistryViewer
               item={active}
-              installed={$pluginsQuery.data.find(
+              installed={pluginsQuery.data.find(
                 (plugin) => plugin.manifest.plugin.id === active!.id,
               )?.manifest}
             />

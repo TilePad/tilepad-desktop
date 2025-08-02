@@ -17,15 +17,15 @@
   const settingsQuery = createSettingsQuery();
 </script>
 
-{#if $settingsQuery.isLoading}
+{#if settingsQuery.isLoading}
   <SkeletonList style="margin: 1rem;" />
-{:else if $settingsQuery.isError}
+{:else if settingsQuery.isError}
   <!-- Error creating current profile -->
   <Aside severity="error" style="margin: 1rem;">
     {$t("settings_error", {
-      values: { error: getErrorMessage($settingsQuery.error) },
+      values: { error: getErrorMessage(settingsQuery.error) },
     })}
   </Aside>
-{:else if $settingsQuery.isSuccess}
-  {@render children?.({ settings: $settingsQuery.data })}
+{:else if settingsQuery.isSuccess}
+  {@render children?.({ settings: settingsQuery.data })}
 {/if}

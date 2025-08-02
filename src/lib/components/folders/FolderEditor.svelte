@@ -34,10 +34,10 @@
   const currentProfileId = $derived(currentProfile.id);
 
   const profilesQuery = createProfilesQuery();
-  const profiles = $derived($profilesQuery.data ?? []);
+  const profiles = $derived(profilesQuery.data ?? []);
 
   const foldersQuery = createFoldersQuery(() => currentProfile.id);
-  const folders = $derived($foldersQuery.data ?? []);
+  const folders = $derived(foldersQuery.data ?? []);
 
   const tilesQuery = createTilesQuery(() => currentFolderId);
 
@@ -53,19 +53,19 @@
 </script>
 
 <div class="layout">
-  {#if $tilesQuery.isLoading}
+  {#if tilesQuery.isLoading}
     <div class="content">
       <SkeletonList />
     </div>
-  {:else if $tilesQuery.isError}
+  {:else if tilesQuery.isError}
     <div class="content">
       <Aside severity="error" style="width: 100%">
         {$t("tiles_error", {
-          values: { error: getErrorMessage($tilesQuery.error) },
+          values: { error: getErrorMessage(tilesQuery.error) },
         })}
       </Aside>
     </div>
-  {:else if $tilesQuery.isSuccess}
+  {:else if tilesQuery.isSuccess}
     <div class="header">
       <div class="profile-options-group">
         <ProfileSelector
@@ -115,7 +115,7 @@
           out:fly={{ x: 50, duration: 300, opacity: 0 }}
         >
           <TileGrid
-            tiles={$tilesQuery.data}
+            tiles={tilesQuery.data}
             rows={currentFolder.config.rows}
             columns={currentFolder.config.columns}
             onClickTile={(tile) => {

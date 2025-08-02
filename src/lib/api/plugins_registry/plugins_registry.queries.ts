@@ -1,7 +1,6 @@
 import { createQuery } from "@tanstack/svelte-query";
 
 import { queryClient } from "../client";
-import { runeStore } from "../utils/svelte.svelte";
 import { pluginRegistryKey } from "./plugins_registry.keys";
 import {
   getPluginReadme,
@@ -10,10 +9,10 @@ import {
 } from "./plugins_registry.requests";
 
 export function createPluginRegistryQuery() {
-  return createQuery({
+  return createQuery(() => ({
     queryKey: pluginRegistryKey.list,
     queryFn: getPluginRegistry,
-  });
+  }));
 }
 
 export function fetchPluginRegistry() {
@@ -24,16 +23,14 @@ export function fetchPluginRegistry() {
 }
 
 export function createPluginManifestQuery(repo: () => string) {
-  return createQuery(
-    runeStore(() => {
-      const r = repo();
-      return {
-        queryKey: pluginRegistryKey.specificManifest(r),
-        queryFn: () => getPluginManifest(r),
-        staleTime: Infinity,
-      };
-    }),
-  );
+  return createQuery(() => {
+    const r = repo();
+    return {
+      queryKey: pluginRegistryKey.specificManifest(r),
+      queryFn: () => getPluginManifest(r),
+      staleTime: Infinity,
+    };
+  });
 }
 
 export function fetchPluginManifest(repo: string) {
@@ -45,14 +42,12 @@ export function fetchPluginManifest(repo: string) {
 }
 
 export function createPluginReadmeQuery(repo: () => string) {
-  return createQuery(
-    runeStore(() => {
-      const r = repo();
-      return {
-        queryKey: pluginRegistryKey.specificReadme(r),
-        queryFn: () => getPluginReadme(r),
-        staleTime: Infinity,
-      };
-    }),
-  );
+  return createQuery(() => {
+    const r = repo();
+    return {
+      queryKey: pluginRegistryKey.specificReadme(r),
+      queryFn: () => getPluginReadme(r),
+      staleTime: Infinity,
+    };
+  });
 }

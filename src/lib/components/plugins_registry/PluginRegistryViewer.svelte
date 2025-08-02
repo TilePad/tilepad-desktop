@@ -35,10 +35,10 @@
   const update = createUpdatePlugin();
 
   async function onInstall() {
-    const manifest = $manifestQuery.data;
+    const manifest = manifestQuery.data;
     if (!manifest) return;
 
-    const installPromise = $install.mutateAsync(
+    const installPromise = install.mutateAsync(
       {
         repo: item.repo,
         version: manifest.plugin.version,
@@ -54,7 +54,7 @@
   }
 
   function handleUninstall() {
-    const revokePromise = $uninstall.mutateAsync({ pluginId: item.id });
+    const revokePromise = uninstall.mutateAsync({ pluginId: item.id });
 
     toast.promise(revokePromise, {
       loading: $t("plugin_uninstalling"),
@@ -67,7 +67,7 @@
     manifest: PluginManifest,
     remotePlugin: PluginRegistryEntry,
   ) {
-    const updatePromise = $update.mutateAsync({
+    const updatePromise = update.mutateAsync({
       repo: remotePlugin.repo,
       version: manifest.plugin.version,
       pluginId: manifest.plugin.id,
@@ -83,19 +83,19 @@
 
 <div class="container">
   <div class="toolbar">
-    {#if $manifestQuery.isLoading}
+    {#if manifestQuery.isLoading}
       <SkeletonList style="padding: 1rem" />
-    {:else if $manifestQuery.isError}
+    {:else if manifestQuery.isError}
       <Aside severity="error" style="margin: 1rem;">
         {$t("manifest_error", {
-          values: { error: getErrorMessage($manifestQuery.error) },
+          values: { error: getErrorMessage(manifestQuery.error) },
         })}
       </Aside>
-    {:else if $manifestQuery.isSuccess}
-      <h2>{$manifestQuery.data.plugin.name}</h2>
-      <p>{$manifestQuery.data.plugin.description}</p>
+    {:else if manifestQuery.isSuccess}
+      <h2>{manifestQuery.data.plugin.name}</h2>
+      <p>{manifestQuery.data.plugin.description}</p>
       <span>
-        {$t("version")}: {$manifestQuery.data.plugin.version}
+        {$t("version")}: {manifestQuery.data.plugin.version}
 
         {#if installed}
           <span class="installed-version">
@@ -106,11 +106,11 @@
 
       {#if installed}
         <div class="actions">
-          {#if semverCompare($manifestQuery.data.plugin.version, installed.plugin.version) === 1}
+          {#if semverCompare(manifestQuery.data.plugin.version, installed.plugin.version) === 1}
             <Button
-              onclick={() => handleUpdate($manifestQuery.data, item)}
-              loading={$update.isPending}
-              disabled={$uninstall.isPaused}
+              onclick={() => handleUpdate(manifestQuery.data, item)}
+              loading={update.isPending}
+              disabled={uninstall.isPaused}
             >
               {$t("update")}
             </Button>
@@ -118,29 +118,29 @@
 
           <Button
             onclick={handleUninstall}
-            loading={$uninstall.isPending}
-            disabled={$update.isPending}>{$t("uninstall")}</Button
+            loading={uninstall.isPending}
+            disabled={update.isPending}>{$t("uninstall")}</Button
           >
         </div>
       {:else}
-        <Button loading={$install.isPending} onclick={onInstall}>
-          {$install.isPending ? $t("installing") : $t("install")}
+        <Button loading={install.isPending} onclick={onInstall}>
+          {install.isPending ? $t("installing") : $t("install")}
         </Button>
       {/if}
     {/if}
   </div>
 
   <div class="readme">
-    {#if $readmeQuery.isLoading}
+    {#if readmeQuery.isLoading}
       <SkeletonList style="padding: 1rem" />
-    {:else if $readmeQuery.isError}
+    {:else if readmeQuery.isError}
       {$t("readme_error", {
-        values: { error: getErrorMessage($readmeQuery.error) },
+        values: { error: getErrorMessage(readmeQuery.error) },
       })}
-    {:else if $readmeQuery.isSuccess}
+    {:else if readmeQuery.isSuccess}
       {@const markdown = replaceMarkdownRelativeUrls(
-        $readmeQuery.data.readme,
-        $readmeQuery.data.baseURL,
+        readmeQuery.data.readme,
+        readmeQuery.data.baseURL,
       )}
       <Markdown source={markdown} />
     {/if}

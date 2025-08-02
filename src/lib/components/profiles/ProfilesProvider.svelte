@@ -48,12 +48,12 @@
   let profileId: ProfileId | undefined = $state(getPersistedProfileId());
 
   const profilesQuery = createProfilesQuery();
-  const profilesQueryData = $derived($profilesQuery.data);
+  const profilesQueryData = $derived(profilesQuery.data);
 
   const createProfile = createCreateProfileMutation();
 
   const profileQuery = createProfileQuery(() => profileId ?? null);
-  const profile = $derived($profileQuery.data);
+  const profile = $derived(profileQuery.data);
 
   function getDefaultProfile(
     profiles: ProfileModel[],
@@ -96,7 +96,7 @@
       if (profileId !== undefined) return;
 
       // Create a new default profile
-      $createProfile.mutate(
+      createProfile.mutate(
         {
           create: {
             name: $t("default_profile"),
@@ -116,31 +116,31 @@
   );
 </script>
 
-{#if $createProfile.isPending || $profilesQuery.isLoading || $profileQuery.isLoading || $profileQuery.isRefetching}
+{#if createProfile.isPending || profilesQuery.isLoading || profileQuery.isLoading || profileQuery.isRefetching}
   <!-- Loading states -->
   <SkeletonList style="margin: 1rem;" />
-{:else if $createProfile.isError}
+{:else if createProfile.isError}
   <!-- Error creating current profile -->
   <Aside severity="error" style="margin: 1rem;">
     {$t("create_profile_error", {
-      values: { error: getErrorMessage($createProfile.error) },
+      values: { error: getErrorMessage(createProfile.error) },
     })}
   </Aside>
-{:else if $profilesQuery.isError}
+{:else if profilesQuery.isError}
   <!-- Error loading profiles list -->
   <Aside severity="error" style="margin: 1rem;">
     {$t("profiles_error", {
-      values: { error: getErrorMessage($profilesQuery.error) },
+      values: { error: getErrorMessage(profilesQuery.error) },
     })}
   </Aside>
-{:else if $profileQuery.isError}
+{:else if profileQuery.isError}
   <!-- Error loading current profile -->
   <Aside severity="error" style="margin: 1rem;">
     {$t("profile_error", {
-      values: { error: getErrorMessage($profileQuery.error) },
+      values: { error: getErrorMessage(profileQuery.error) },
     })}
   </Aside>
-{:else if ($createProfile.isIdle || $createProfile.isSuccess) && $profilesQuery.isSuccess && $profileQuery.isSuccess}
+{:else if (createProfile.isIdle || createProfile.isSuccess) && profilesQuery.isSuccess && profileQuery.isSuccess}
   <!-- Profiles are loaded, current profile is loaded, current profile is created -->
   {@render children?.()}
 {/if}

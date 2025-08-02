@@ -12,7 +12,7 @@ import {
 } from "./devices.requests";
 
 export function createSetDeviceProfileMutation() {
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: ({
       deviceId,
       profileId,
@@ -23,11 +23,11 @@ export function createSetDeviceProfileMutation() {
     onSuccess() {
       invalidateDevices();
     },
-  });
+  }));
 }
 
 export function createSetDeviceFolderMutation() {
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: ({
       deviceId,
       folderId,
@@ -38,15 +38,15 @@ export function createSetDeviceFolderMutation() {
     onSuccess() {
       invalidateDevices();
     },
-  });
+  }));
 }
 
 export function createRevokeDeviceFolderMutation() {
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: ({ deviceId }: { deviceId: DeviceId }) =>
       revokeDevice(deviceId),
     onSuccess() {
       invalidateDevices();
     },
-  });
+  }));
 }

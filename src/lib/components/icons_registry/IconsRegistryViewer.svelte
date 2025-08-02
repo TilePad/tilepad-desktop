@@ -31,10 +31,10 @@
   const uninstallMutation = createUninstallIconPackMutation();
 
   async function onInstall() {
-    const manifest = $manifestQuery.data;
+    const manifest = manifestQuery.data;
     if (!manifest) return;
 
-    const installPromise = $install.mutateAsync(
+    const installPromise = install.mutateAsync(
       {
         repo: item.repo,
         version: manifest.version,
@@ -51,7 +51,7 @@
   }
 
   function handleUninstall() {
-    const uninstallPromise = $uninstallMutation.mutateAsync({
+    const uninstallPromise = uninstallMutation.mutateAsync({
       packId: item.id,
     });
 
@@ -65,22 +65,22 @@
 
 <div class="container">
   <div class="toolbar">
-    {#if $manifestQuery.isLoading}
+    {#if manifestQuery.isLoading}
       <SkeletonList style="padding: 1rem" />
-    {:else if $manifestQuery.isError}
+    {:else if manifestQuery.isError}
       <Aside severity="error" style="margin: 1rem;">
         {$t("manifest_error", {
-          values: { error: getErrorMessage($manifestQuery.error) },
+          values: { error: getErrorMessage(manifestQuery.error) },
         })}
       </Aside>
-    {:else if $manifestQuery.isSuccess}
+    {:else if manifestQuery.isSuccess}
       <h2>{item.name}</h2>
       <p>{item.description}</p>
 
       {#if installed}
         <Button onclick={handleUninstall}>{$t("uninstall")}</Button>
       {:else}
-        <Button disabled={$install.isPending} onclick={onInstall}>
+        <Button disabled={install.isPending} onclick={onInstall}>
           {$t("install")}
         </Button>
       {/if}
@@ -88,16 +88,16 @@
   </div>
 
   <div class="readme">
-    {#if $readmeQuery.isLoading}
+    {#if readmeQuery.isLoading}
       <SkeletonList style="padding: 1rem" />
-    {:else if $readmeQuery.isError}
+    {:else if readmeQuery.isError}
       {$t("readme_error", {
-        values: { error: getErrorMessage($readmeQuery.error) },
+        values: { error: getErrorMessage(readmeQuery.error) },
       })}
-    {:else if $readmeQuery.isSuccess}
+    {:else if readmeQuery.isSuccess}
       {@const markdown = replaceMarkdownRelativeUrls(
-        $readmeQuery.data.readme,
-        $readmeQuery.data.baseURL,
+        readmeQuery.data.readme,
+        readmeQuery.data.baseURL,
       )}
       <Markdown source={markdown} />
     {/if}

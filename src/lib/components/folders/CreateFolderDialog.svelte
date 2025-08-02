@@ -41,7 +41,7 @@
     event.preventDefault();
     if (name.length < 1) return;
 
-    const createPromise = $createFolderMutation.mutateAsync(
+    const createPromise = createFolderMutation.mutateAsync(
       {
         create: {
           name,

@@ -8,11 +8,11 @@ import { invalidateIconPacksQuery } from "./icons.mutators";
 export function createUninstallIconPackMutation() {
   const queryClient = getQueryClientContext();
 
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: ({ packId }: { packId: IconPackId }) =>
       uninstallIconPack(packId),
     onSuccess() {
       invalidateIconPacksQuery(queryClient);
     },
-  });
+  }));
 }

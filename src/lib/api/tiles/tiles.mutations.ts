@@ -25,7 +25,7 @@ import {
 } from "./tiles.requests";
 
 export function createCreateTileMutation() {
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: ({ create }: { create: CreateTile }) => createTile(create),
     onSuccess: (tile) => {
       invalidateTilesList(tile.folder_id);
@@ -34,11 +34,11 @@ export function createCreateTileMutation() {
         tile,
       );
     },
-  });
+  }));
 }
 
 export function createUpdateTilePositionMutation() {
-  return createMutation({
+  return createMutation(() => ({
     scope: { id: "tile" },
     mutationFn: ({
       tileId,
@@ -54,11 +54,11 @@ export function createUpdateTilePositionMutation() {
         tile,
       );
     },
-  });
+  }));
 }
 
 export function createUpdateTilePropertiesMutation() {
-  return createMutation({
+  return createMutation(() => ({
     scope: { id: "tile" },
     mutationFn: ({
       tileId,
@@ -76,11 +76,11 @@ export function createUpdateTilePropertiesMutation() {
         tile,
       );
     },
-  });
+  }));
 }
 
 export function createUpdateTileLabelMutation() {
-  return createMutation({
+  return createMutation(() => ({
     scope: { id: "tile" },
     mutationFn: ({
       tileId,
@@ -98,11 +98,11 @@ export function createUpdateTileLabelMutation() {
         tile,
       );
     },
-  });
+  }));
 }
 
 export function createUpdateTileIconMutation() {
-  return createMutation({
+  return createMutation(() => ({
     scope: { id: "tile" },
     mutationFn: ({
       tileId,
@@ -120,11 +120,11 @@ export function createUpdateTileIconMutation() {
         tile,
       );
     },
-  });
+  }));
 }
 
 export function createUpdateTileIconOptionsMutation() {
-  return createMutation({
+  return createMutation(() => ({
     scope: { id: "tile" },
     mutationFn: ({
       tileId,
@@ -140,11 +140,11 @@ export function createUpdateTileIconOptionsMutation() {
         tile,
       );
     },
-  });
+  }));
 }
 
 export function createDeleteTileMutation() {
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: ({ tileId }: { tileId: TileId; folderId: FolderId }) =>
       deleteTile(tileId),
     onSuccess: (_, { tileId, folderId }) => {
@@ -153,5 +153,5 @@ export function createDeleteTileMutation() {
         queryKey: tilesKeys.specific(folderId, tileId),
       });
     },
-  });
+  }));
 }

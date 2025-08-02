@@ -46,7 +46,7 @@
   let iconOptions = $state(config.icon_options);
 
   const onClickIconPackIcon = (icon: ITileIcon) => {
-    $updateTileIcon.mutate({
+    updateTileIcon.mutate({
       tileId,
       icon,
       kind: UpdateKind.User,
@@ -77,7 +77,7 @@
 
     console.log(action?.icon_options, defaultIconOptions);
 
-    $updateTileIcon.mutate({
+    updateTileIcon.mutate({
       tileId,
       icon,
       kind: UpdateKind.Reset,
@@ -90,7 +90,7 @@
   const updateIconOptions = useDebounce((iconOptions: TileIconOptions) => {
     lastOptionsUpdate = iconOptions;
 
-    $updateTileIconOptions.mutate({
+    updateTileIconOptions.mutate({
       tileId,
       iconOptions,
     });

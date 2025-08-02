@@ -28,7 +28,7 @@
   function onSave(event: Event) {
     event.preventDefault();
 
-    const updatePromise = $setFolderNameMutation.mutateAsync(
+    const updatePromise = setFolderNameMutation.mutateAsync(
       {
         folderId: folder.id,
         name,
@@ -83,7 +83,7 @@
 
     <div class="actions">
       <DialogCloseButton buttonLabel={{ text: $t("close") }} />
-      <Button type="submit" loading={$setFolderNameMutation.isPending}>
+      <Button type="submit" loading={setFolderNameMutation.isPending}>
         {$t("save")}
       </Button>
     </div>

@@ -12,7 +12,7 @@
   const { profileId, content }: Props = $props();
 
   const foldersQuery = createFoldersQuery(() => profileId);
-  const folders = $derived($foldersQuery.data ?? []);
+  const folders = $derived(foldersQuery.data ?? []);
 </script>
 
 {@render content?.({ folders })}

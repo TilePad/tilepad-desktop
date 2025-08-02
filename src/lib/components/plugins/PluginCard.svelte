@@ -53,7 +53,7 @@
   }
 
   function handleUninstall() {
-    const uninstallPromise = $uninstall.mutateAsync({
+    const uninstallPromise = uninstall.mutateAsync({
       pluginId: id,
     });
 
@@ -67,7 +67,7 @@
   async function handleUpdate() {
     if (!latestVersion) return;
 
-    const updatePromise = $update.mutateAsync({
+    const updatePromise = update.mutateAsync({
       repo: latestVersion.remotePlugin.repo,
       version: latestVersion.version,
       pluginId: id,
@@ -132,8 +132,8 @@
         variant="secondary"
         size="small"
         onclick={handleUpdate}
-        loading={$update.isPending}
-        disabled={$uninstall.isPending}
+        loading={update.isPending}
+        disabled={uninstall.isPending}
       >
         {$t("update")}
       </Button>
@@ -144,8 +144,8 @@
         variant="secondary"
         size="small"
         onclick={handleUninstall}
-        loading={$uninstall.isPending}
-        disabled={$update.isPending}
+        loading={uninstall.isPending}
+        disabled={update.isPending}
       >
         {$t("uninstall")}
       </Button>

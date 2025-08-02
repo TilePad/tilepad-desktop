@@ -7,7 +7,7 @@ import { setSettings } from "./settings.requests";
 
 export function createSetSettingsMutation() {
   const queryClient = getQueryClientContext();
-  return createMutation({
+  return createMutation(() => ({
     scope: {
       id: "settings",
     },
@@ -16,5 +16,5 @@ export function createSetSettingsMutation() {
     onSuccess: (data) => {
       queryClient.setQueryData(settingsKeys.root, data);
     },
-  });
+  }));
 }

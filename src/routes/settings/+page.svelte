@@ -31,7 +31,7 @@
 
   const updateSettingsDebounce = useDebounce((settings: SettingsConfig) => {
     lastSettingsUpdate = settings;
-    $setSettings.mutate({
+    setSettings.mutate({
       settings,
     });
   }, 150);

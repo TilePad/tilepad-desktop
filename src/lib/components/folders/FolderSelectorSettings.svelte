@@ -29,7 +29,7 @@
   const setFolderConfigMutation = createSetFolderConfigMutation();
 
   const debounceUpdateFolder = useDebounce(({ rows, columns }) => {
-    $setFolderConfigMutation.mutateAsync({
+    setFolderConfigMutation.mutateAsync({
       folderId: folder.id,
       config: {
         ...folder.config,

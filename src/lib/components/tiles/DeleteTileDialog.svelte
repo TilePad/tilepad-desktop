@@ -27,7 +27,7 @@
   function onDelete() {
     if (!tile) return;
 
-    const deletePromise = $deleteTile.mutateAsync({
+    const deletePromise = deleteTile.mutateAsync({
       tileId: tile.id,
       folderId: tile.folder_id,
     });

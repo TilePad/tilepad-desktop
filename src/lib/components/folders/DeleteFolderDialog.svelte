@@ -27,7 +27,7 @@
   function onDelete(event: Event) {
     event.preventDefault();
 
-    const createPromise = $deleteFolderMutation.mutateAsync(
+    const createPromise = deleteFolderMutation.mutateAsync(
       {
         profileId,
         folderId: folder.id,

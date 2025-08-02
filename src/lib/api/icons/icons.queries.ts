@@ -4,8 +4,8 @@ import { iconsKeys } from "./icons.keys";
 import { getIconPacks } from "./icons.requests";
 
 export function createIconPacksQuery() {
-  return createQuery({
+  return createQuery(() => ({
     queryKey: iconsKeys.list,
     queryFn: getIconPacks,
-  });
+  }));
 }

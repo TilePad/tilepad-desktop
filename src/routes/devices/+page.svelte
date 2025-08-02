@@ -24,7 +24,7 @@
   const connectedDevices = connectedDevicesQuery();
 
   const profilesQuery = createProfilesQuery();
-  const profiles = $derived($profilesQuery.data ?? []);
+  const profiles = $derived(profilesQuery.data ?? []);
 
   const connectInfoPromise = getConnectionInfo();
 
@@ -33,7 +33,7 @@
   const revokeDeviceMutation = createRevokeDeviceFolderMutation();
 
   const connectedDeviceIds = $derived.by(() => {
-    const data = $connectedDevices.data;
+    const data = connectedDevices.data;
     if (data === undefined) return [];
     return data.map((data) => data.device_id);
   });
@@ -43,7 +43,7 @@
   }
 
   function onRevoke(deviceId: string) {
-    const revokePromise = $revokeDeviceMutation.mutateAsync({
+    const revokePromise = revokeDeviceMutation.mutateAsync({
       deviceId,
     });
 
@@ -55,28 +55,28 @@
   }
 
   function onChangeProfile(deviceId: string, profileId: ProfileId) {
-    $setDeviceProfileMutation.mutate({ deviceId, profileId });
+    setDeviceProfileMutation.mutate({ deviceId, profileId });
   }
 
   function onChangeFolder(deviceId: string, folderId: FolderId) {
-    $setDeviceFolderMutation.mutate({ deviceId, folderId });
+    setDeviceFolderMutation.mutate({ deviceId, folderId });
   }
 </script>
 
 <div class="layout">
   <div class="layout__devices">
-    {#if $devices.isLoading}
+    {#if devices.isLoading}
       <SkeletonList style="margin: 1rem" />
-    {:else if $devices.isError}
+    {:else if devices.isError}
       <Aside severity="error" style="margin: 1rem">
         {$t("devices_error", {
-          values: { error: getErrorMessage($devices.error) },
+          values: { error: getErrorMessage(devices.error) },
         })}
       </Aside>
-    {:else if $devices.isSuccess}
+    {:else if devices.isSuccess}
       <div class="devices-wrapper">
         <div class="devices">
-          {#each $devices.data as device (device.id)}
+          {#each devices.data as device (device.id)}
             {@const connected = isDeviceConnected(device.id)}
             <FoldersLoader profileId={device.profile_id}>
               {#snippet content({ folders })}

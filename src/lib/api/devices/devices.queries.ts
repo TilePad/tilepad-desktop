@@ -8,22 +8,22 @@ import {
 } from "./devices.requests";
 
 export function deviceRequestsQuery() {
-  return createQuery({
+  return createQuery(() => ({
     queryKey: devicesKeys.requests,
     queryFn: getDeviceRequests,
-  });
+  }));
 }
 
 export function devicesQuery() {
-  return createQuery({
+  return createQuery(() => ({
     queryKey: devicesKeys.devices,
     queryFn: getDevices,
-  });
+  }));
 }
 
 export function connectedDevicesQuery() {
-  return createQuery({
+  return createQuery(() => ({
     queryKey: devicesKeys.connectedDevices,
     queryFn: getConnectedDevices,
-  });
+  }));
 }

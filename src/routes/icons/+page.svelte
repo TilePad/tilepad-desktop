@@ -26,15 +26,15 @@
 </script>
 
 <div class="layout">
-  {#if $iconPacksQuery.isLoading}
+  {#if iconPacksQuery.isLoading}
     <SkeletonList style="margin: 1rem" />
-  {:else if $iconPacksQuery.isError}
+  {:else if iconPacksQuery.isError}
     <Aside severity="error" style="margin: 1rem">
       {$t("icon_packs_installed_error", {
-        values: { error: getErrorMessage($iconPacksQuery.error) },
+        values: { error: getErrorMessage(iconPacksQuery.error) },
       })}
     </Aside>
-  {:else if $iconPacksQuery.isSuccess}
+  {:else if iconPacksQuery.isSuccess}
     <div class="header">
       <div class="actions">
         <IconsRegistryDialog
@@ -49,7 +49,7 @@
 
     <div class="plugins-wrapper">
       <div class="plugins">
-        {#each $iconPacksQuery.data as pack, index (index)}
+        {#each iconPacksQuery.data as pack, index (index)}
           {@const manifest = pack.manifest.icons}
 
           <IconPackCard

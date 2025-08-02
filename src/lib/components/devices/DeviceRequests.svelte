@@ -13,7 +13,7 @@
   const requests = deviceRequestsQuery();
 
   const request = $derived.by(() => {
-    const requestsList = $requests.data;
+    const requestsList = requests.data;
     if (!requestsList || requestsList.length < 1) return undefined;
     return requestsList[0];
   });

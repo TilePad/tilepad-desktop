@@ -26,7 +26,7 @@
   let search = $state("");
 
   const filteredRegistry = $derived(
-    filterIconPacks($iconRegistryQuery.data ?? [], search),
+    filterIconPacks(iconRegistryQuery.data ?? [], search),
   );
 
   function filterIconPacks(packs: IconRegistryEntry[], query: string) {
@@ -43,21 +43,21 @@
 
 <Dialog {...restProps}>
   <div class="content">
-    {#if $iconRegistryQuery.isLoading || $iconPacksQuery.isLoading}
+    {#if iconRegistryQuery.isLoading || iconPacksQuery.isLoading}
       <SkeletonList style="padding: 1rem" />
-    {:else if $iconRegistryQuery.isError}
+    {:else if iconRegistryQuery.isError}
       <Aside severity="error" style="margin: 1rem;">
         {$t("community_icons_error", {
-          values: { error: getErrorMessage($iconRegistryQuery.error) },
+          values: { error: getErrorMessage(iconRegistryQuery.error) },
         })}
       </Aside>
-    {:else if $iconPacksQuery.isError}
+    {:else if iconPacksQuery.isError}
       <Aside severity="error" style="margin: 1rem;">
         {$t("icon_packs_installed_error", {
-          values: { error: getErrorMessage($iconPacksQuery.error) },
+          values: { error: getErrorMessage(iconPacksQuery.error) },
         })}
       </Aside>
-    {:else if $iconRegistryQuery.isSuccess && $iconPacksQuery.isSuccess}
+    {:else if iconRegistryQuery.isSuccess && iconPacksQuery.isSuccess}
       <div class="split">
         <div class="plugins">
           <div class="titlebar">
@@ -94,7 +94,7 @@
                     active = item;
                   }
                 }}
-                installed={$iconPacksQuery.data.find(
+                installed={iconPacksQuery.data.find(
                   (plugin) => plugin.manifest.icons.id === item.id,
                 ) !== undefined}
                 selected={active !== undefined && active.id === item.id}
@@ -109,7 +109,7 @@
           {#if active}
             <IconsRegistryViewer
               item={active}
-              installed={$iconPacksQuery.data.find(
+              installed={iconPacksQuery.data.find(
                 (plugin) => plugin.manifest.icons.id === active!.id,
               ) !== undefined}
             />

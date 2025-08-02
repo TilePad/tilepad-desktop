@@ -5,8 +5,8 @@ import type { CreateProfile } from "../types/profiles";
 import { createProfile } from "./profiles.requests";
 
 export function createCreateProfileMutation() {
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: ({ create }: { create: CreateProfile }) =>
       createProfile(create),
-  });
+  }));
 }

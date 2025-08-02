@@ -34,7 +34,7 @@
   let search = $state("");
 
   const iconPackData = $derived(
-    ($iconPacksQuery.data ?? []).map((item) => ({
+    (iconPacksQuery.data ?? []).map((item) => ({
       id: item.manifest.icons.id,
       name: item.manifest.icons.name,
       icons: item.icons.map((icon) => ({
@@ -73,15 +73,15 @@
 </script>
 
 <div class="content">
-  {#if $iconPacksQuery.isLoading}
+  {#if iconPacksQuery.isLoading}
     <SkeletonList />
-  {:else if $iconPacksQuery.isError}
+  {:else if iconPacksQuery.isError}
     <Aside severity="error" style="margin: 1rem">
       {$t("icon_packs_error", {
-        values: { error: getErrorMessage($iconPacksQuery.error) },
+        values: { error: getErrorMessage(iconPacksQuery.error) },
       })}
     </Aside>
-  {:else if $iconPacksQuery.isSuccess}
+  {:else if iconPacksQuery.isSuccess}
     <TextInput
       fullWidth
       placeholder={$t("search_placeholder")}

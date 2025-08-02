@@ -52,7 +52,7 @@
   const currentProfile = $derived.by(profileContext.profile);
 
   const foldersQuery = createFoldersQuery(() => currentProfile.id);
-  const foldersQueryData = $derived($foldersQuery.data);
+  const foldersQueryData = $derived(foldersQuery.data);
 
   // State for the actively selected folder
   let folderId: FolderId | undefined = $state(getPersistedCurrentFolder());
@@ -62,7 +62,7 @@
     () => folderId ?? null,
   );
 
-  const folder = $derived($folderQuery.data);
+  const folder = $derived(folderQuery.data);
 
   const createFolder = createCreateFolderMutation();
 
@@ -111,7 +111,7 @@
       if (folderId !== undefined) return;
 
       // Create a new default profile
-      $createFolder.mutate(
+      createFolder.mutate(
         {
           create: {
             name: $t("default_folder"),
@@ -132,30 +132,30 @@
   );
 </script>
 
-{#if $createFolder.isPending || $foldersQuery.isLoading || $folderQuery.isLoading}
+{#if createFolder.isPending || foldersQuery.isLoading || folderQuery.isLoading}
   <!-- Loading states -->
   <SkeletonList style="margin: 1rem;" />
-{:else if $createFolder.isError}
+{:else if createFolder.isError}
   <!-- Error creating current folder -->
   <Aside severity="error" style="margin: 1rem;">
     {$t("create_folder_error", {
-      values: { error: getErrorMessage($createFolder.error) },
+      values: { error: getErrorMessage(createFolder.error) },
     })}
   </Aside>
-{:else if $foldersQuery.isError}
+{:else if foldersQuery.isError}
   <!-- Error loading folders list -->
   <Aside severity="error" style="margin: 1rem;">
     {$t("folders_error", {
-      values: { error: getErrorMessage($foldersQuery.error) },
+      values: { error: getErrorMessage(foldersQuery.error) },
     })}
   </Aside>
-{:else if $folderQuery.isError}
+{:else if folderQuery.isError}
   <!-- Error loading current folder -->
   <Aside severity="error" style="margin: 1rem;">
     {$t("folder_error", {
-      values: { error: getErrorMessage($folderQuery.error) },
+      values: { error: getErrorMessage(folderQuery.error) },
     })}
   </Aside>
-{:else if ($createFolder.isIdle || $createFolder.isSuccess) && $foldersQuery.isSuccess && $folderQuery.isSuccess && folder}
+{:else if (createFolder.isIdle || createFolder.isSuccess) && foldersQuery.isSuccess && folderQuery.isSuccess && folder}
   {@render content?.({ folder })}
 {/if}

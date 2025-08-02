@@ -9,7 +9,7 @@ import {
 } from "../plugins/plugins.requests";
 
 export function createInstallPluginFromRegistry() {
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: async ({
       repo,
       version,
@@ -20,11 +20,11 @@ export function createInstallPluginFromRegistry() {
       const bundle = await getPluginBundle(repo, version);
       await installPluginBuffer(bundle);
     },
-  });
+  }));
 }
 
 export function createUpdatePlugin() {
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: async ({
       repo,
       version,
@@ -43,5 +43,5 @@ export function createUpdatePlugin() {
       // Install the new version
       await installPluginBuffer(bundle);
     },
-  });
+  }));
 }

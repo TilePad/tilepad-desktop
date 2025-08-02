@@ -30,7 +30,7 @@
     () => tileId,
   );
 
-  const tile = $derived($tileQuery.data);
+  const tile = $derived(tileQuery.data);
 
   const actionQuery = createActionQuery(
     () => tile?.plugin_id ?? null,
@@ -38,8 +38,8 @@
   );
 </script>
 
-{#if $tileQuery.isSuccess && $tileQuery.data}
-  {@const tile = $tileQuery.data}
+{#if tileQuery.isSuccess && tileQuery.data}
+  {@const tile = tileQuery.data}
   {@const ctx = {
     profile_id: profileId,
     folder_id: tile.folder_id,
@@ -50,8 +50,8 @@
 
   <div class="header">
     <div>
-      {#if $actionQuery.isSuccess && $actionQuery.data}
-        {@const action = $actionQuery.data}
+      {#if actionQuery.isSuccess && actionQuery.data}
+        {@const action = actionQuery.data}
         {#if action.inspector !== null}
           <p class="titlebar__name">
             <b>{action.category_label}</b>: {action.label}
@@ -73,21 +73,21 @@
     <div class="tile-area">
       <TileIconEditor
         config={tile.config}
-        action={$actionQuery.data ?? undefined}
+        action={actionQuery.data ?? undefined}
         tileId={tile.id}
       />
       <TileNameEditor config={tile.config} tileId={tile.id} />
     </div>
 
     <div class="action-area">
-      {#if $actionQuery.isSuccess && $actionQuery.data}
-        {@const action = $actionQuery.data}
+      {#if actionQuery.isSuccess && actionQuery.data}
+        {@const action = actionQuery.data}
         {#if action.inspector !== null}
           <div class="inspector">
             <PropertyInspector {ctx} inspector={action.inspector} />
           </div>
         {/if}
-      {:else if $actionQuery.isSuccess && $actionQuery.data === null}
+      {:else if actionQuery.isSuccess && actionQuery.data === null}
         <Aside severity="error" title="Action not found" style="margin: 1rem;">
           <!-- eslint-disable-next-line svelte/no-at-html-tags -->
           {@html $t("action_not_found", {
@@ -97,7 +97,7 @@
             },
           })}
         </Aside>
-      {:else if $actionQuery.isLoading}
+      {:else if actionQuery.isLoading}
         <div class="skeleton-list" style="padding: 1rem;">
           <div class="skeleton" style="width: 80%; height: 1rem"></div>
           <div
@@ -109,20 +109,20 @@
             style="width: 30%; height: 0.75rem; opacity: 0.5"
           ></div>
         </div>
-      {:else if $actionQuery.isError}
+      {:else if actionQuery.isError}
         <Aside severity="error" style="margin: 1rem;">
           {$t("action_error", {
-            values: { error: getErrorMessage($actionQuery.error) },
+            values: { error: getErrorMessage(actionQuery.error) },
           })}
         </Aside>
       {/if}
     </div>
   </div>
-{:else if $tileQuery.isSuccess}
+{:else if tileQuery.isSuccess}
   <Aside severity="error" style="margin: 1rem;">
     {$t("tile_not_found")}
   </Aside>
-{:else if $tileQuery.isLoading}
+{:else if tileQuery.isLoading}
   <div class="skeleton-list" style="padding: 1rem;">
     <div class="skeleton" style="width: 120px; height: 120px"></div>
 
@@ -136,10 +136,10 @@
       style="width: 30%; height: 0.75rem; opacity: 0.5"
     ></div>
   </div>
-{:else if $tileQuery.isError}
+{:else if tileQuery.isError}
   <Aside severity="error" style="margin: 1rem;">
     {$t("tile_error", {
-      values: { error: getErrorMessage($tileQuery.error) },
+      values: { error: getErrorMessage(tileQuery.error) },
     })}
   </Aside>
 {/if}

@@ -137,7 +137,7 @@
         return;
       }
 
-      await $updateTileProperties.mutateAsync({
+      await updateTileProperties.mutateAsync({
         tileId: ctx.tile_id,
         properties,
         partial: true,
@@ -159,7 +159,7 @@
         return;
       }
 
-      await $updateTileLabel.mutateAsync({
+      await updateTileLabel.mutateAsync({
         tileId: currentTile.id,
         label,
         kind: UpdateKind.Program,
@@ -181,7 +181,7 @@
         return;
       }
 
-      await $updateTileIcon.mutateAsync({
+      await updateTileIcon.mutateAsync({
         tileId: currentTile.id,
         icon,
         kind: UpdateKind.Program,

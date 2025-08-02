@@ -91,7 +91,7 @@
   }
 
   const debounceUpdatePosition = useDebounce((position: TilePosition) => {
-    $updateTilePosition.mutate({
+    updateTilePosition.mutate({
       tileId: tile.id,
       position,
     });
