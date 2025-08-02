@@ -1,5 +1,6 @@
 <script lang="ts">
   import { getPluginAssetPath } from "$lib/api/utils/url";
+  import { SvelteURLSearchParams } from "svelte/reactivity";
   import { openPluginInspector, closePluginInspector } from "$lib/api/plugins";
   import {
     type InspectorContext,
@@ -25,7 +26,7 @@
   const serverContext = getServerContext();
 
   const inspectorSrc = $derived.by(() => {
-    const params = new URLSearchParams();
+    const params = new SvelteURLSearchParams();
     params.append("ctx", encodeInspectorContext(ctx));
 
     const baseSrc = getPluginAssetPath(
