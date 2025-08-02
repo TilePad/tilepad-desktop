@@ -41,6 +41,13 @@ pub fn router() -> Router {
         )
         .nest(
             "/dev",
-            Router::new().route("/reload_plugins", post(dev::reload_plugins)),
+            Router::new()
+                .route("/reload_plugins", post(dev::reload_plugins))
+                .nest(
+                    "/plugin/{id}",
+                    Router::new()
+                        .route("/stop", post(dev::stop_plugin))
+                        .route("/restart", post(dev::restart_plugin)),
+                ),
         )
 }
