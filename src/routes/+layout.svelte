@@ -6,26 +6,27 @@
   import AppToaster from "$lib/components/AppToaster.svelte";
   import { QueryClientProvider } from "@tanstack/svelte-query";
   import SettingsLoader from "$lib/components/SettingsLoader.svelte";
+  import ServerProvider from "$lib/components/ServerProvider.svelte";
   import I18nProvider from "$lib/components/i18n/I18nProvider.svelte";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import SettingsProvider from "$lib/components/SettingsProvider.svelte";
   import DeviceRequests from "$lib/components/devices/DeviceRequests.svelte";
   import UpdateNotification from "$lib/components/UpdateNotification.svelte";
-  import InternalServerProvider from "$lib/components/InternalServerProvider.svelte";
 
   import type { LayoutProps } from "./$types";
 
-  let { children: layoutChildren }: LayoutProps = $props();
+  const { children: layoutChildren, data }: LayoutProps = $props();
+  const port = $derived(data.port);
 </script>
 
-<RootLayout>
-  <Tooltip.Provider>
-    <QueryClientProvider client={queryClient}>
-      <SettingsLoader>
-        {#snippet children({ settings })}
-          <SettingsProvider {settings}>
-            <I18nProvider locale={settings.language}>
-              <InternalServerProvider>
+<ServerProvider serverURL="http://127.0.0.1:{port}/">
+  <RootLayout>
+    <Tooltip.Provider>
+      <QueryClientProvider client={queryClient}>
+        <SettingsLoader>
+          {#snippet children({ settings })}
+            <SettingsProvider {settings}>
+              <I18nProvider locale={settings.language}>
                 <div class="layout">
                   <Header />
 
@@ -38,16 +39,16 @@
 
                 <AppToaster />
                 <UpdateNotification />
-              </InternalServerProvider>
-            </I18nProvider>
-          </SettingsProvider>
-        {/snippet}
-      </SettingsLoader>
+              </I18nProvider>
+            </SettingsProvider>
+          {/snippet}
+        </SettingsLoader>
 
-      <SvelteQueryDevtools buttonPosition="bottom-left" position="bottom" />
-    </QueryClientProvider>
-  </Tooltip.Provider>
-</RootLayout>
+        <SvelteQueryDevtools buttonPosition="bottom-left" position="bottom" />
+      </QueryClientProvider>
+    </Tooltip.Provider>
+  </RootLayout>
+</ServerProvider>
 
 <style>
   .layout {
