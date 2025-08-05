@@ -1,6 +1,7 @@
 <script module>
-  const PROFILE_STORE_KEY = Symbol("ProfileStore");
   const currentProfileKey = "currentProfileId";
+
+  const profileStore = new Context<ProfileContext>("profileStore");
 
   export function getPersistedProfileId() {
     return localStorage.getItem(currentProfileKey) ?? undefined;
@@ -12,12 +13,17 @@
 
   interface ProfileContext {
     profile(): ProfileModel;
-    profileId(): ProfileId;
     setProfileId: (value: ProfileId) => void;
   }
 
   export function getProfileContext(): ProfileContext {
-    return getContext(PROFILE_STORE_KEY);
+    return profileStore.get();
+  }
+
+  function getDefaultProfile(
+    profiles: ProfileModel[],
+  ): ProfileModel | undefined {
+    return profiles.find((profile) => profile.default);
   }
 </script>
 
@@ -25,10 +31,10 @@
 <script lang="ts">
   import type { ProfileId, ProfileModel } from "$lib/api/types/profiles";
 
-  import { watch } from "runed";
   import { t } from "svelte-i18n";
+  import { type Snippet } from "svelte";
+  import { watch, Context } from "runed";
   import { getErrorMessage } from "$lib/api/utils/error";
-  import { getContext, setContext, type Snippet } from "svelte";
   import {
     createProfileQuery,
     createProfilesQuery,
@@ -55,15 +61,8 @@
   const profileQuery = createProfileQuery(() => profileId ?? null);
   const profile = $derived(profileQuery.data);
 
-  function getDefaultProfile(
-    profiles: ProfileModel[],
-  ): ProfileModel | undefined {
-    return profiles.find((profile) => profile.default);
-  }
-
-  setContext(PROFILE_STORE_KEY, {
+  profileStore.set({
     profile: () => profile!,
-    profileId: () => profileId!,
     setProfileId: (value: string) => {
       profileId = value;
       setPersistedProfileId(value);

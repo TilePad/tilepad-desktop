@@ -1,6 +1,6 @@
 <script module>
-  const FOLDER_STORE_KEY = Symbol("FolderStore");
   const currentFolderKey = "currentFolderId";
+  const folderStore = new Context<FolderContext>("folderStore");
 
   export function getPersistedFolderId() {
     return localStorage.getItem(currentFolderKey) ?? undefined;
@@ -12,12 +12,11 @@
 
   interface FolderContext {
     folder(): FolderModel;
-    folderId(): FolderId;
     setFolderId: (value: FolderId) => void;
   }
 
   export function getFolderContext(): FolderContext {
-    return getContext(FOLDER_STORE_KEY);
+    return folderStore.get();
   }
 </script>
 
@@ -25,10 +24,10 @@
 <script lang="ts">
   import type { FolderId, FolderModel } from "$lib/api/types/folders";
 
-  import { watch } from "runed";
   import { t } from "svelte-i18n";
+  import { type Snippet } from "svelte";
+  import { watch, Context } from "runed";
   import { getErrorMessage } from "$lib/api/utils/error";
-  import { getContext, setContext, type Snippet } from "svelte";
   import {
     createFolderQuery,
     createFoldersQuery,
@@ -78,9 +77,8 @@
     return folders.find((profile) => profile.default);
   }
 
-  setContext(FOLDER_STORE_KEY, {
+  folderStore.set({
     folder: () => folder!,
-    folderId: () => folderId!,
     setFolderId: (value: FolderId) => {
       folderId = value;
       setPersistedFolderId(value);
