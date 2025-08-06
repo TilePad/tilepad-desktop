@@ -1,7 +1,7 @@
 use std::net::{IpAddr, Ipv4Addr};
 
 use serde::Serialize;
-use tauri::{AppHandle, Manager, State};
+use tauri::State;
 
 use crate::server::ServerPort;
 
