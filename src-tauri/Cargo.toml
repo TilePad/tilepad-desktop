@@ -24,7 +24,7 @@ tauri-build = { version = "=2.2.0", features = [] }
 
 [dependencies]
 # Tauri and plugins
-tauri = { version = "=2.5.1", features = ["tray-icon"] }
+tauri = { version = "=2.5.1", features = ["tray-icon", "devtools"] }
 tauri-plugin-opener = "=2.3.0"
 tauri-plugin-single-instance = { version = "=2.2.4", features = ["deep-link"] }
 tauri-plugin-deep-link = "=2.3.0"
