@@ -61,7 +61,7 @@
 </script>
 
 {#if icon.type === TileIconType.Display}
-  <Display {ctx} inspector={icon.path} />
+  <Display {ctx} inspector={icon.path} {style} />
 {:else if src !== null}
   <img
     class="tile__icon"

@@ -13,6 +13,7 @@
   type Props = {
     ctx: DisplayContext;
     inspector: string;
+    style: string;
     onFrameEvent: (
       ctx: DisplayContext,
       event: DisplayMessage,
@@ -21,7 +22,7 @@
     onFrameMount: (ctx: DisplayContext, send: (data: object) => void) => void;
   };
 
-  const { ctx, inspector, onFrameEvent, onFrameMount }: Props = $props();
+  const { ctx, inspector, style, onFrameEvent, onFrameMount }: Props = $props();
   const serverContext = getServerContext();
 
   const inspectorSrc = $derived.by(() => {
@@ -57,11 +58,19 @@
 
 <svelte:window onmessage={onMessage} />
 
-<iframe class="frame" bind:this={iframe} title="Inspector" src={inspectorSrc}>
+<iframe
+  class="frame"
+  bind:this={iframe}
+  title="Inspector"
+  src={inspectorSrc}
+  allowtransparency={true}
+  {style}
+>
 </iframe>
 
 <style>
   .frame {
+    background: transparent;
     border: none;
     width: 100%;
     height: 100%;

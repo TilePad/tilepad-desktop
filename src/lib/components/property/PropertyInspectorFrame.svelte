@@ -10,6 +10,7 @@
   import type { PropertyInspectorMessage } from "./propertyInspectorMessage";
 
   import { getServerContext } from "../ServerProvider.svelte";
+  import LoadingSpinner from "../loading/LoadingSpinner.svelte";
 
   type Props = {
     ctx: InspectorContext;
@@ -21,6 +22,8 @@
     ) => void;
     onFrameMount: (ctx: InspectorContext, send: (data: object) => void) => void;
   };
+
+  let loading = $state(true);
 
   const { ctx, inspector, onFrameEvent, onFrameMount }: Props = $props();
   const serverContext = getServerContext();
@@ -63,13 +66,40 @@
 
 <svelte:window onmessage={onMessage} />
 
-<iframe class="frame" bind:this={iframe} title="Inspector" src={inspectorSrc}
-></iframe>
+<div class="frame-container">
+  <iframe
+    class="frame"
+    bind:this={iframe}
+    title="Inspector"
+    src={inspectorSrc}
+    onload={() => (loading = false)}
+  ></iframe>
+
+  {#if loading}
+    <div class="loading-container">
+      <LoadingSpinner size={80} />
+    </div>
+  {/if}
+</div>
 
 <style>
-  .frame {
+  .frame,
+  .frame-container {
+    position: relative;
     border: none;
     width: 100%;
     height: 100%;
+  }
+
+  .loading-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1f1e22;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 </style>

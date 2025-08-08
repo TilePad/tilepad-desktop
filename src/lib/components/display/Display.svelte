@@ -14,9 +14,10 @@
   type Props = {
     ctx: DisplayContext;
     inspector: string;
+    style: string;
   };
 
-  const { ctx, inspector }: Props = $props();
+  const { ctx, inspector, style }: Props = $props();
 
   type CurrentFrameData = {
     ctx: DisplayContext;
@@ -98,5 +99,5 @@
 </script>
 
 <DisplayPluginMessageListener {onMessage}>
-  <DisplayFrame {onFrameEvent} {onFrameMount} {ctx} {inspector} />
+  <DisplayFrame {onFrameEvent} {onFrameMount} {ctx} {inspector} {style} />
 </DisplayPluginMessageListener>
