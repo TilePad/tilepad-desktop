@@ -275,7 +275,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
             rfd::MessageDialog::new()
                 .set_title("Failed to start")
                 .set_description(format!(
-                    "The port {} required to run TilePad is currently in use, please change your port in settings 
+                    "The port {} required to run TilePad is currently in use, please change your port in settings
                     or most features of TilePad will be non-functional",
                     settings.port
                 ))
@@ -353,7 +353,7 @@ fn on_deep_link(plugins: &Arc<Plugins>, event: OpenUrlEvent) {
     }
 }
 
-/// In development we directly use the source path to "core" resources  
+/// In development we directly use the source path to "core" resources
 /// because tauri does not automatically update these files unless you
 /// touch some source code in the main project and cause a re-build
 #[cfg(debug_assertions)]
