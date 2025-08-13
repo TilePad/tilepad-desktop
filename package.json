@@ -32,7 +32,7 @@
     "@tanstack/svelte-query-devtools": "https://pkg.pr.new/@tanstack/svelte-query-devtools@746b9c5",
     "@tauri-apps/api": "2.7.0",
     "@tauri-apps/plugin-autostart": "2.5.0",
-    "@tauri-apps/plugin-deep-link": "2.4.0",
+    "@tauri-apps/plugin-deep-link": "2.4.1",
     "@tauri-apps/plugin-opener": "2.4.0",
     "@tauri-apps/plugin-updater": "2.9.0",
     "bits-ui": "2.8.11",
