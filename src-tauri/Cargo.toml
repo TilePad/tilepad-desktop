@@ -1,6 +1,6 @@
 [package]
 name = "tilepad-desktop"
-version = "0.0.2"
+version = "0.0.3"
 description = "Tilepad desktop app"
 authors = ["Jacobtread"]
 edition = "2024"
@@ -77,13 +77,13 @@ parking_lot = "=0.12.4"
 # Date time for time keeping and date storage
 chrono = { version = "=0.4.41", features = ["serde"] }
 
-# Node specific semver versioning for node installs 
+# Node specific semver versioning for node installs
 node-semver = "=2.2.0"
 
 # UUIDv4 for unique IDs
 uuid = { version = "=1.18.0", features = ["v4"] }
 
-# Get local addresses for LAN 
+# Get local addresses for LAN
 local-ip-address = "=0.6.5"
 
 # System info library

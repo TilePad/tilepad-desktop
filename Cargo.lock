@@ -6051,7 +6051,7 @@ dependencies = [
 
 [[package]]
 name = "tilepad-desktop"
-version = "0.0.2"
+version = "0.0.3"
 dependencies = [
  "anyhow",
  "arboard",
