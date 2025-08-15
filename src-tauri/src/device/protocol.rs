@@ -136,4 +136,7 @@ pub enum DeviceIndicator {
     Error,
     Success,
     Warning,
+    Loading,
+    // Clear the current indicator
+    None,
 }
