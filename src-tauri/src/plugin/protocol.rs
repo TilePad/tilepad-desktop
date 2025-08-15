@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 use crate::{
     database::{
@@ -8,6 +9,7 @@ use crate::{
             tile::{TileIcon, TileId, TileLabel, TileModel},
         },
     },
+    device::protocol::DeviceIndicator,
     events::{DeepLinkContext, DisplayContext, InspectorContext, TileInteractionContext},
 };
 
@@ -76,6 +78,19 @@ pub enum ClientPluginMessage {
 
     /// Get all currently visible tiles
     GetVisibleTiles,
+
+    /// Display an icon on connected devices
+    DisplayIndicator {
+        /// ID of the device to display on
+        device_id: Uuid,
+        /// ID of the tile to display it on
+        tile_id: Uuid,
+        /// Indicator to display
+        indicator: DeviceIndicator,
+        /// Duration in milliseconds to display the
+        /// indicator for
+        duration: u32,
+    },
 }
 
 fn default_partial_value() -> bool {

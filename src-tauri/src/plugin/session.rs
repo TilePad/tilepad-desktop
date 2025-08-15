@@ -267,6 +267,16 @@ impl PluginSession {
                 }
             }
 
+            ClientPluginMessage::DisplayIndicator {
+                device_id,
+                tile_id,
+                indicator,
+                duration,
+            } => {
+                self.tiles
+                    .display_tile_indicator(device_id, tile_id, indicator, duration);
+            }
+
             message => {
                 tracing::warn!(?message, "got unexpected message from authorized plugin");
             }

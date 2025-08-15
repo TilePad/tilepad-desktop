@@ -8,6 +8,7 @@ use crate::{
             tile::{TileId, TileModel},
         },
     },
+    device::protocol::DeviceIndicator,
     events::{
         AppEvent, AppEventSender, DeviceAppEvent, DeviceRequestAppEvent, DisplayContext,
         TileInteractionContext,
@@ -448,5 +449,17 @@ impl Devices {
             .await?;
 
         Ok(())
+    }
+
+    pub fn display_tile_indicator(
+        &self,
+        device_id: DeviceId,
+        tile_id: TileId,
+        indicator: DeviceIndicator,
+        duration: u32,
+    ) {
+        if let Some(session) = self.get_session_by_device(device_id) {
+            session.on_tile_indicator(tile_id, indicator, duration);
+        }
     }
 }

@@ -1,11 +1,14 @@
 use crate::{
     database::{
         DbPool, JsonObject,
-        entity::tile::{
-            TileIcon, TileIconOptions, TileId, TileLabel, TileModel, TilePosition, UpdateKind,
+        entity::{
+            device::DeviceId,
+            tile::{
+                TileIcon, TileIconOptions, TileId, TileLabel, TileModel, TilePosition, UpdateKind,
+            },
         },
     },
-    device::Devices,
+    device::{Devices, protocol::DeviceIndicator},
     events::DisplayContext,
     icons::Icons,
 };
@@ -154,5 +157,16 @@ impl Tiles {
             TileModel::get_by_from_devices_by_plugin(&self.db, &device_ids, plugin_id).await?;
 
         Ok(tiles)
+    }
+
+    pub fn display_tile_indicator(
+        &self,
+        device_id: DeviceId,
+        tile_id: TileId,
+        indicator: DeviceIndicator,
+        duration: u32,
+    ) {
+        self.devices
+            .display_tile_indicator(device_id, tile_id, indicator, duration);
     }
 }

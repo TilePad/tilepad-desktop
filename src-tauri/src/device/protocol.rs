@@ -118,4 +118,22 @@ pub enum ServerDeviceMessageEncrypted {
         ctx: DisplayContext,
         message: serde_json::Value,
     },
+
+    /// Display an icon on connected devices
+    DisplayIndicator {
+        /// ID of the tile to display it on
+        tile_id: Uuid,
+        /// Indicator to display
+        indicator: DeviceIndicator,
+        /// Duration in milliseconds to display the
+        /// indicator for
+        duration: u32,
+    },
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum DeviceIndicator {
+    Error,
+    Success,
+    Warning,
 }

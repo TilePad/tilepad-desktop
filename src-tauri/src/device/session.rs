@@ -12,8 +12,14 @@ use uuid::Uuid;
 use x25519_dalek::PublicKey;
 
 use crate::{
-    database::entity::{device::DeviceId, folder::FolderModel, tile::TileModel},
-    device::protocol::{ClientDeviceMessageEncrypted, ServerDeviceMessageEncrypted},
+    database::entity::{
+        device::DeviceId,
+        folder::FolderModel,
+        tile::{TileId, TileModel},
+    },
+    device::protocol::{
+        ClientDeviceMessageEncrypted, DeviceIndicator, ServerDeviceMessageEncrypted,
+    },
     events::DisplayContext,
     utils::{
         error::try_cast_error,
@@ -219,6 +225,14 @@ impl DeviceSession {
 
     pub fn on_plugin_message(&self, ctx: DisplayContext, message: serde_json::Value) {
         self.send_encrypted_message(ServerDeviceMessageEncrypted::RecvFromPlugin { ctx, message });
+    }
+
+    pub fn on_tile_indicator(&self, tile_id: TileId, indicator: DeviceIndicator, duration: u32) {
+        self.send_encrypted_message(ServerDeviceMessageEncrypted::DisplayIndicator {
+            tile_id,
+            indicator,
+            duration,
+        });
     }
 
     pub fn on_tiles(&self, tiles: Vec<TileModel>, folder: FolderModel) {
