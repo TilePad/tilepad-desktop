@@ -11,14 +11,11 @@
   import Button from "$lib/components/input/Button.svelte";
   import SolarShopBoldDuotone from "~icons/solar/shop-bold-duotone";
   import PluginCard from "$lib/components/plugins/PluginCard.svelte";
+  import { getLatestPluginVersions } from "$lib/api/plugins_registry";
   import SkeletonList from "$lib/components/skeleton/SkeletonList.svelte";
   import { getSettingsContext } from "$lib/components/SettingsProvider.svelte";
   import ManualImportPlugin from "$lib/components/plugins/ManualImportPlugin.svelte";
   import PluginsRegistryDialog from "$lib/components/plugins_registry/PluginsRegistryDialog.svelte";
-  import {
-    fetchPluginManifest,
-    fetchPluginRegistry,
-  } from "$lib/api/plugins_registry";
 
   const settingsContext = getSettingsContext();
   const settings = $derived.by(settingsContext.settings);
@@ -27,45 +24,22 @@
 
   const checkUpdatesMutation = createMutation(() => ({
     mutationFn: async ({ plugins }: { plugins: PluginWithState[] }) => {
-      // Load remote available plugins
-      const remotePlugins = await fetchPluginRegistry();
-
-      // Find the remote plugins that are currently installed
-      const installedPlugins = remotePlugins.filter((remotePlugin) => {
-        return plugins.find(
-          (plugin) => remotePlugin.id === plugin.manifest.plugin.id,
-        );
-      });
-
-      //
+      const latestVersions = await getLatestPluginVersions(plugins);
       const updates = [];
 
-      // Process in batches of 5
-      for (let i = 0; i < installedPlugins.length; i += 5) {
-        // Fetch all the manifests for the installed plugins
-        const remotePluginSet = installedPlugins.slice(i, i + 5);
-        const remotePluginManifests = await Promise.all(
-          remotePluginSet.map(async (remotePlugin) => {
-            const manifest = await fetchPluginManifest(remotePlugin.repo);
-            return { manifest, remotePlugin };
-          }),
+      for (const entry of latestVersions) {
+        const localPlugin = plugins.find(
+          (plugin) => plugin.manifest.plugin.id === entry.manifest.plugin.id,
         );
 
-        for (const entry of remotePluginManifests) {
-          const localPlugin = plugins.find(
-            (plugin) => plugin.manifest.plugin.id === entry.manifest.plugin.id,
-          );
-
-          if (!localPlugin) continue;
-
-          if (
-            semverCompare(
-              entry.manifest.plugin.version,
-              localPlugin.manifest.plugin.version,
-            ) === 1
-          ) {
-            updates.push(entry);
-          }
+        if (
+          localPlugin &&
+          semverCompare(
+            entry.manifest.plugin.version,
+            localPlugin.manifest.plugin.version,
+          ) === 1
+        ) {
+          updates.push(entry);
         }
       }
 
