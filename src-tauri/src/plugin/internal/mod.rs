@@ -44,7 +44,7 @@ pub async fn handle_internal_action(
         }
 
         "com.tilepad.system.system" => {
-            system::actions::handle(context, properties).await?;
+            system::actions::handle(devices, context, properties).await?;
         }
 
         plugin_id => {

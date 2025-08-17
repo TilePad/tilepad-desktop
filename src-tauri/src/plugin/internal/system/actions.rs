@@ -1,11 +1,17 @@
+use anyhow::Context;
 use arboard::Clipboard;
 use enigo::{Enigo, Key, Keyboard};
 use serde::Deserialize;
 use std::{path::Path, time::Duration};
 use sysinfo::{ProcessRefreshKind, ProcessesToUpdate, RefreshKind, System, UpdateKind};
 use tauri_plugin_opener::{open_path, open_url};
+use tokio::sync::oneshot;
 
-use crate::{database::JsonObject, events::TileInteractionContext};
+use crate::{
+    database::JsonObject,
+    device::{Devices, protocol::DeviceIndicator},
+    events::TileInteractionContext,
+};
 
 #[derive(Deserialize)]
 pub struct SystemWebsiteProperties {
@@ -69,33 +75,72 @@ pub struct ClipboardProperties {
     text: Option<String>,
 }
 
-pub async fn handle(context: TileInteractionContext, properties: JsonObject) -> anyhow::Result<()> {
+pub async fn handle(
+    devices: &Devices,
+    context: TileInteractionContext,
+    properties: JsonObject,
+) -> anyhow::Result<()> {
+    let success_indicator = || {
+        devices.display_tile_indicator(
+            context.device_id,
+            context.tile_id,
+            DeviceIndicator::Success,
+            1000,
+        );
+    };
+
+    let error_indicator = || {
+        devices.display_tile_indicator(
+            context.device_id,
+            context.tile_id,
+            DeviceIndicator::Error,
+            2000,
+        );
+    };
+
+    let loading_indicator = || {
+        devices.display_tile_indicator(
+            context.device_id,
+            context.tile_id,
+            DeviceIndicator::Loading,
+            10_000,
+        );
+    };
+
     match context.action_id.as_str() {
         "website" => {
             let data: SystemWebsiteProperties =
                 serde_json::from_value(serde_json::Value::Object(properties))?;
             if let Some(url) = data.url {
-                open_url(url, None::<&str>)?;
+                loading_indicator();
+                open_url(url, None::<&str>).inspect_err(|_| error_indicator())?;
+                success_indicator();
             }
         }
         "open" => {
             let data: SystemOpenProperties =
                 serde_json::from_value(serde_json::Value::Object(properties))?;
             if let Some(path) = data.path {
-                open_path(path, None::<&str>)?;
+                loading_indicator();
+                open_path(path, None::<&str>).inspect_err(|_| error_indicator())?;
+                success_indicator();
             }
         }
         "open_folder" => {
             let data: SystemOpenFolderProperties =
                 serde_json::from_value(serde_json::Value::Object(properties))?;
             if let Some(path) = data.path {
-                open_path(path, None::<&str>)?;
+                loading_indicator();
+                open_path(path, None::<&str>).inspect_err(|_| error_indicator())?;
+                success_indicator();
             }
         }
         "close" => {
             let data: SystemCloseProperties =
                 serde_json::from_value(serde_json::Value::Object(properties))?;
             if let Some(path) = data.path {
+                loading_indicator();
+
                 let path = Path::new(&path);
                 let mut system = System::new_with_specifics(RefreshKind::nothing().with_processes(
                     ProcessRefreshKind::nothing().with_exe(UpdateKind::OnlyIfNotSet),
@@ -110,13 +155,19 @@ pub async fn handle(context: TileInteractionContext, properties: JsonObject) -> 
                         }
                     }
                 }
+
+                success_indicator();
             }
         }
         "text" => {
             let data: SystemTextProperties =
                 serde_json::from_value(serde_json::Value::Object(properties))?;
             if let Some(text) = data.text {
-                execute_enigo_action(EnoAction::Text { text });
+                loading_indicator();
+                background_execute_enigo_action(EnoAction::Text { text })
+                    .await
+                    .inspect_err(|_| error_indicator())?;
+                success_indicator();
             }
         }
         "multimedia" => {
@@ -152,7 +203,11 @@ pub async fn handle(context: TileInteractionContext, properties: JsonObject) -> 
                 MultimediaAction::Mute => Key::VolumeMute,
             };
 
-            execute_enigo_action(EnoAction::Key { key });
+            loading_indicator();
+            background_execute_enigo_action(EnoAction::Key { key })
+                .await
+                .inspect_err(|_| error_indicator())?;
+            success_indicator();
         }
         "hotkey" => {
             let data: HotkeyProperties =
@@ -175,7 +230,11 @@ pub async fn handle(context: TileInteractionContext, properties: JsonObject) -> 
                 .map(|key| Key::Other(key.code))
                 .collect();
 
-            execute_enigo_action(EnoAction::HotKey { modifiers, keys });
+            loading_indicator();
+            background_execute_enigo_action(EnoAction::HotKey { modifiers, keys })
+                .await
+                .inspect_err(|_| error_indicator())?;
+            success_indicator();
         }
         "clipboard" => {
             let data: ClipboardProperties =
@@ -183,6 +242,7 @@ pub async fn handle(context: TileInteractionContext, properties: JsonObject) -> 
             if let Some(text) = data.text {
                 let mut clipboard = Clipboard::new()?;
                 clipboard.set_text(text)?;
+                success_indicator();
             }
         }
         action_id => {
@@ -199,62 +259,73 @@ pub enum EnoAction {
     Text { text: String },
 }
 
+/// Execute a enigo action in the background on a dedicated thread,
+/// waits for the response through a channel
+async fn background_execute_enigo_action(action: EnoAction) -> anyhow::Result<()> {
+    let (tx, rx) = oneshot::channel();
+
+    std::thread::spawn(|| {
+        let outcome = execute_enigo_action(action);
+        _ = tx.send(outcome);
+    });
+
+    rx.await.context("channel closed")?
+}
+
 /// Executes an enigo action, on windows these can be done in an async environment
 /// but on other platforms these are !Send so have to be performed in a dedicated
-/// thread
-fn execute_enigo_action(action: EnoAction) {
-    std::thread::spawn(|| {
-        let mut enigo = Enigo::new(&enigo::Settings::default())?;
+/// thread. Calls to this will block so use std::thread::spawn
+fn execute_enigo_action(action: EnoAction) -> anyhow::Result<()> {
+    let mut enigo = Enigo::new(&enigo::Settings::default())?;
 
-        match action {
-            EnoAction::HotKey { modifiers, keys } => {
-                for key in &modifiers {
-                    enigo.key(*key, enigo::Direction::Press)?;
-                }
-
-                for key in keys {
-                    enigo.key(key, enigo::Direction::Click)?;
-                }
-
-                for key in modifiers {
-                    enigo.key(key, enigo::Direction::Release)?;
-                }
+    match action {
+        EnoAction::HotKey { modifiers, keys } => {
+            for key in &modifiers {
+                enigo.key(*key, enigo::Direction::Press)?;
             }
-            EnoAction::Key { key } => {
+
+            for key in keys {
                 enigo.key(key, enigo::Direction::Click)?;
             }
-            EnoAction::Text { text } => {
-                let mut current_text = String::new();
 
-                for char in text.chars() {
-                    match char {
-                        '\n' => {
-                            // Send the current buffered text
-                            if !current_text.is_empty() {
-                                enigo.text(&current_text)?;
-                                current_text.clear();
-                            }
-
-                            // Enter new line
-                            enigo.key(Key::Return, enigo::Direction::Click)?;
-                        }
-                        char => {
-                            current_text.push(char);
-                        }
-                    }
-
-                    // Reached enough characters to send
-                    if !current_text.is_empty() {
-                        enigo.text(&current_text)?;
-                        current_text.clear();
-                    }
-
-                    // Sleep between sends
-                    std::thread::sleep(Duration::from_millis(2));
-                }
+            for key in modifiers {
+                enigo.key(key, enigo::Direction::Release)?;
             }
         }
+        EnoAction::Key { key } => {
+            enigo.key(key, enigo::Direction::Click)?;
+        }
+        EnoAction::Text { text } => {
+            let mut current_text = String::new();
 
-        Ok::<(), anyhow::Error>(())
-    });
+            for char in text.chars() {
+                match char {
+                    '\n' => {
+                        // Send the current buffered text
+                        if !current_text.is_empty() {
+                            enigo.text(&current_text)?;
+                            current_text.clear();
+                        }
+
+                        // Enter new line
+                        enigo.key(Key::Return, enigo::Direction::Click)?;
+                    }
+                    char => {
+                        current_text.push(char);
+                    }
+                }
+
+                // Reached enough characters to send
+                if !current_text.is_empty() {
+                    enigo.text(&current_text)?;
+                    current_text.clear();
+                }
+
+                // Sleep between sends
+                std::thread::sleep(Duration::from_millis(2));
+            }
+        }
+    }
+
+    Ok::<(), anyhow::Error>(())
 }
