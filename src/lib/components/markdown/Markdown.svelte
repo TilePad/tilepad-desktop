@@ -12,6 +12,7 @@
   DOMPurify.addHook("afterSanitizeAttributes", (currentNode: unknown) => {
     if (currentNode instanceof HTMLAnchorElement) {
       currentNode.setAttribute("target", "_blank");
+      currentNode.setAttribute("rel", "noopener noreferrer");
     }
   });
 
