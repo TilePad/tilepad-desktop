@@ -9,8 +9,8 @@
   import { createActionsQuery } from "$lib/api/actions";
   import { getPluginAssetPath } from "$lib/api/utils/url";
   import { toastErrorMessage } from "$lib/api/utils/error";
+  import { serverContext } from "$lib/contexts/server.context";
   import FolderEditor from "$lib/components/folders/FolderEditor.svelte";
-  import { getServerContext } from "$lib/components/ServerProvider.svelte";
   import ActionsSidebar from "$lib/components/actions/ActionsSidebar.svelte";
   import FolderProvider from "$lib/components/folders/FolderProvider.svelte";
   import ProfilesProvider from "$lib/components/profiles/ProfilesProvider.svelte";
@@ -31,7 +31,7 @@
   const createTile = createCreateTileMutation();
   const updateTilePosition = createUpdateTilePositionMutation();
 
-  const serverContext = getServerContext();
+  const currentServerContext = serverContext.get();
 
   const actionCategoryData: ActionCategoryData[] = $derived.by(() => {
     return actions.map((category) => ({
@@ -39,7 +39,7 @@
       label: category.label,
       icon: category.icon
         ? getPluginAssetPath(
-            serverContext.serverURL,
+            currentServerContext.serverURL,
             category.plugin_id,
             category.icon,
           )
@@ -50,7 +50,7 @@
         label: action.label,
         icon: action.icon
           ? getPluginAssetPath(
-              serverContext.serverURL,
+              currentServerContext.serverURL,
               action.plugin_id,
               action.icon,
             )

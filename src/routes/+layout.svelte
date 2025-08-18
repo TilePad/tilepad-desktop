@@ -5,8 +5,8 @@
   import Header from "$lib/components/layout/Header.svelte";
   import AppToaster from "$lib/components/AppToaster.svelte";
   import { QueryClientProvider } from "@tanstack/svelte-query";
+  import { serverContext } from "$lib/contexts/server.context";
   import SettingsLoader from "$lib/components/SettingsLoader.svelte";
-  import ServerProvider from "$lib/components/ServerProvider.svelte";
   import I18nProvider from "$lib/components/i18n/I18nProvider.svelte";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import SettingsProvider from "$lib/components/SettingsProvider.svelte";
@@ -17,38 +17,42 @@
 
   const { children: layoutChildren, data }: LayoutProps = $props();
   const port = $derived(data.port);
+
+  serverContext.set({
+    get serverURL() {
+      return `http://127.0.0.1:${port}/`;
+    },
+  });
 </script>
 
-<ServerProvider serverURL="http://127.0.0.1:{port}/">
-  <RootLayout>
-    <Tooltip.Provider>
-      <QueryClientProvider client={queryClient}>
-        <SettingsLoader>
-          {#snippet children({ settings })}
-            <SettingsProvider {settings}>
-              <I18nProvider locale={settings.language}>
-                <div class="layout">
-                  <Header />
+<RootLayout>
+  <Tooltip.Provider>
+    <QueryClientProvider client={queryClient}>
+      <SettingsLoader>
+        {#snippet children({ settings })}
+          <SettingsProvider {settings}>
+            <I18nProvider locale={settings.language}>
+              <div class="layout">
+                <Header />
 
-                  <main class="main">
-                    {@render layoutChildren()}
+                <main class="main">
+                  {@render layoutChildren()}
 
-                    <DeviceRequests />
-                  </main>
-                </div>
+                  <DeviceRequests />
+                </main>
+              </div>
 
-                <AppToaster />
-                <UpdateNotification />
-              </I18nProvider>
-            </SettingsProvider>
-          {/snippet}
-        </SettingsLoader>
+              <AppToaster />
+              <UpdateNotification />
+            </I18nProvider>
+          </SettingsProvider>
+        {/snippet}
+      </SettingsLoader>
 
-        <SvelteQueryDevtools buttonPosition="bottom-left" position="bottom" />
-      </QueryClientProvider>
-    </Tooltip.Provider>
-  </RootLayout>
-</ServerProvider>
+      <SvelteQueryDevtools buttonPosition="bottom-left" position="bottom" />
+    </QueryClientProvider>
+  </Tooltip.Provider>
+</RootLayout>
 
 <style>
   .layout {

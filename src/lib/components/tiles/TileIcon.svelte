@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { DisplayContext } from "$lib/api/types/plugin";
 
+  import { serverContext } from "$lib/contexts/server.context";
   import {
     TileIconType,
     type TileIcon,
@@ -13,7 +14,6 @@
   } from "$lib/api/utils/url";
 
   import Display from "../display/Display.svelte";
-  import { getServerContext } from "../ServerProvider.svelte";
 
   type Props = {
     ctx: DisplayContext;
@@ -23,7 +23,7 @@
 
   const { ctx, icon, iconOptions }: Props = $props();
 
-  const serverContext = getServerContext();
+  const currentServerContext = serverContext.get();
 
   const src = $derived(getIconSrc(icon));
   const style = $derived(
@@ -40,18 +40,21 @@
     switch (icon.type) {
       case TileIconType.PluginIcon:
         return getPluginAssetPath(
-          serverContext.serverURL,
+          currentServerContext.serverURL,
           icon.plugin_id,
           icon.icon,
         );
       case TileIconType.IconPack:
         return getIconAssetPath(
-          serverContext.serverURL,
+          currentServerContext.serverURL,
           icon.pack_id,
           icon.path,
         );
       case TileIconType.Uploaded:
-        return getUploadedIconAssetPath(serverContext.serverURL, icon.path);
+        return getUploadedIconAssetPath(
+          currentServerContext.serverURL,
+          icon.path,
+        );
       case TileIconType.Url:
         return icon.src;
       default:

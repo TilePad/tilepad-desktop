@@ -5,6 +5,7 @@
   import { createIconPacksQuery } from "$lib/api/icons";
   import { getIconAssetPath } from "$lib/api/utils/url";
   import { getErrorMessage } from "$lib/api/utils/error";
+  import { serverContext } from "$lib/contexts/server.context";
 
   import type { IconGridItem } from "./IconsGrid.svelte";
 
@@ -12,7 +13,6 @@
   import TextInput from "../input/TextInput.svelte";
   import IconPackCategory from "./IconPackCategory.svelte";
   import SkeletonList from "../skeleton/SkeletonList.svelte";
-  import { getServerContext } from "../ServerProvider.svelte";
 
   type IconPackData = {
     id: string;
@@ -28,8 +28,8 @@
 
   const iconPacksQuery = createIconPacksQuery();
 
-  const serverContext = getServerContext();
-  const serverURL = $derived(serverContext.serverURL);
+  const currentServerContext = serverContext.get();
+  const serverURL = $derived(currentServerContext.serverURL);
 
   let search = $state("");
 
