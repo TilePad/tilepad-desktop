@@ -22,7 +22,8 @@
     "lint:fix": "eslint src --fix",
     "make:licenses": "node scripts/generate-licenses.mjs",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "test:unit": "vitest"
   },
   "license": "MIT",
   "dependencies": {
@@ -68,7 +69,8 @@
     "typescript": "5.8.3",
     "typescript-eslint": "8.37.0",
     "unplugin-icons": "22.1.0",
-    "vite": "6.3.5"
+    "vite": "6.3.5",
+    "vitest": "^3.2.4"
   },
   "overrides": {
     "@sveltejs/kit": {
