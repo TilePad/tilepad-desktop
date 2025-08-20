@@ -1,17 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+type EventCallback = (...args: any[]) => void;
+
 /**
  * Event emitting and subscribing
  */
 export class EventEmitter {
-  events: Record<string, any>;
+  private events: Record<string, EventCallback[]>;
 
   constructor() {
     this.events = {};
   }
 
   // Subscribe to an event
-  on(event, callback) {
+  on<T extends EventCallback>(event: string, callback: T) {
     if (!this.events[event]) {
       this.events[event] = [];
     }
@@ -19,13 +21,13 @@ export class EventEmitter {
   }
 
   // Unsubscribe from an event
-  off(event, callback) {
+  off<T extends EventCallback>(event: string, callback: T) {
     if (!this.events[event]) return;
     this.events[event] = this.events[event].filter((cb) => cb !== callback);
   }
 
   // Emit an event
-  emit(event, ...args) {
+  emit(event: string, ...args: any[]) {
     if (!this.events[event]) return;
     this.events[event].forEach((callback) => callback(...args));
   }
