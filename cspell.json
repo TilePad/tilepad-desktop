@@ -1,19 +1,27 @@
 {
   "words": [
+    "afinet",
     "appender",
     "arboard",
     "autolaunch",
     "cdylib",
+    "chacha",
     "chrono",
+    "dalek",
     "Deque",
+    "diffie",
+    "ECDH",
     "enigo",
     "fontdb",
     "gethostname",
+    "msgpack",
+    "netifas",
     "oneshot",
     "reqwest",
     "rlib",
     "rngs",
     "Roboto",
+    "runed",
     "rustls",
     "Seedable",
     "serde",
@@ -21,6 +29,6 @@
     "staticlib",
     "sysinfo",
     "tauri",
-    "runed"
+    "thiserror"
   ]
 }
