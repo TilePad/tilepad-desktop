@@ -29,6 +29,10 @@
     "staticlib",
     "sysinfo",
     "tauri",
-    "thiserror"
+    "thiserror",
+    "tilepad",
+    "getrandom",
+    "macropad",
+    "Jacobtread"
   ]
 }
