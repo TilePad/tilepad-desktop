@@ -73,7 +73,7 @@
           }}
           loading={checkUpdatesMutation.isPending}
         >
-          Check for updates
+          {i18n.f("check_for_updates")}
         </Button>
         <PluginsRegistryDialog
           buttonLabel={{

@@ -174,5 +174,8 @@
   "installing": "Instaluje se",
   "no_interfaces": "Nejsou k dispozici žádná rozhraní pro připojení",
   "ip_address": "IP adresa",
-  "fingerprint": "Otisk veřejného klíče"
+  "fingerprint": "Otisk veřejného klíče",
+  "server_port": "Port serveru",
+  "server_port_description": "Port, ze kterého poběží interní server, musí být pro správný chod aplikace jedinečný. Změna se použije po restartu TilePad",
+  "check_for_updates": "Zkontrolovat aktualizace"
 }

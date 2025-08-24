@@ -174,5 +174,8 @@
   "installing": "Wird installiert",
   "no_interfaces": "Keine Schnittstellen verfügbar, um eine Verbindung herzustellen",
   "ip_address": "IP-Adresse",
-  "fingerprint": "Fingerprint des öffentlichen Schlüssels"
+  "fingerprint": "Fingerprint des öffentlichen Schlüssels",
+  "server_port": "Server-Port",
+  "server_port_description": "Port, von dem der interne Server ausgeführt wird. Dieser muss eindeutig sein, damit die App ordnungsgemäß funktioniert. Wird nach einem Neustart von TilePad angewendet",
+  "check_for_updates": "Nach Updates suchen"
 }

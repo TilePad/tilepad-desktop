@@ -174,5 +174,8 @@
   "installing": "Instalando",
   "no_interfaces": "No hay interfaces disponibles desde las que conectarse",
   "ip_address": "Dirección IP",
-  "fingerprint": "Huella de la clave pública"
+  "fingerprint": "Huella de la clave pública",
+  "server_port": "Puerto del servidor",
+  "server_port_description": "Puerto desde el que se ejecutará el servidor interno; debe ser único para que la aplicación funcione correctamente. Se aplicará después de reiniciar TilePad",
+  "check_for_updates": "Buscar actualizaciones"
 }
