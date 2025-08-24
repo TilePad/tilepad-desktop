@@ -1,4 +1,4 @@
-import { Context } from "runed";
+import { watch, Context } from "runed";
 import IntlMessageFormat from "intl-messageformat";
 
 interface I18nContext {
@@ -70,8 +70,21 @@ export function createI18n(): I18nContext {
     };
   };
 
-  // Load the initial locale
-  cancel = loadLocale(locale);
+  // Load locale based on current value
+  watch(
+    () => locale,
+    (locale) => {
+      localeData = {};
+      loading = true;
+
+      // Cancel any current loading
+      if (cancel) {
+        cancel();
+      }
+
+      cancel = loadLocale(locale);
+    },
+  );
 
   return {
     get loading() {
@@ -89,16 +102,6 @@ export function createI18n(): I18nContext {
     set locale(value: string) {
       if (locale !== value) {
         locale = value;
-
-        localeData = {};
-        loading = true;
-
-        // Cancel any current loading
-        if (cancel) {
-          cancel();
-        }
-
-        cancel = loadLocale(value);
       }
     },
 
