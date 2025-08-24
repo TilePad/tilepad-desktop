@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { uploadUserIcon } from "$lib/api/icons";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import { TileIconType, type TileIcon } from "$lib/api/types/tiles";
 
@@ -12,6 +12,8 @@
   };
 
   const { onSelectIcon }: Props = $props();
+
+  const i18n = i18nContext.get();
 
   let inputElm: HTMLInputElement | undefined = $state();
 
@@ -28,7 +30,7 @@
       const path = await uploadUserIcon(file);
       onSelectIcon({ type: TileIconType.Uploaded, path });
     } catch (err) {
-      toast.error(toastErrorMessage($t("file_upload_failed"))(err));
+      toast.error(toastErrorMessage(i18n.f("file_upload_failed"))(err));
     }
   }
 </script>
@@ -40,7 +42,7 @@
   }}
   style="width: 100%"
 >
-  {$t("select_icon_file")}
+  {i18n.f("select_icon_file")}
 </Button>
 
 <input

@@ -31,9 +31,9 @@
 <script lang="ts">
   import type { ProfileId, ProfileModel } from "$lib/api/types/profiles";
 
-  import { t } from "svelte-i18n";
   import { type Snippet } from "svelte";
   import { watch, Context } from "runed";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { getErrorMessage } from "$lib/api/utils/error";
   import {
     createProfileQuery,
@@ -49,6 +49,8 @@
   };
 
   const { children }: Props = $props();
+
+  const i18n = i18nContext.get();
 
   // State for the actively selected profile
   let profileId: ProfileId | undefined = $state(getPersistedProfileId());
@@ -98,7 +100,7 @@
       createProfile.mutate(
         {
           create: {
-            name: $t("default_profile"),
+            name: i18n.f("default_profile"),
             default: true,
             config: {},
             order: 0,
@@ -121,21 +123,21 @@
 {:else if createProfile.isError}
   <!-- Error creating current profile -->
   <Aside severity="error" style="margin: 1rem;">
-    {$t("create_profile_error", {
+    {i18n.f("create_profile_error", {
       values: { error: getErrorMessage(createProfile.error) },
     })}
   </Aside>
 {:else if profilesQuery.isError}
   <!-- Error loading profiles list -->
   <Aside severity="error" style="margin: 1rem;">
-    {$t("profiles_error", {
+    {i18n.f("profiles_error", {
       values: { error: getErrorMessage(profilesQuery.error) },
     })}
   </Aside>
 {:else if profileQuery.isError}
   <!-- Error loading current profile -->
   <Aside severity="error" style="margin: 1rem;">
-    {$t("profile_error", {
+    {i18n.f("profile_error", {
       values: { error: getErrorMessage(profileQuery.error) },
     })}
   </Aside>

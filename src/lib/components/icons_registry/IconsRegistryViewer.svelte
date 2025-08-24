@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { IconRegistryEntry } from "$lib/api/types/icons_registry";
 
-  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { createUninstallIconPackMutation } from "$lib/api/icons";
   import { replaceMarkdownRelativeUrls } from "$lib/utils/markdown";
   import { getErrorMessage, toastErrorMessage } from "$lib/api/utils/error";
@@ -24,6 +24,8 @@
 
   const { item, installed }: Props = $props();
 
+  const i18n = i18nContext.get();
+
   const manifestQuery = createIconPackManifestQuery(() => item.repo);
   const readmeQuery = createIconPackReadmeQuery(() => item.repo);
 
@@ -44,9 +46,9 @@
     );
 
     toast.promise(installPromise, {
-      loading: $t("icon_packs_installing"),
-      success: $t("icon_packs_installed"),
-      error: toastErrorMessage($t("icon_packs_install_error")),
+      loading: i18n.f("icon_packs_installing"),
+      success: i18n.f("icon_packs_installed"),
+      error: toastErrorMessage(i18n.f("icon_packs_install_error")),
     });
   }
 
@@ -56,9 +58,9 @@
     });
 
     toast.promise(uninstallPromise, {
-      loading: $t("icon_packs_uninstalling"),
-      success: $t("icon_packs_uninstalled"),
-      error: toastErrorMessage($t("icon_packs_uninstall_error")),
+      loading: i18n.f("icon_packs_uninstalling"),
+      success: i18n.f("icon_packs_uninstalled"),
+      error: toastErrorMessage(i18n.f("icon_packs_uninstall_error")),
     });
   }
 </script>
@@ -69,7 +71,7 @@
       <SkeletonList style="padding: 1rem" />
     {:else if manifestQuery.isError}
       <Aside severity="error" style="margin: 1rem;">
-        {$t("manifest_error", {
+        {i18n.f("manifest_error", {
           values: { error: getErrorMessage(manifestQuery.error) },
         })}
       </Aside>
@@ -78,10 +80,10 @@
       <p>{item.description}</p>
 
       {#if installed}
-        <Button onclick={handleUninstall}>{$t("uninstall")}</Button>
+        <Button onclick={handleUninstall}>{i18n.f("uninstall")}</Button>
       {:else}
         <Button disabled={install.isPending} onclick={onInstall}>
-          {$t("install")}
+          {i18n.f("install")}
         </Button>
       {/if}
     {/if}
@@ -91,7 +93,7 @@
     {#if readmeQuery.isLoading}
       <SkeletonList style="padding: 1rem" />
     {:else if readmeQuery.isError}
-      {$t("readme_error", {
+      {i18n.f("readme_error", {
         values: { error: getErrorMessage(readmeQuery.error) },
       })}
     {:else if readmeQuery.isSuccess}

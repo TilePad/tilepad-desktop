@@ -37,12 +37,12 @@
     "@tauri-apps/plugin-opener": "2.4.0",
     "@tauri-apps/plugin-updater": "2.9.0",
     "bits-ui": "2.8.11",
+    "intl-messageformat": "^10.7.16",
     "isomorphic-dompurify": "2.26.0",
     "marked": "16.1.1",
     "runed": "0.31.0",
     "semver-ts": "1.0.3",
     "svelte-awesome-color-picker": "4.0.2",
-    "svelte-i18n": "4.0.1",
     "svelte-sonner": "1.0.5"
   },
   "devDependencies": {
@@ -75,8 +75,7 @@
   "overrides": {
     "@sveltejs/kit": {
       "cookie": "^0.7.0"
-    },
-    "esbuild": "0.25.8"
+    }
   },
   "npm": {
     "overrides": {

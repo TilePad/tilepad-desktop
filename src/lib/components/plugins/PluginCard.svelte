@@ -2,8 +2,8 @@
   import type { PluginId, PluginTaskState } from "$lib/api/types/plugin";
   import type { PluginRegistryEntry } from "$lib/api/types/plugins_registry";
 
-  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import SolarRefreshLinear from "~icons/solar/refresh-linear";
   import { createUpdatePlugin } from "$lib/api/plugins_registry";
@@ -39,6 +39,8 @@
     developerMode,
   }: Props = $props();
 
+  const i18n = i18nContext.get();
+
   const uninstall = createUninstallPlugin();
   const update = createUpdatePlugin();
 
@@ -46,9 +48,9 @@
     const reloadPromise = reloadPlugin(id);
 
     toast.promise(reloadPromise, {
-      loading: $t("plugin_reloading"),
-      success: $t("plugin_reloaded"),
-      error: toastErrorMessage($t("plugin_reload_error")),
+      loading: i18n.f("plugin_reloading"),
+      success: i18n.f("plugin_reloaded"),
+      error: toastErrorMessage(i18n.f("plugin_reload_error")),
     });
   }
 
@@ -58,9 +60,9 @@
     });
 
     toast.promise(uninstallPromise, {
-      loading: $t("plugin_uninstalling"),
-      success: $t("plugin_uninstalled"),
-      error: toastErrorMessage($t("plugin_uninstall_error")),
+      loading: i18n.f("plugin_uninstalling"),
+      success: i18n.f("plugin_uninstalled"),
+      error: toastErrorMessage(i18n.f("plugin_uninstall_error")),
     });
   }
 
@@ -73,9 +75,9 @@
       pluginId: id,
     });
     toast.promise(updatePromise, {
-      loading: $t("plugin_updating"),
-      success: $t("plugin_updated"),
-      error: toastErrorMessage($t("plugin_update_error")),
+      loading: i18n.f("plugin_updating"),
+      success: i18n.f("plugin_updated"),
+      error: toastErrorMessage(i18n.f("plugin_update_error")),
     });
   }
 </script>
@@ -119,7 +121,7 @@
     {#if developerMode}
       <Button
         variant="secondary"
-        title={$t("Reload")}
+        title={i18n.f("Reload")}
         size="small"
         onclick={handleReload}
       >
@@ -135,7 +137,7 @@
         loading={update.isPending}
         disabled={uninstall.isPending}
       >
-        {$t("update")}
+        {i18n.f("update")}
       </Button>
     {/if}
 
@@ -147,7 +149,7 @@
         loading={uninstall.isPending}
         disabled={update.isPending}
       >
-        {$t("uninstall")}
+        {i18n.f("uninstall")}
       </Button>
     {/if}
   </div>

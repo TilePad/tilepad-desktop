@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { t } from "svelte-i18n";
   import { watch, useDebounce } from "runed";
   import SolarEyeBold from "~icons/solar/eye-bold";
   import { createFontsQuery } from "$lib/api/fonts";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import SolarEyeClosedBold from "~icons/solar/eye-closed-bold";
   import { createUpdateTileLabelMutation } from "$lib/api/tiles";
   import {
@@ -24,6 +24,8 @@
   };
 
   const { tileId, config }: Props = $props();
+
+  const i18n = i18nContext.get();
 
   const fontsQuery = createFontsQuery();
   const fonts = $derived(fontsQuery.data ?? []);
@@ -106,13 +108,13 @@
 <div class="layout">
   <TextInput
     value={label.label}
-    placeholder={$t("tile_label_placeholder")}
+    placeholder={i18n.f("tile_label_placeholder")}
     oninput={(event) => {
       onChangeTileName(event.currentTarget.value);
     }}
   />
 
-  <Tooltip title={$t("toggle_label_tooltip")}>
+  <Tooltip title={i18n.f("toggle_label_tooltip")}>
     {#snippet trigger({ props })}
       <Button {...props} onclick={onToggleEnabled} size="icon">
         {#if label.enabled}

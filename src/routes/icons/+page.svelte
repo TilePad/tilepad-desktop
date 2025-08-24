@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { IconPackId } from "$lib/api/types/icons";
 
-  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import Aside from "$lib/components/Aside.svelte";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import SolarShopBoldDuotone from "~icons/solar/shop-bold-duotone";
   import IconPackCard from "$lib/components/icons/IconPackCard.svelte";
   import SkeletonList from "$lib/components/skeleton/SkeletonList.svelte";
@@ -12,15 +12,17 @@
   import ManualImportIconPack from "$lib/components/icons/ManualImportIconPack.svelte";
   import IconsRegistryDialog from "$lib/components/icons_registry/IconsRegistryDialog.svelte";
 
+  const i18n = i18nContext.get();
+
   const iconPacksQuery = createIconPacksQuery();
 
   function handleUninstall(iconPackId: IconPackId) {
     const revokePromise = uninstallIconPack(iconPackId);
 
     toast.promise(revokePromise, {
-      loading: $t("icon_packs_uninstalling"),
-      success: $t("icon_packs_uninstalled"),
-      error: toastErrorMessage($t("icon_packs_uninstall_error")),
+      loading: i18n.f("icon_packs_uninstalling"),
+      success: i18n.f("icon_packs_uninstalled"),
+      error: toastErrorMessage(i18n.f("icon_packs_uninstall_error")),
     });
   }
 </script>
@@ -30,7 +32,7 @@
     <SkeletonList style="margin: 1rem" />
   {:else if iconPacksQuery.isError}
     <Aside severity="error" style="margin: 1rem">
-      {$t("icon_packs_installed_error", {
+      {i18n.f("icon_packs_installed_error", {
         values: { error: getErrorMessage(iconPacksQuery.error) },
       })}
     </Aside>
@@ -39,7 +41,7 @@
       <div class="actions">
         <IconsRegistryDialog
           buttonLabel={{
-            text: $t("community_icon_packs"),
+            text: i18n.f("community_icon_packs"),
             icon: SolarShopBoldDuotone,
           }}
         />

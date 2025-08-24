@@ -2,8 +2,8 @@
   import type { PluginManifest } from "$lib/api/types/plugin";
   import type { PluginRegistryEntry } from "$lib/api/types/plugins_registry";
 
-  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { compare as semverCompare } from "semver-ts";
   import { createUninstallPlugin } from "$lib/api/plugins";
   import { replaceMarkdownRelativeUrls } from "$lib/utils/markdown";
@@ -27,6 +27,8 @@
 
   const { item, installed }: Props = $props();
 
+  const i18n = i18nContext.get();
+
   const manifestQuery = createPluginManifestQuery(() => item.repo);
   const readmeQuery = createPluginReadmeQuery(() => item.repo);
 
@@ -47,9 +49,9 @@
     );
 
     toast.promise(installPromise, {
-      loading: $t("plugin_installing"),
-      success: $t("plugin_installed"),
-      error: toastErrorMessage($t("plugin_install_error")),
+      loading: i18n.f("plugin_installing"),
+      success: i18n.f("plugin_installed"),
+      error: toastErrorMessage(i18n.f("plugin_install_error")),
     });
   }
 
@@ -57,9 +59,9 @@
     const revokePromise = uninstall.mutateAsync({ pluginId: item.id });
 
     toast.promise(revokePromise, {
-      loading: $t("plugin_uninstalling"),
-      success: $t("plugin_uninstalled"),
-      error: toastErrorMessage($t("plugin_uninstall_error")),
+      loading: i18n.f("plugin_uninstalling"),
+      success: i18n.f("plugin_uninstalled"),
+      error: toastErrorMessage(i18n.f("plugin_uninstall_error")),
     });
   }
 
@@ -74,9 +76,9 @@
     });
 
     toast.promise(updatePromise, {
-      loading: $t("plugin_updating"),
-      success: $t("plugin_updated"),
-      error: toastErrorMessage($t("plugin_update_error")),
+      loading: i18n.f("plugin_updating"),
+      success: i18n.f("plugin_updated"),
+      error: toastErrorMessage(i18n.f("plugin_update_error")),
     });
   }
 </script>
@@ -87,7 +89,7 @@
       <SkeletonList style="padding: 1rem" />
     {:else if manifestQuery.isError}
       <Aside severity="error" style="margin: 1rem;">
-        {$t("manifest_error", {
+        {i18n.f("manifest_error", {
           values: { error: getErrorMessage(manifestQuery.error) },
         })}
       </Aside>
@@ -95,11 +97,11 @@
       <h2>{manifestQuery.data.plugin.name}</h2>
       <p>{manifestQuery.data.plugin.description}</p>
       <span>
-        {$t("version")}: {manifestQuery.data.plugin.version}
+        {i18n.f("version")}: {manifestQuery.data.plugin.version}
 
         {#if installed}
           <span class="installed-version">
-            ({$t("installed")}: {installed.plugin.version})
+            ({i18n.f("installed")}: {installed.plugin.version})
           </span>
         {/if}
       </span>
@@ -112,19 +114,19 @@
               loading={update.isPending}
               disabled={uninstall.isPaused}
             >
-              {$t("update")}
+              {i18n.f("update")}
             </Button>
           {/if}
 
           <Button
             onclick={handleUninstall}
             loading={uninstall.isPending}
-            disabled={update.isPending}>{$t("uninstall")}</Button
+            disabled={update.isPending}>{i18n.f("uninstall")}</Button
           >
         </div>
       {:else}
         <Button loading={install.isPending} onclick={onInstall}>
-          {install.isPending ? $t("installing") : $t("install")}
+          {install.isPending ? i18n.f("installing") : i18n.f("install")}
         </Button>
       {/if}
     {/if}
@@ -134,7 +136,7 @@
     {#if readmeQuery.isLoading}
       <SkeletonList style="padding: 1rem" />
     {:else if readmeQuery.isError}
-      {$t("readme_error", {
+      {i18n.f("readme_error", {
         values: { error: getErrorMessage(readmeQuery.error) },
       })}
     {:else if readmeQuery.isSuccess}

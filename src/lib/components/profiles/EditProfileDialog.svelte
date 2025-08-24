@@ -2,9 +2,9 @@
   import type { ProfileModel } from "$lib/api/types/profiles";
 
   import { watch } from "runed";
-  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { setProfileName } from "$lib/api/profiles";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { toastErrorMessage } from "$lib/api/utils/error";
 
   import type { DialogProps } from "../dialog/Dialog.svelte";
@@ -19,6 +19,8 @@
 
   let { profile }: Props = $props();
 
+  const i18n = i18nContext.get();
+
   let open = $state(false);
   let name = $state(profile.name);
 
@@ -28,9 +30,9 @@
     const updatePromise = setProfileName(profile.id, name);
 
     toast.promise(updatePromise, {
-      loading: $t("profile_updating"),
-      success: $t("profile_updated"),
-      error: toastErrorMessage($t("profile_update_error")),
+      loading: i18n.f("profile_updating"),
+      success: i18n.f("profile_updated"),
+      error: toastErrorMessage(i18n.f("profile_update_error")),
     });
 
     open = false;
@@ -51,11 +53,11 @@
 
 <Dialog bind:open>
   {#snippet button({ props })}
-    <Button {...props}>{$t("edit_profile")}</Button>
+    <Button {...props}>{i18n.f("edit_profile")}</Button>
   {/snippet}
 
   {#snippet title()}
-    {$t("edit_profile")}
+    {i18n.f("edit_profile")}
   {/snippet}
 
   <form onsubmit={onSave}>
@@ -66,13 +68,13 @@
         required
         minlength="1"
         class="input"
-        placeholder={$t("name")}
+        placeholder={i18n.f("name")}
       />
     </div>
 
     <div class="actions">
-      <DialogCloseButton buttonLabel={{ text: $t("close") }} />
-      <Button type="submit">{$t("save")}</Button>
+      <DialogCloseButton buttonLabel={{ text: i18n.f("close") }} />
+      <Button type="submit">{i18n.f("save")}</Button>
     </div>
   </form>
 </Dialog>

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { t } from "svelte-i18n";
   import { Select } from "bits-ui";
   import { slide } from "svelte/transition";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import TwemojiFlagSpain from "~icons/twemoji/flag-spain";
   import DownArrow from "~icons/solar/alt-arrow-down-bold";
   import TwemojiFlagFrance from "~icons/twemoji/flag-france";
@@ -16,6 +16,8 @@
     value: string;
     onChangeValue: (value: string) => void;
   };
+
+  const i18n = i18nContext.get();
 
   const { value, onChangeValue }: Props = $props();
 
@@ -50,7 +52,7 @@
               <language.icon />
               {language.label}
             {:else}
-              {$t("select_language")}
+              {i18n.f("select_language")}
             {/if}
           </span>
           <DownArrow class="trigger__icon" />
@@ -84,10 +86,10 @@
                       </span>
 
                       {#if language.auto}
-                        <Tooltip title={$t("auto_generated")}>
+                        <Tooltip title={i18n.f("auto_generated")}>
                           {#snippet trigger({ props })}
                             <span {...props} class="auto-label">
-                              {$t("auto")}
+                              {i18n.f("auto")}
                             </span>
                           {/snippet}
                         </Tooltip>

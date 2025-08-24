@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from "svelte-i18n";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
 
   type Props = {
     name: string;
@@ -21,6 +21,8 @@
     installed,
     onClick,
   }: Props = $props();
+
+  const i18n = i18nContext.get();
 </script>
 
 <button onclick={onClick} class="item" class:item--selected={selected}>
@@ -32,7 +34,7 @@
   <p class="repo">{repo}</p>
 
   {#if installed}
-    <p class="installed">{$t("installed")}</p>
+    <p class="installed">{i18n.f("installed")}</p>
   {/if}
 </button>
 

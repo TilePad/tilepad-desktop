@@ -2,7 +2,7 @@
   import type { Snippet } from "svelte";
   import type { SettingsConfig } from "$lib/api/types/settings";
 
-  import { t } from "svelte-i18n";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { getErrorMessage } from "$lib/api/utils/error";
   import { createSettingsQuery } from "$lib/api/settings";
 
@@ -14,6 +14,9 @@
   };
 
   const { children }: Props = $props();
+
+  const i18n = i18nContext.get();
+
   const settingsQuery = createSettingsQuery();
 </script>
 
@@ -22,7 +25,7 @@
 {:else if settingsQuery.isError}
   <!-- Error creating current profile -->
   <Aside severity="error" style="margin: 1rem;">
-    {$t("settings_error", {
+    {i18n.f("settings_error", {
       values: { error: getErrorMessage(settingsQuery.error) },
     })}
   </Aside>

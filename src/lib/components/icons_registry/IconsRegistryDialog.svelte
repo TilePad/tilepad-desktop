@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { IconRegistryEntry } from "$lib/api/types/icons_registry";
 
-  import { t } from "svelte-i18n";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { createIconPacksQuery } from "$lib/api/icons";
   import { getErrorMessage } from "$lib/api/utils/error";
   import { createIconPackRegistryQuery } from "$lib/api/icons_registry";
@@ -18,6 +18,8 @@
   type Props = DialogProps & {};
 
   const { ...restProps }: Props = $props();
+
+  const i18n = i18nContext.get();
 
   const iconRegistryQuery = createIconPackRegistryQuery();
   const iconPacksQuery = createIconPacksQuery();
@@ -47,13 +49,13 @@
       <SkeletonList style="padding: 1rem" />
     {:else if iconRegistryQuery.isError}
       <Aside severity="error" style="margin: 1rem;">
-        {$t("community_icons_error", {
+        {i18n.f("community_icons_error", {
           values: { error: getErrorMessage(iconRegistryQuery.error) },
         })}
       </Aside>
     {:else if iconPacksQuery.isError}
       <Aside severity="error" style="margin: 1rem;">
-        {$t("icon_packs_installed_error", {
+        {i18n.f("icon_packs_installed_error", {
           values: { error: getErrorMessage(iconPacksQuery.error) },
         })}
       </Aside>
@@ -62,22 +64,22 @@
         <div class="plugins">
           <div class="titlebar">
             <div class="titlebar__text">
-              <h2>{$t("community_icons")}</h2>
+              <h2>{i18n.f("community_icons")}</h2>
               <p class="total">
-                {$t("count_icon_packs", {
+                {i18n.f("count_icon_packs", {
                   values: { count: filteredRegistry.length },
                 })}
               </p>
             </div>
 
-            <DialogCloseButton buttonLabel={{ text: $t("close") }} />
+            <DialogCloseButton buttonLabel={{ text: i18n.f("close") }} />
           </div>
 
           <input
             bind:value={search}
             class="search"
             type="text"
-            placeholder={$t("search_placeholder")}
+            placeholder={i18n.f("search_placeholder")}
           />
 
           <div class="plugins-list">
@@ -100,7 +102,7 @@
                 selected={active !== undefined && active.id === item.id}
               />
             {:else}
-              {$t("community_icons_none")}
+              {i18n.f("community_icons_none")}
             {/each}
           </div>
         </div>

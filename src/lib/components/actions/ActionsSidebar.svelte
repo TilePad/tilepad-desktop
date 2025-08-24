@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { PluginId } from "$lib/api/types/plugin";
 
-  import { t } from "svelte-i18n";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { getErrorMessage } from "$lib/api/utils/error";
   import { persistedState } from "$lib/utils/localStorage.svelte";
   import SolarAltArrowLeftOutline from "~icons/solar/alt-arrow-left-outline";
@@ -25,6 +25,8 @@
   };
 
   const { actions, actionsError, actionsLoading }: Props = $props();
+
+  const i18n = i18nContext.get();
 
   const actionSidebarState = persistedState<ActionSidebarState>(
     "actionSidebarState",
@@ -101,7 +103,7 @@
         bind:value={search}
         class="search"
         type="text"
-        placeholder={$t("search_placeholder")}
+        placeholder={i18n.f("search_placeholder")}
       />
     </div>
   </div>
@@ -111,7 +113,7 @@
       <SkeletonList style="margin: 1rem" />
     {:else if actionsError}
       <Aside severity="error" style="margin: 1rem;">
-        {$t("actions_error", {
+        {i18n.f("actions_error", {
           values: { error: getErrorMessage(actionsError) },
         })}
       </Aside>
@@ -127,7 +129,7 @@
         />
       {:else}
         <p class="none">
-          {$t("no_results")}
+          {i18n.f("no_results")}
         </p>
       {/each}
     {/if}

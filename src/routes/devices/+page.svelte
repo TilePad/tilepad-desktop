@@ -2,10 +2,10 @@
   import type { FolderId } from "$lib/api/types/folders";
   import type { ProfileId } from "$lib/api/types/profiles";
 
-  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import Aside from "$lib/components/Aside.svelte";
   import { getConnectionInfo } from "$lib/api/server";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { createProfilesQuery } from "$lib/api/profiles";
   import DeviceCard from "$lib/components/devices/DeviceCard.svelte";
   import SkeletonList from "$lib/components/skeleton/SkeletonList.svelte";
@@ -19,6 +19,8 @@
     createSetDeviceProfileMutation,
     createRevokeDeviceFolderMutation,
   } from "$lib/api/devices";
+
+  const i18n = i18nContext.get();
 
   const devices = devicesQuery();
   const connectedDevices = connectedDevicesQuery();
@@ -48,9 +50,9 @@
     });
 
     toast.promise(revokePromise, {
-      loading: $t("device_revoking"),
-      success: $t("device_revoked"),
-      error: toastErrorMessage($t("device_revoke_error")),
+      loading: i18n.f("device_revoking"),
+      success: i18n.f("device_revoked"),
+      error: toastErrorMessage(i18n.f("device_revoke_error")),
     });
   }
 
@@ -69,7 +71,7 @@
       <SkeletonList style="margin: 1rem" />
     {:else if devices.isError}
       <Aside severity="error" style="margin: 1rem">
-        {$t("devices_error", {
+        {i18n.f("devices_error", {
           values: { error: getErrorMessage(devices.error) },
         })}
       </Aside>
@@ -104,7 +106,7 @@
               {/snippet}
             </FoldersLoader>
           {:else}
-            {$t("devices_none")}
+            {i18n.f("devices_none")}
           {/each}
         </div>
       </div>

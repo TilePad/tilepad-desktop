@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from "svelte-i18n";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import tilepadLogo from "$lib/assets/tilepad-logo.svg";
   import SolarDevicesBoldDuotone from "~icons/solar/devices-bold-duotone";
   import SolarSettingsBoldDuotone from "~icons/solar/settings-bold-duotone";
@@ -8,6 +8,8 @@
   import SolarLayersMinimalisticBoldDuotone from "~icons/solar/layers-minimalistic-bold-duotone";
 
   import NavButton from "./NavButton.svelte";
+
+  const i18n = i18nContext.get();
 </script>
 
 <header class="header">
@@ -16,27 +18,27 @@
     <NavButton
       icon={SolarLayersMinimalisticBoldDuotone}
       href="/"
-      title={$t("profiles")}
+      title={i18n.f("profiles")}
     />
     <NavButton
       icon={SolarDevicesBoldDuotone}
       href="/devices"
-      title={$t("devices")}
+      title={i18n.f("devices")}
     />
     <NavButton
       icon={SolarPlugCircleBoldDuotone}
       href="/plugins"
-      title={$t("plugins")}
+      title={i18n.f("plugins")}
     />
     <NavButton
       icon={SolarGalleryWideBoldDuotone}
       href="/icons"
-      title={$t("icon_packs")}
+      title={i18n.f("icon_packs")}
     />
     <NavButton
       icon={SolarSettingsBoldDuotone}
       href="/settings"
-      title={$t("settings")}
+      title={i18n.f("settings")}
     />
   </nav>
 </header>

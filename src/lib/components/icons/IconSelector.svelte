@@ -1,6 +1,6 @@
 <script lang="ts">
   import { watch } from "runed";
-  import { t } from "svelte-i18n";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import ColorPicker from "svelte-awesome-color-picker";
   import SolarGalleryEditBoldDuotone from "~icons/solar/gallery-edit-bold-duotone";
   import {
@@ -35,6 +35,8 @@
     onResetDefault,
   }: Props = $props();
 
+  const i18n = i18nContext.get();
+
   let open = $state(false);
   let pickPack: boolean = $state(false);
 
@@ -46,7 +48,7 @@
   );
 </script>
 
-<Tooltip title={$t("icon_options")}>
+<Tooltip title={i18n.f("icon_options")}>
   {#snippet trigger({ props })}
     <PopoverButton
       triggerProps={props}
@@ -72,7 +74,7 @@
           />
         {:else}
           <div>
-            {$t("padding_px")}
+            {i18n.f("padding_px")}
             <NumberInput
               value={iconOptions.padding}
               oninput={(event) =>
@@ -86,7 +88,7 @@
               if (color.hex) onChangeBackgroundColor(color.hex);
             }}
             position="responsive"
-            label={$t("background_color")}
+            label={i18n.f("background_color")}
           />
 
           <ColorPicker
@@ -95,12 +97,12 @@
               if (color.hex) onChangeBorderColor(color.hex);
             }}
             position="responsive"
-            label={$t("border_color")}
+            label={i18n.f("border_color")}
           />
 
           <div class="content">
             <Button style="width: 100%;" onclick={() => (pickPack = true)}>
-              {$t("icon_pack_icon")}
+              {i18n.f("icon_pack_icon")}
             </Button>
 
             <IconFilePicker
@@ -117,7 +119,7 @@
               }}
               style="width: 100%"
             >
-              {$t("reset_default")}
+              {i18n.f("reset_default")}
             </Button>
           </div>
         {/if}

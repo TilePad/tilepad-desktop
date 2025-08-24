@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { PluginRegistryEntry } from "$lib/api/types/plugins_registry";
 
-  import { t } from "svelte-i18n";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { createPluginsQuery } from "$lib/api/plugins";
   import { getErrorMessage } from "$lib/api/utils/error";
   import { createPluginRegistryQuery } from "$lib/api/plugins_registry";
@@ -18,6 +18,8 @@
   type Props = DialogProps & {};
 
   const { ...restProps }: Props = $props();
+
+  const i18n = i18nContext.get();
 
   const pluginRegistryQuery = createPluginRegistryQuery();
   const pluginsQuery = createPluginsQuery();
@@ -47,13 +49,13 @@
       <SkeletonList style="padding: 1rem" />
     {:else if pluginRegistryQuery.isError}
       <Aside severity="error" style="margin: 1rem;">
-        {$t("community_plugins_error", {
+        {i18n.f("community_plugins_error", {
           values: { error: getErrorMessage(pluginRegistryQuery.error) },
         })}
       </Aside>
     {:else if pluginsQuery.isError}
       <Aside severity="error" style="margin: 1rem;">
-        {$t("plugins_installed_error", {
+        {i18n.f("plugins_installed_error", {
           values: { error: getErrorMessage(pluginsQuery.error) },
         })}
       </Aside>
@@ -62,22 +64,22 @@
         <div class="plugins">
           <div class="titlebar">
             <div class="titlebar__text">
-              <h2>{$t("community_plugins")}</h2>
+              <h2>{i18n.f("community_plugins")}</h2>
               <p class="total">
-                {$t("count_plugins", {
+                {i18n.f("count_plugins", {
                   values: { count: filteredRegistry.length },
                 })}
               </p>
             </div>
 
-            <DialogCloseButton buttonLabel={{ text: $t("close") }} />
+            <DialogCloseButton buttonLabel={{ text: i18n.f("close") }} />
           </div>
 
           <input
             bind:value={search}
             class="search"
             type="text"
-            placeholder={$t("search_placeholder")}
+            placeholder={i18n.f("search_placeholder")}
           />
 
           <div class="plugins-list">
@@ -100,7 +102,7 @@
                 selected={active !== undefined && active.id === item.id}
               />
             {:else}
-              {$t("community_plugins_none")}
+              {i18n.f("community_plugins_none")}
             {/each}
           </div>
         </div>

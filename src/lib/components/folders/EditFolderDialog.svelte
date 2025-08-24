@@ -2,8 +2,8 @@
   import type { FolderModel } from "$lib/api/types/folders";
 
   import { watch } from "runed";
-  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import { createSetFolderNameMutation } from "$lib/api/folders";
 
@@ -19,6 +19,8 @@
   };
 
   const { folder }: Props = $props();
+
+  const i18n = i18nContext.get();
 
   const setFolderNameMutation = createSetFolderNameMutation();
 
@@ -42,9 +44,9 @@
     );
 
     toast.promise(updatePromise, {
-      loading: $t("folder_updating"),
-      success: $t("folder_updated"),
-      error: toastErrorMessage($t("folder_update_error")),
+      loading: i18n.f("folder_updating"),
+      success: i18n.f("folder_updated"),
+      error: toastErrorMessage(i18n.f("folder_update_error")),
     });
   }
 
@@ -62,11 +64,11 @@
 
 <Dialog bind:open>
   {#snippet button({ props })}
-    <Button {...props}>{$t("edit_folder")}</Button>
+    <Button {...props}>{i18n.f("edit_folder")}</Button>
   {/snippet}
 
   {#snippet title()}
-    {$t("edit_folder")}
+    {i18n.f("edit_folder")}
   {/snippet}
 
   <form onsubmit={onSave}>
@@ -77,14 +79,14 @@
         required
         minlength={1}
         class="input"
-        placeholder={$t("name")}
+        placeholder={i18n.f("name")}
       />
     </div>
 
     <div class="actions">
-      <DialogCloseButton buttonLabel={{ text: $t("close") }} />
+      <DialogCloseButton buttonLabel={{ text: i18n.f("close") }} />
       <Button type="submit" loading={setFolderNameMutation.isPending}>
-        {$t("save")}
+        {i18n.f("save")}
       </Button>
     </div>
   </form>

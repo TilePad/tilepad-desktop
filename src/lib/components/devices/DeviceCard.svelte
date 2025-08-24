@@ -4,7 +4,7 @@
   import type { FolderId } from "$lib/api/types/folders";
   import type { ProfileId } from "$lib/api/types/profiles";
 
-  import { t } from "svelte-i18n";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { fingerprint } from "$lib/utils/fingerprint";
   import SolarTrashBin2BoldDuotone from "~icons/solar/trash-bin-2-bold-duotone";
   import SolarTranslationBoldDuotone from "~icons/solar/translation-bold-duotone";
@@ -44,6 +44,8 @@
     onChangeFolder,
   }: Props = $props();
 
+  const i18n = i18nContext.get();
+
   const fingerprintPromise = $derived(fingerprint(new Uint8Array(publicKey)));
 </script>
 
@@ -54,10 +56,10 @@
     <p class="state" data-connected={connected}>
       {#if connected}
         <SolarTranslationBoldDuotone />
-        {$t("connected")}
+        {i18n.f("connected")}
       {:else}
         <SolarTranslationBoldDuotone />
-        {$t("not_connected")}
+        {i18n.f("not_connected")}
       {/if}
     </p>
   </div>
@@ -75,19 +77,19 @@
       value={profileId}
       options={profiles}
       onChangeValue={onChangeProfile}
-      placeholder={$t("choose_profile")}
+      placeholder={i18n.f("choose_profile")}
     />
 
     <Select
       value={folderId}
       options={folders}
       onChangeValue={onChangeFolder}
-      placeholder={$t("choose_folder")}
+      placeholder={i18n.f("choose_folder")}
     />
 
     <Button variant="error" onclick={onRevoke}>
       <SolarTrashBin2BoldDuotone />
-      {$t("revoke")}
+      {i18n.f("revoke")}
     </Button>
   </div>
 </div>

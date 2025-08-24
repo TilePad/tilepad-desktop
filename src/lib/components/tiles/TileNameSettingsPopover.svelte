@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { t } from "svelte-i18n";
   import { LabelAlign } from "$lib/api/types/tiles";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import ColorPicker from "svelte-awesome-color-picker";
   import SolarTextBoldDuotone from "~icons/solar/text-bold-duotone";
   import SolarAlignTopBoldDuotone from "~icons/solar/align-top-bold-duotone";
@@ -76,9 +76,11 @@
     outlineColor,
     onChangeOutlineColor,
   }: Props = $props();
+
+  const i18n = i18nContext.get();
 </script>
 
-<Tooltip title={$t("label_options_tooltip")}>
+<Tooltip title={i18n.f("label_options_tooltip")}>
   {#snippet trigger({ props })}
     <PopoverButton triggerProps={{ ...props }} size="icon">
       <SolarTextBoldDuotone width="1.5rem" height="1.5rem" />
@@ -87,7 +89,7 @@
         <FontSelector {fonts} value={font} onChangeValue={onChangeFont} />
 
         <div>
-          {$t("font_size")}
+          {i18n.f("font_size")}
           <NumberInput
             value={fontSize}
             oninput={(event) => {
@@ -141,7 +143,7 @@
             if (color.hex) onChangeColor(color.hex);
           }}
           position="responsive"
-          label={$t("text_color")}
+          label={i18n.f("text_color")}
         />
 
         <ColorPicker
@@ -150,7 +152,7 @@
             if (color.hex) onChangeOutlineColor(color.hex);
           }}
           position="responsive"
-          label={$t("text_outline_color")}
+          label={i18n.f("text_outline_color")}
         />
       {/snippet}
     </PopoverButton>

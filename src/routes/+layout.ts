@@ -3,7 +3,7 @@
 
 import { getServerPort } from "$lib/api/server";
 
-import type { LayoutLoad } from "./$types";
+import type { LayoutLoad } from "./i18n.fypes";
 
 // See: https://v2.tauri.app/start/frontend/sveltekit/ for more info
 export const prerender = true;

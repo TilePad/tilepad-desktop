@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { TileModel } from "$lib/api/types/tiles";
 
-  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import { createDeleteTileMutation } from "$lib/api/tiles";
   import SolarTrashBinTrashBoldDuotone from "~icons/solar/trash-bin-trash-bold-duotone";
@@ -20,6 +20,8 @@
 
   let { tile, onClose }: Props = $props();
 
+  const i18n = i18nContext.get();
+
   const deleteTile = createDeleteTileMutation();
 
   let open = $state(false);
@@ -33,9 +35,9 @@
     });
 
     toast.promise(deletePromise, {
-      loading: $t("tile_deleting"),
-      success: $t("tile_deleted"),
-      error: toastErrorMessage($t("tile_delete_error")),
+      loading: i18n.f("tile_deleting"),
+      success: i18n.f("tile_deleted"),
+      error: toastErrorMessage(i18n.f("tile_delete_error")),
     });
 
     open = false;
@@ -51,17 +53,17 @@
   {/snippet}
 
   {#snippet title()}
-    {$t("confirm_delete")}
+    {i18n.f("confirm_delete")}
   {/snippet}
 
   {#snippet description()}
-    {$t("confirm_delete_tile")}
+    {i18n.f("confirm_delete_tile")}
   {/snippet}
 
   {#snippet actions()}
-    <DialogCloseButton buttonLabel={{ text: $t("close") }} />
+    <DialogCloseButton buttonLabel={{ text: i18n.f("close") }} />
     <Button type="submit" variant="error" onclick={onDelete}>
-      {$t("delete")}
+      {i18n.f("delete")}
     </Button>
   {/snippet}
 </Dialog>

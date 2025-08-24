@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { PluginWithState } from "$lib/api/types/plugin";
 
-  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import Aside from "$lib/components/Aside.svelte";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { compare as semverCompare } from "semver-ts";
   import { createPluginsQuery } from "$lib/api/plugins";
   import { getErrorMessage } from "$lib/api/utils/error";
@@ -16,6 +16,8 @@
   import { getSettingsContext } from "$lib/components/SettingsProvider.svelte";
   import ManualImportPlugin from "$lib/components/plugins/ManualImportPlugin.svelte";
   import PluginsRegistryDialog from "$lib/components/plugins_registry/PluginsRegistryDialog.svelte";
+
+  const i18n = i18nContext.get();
 
   const settingsContext = getSettingsContext();
   const settings = $derived.by(settingsContext.settings);
@@ -44,7 +46,7 @@
       }
 
       toast.success(
-        $t("updates_found_count", { values: { count: updates.length } }),
+        i18n.f("updates_found_count", { values: { count: updates.length } }),
       );
 
       return updates;
@@ -57,7 +59,7 @@
     <SkeletonList style="margin: 1rem" />
   {:else if pluginsQuery.isError}
     <Aside severity="error" style="margin: 1rem">
-      {$t("plugins_error", {
+      {i18n.f("plugins_error", {
         values: { error: getErrorMessage(pluginsQuery.error) },
       })}
     </Aside>
@@ -75,7 +77,7 @@
         </Button>
         <PluginsRegistryDialog
           buttonLabel={{
-            text: $t("community_plugins"),
+            text: i18n.f("community_plugins"),
             icon: SolarShopBoldDuotone,
           }}
         />
@@ -114,7 +116,7 @@
             />
           {/if}
         {:else}
-          {$t("plugins_none")}
+          {i18n.f("plugins_none")}
         {/each}
       </div>
     </div>

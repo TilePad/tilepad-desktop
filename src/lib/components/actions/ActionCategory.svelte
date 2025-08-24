@@ -13,8 +13,8 @@
 </script>
 
 <script lang="ts">
-  import { t } from "svelte-i18n";
   import { slide } from "svelte/transition";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import SolarAltArrowDownOutline from "~icons/solar/alt-arrow-down-outline";
   import SolarAltArrowRightOutline from "~icons/solar/alt-arrow-right-outline";
 
@@ -26,6 +26,8 @@
   };
 
   const { label, icon, actions, expanded, onToggleExpanded }: Props = $props();
+
+  const i18n = i18nContext.get();
 </script>
 
 <div class="section">
@@ -37,7 +39,7 @@
     {/if}
 
     {#if icon}
-      <img class="icon" src={icon} alt={$t("action_icon")} />
+      <img class="icon" src={icon} alt={i18n.f("action_icon")} />
     {/if}
 
     {label}

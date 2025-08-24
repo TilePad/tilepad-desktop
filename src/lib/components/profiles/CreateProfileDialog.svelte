@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { ProfileId } from "$lib/api/types/profiles";
 
-  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { createProfile } from "$lib/api/profiles";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import SolarUserPlusBold from "~icons/solar/user-plus-bold";
 
@@ -20,6 +20,7 @@
   };
 
   const { order, onCreated, ...restProps }: Props = $props();
+  const i18n = i18nContext.get();
 
   let open = $state(false);
   let name = $state("");
@@ -36,9 +37,9 @@
     });
 
     toast.promise(createPromise, {
-      loading: $t("profile_creating"),
-      success: $t("profile_created"),
-      error: toastErrorMessage($t("profile_create_error")),
+      loading: i18n.f("profile_creating"),
+      success: i18n.f("profile_created"),
+      error: toastErrorMessage(i18n.f("profile_create_error")),
     });
 
     const promise = await createPromise;
@@ -54,7 +55,7 @@
   }
 </script>
 
-<Tooltip title={$t("create_profile")}>
+<Tooltip title={i18n.f("create_profile")}>
   {#snippet trigger({ props: triggerProps })}
     <Dialog {triggerProps} {...restProps} bind:open>
       {#snippet button({ props })}
@@ -66,7 +67,7 @@
       {/snippet}
 
       {#snippet title()}
-        {$t("create_profile")}
+        {i18n.f("create_profile")}
       {/snippet}
 
       <form onsubmit={onCreate}>
@@ -76,14 +77,14 @@
             minlength="1"
             class="input"
             bind:value={name}
-            placeholder={$t("name")}
+            placeholder={i18n.f("name")}
           />
         </div>
 
         <div class="actions">
-          <DialogCloseButton buttonLabel={{ text: $t("close") }} />
+          <DialogCloseButton buttonLabel={{ text: i18n.f("close") }} />
           <DialogCloseButton
-            buttonLabel={{ text: $t("create") }}
+            buttonLabel={{ text: i18n.f("create") }}
             onclick={onCreate}
             type="submit"
           />

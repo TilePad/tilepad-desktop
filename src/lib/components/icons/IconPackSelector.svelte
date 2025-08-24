@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Icon, IconPackId } from "$lib/api/types/icons";
 
-  import { t } from "svelte-i18n";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { createIconPacksQuery } from "$lib/api/icons";
   import { getIconAssetPath } from "$lib/api/utils/url";
   import { getErrorMessage } from "$lib/api/utils/error";
@@ -27,6 +27,8 @@
   const { onClickIcon }: Props = $props();
 
   const iconPacksQuery = createIconPacksQuery();
+
+  const i18n = i18nContext.get();
 
   const currentServerContext = serverContext.get();
   const serverURL = $derived(currentServerContext.serverURL);
@@ -77,14 +79,14 @@
     <SkeletonList />
   {:else if iconPacksQuery.isError}
     <Aside severity="error" style="margin: 1rem">
-      {$t("icon_packs_error", {
+      {i18n.f("icon_packs_error", {
         values: { error: getErrorMessage(iconPacksQuery.error) },
       })}
     </Aside>
   {:else if iconPacksQuery.isSuccess}
     <TextInput
       fullWidth
-      placeholder={$t("search_placeholder")}
+      placeholder={i18n.f("search_placeholder")}
       bind:value={search}
       style="margin-bottom: 8px"
     />

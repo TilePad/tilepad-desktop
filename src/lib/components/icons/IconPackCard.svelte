@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from "svelte-i18n";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
 
   import Button from "../input/Button.svelte";
 
@@ -12,6 +12,8 @@
   };
 
   const { version, name, description, authors, onUninstall }: Props = $props();
+
+  const i18n = i18nContext.get();
 </script>
 
 <div class="card">
@@ -33,7 +35,7 @@
 
   <div class="actions">
     <Button variant="secondary" size="small" onclick={onUninstall}>
-      {$t("uninstall")}
+      {i18n.f("uninstall")}
     </Button>
   </div>
 </div>

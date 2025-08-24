@@ -1,12 +1,14 @@
 <!-- Button to allow manually importing a plugin -->
 <script lang="ts">
-  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { installPlugin } from "$lib/api/plugins";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import SolarImportBoldDuotone from "~icons/solar/import-bold-duotone";
 
   import Button from "../input/Button.svelte";
+
+  const i18n = i18nContext.get();
 
   let inputElm: HTMLInputElement | undefined = $state();
 
@@ -22,9 +24,9 @@
     const createPromise = installPlugin(file);
 
     toast.promise(createPromise, {
-      loading: $t("plugin_installing"),
-      success: $t("plugin_installed"),
-      error: toastErrorMessage($t("plugin_install_error")),
+      loading: i18n.f("plugin_installing"),
+      success: i18n.f("plugin_installed"),
+      error: toastErrorMessage(i18n.f("plugin_install_error")),
     });
   }
 </script>
@@ -37,7 +39,7 @@
   }}
 >
   <SolarImportBoldDuotone width="1.5rem" height="1.5rem" />
-  {$t("import_plugin")}
+  {i18n.f("import_plugin")}
 </Button>
 
 <input

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import {
     deviceRequestsQuery,
@@ -9,6 +9,8 @@
   } from "$lib/api/devices";
 
   import DeviceRequestDialog from "./DeviceRequestDialog.svelte";
+
+  const i18n = i18nContext.get();
 
   const requests = deviceRequestsQuery();
 
@@ -22,9 +24,9 @@
     const approvePromise = approveDeviceRequest(requestId);
 
     toast.promise(approvePromise, {
-      loading: $t("device_approving"),
-      success: $t("device_approved"),
-      error: toastErrorMessage($t("device_approve_error")),
+      loading: i18n.f("device_approving"),
+      success: i18n.f("device_approved"),
+      error: toastErrorMessage(i18n.f("device_approve_error")),
     });
   }
 
@@ -32,9 +34,9 @@
     const declinePromise = declineDeviceRequest(requestId);
 
     toast.promise(declinePromise, {
-      loading: $t("device_declining"),
-      success: $t("device_declined"),
-      error: toastErrorMessage($t("device_decline_error")),
+      loading: i18n.f("device_declining"),
+      success: i18n.f("device_declined"),
+      error: toastErrorMessage(i18n.f("device_decline_error")),
     });
   }
 </script>

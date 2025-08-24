@@ -1,15 +1,17 @@
 <script lang="ts">
   import type { ServerConnectionInfo } from "$lib/api/types/server";
 
-  import { t } from "svelte-i18n";
   import QRCode from "@castlenine/svelte-qrcode";
   import Aside from "$lib/components/Aside.svelte";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
 
   type Props = {
     connectInfo: ServerConnectionInfo;
   };
 
   const { connectInfo }: Props = $props();
+
+  const i18n = i18nContext.get();
 
   const encodedInterfaces = $derived(
     JSON.stringify({
@@ -26,7 +28,7 @@
     </div>
 
     <div class="port">
-      <b>{$t("port")}</b>
+      <b>{i18n.f("port")}</b>
       {connectInfo.port}
     </div>
 
@@ -40,7 +42,7 @@
     </ul>
   {:else}
     <Aside severity="error" style="margin: 1rem;">
-      {$t("no_interfaces")}
+      {i18n.f("no_interfaces")}
     </Aside>
   {/if}
 </div>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from "svelte-i18n";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { getErrorMessage } from "$lib/api/utils/error";
 
   import type { DialogProps } from "../dialog/Dialog.svelte";
@@ -14,6 +14,8 @@
 
   const { ...restProps }: Props = $props();
 
+  const i18n = i18nContext.get();
+
   const licenseMarkdownPromise = import(
     "../../../../THIRD_PARTY_LICENSES.md?raw"
   );
@@ -22,8 +24,8 @@
 <Dialog {...restProps}>
   <div class="content">
     <div class="header">
-      <h2>{$t("third_party_licenses")}</h2>
-      <DialogCloseButton buttonLabel={{ text: $t("close") }} />
+      <h2>{i18n.f("third_party_licenses")}</h2>
+      <DialogCloseButton buttonLabel={{ text: i18n.f("close") }} />
     </div>
 
     <div class="viewer">
@@ -33,7 +35,7 @@
         <Markdown source={markdown.default} />
       {:catch error}
         <Aside severity="error" style="margin: 1rem;">
-          {$t("readme_error", {
+          {i18n.f("readme_error", {
             values: { error: getErrorMessage(error) },
           })}
         </Aside>

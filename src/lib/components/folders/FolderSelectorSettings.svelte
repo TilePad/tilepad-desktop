@@ -2,10 +2,10 @@
   import type { ProfileId } from "$lib/api/types/profiles";
   import type { FolderModel } from "$lib/api/types/folders";
 
-  import { t } from "svelte-i18n";
   import { useDebounce } from "runed";
   import { mergeProps } from "bits-ui";
   import { queryClient } from "$lib/api/client";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import SettingsIcon from "~icons/solar/settings-bold";
   import {
     updateFolderRows,
@@ -25,6 +25,8 @@
   };
 
   const { profileId, folder }: Props = $props();
+
+  const i18n = i18nContext.get();
 
   const setFolderConfigMutation = createSetFolderConfigMutation();
 
@@ -54,7 +56,7 @@
   }
 </script>
 
-<Tooltip title={$t("folder_settings")}>
+<Tooltip title={i18n.f("folder_settings")}>
   {#snippet trigger({ props: triggerProps })}
     <PopoverButton {triggerProps}>
       {#snippet button({ props })}
@@ -71,7 +73,7 @@
 
       {#snippet content()}
         <div>
-          <label for="rows">{$t("rows")}</label>
+          <label for="rows">{i18n.f("rows")}</label>
           <NumberInput
             id="rows"
             type="number"
@@ -82,7 +84,7 @@
           />
         </div>
         <div>
-          <label for="columns">{$t("columns")}</label>
+          <label for="columns">{i18n.f("columns")}</label>
           <NumberInput
             id="columns"
             type="number"

@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { SettingsConfig } from "$lib/api/types/settings";
 
-  import { t } from "svelte-i18n";
   import { getVersion } from "@tauri-apps/api/app";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { watch, resource, useDebounce } from "runed";
   import { createSetSettingsMutation } from "$lib/api/settings";
   import TextInput from "$lib/components/input/TextInput.svelte";
@@ -17,6 +17,8 @@
   const settingsContext = getSettingsContext();
   const currentSettings = $derived.by(settingsContext.settings);
   const setSettings = createSetSettingsMutation();
+
+  const i18n = i18nContext.get();
 
   const version = resource(
     () => getVersion(),
@@ -51,6 +53,7 @@
 
   const onChangeLanguage = (language: string) => {
     updateSettings({ ...settings, language });
+    i18n.locale = language;
   };
 
   const onChangeDeveloperMode = (developer_mode: boolean) => {
@@ -87,18 +90,20 @@
     <div class="grid">
       <div class="card">
         <div class="tile-item">
-          <label class="tile-label" for="language">{$t("language")}</label>
+          <label class="tile-label" for="language">{i18n.f("language")}</label>
           <LanguageSelector
             value={settings.language}
             onChangeValue={(value) => onChangeLanguage(value)}
           />
-          <p class="tile-description">{$t("language_description")}</p>
+          <p class="tile-description">{i18n.f("language_description")}</p>
         </div>
       </div>
 
       <div class="card">
         <div class="tile-item">
-          <label class="tile-label" for="deviceName">{$t("device_name")}</label>
+          <label class="tile-label" for="deviceName">
+            {i18n.f("device_name")}
+          </label>
           <TextInput
             style="width: 100%"
             id="deviceName"
@@ -106,7 +111,7 @@
             onchange={(event) => onChangeDeviceName(event.currentTarget.value)}
           />
           <p class="tile-description">
-            {$t("device_name_description")}
+            {i18n.f("device_name_description")}
           </p>
         </div>
       </div>
@@ -115,10 +120,10 @@
         <div class="dev-row">
           <div class="tile-item">
             <label class="tile-label" for="startAutomatically"
-              >{$t("auto_start")}</label
+              >{i18n.f("auto_start")}</label
             >
             <p class="tile-description">
-              {$t("auto_start_description")}
+              {i18n.f("auto_start_description")}
             </p>
           </div>
 
@@ -134,10 +139,10 @@
         <div class="dev-row">
           <div class="tile-item">
             <label class="tile-label" for="startMinimized"
-              >{$t("start_minimized")}</label
+              >{i18n.f("start_minimized")}</label
             >
             <p class="tile-description">
-              {$t("start_minimized_description")}
+              {i18n.f("start_minimized_description")}
             </p>
           </div>
 
@@ -153,10 +158,10 @@
         <div class="dev-row">
           <div class="tile-item">
             <label class="tile-label" for="startAutomatically"
-              >{$t("minimize_tray")}</label
+              >{i18n.f("minimize_tray")}</label
             >
             <p class="tile-description">
-              {$t("minimize_tray_description")}
+              {i18n.f("minimize_tray_description")}
             </p>
           </div>
 
@@ -171,11 +176,11 @@
       <div class="card">
         <div class="dev-row">
           <div class="tile-item">
-            <label class="tile-label" for="developmentMode"
-              >{$t("development_mode")}</label
-            >
+            <label class="tile-label" for="developmentMode">
+              {i18n.f("development_mode")}
+            </label>
             <p class="tile-description">
-              {$t("development_mode_description")}
+              {i18n.f("development_mode_description")}
             </p>
           </div>
 
@@ -190,7 +195,9 @@
 
     <div class="card">
       <div class="tile-item">
-        <label class="tile-label" for="serverPort">{$t("server_port")}</label>
+        <label class="tile-label" for="serverPort">
+          {i18n.f("server_port")}
+        </label>
         <NumberInput
           style="width: 100%"
           id="serverPort"
@@ -200,7 +207,7 @@
         />
 
         <p class="tile-description">
-          {$t("server_port_description")}
+          {i18n.f("server_port_description")}
         </p>
       </div>
     </div>
@@ -209,15 +216,15 @@
       <div class="dev-row">
         <div class="tile-item">
           <label class="tile-label" for="third_party_licenses">
-            {$t("third_party_licenses")}
+            {i18n.f("third_party_licenses")}
           </label>
           <p class="tile-description">
-            {$t("third_party_licenses_description")}
+            {i18n.f("third_party_licenses_description")}
           </p>
         </div>
         <LicensesDialog
           buttonLabel={{
-            text: $t("third_party_licenses"),
+            text: i18n.f("third_party_licenses"),
             icon: SolarDocumentAddBoldDuotone,
           }}
         />

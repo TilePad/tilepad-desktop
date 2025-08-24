@@ -1,8 +1,8 @@
 <script lang="ts">
   import { tick } from "svelte";
-  import { t } from "svelte-i18n";
   import { Dialog } from "bits-ui";
   import { fade, slide } from "svelte/transition";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { fingerprint } from "$lib/utils/fingerprint";
   import SolarKeyBoldDuotone from "~icons/solar/key-bold-duotone";
   import SolarRoutingBoldDuotone from "~icons/solar/routing-bold-duotone";
@@ -22,6 +22,8 @@
 
   const { deviceName, address, clientPublicKey, onApprove, onDecline }: Props =
     $props();
+
+  const i18n = i18nContext.get();
 
   const fingerprintPromise = $derived(
     fingerprint(new Uint8Array(clientPublicKey)),
@@ -68,14 +70,14 @@
               <SolarMonitorBoldDuotone width="3rem" height="3rem" />
             </div>
 
-            <h2 class="title">{$t("device_approval_request")}</h2>
-            <p class="description">{$t("device_approval_request_desc")}</p>
+            <h2 class="title">{i18n.f("device_approval_request")}</h2>
+            <p class="description">{i18n.f("device_approval_request_desc")}</p>
 
             <h3 class="name">
               {deviceName}
             </h3>
 
-            <span class="address">{$t("ip_address")}: {address}</span>
+            <span class="address">{i18n.f("ip_address")}: {address}</span>
 
             {#await fingerprintPromise then print}
               <div class="fingerprint">
@@ -83,7 +85,7 @@
                   <SolarKeyBoldDuotone
                     style="display: inline; vertical-align: middle;"
                   />
-                  {$t("fingerprint")}:
+                  {i18n.f("fingerprint")}:
                 </p>
                 <p class="fingerprint__value">
                   {print}
@@ -93,10 +95,10 @@
 
             <div class="actions">
               <Button variant="error" onclick={onDecline}>
-                {$t("decline")}
+                {i18n.f("decline")}
               </Button>
               <Button onclick={onApprove}>
-                {$t("approve")}
+                {i18n.f("approve")}
               </Button>
             </div>
           </div>

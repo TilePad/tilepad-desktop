@@ -4,8 +4,8 @@
   import type { ActionId, ActionCategory } from "$lib/api/types/actions";
   import type { ActionCategoryData } from "$lib/components/actions/ActionCategory.svelte";
 
-  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { createActionsQuery } from "$lib/api/actions";
   import { getPluginAssetPath } from "$lib/api/utils/url";
   import { toastErrorMessage } from "$lib/api/utils/error";
@@ -24,6 +24,8 @@
     createCreateTileMutation,
     createUpdateTilePositionMutation,
   } from "$lib/api/tiles";
+
+  const i18n = i18nContext.get();
 
   const actionsQuery = createActionsQuery();
   const actions = $derived(actionsQuery.data ?? []);
@@ -131,9 +133,9 @@
     });
 
     toast.promise(createPromise, {
-      loading: $t("tile_creating"),
-      success: $t("tile_created"),
-      error: toastErrorMessage($t("tile_create_error")),
+      loading: i18n.f("tile_creating"),
+      success: i18n.f("tile_created"),
+      error: toastErrorMessage(i18n.f("tile_create_error")),
     });
   }
 </script>

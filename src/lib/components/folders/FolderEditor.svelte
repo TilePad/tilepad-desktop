@@ -3,9 +3,9 @@
   import type { TileId } from "$lib/api/types/tiles";
 
   import { watch } from "runed";
-  import { t } from "svelte-i18n";
   import { fly } from "svelte/transition";
   import { createTilesQuery } from "$lib/api/tiles";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { createFoldersQuery } from "$lib/api/folders";
   import { getErrorMessage } from "$lib/api/utils/error";
   import { createProfilesQuery } from "$lib/api/profiles";
@@ -23,6 +23,8 @@
   import { getProfileContext } from "../profiles/ProfilesProvider.svelte";
   import CreateProfileDialog from "../profiles/CreateProfileDialog.svelte";
   import ProfileSelectorSettings from "../profiles/ProfileSelectorSettings.svelte";
+
+  const i18n = i18nContext.get();
 
   const { profile, setProfileId } = getProfileContext();
   const { folder, setFolderId } = getFolderContext();
@@ -60,7 +62,7 @@
   {:else if tilesQuery.isError}
     <div class="content">
       <Aside severity="error" style="width: 100%">
-        {$t("tiles_error", {
+        {i18n.f("tiles_error", {
           values: { error: getErrorMessage(tilesQuery.error) },
         })}
       </Aside>

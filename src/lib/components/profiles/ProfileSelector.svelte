@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { ProfileId, ProfileModel } from "$lib/api/types/profiles";
 
-  import { t } from "svelte-i18n";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import DownArrowIcon from "~icons/solar/alt-arrow-down-bold";
   import SolarUsersGroupRoundedBoldDuotone from "~icons/solar/users-group-rounded-bold-duotone";
 
@@ -22,6 +22,8 @@
 
   const { options, value, onChangeValue }: Props = $props();
 
+  const i18n = i18nContext.get();
+
   const profileOptions: ProfileOption[] = $derived(
     options.map((option) => ({
       value: option.id,
@@ -38,7 +40,7 @@
 
       {#if option.default}
         <span class="default-label">
-          {$t("default")}
+          {i18n.f("default")}
         </span>
       {/if}
     </div>

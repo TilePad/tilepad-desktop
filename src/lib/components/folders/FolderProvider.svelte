@@ -24,9 +24,9 @@
 <script lang="ts">
   import type { FolderId, FolderModel } from "$lib/api/types/folders";
 
-  import { t } from "svelte-i18n";
   import { type Snippet } from "svelte";
   import { watch, Context } from "runed";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { getErrorMessage } from "$lib/api/utils/error";
   import {
     createFolderQuery,
@@ -46,6 +46,8 @@
   };
 
   const { content }: Props = $props();
+
+  const i18n = i18nContext.get();
 
   const profileContext = getProfileContext();
   const currentProfile = $derived.by(profileContext.profile);
@@ -112,7 +114,7 @@
       createFolder.mutate(
         {
           create: {
-            name: $t("default_folder"),
+            name: i18n.f("default_folder"),
             default: true,
             config: {},
             profile_id: currentProfile.id,
@@ -136,21 +138,21 @@
 {:else if createFolder.isError}
   <!-- Error creating current folder -->
   <Aside severity="error" style="margin: 1rem;">
-    {$t("create_folder_error", {
+    {i18n.f("create_folder_error", {
       values: { error: getErrorMessage(createFolder.error) },
     })}
   </Aside>
 {:else if foldersQuery.isError}
   <!-- Error loading folders list -->
   <Aside severity="error" style="margin: 1rem;">
-    {$t("folders_error", {
+    {i18n.f("folders_error", {
       values: { error: getErrorMessage(foldersQuery.error) },
     })}
   </Aside>
 {:else if folderQuery.isError}
   <!-- Error loading current folder -->
   <Aside severity="error" style="margin: 1rem;">
-    {$t("folder_error", {
+    {i18n.f("folder_error", {
       values: { error: getErrorMessage(folderQuery.error) },
     })}
   </Aside>

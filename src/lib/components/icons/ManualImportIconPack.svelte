@@ -1,11 +1,13 @@
 <script lang="ts">
-  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
   import { installIconPack } from "$lib/api/icons";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import ImportIcon from "~icons/solar/import-bold-duotone";
 
   import Button from "../input/Button.svelte";
+
+  const i18n = i18nContext.get();
 
   let inputElm: HTMLInputElement | undefined = $state();
 
@@ -21,9 +23,9 @@
     const createPromise = installIconPack(file);
 
     toast.promise(createPromise, {
-      loading: $t("icon_packs_installing"),
-      success: $t("icon_packs_installed"),
-      error: toastErrorMessage($t("icon_packs_install_error")),
+      loading: i18n.f("icon_packs_installing"),
+      success: i18n.f("icon_packs_installed"),
+      error: toastErrorMessage(i18n.f("icon_packs_install_error")),
     });
   }
 </script>
@@ -36,7 +38,7 @@
   }}
 >
   <ImportIcon width="1.5rem" height="1.5rem" />
-  {$t("import_pack")}
+  {i18n.f("import_pack")}
 </Button>
 
 <input

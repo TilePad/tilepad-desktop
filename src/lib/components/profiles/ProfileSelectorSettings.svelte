@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { ProfileModel } from "$lib/api/types/profiles";
 
-  import { t } from "svelte-i18n";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import SolarSettingsBold from "~icons/solar/settings-bold";
 
   import Tooltip from "../Tooltip.svelte";
@@ -15,9 +15,11 @@
   };
 
   const { profile }: Props = $props();
+
+  const i18n = i18nContext.get();
 </script>
 
-<Tooltip title={$t("profile_settings")}>
+<Tooltip title={i18n.f("profile_settings")}>
   {#snippet trigger({ props: triggerProps })}
     <PopoverButton {triggerProps}>
       {#snippet button({ props })}

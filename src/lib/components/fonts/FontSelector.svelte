@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from "svelte-i18n";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
 
   import Select from "../input/Select.svelte";
 
@@ -10,6 +10,9 @@
   };
 
   const { fonts, value, onChangeValue }: Props = $props();
+
+  const i18n = i18nContext.get();
+
   const options = $derived([
     { value: "Roboto", name: "Roboto" },
     ...fonts
@@ -18,7 +21,7 @@
   ]);
 </script>
 
-<Select {options} {value} {onChangeValue} placeholder={$t("select_font")}>
+<Select {options} {value} {onChangeValue} placeholder={i18n.f("select_font")}>
   {#snippet item({ option })}
     <span style="font-family: {option.value};">{option.name}</span>
   {/snippet}

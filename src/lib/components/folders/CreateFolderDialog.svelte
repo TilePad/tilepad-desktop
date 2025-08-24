@@ -2,8 +2,8 @@
   import type { ProfileId } from "$lib/api/types/profiles";
   import type { FolderId, FolderConfig } from "$lib/api/types/folders";
 
-  import { t } from "svelte-i18n";
   import { toast } from "svelte-sonner";
+  import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import SolarAddFolderBold from "~icons/solar/add-folder-bold";
   import { createCreateFolderMutation } from "$lib/api/folders";
@@ -31,6 +31,8 @@
   };
 
   const { profileId, baseConfig, order, onCreated }: Props = $props();
+
+  const i18n = i18nContext.get();
 
   const createFolderMutation = createCreateFolderMutation();
 
@@ -65,9 +67,9 @@
     );
 
     toast.promise(createPromise, {
-      loading: $t("folder_creating"),
-      success: $t("folder_created"),
-      error: toastErrorMessage($t("folder_create_error")),
+      loading: i18n.f("folder_creating"),
+      success: i18n.f("folder_created"),
+      error: toastErrorMessage(i18n.f("folder_create_error")),
     });
   }
 
@@ -76,7 +78,7 @@
   }
 </script>
 
-<Tooltip title={$t("create_folder")}>
+<Tooltip title={i18n.f("create_folder")}>
   {#snippet trigger({ props: triggerProps })}
     <Dialog {triggerProps} bind:open>
       {#snippet button({ props })}
@@ -88,7 +90,7 @@
       {/snippet}
 
       {#snippet title()}
-        {$t("create_folder")}
+        {i18n.f("create_folder")}
       {/snippet}
 
       <form onsubmit={onCreate}>
@@ -99,13 +101,13 @@
             required
             minlength={1}
             class="input"
-            placeholder={$t("name")}
+            placeholder={i18n.f("name")}
           />
         </div>
 
         <div class="actions">
-          <DialogCloseButton buttonLabel={{ text: $t("close") }} />
-          <Button type="submit">{$t("create")}</Button>
+          <DialogCloseButton buttonLabel={{ text: i18n.f("close") }} />
+          <Button type="submit">{i18n.f("create")}</Button>
         </div>
       </form>
     </Dialog>
