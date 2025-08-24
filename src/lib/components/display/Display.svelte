@@ -1,6 +1,5 @@
 <script lang="ts">
   import { getTile } from "$lib/api/tiles";
-  import { sendPluginDisplayMessage } from "$lib/api/plugins";
   import {
     type DisplayContext,
     isDisplayContextEqual,
@@ -15,9 +14,10 @@
     ctx: DisplayContext;
     inspector: string;
     style: string;
+    sendMessage: (ctx: DisplayContext, message: object) => void;
   };
 
-  const { ctx, inspector, style }: Props = $props();
+  const { ctx, inspector, style, sendMessage }: Props = $props();
 
   type CurrentFrameData = {
     ctx: DisplayContext;
@@ -59,7 +59,7 @@
    * @param message
    */
   function onSendToPlugin(ctx: DisplayContext, message: object) {
-    sendPluginDisplayMessage(ctx, message);
+    sendMessage(ctx, message);
   }
 
   async function onGetTile(ctx: DisplayContext, send: (data: object) => void) {

@@ -1,6 +1,5 @@
 <script lang="ts">
   import { getPluginAssetPath } from "$lib/api/utils/url";
-  import { SvelteURLSearchParams } from "svelte/reactivity";
   import { serverContext } from "$lib/contexts/server.context";
   import { openPluginInspector, closePluginInspector } from "$lib/api/plugins";
   import {
@@ -29,7 +28,8 @@
   const currentServerContext = serverContext.get();
 
   const inspectorSrc = $derived.by(() => {
-    const params = new SvelteURLSearchParams();
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
+    const params = new URLSearchParams();
     params.append("ctx", encodeInspectorContext(ctx));
 
     const baseSrc = getPluginAssetPath(

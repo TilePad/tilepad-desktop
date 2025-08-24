@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { DisplayContext } from "$lib/api/types/plugin";
 
+  import { sendPluginDisplayMessage } from "$lib/api/plugins";
   import { serverContext } from "$lib/contexts/server.context";
   import {
     TileIconType,
@@ -64,7 +65,12 @@
 </script>
 
 {#if icon.type === TileIconType.Display}
-  <Display {ctx} inspector={icon.path} {style} />
+  <Display
+    {ctx}
+    inspector={icon.path}
+    {style}
+    sendMessage={sendPluginDisplayMessage}
+  />
 {:else if src !== null}
   <img
     class="tile__icon"
