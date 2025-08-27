@@ -52,7 +52,7 @@
     "@storybook/addon-svelte-csf": "^5.0.7",
     "@storybook/sveltekit": "^9.1.2",
     "@sveltejs/adapter-static": "3.0.8",
-    "@sveltejs/kit": "2.25.1",
+    "@sveltejs/kit": "2.36.2",
     "@sveltejs/vite-plugin-svelte": "6.1.0",
     "@tanstack/eslint-plugin-query": "5.81.2",
     "@tauri-apps/cli": "2.7.0",
