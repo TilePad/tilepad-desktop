@@ -9,7 +9,6 @@
   import SolarShopBoldDuotone from "~icons/solar/shop-bold-duotone";
   import { createIconPackRegistryQuery } from "$lib/api/icons_registry";
   import SkeletonList from "$lib/components/skeleton/SkeletonList.svelte";
-  import ManualImportIconPack from "$lib/components/icons/ManualImportIconPack.svelte";
   import IconsRegistryItem from "$lib/components/icons_registry/IconsRegistryItem.svelte";
   import IconsRegistryViewer from "$lib/components/icons_registry/IconsRegistryViewer.svelte";
 
@@ -57,10 +56,6 @@
       type="text"
       placeholder={i18n.f("search_placeholder")}
     />
-
-    <div class="actions">
-      <ManualImportIconPack />
-    </div>
   </div>
 
   {#if iconPacksQuery.isLoading}
@@ -175,20 +170,17 @@
     margin-bottom: 1rem;
   }
 
-  .actions {
-    display: flex;
-    gap: var(--tp-space-3);
-  }
-
   .nav {
     display: flex;
     align-items: center;
     flex-shrink: 0;
+    width: calc(24rem - var(--tp-space-4) * 2);
   }
 
   .tab {
     display: inline-flex;
     align-items: center;
+    flex: auto;
     gap: var(--tp-space-2);
     justify-content: center;
     font-size: var(--tp-text-base);

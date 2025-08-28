@@ -115,11 +115,13 @@
     display: flex;
     align-items: center;
     flex-shrink: 0;
+    width: calc(24rem - var(--tp-space-4) * 2);
   }
 
   .tab {
     display: inline-flex;
     align-items: center;
+    flex: auto;
     gap: var(--tp-space-2);
     justify-content: center;
     font-size: var(--tp-text-base);

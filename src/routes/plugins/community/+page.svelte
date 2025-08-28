@@ -1,25 +1,16 @@
 <script lang="ts">
-  import type { PluginWithState } from "$lib/api/types/plugin";
   import type { PluginRegistryEntry } from "$lib/api/types/plugins_registry";
 
-  import { toast } from "svelte-sonner";
   import Aside from "$lib/components/Aside.svelte";
   import { i18nContext } from "$lib/i18n/i18n.svelte";
-  import { compare as semverCompare } from "semver-ts";
   import { createPluginsQuery } from "$lib/api/plugins";
   import { getErrorMessage } from "$lib/api/utils/error";
-  import { createMutation } from "@tanstack/svelte-query";
-  import Button from "$lib/components/input/Button.svelte";
   import SolarBoxBoldDuotone from "~icons/solar/box-bold-duotone";
   import SolarShopBoldDuotone from "~icons/solar/shop-bold-duotone";
+  import { createPluginRegistryQuery } from "$lib/api/plugins_registry";
   import SkeletonList from "$lib/components/skeleton/SkeletonList.svelte";
-  import ManualImportPlugin from "$lib/components/plugins/ManualImportPlugin.svelte";
   import PluginsRegistryItem from "$lib/components/plugins_registry/PluginsRegistryItem.svelte";
   import PluginRegistryViewer from "$lib/components/plugins_registry/PluginRegistryViewer.svelte";
-  import {
-    getLatestPluginVersions,
-    createPluginRegistryQuery,
-  } from "$lib/api/plugins_registry";
 
   const i18n = i18nContext.get();
 
@@ -43,35 +34,6 @@
       return name === query || name.includes(query);
     });
   }
-
-  const checkUpdatesMutation = createMutation(() => ({
-    mutationFn: async ({ plugins }: { plugins: PluginWithState[] }) => {
-      const latestVersions = await getLatestPluginVersions(plugins);
-      const updates = [];
-
-      for (const entry of latestVersions) {
-        const localPlugin = plugins.find(
-          (plugin) => plugin.manifest.plugin.id === entry.manifest.plugin.id,
-        );
-
-        if (
-          localPlugin &&
-          semverCompare(
-            entry.manifest.plugin.version,
-            localPlugin.manifest.plugin.version,
-          ) === 1
-        ) {
-          updates.push(entry);
-        }
-      }
-
-      toast.success(
-        i18n.f("updates_found_count", { values: { count: updates.length } }),
-      );
-
-      return updates;
-    },
-  }));
 </script>
 
 <div class="layout">
@@ -104,20 +66,6 @@
         type="text"
         placeholder={i18n.f("search_placeholder")}
       />
-
-      <div class="actions">
-        <Button
-          variant="secondary"
-          onclick={() => {
-            checkUpdatesMutation.mutate({ plugins: pluginsQuery.data });
-          }}
-          loading={checkUpdatesMutation.isPending}
-        >
-          {i18n.f("check_for_updates")}
-        </Button>
-
-        <ManualImportPlugin />
-      </div>
     </div>
 
     <div class="plugins-wrapper">
@@ -223,20 +171,17 @@
     margin-bottom: 1rem;
   }
 
-  .actions {
-    display: flex;
-    gap: var(--tp-space-3);
-  }
-
   .nav {
     display: flex;
     align-items: center;
     flex-shrink: 0;
+    width: calc(24rem - var(--tp-space-4) * 2);
   }
 
   .tab {
     display: inline-flex;
     align-items: center;
+    flex: auto;
     gap: var(--tp-space-2);
     justify-content: center;
     font-size: var(--tp-text-base);
