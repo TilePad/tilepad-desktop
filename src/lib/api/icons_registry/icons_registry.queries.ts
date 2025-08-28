@@ -1,5 +1,6 @@
 import { createQuery } from "@tanstack/svelte-query";
 
+import { queryClient } from "../client";
 import { iconRegistryKey } from "./icons_registry.keys";
 import {
   getIconRegistry,
@@ -12,6 +13,13 @@ export function createIconPackRegistryQuery() {
     queryKey: iconRegistryKey.list,
     queryFn: getIconRegistry,
   }));
+}
+
+export function fetchIconPackRegistry() {
+  return queryClient.fetchQuery({
+    queryKey: iconRegistryKey.list,
+    queryFn: getIconRegistry,
+  });
 }
 
 export function createIconPackManifestQuery(repo: () => string) {

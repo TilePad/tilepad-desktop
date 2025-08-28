@@ -1,30 +1,53 @@
 <script lang="ts">
-  import type { IconPackId } from "$lib/api/types/icons";
+  import type { IconPack } from "$lib/api/types/icons";
 
   import { toast } from "svelte-sonner";
   import Aside from "$lib/components/Aside.svelte";
   import { i18nContext } from "$lib/i18n/i18n.svelte";
+  import { compare as semverCompare } from "semver-ts";
+  import { createIconPacksQuery } from "$lib/api/icons";
+  import { getErrorMessage } from "$lib/api/utils/error";
+  import { createMutation } from "@tanstack/svelte-query";
+  import Button from "$lib/components/input/Button.svelte";
   import SolarBoxBoldDuotone from "~icons/solar/box-bold-duotone";
   import SolarShopBoldDuotone from "~icons/solar/shop-bold-duotone";
+  import { getLatestIconPackVersions } from "$lib/api/icons_registry";
   import IconPackCard from "$lib/components/icons/IconPackCard.svelte";
   import SkeletonList from "$lib/components/skeleton/SkeletonList.svelte";
-  import { uninstallIconPack, createIconPacksQuery } from "$lib/api/icons";
-  import { getErrorMessage, toastErrorMessage } from "$lib/api/utils/error";
   import ManualImportIconPack from "$lib/components/icons/ManualImportIconPack.svelte";
 
   const i18n = i18nContext.get();
 
   const iconPacksQuery = createIconPacksQuery();
 
-  function handleUninstall(iconPackId: IconPackId) {
-    const revokePromise = uninstallIconPack(iconPackId);
+  const checkUpdatesMutation = createMutation(() => ({
+    mutationFn: async ({ packs: packs }: { packs: IconPack[] }) => {
+      const latestVersions = await getLatestIconPackVersions(packs);
+      const updates = [];
 
-    toast.promise(revokePromise, {
-      loading: i18n.f("icon_packs_uninstalling"),
-      success: i18n.f("icon_packs_uninstalled"),
-      error: toastErrorMessage(i18n.f("icon_packs_uninstall_error")),
-    });
-  }
+      for (const entry of latestVersions) {
+        const localPack = packs.find(
+          (pack) => pack.manifest.icons.id === entry.remotePack.id,
+        );
+
+        if (
+          localPack &&
+          semverCompare(
+            entry.manifest.version,
+            localPack.manifest.icons.version,
+          ) === 1
+        ) {
+          updates.push(entry);
+        }
+      }
+
+      toast.success(
+        i18n.f("updates_found_count", { values: { count: updates.length } }),
+      );
+
+      return updates;
+    },
+  }));
 </script>
 
 <div class="layout">
@@ -42,6 +65,19 @@
     </div>
 
     <div class="actions">
+      <Button
+        disabled={!iconPacksQuery.data}
+        variant="secondary"
+        onclick={() => {
+          if (!iconPacksQuery.data) return;
+
+          checkUpdatesMutation.mutate({ packs: iconPacksQuery.data });
+        }}
+        loading={checkUpdatesMutation.isPending}
+      >
+        {i18n.f("check_for_updates")}
+      </Button>
+
       <ManualImportIconPack />
     </div>
   </div>
@@ -58,14 +94,26 @@
     <div class="plugins-wrapper">
       <div class="plugins">
         {#each iconPacksQuery.data as pack, index (index)}
+          {@const latestManifest = checkUpdatesMutation.data?.find(
+            (entry) =>
+              entry.remotePack.id === pack.manifest.icons.id &&
+              // Ignore if version already matches
+              entry.manifest.version !== pack.manifest.icons.version,
+          )}
           {@const manifest = pack.manifest.icons}
 
           <IconPackCard
+            id={manifest.id}
             version={manifest.version}
             name={manifest.name}
             description={manifest.description}
             authors={manifest.authors}
-            onUninstall={() => handleUninstall(manifest.id)}
+            latestVersion={latestManifest
+              ? {
+                  version: latestManifest.manifest.version,
+                  remotePlugin: latestManifest.remotePack,
+                }
+              : undefined}
           />
         {/each}
       </div>

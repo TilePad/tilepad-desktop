@@ -1,6 +1,9 @@
 import { invoke } from "@tauri-apps/api/core";
 
+import type { IconPack } from "../types/icons";
 import type { IconRegistryEntry } from "../types/icons_registry";
+
+import { fetchIconPackRegistry } from "./icons_registry.queries";
 
 export async function getIconRegistry(): Promise<IconRegistryEntry[]> {
   const response = await fetch(
@@ -51,4 +54,35 @@ export async function getIconPackReadme(repo: string) {
 
   const data = await response.text();
   return { readme: data, baseURL };
+}
+
+const UPDATE_CHECK_BATCH_SIZE: number = 5;
+
+export async function getLatestIconPackVersions(packs: IconPack[]) {
+  // Load remote available plugins
+  const remotePacks = await fetchIconPackRegistry();
+
+  // Find the remote packs that are currently installed
+  const installedPacks = remotePacks.filter((remotePack) => {
+    return packs.find((plugin) => remotePack.id === plugin.manifest.icons.id);
+  });
+
+  // List of latest versions
+  const latestVersions = [];
+
+  // Process in batches
+  for (let i = 0; i < installedPacks.length; i += UPDATE_CHECK_BATCH_SIZE) {
+    const remotePackSet = installedPacks.slice(i, i + UPDATE_CHECK_BATCH_SIZE);
+
+    const remotePackManifests = await Promise.all(
+      remotePackSet.map(async (remotePack) => {
+        const manifest = await getIconPackManifest(remotePack.repo);
+        return { manifest, remotePack };
+      }),
+    );
+
+    latestVersions.push(...remotePackManifests);
+  }
+
+  return latestVersions;
 }

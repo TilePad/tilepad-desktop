@@ -14,6 +14,7 @@
 <Story
   name="Default"
   args={{
+    id: "00000000-0000-0000-0000-000000000000",
     version: "0.0.0",
     name: "Example Icon pack",
     description: "Example icon pack description for the example icon pack",

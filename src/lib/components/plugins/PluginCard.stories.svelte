@@ -1,10 +1,11 @@
 <script module lang="ts">
+  import type { ComponentProps } from "svelte";
+
+  import { range } from "$lib/api/utils/svelte.svelte";
   import { PluginTaskState } from "$lib/api/types/plugin";
   import { defineMeta } from "@storybook/addon-svelte-csf";
 
   import PluginCard from "./PluginCard.svelte";
-  import type { ComponentProps } from "svelte";
-  import { range } from "$lib/api/utils/svelte.svelte";
 
   const { Story } = defineMeta({
     title: "Plugins/PluginCard",

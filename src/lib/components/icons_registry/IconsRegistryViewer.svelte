@@ -5,7 +5,7 @@
   import { toast } from "svelte-sonner";
   import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { compare as semverCompare } from "semver-ts";
-  import { createUninstallIconPackMutation } from "$lib/api/icons";
+  import { createUninstallIconPack } from "$lib/api/icons";
   import { replaceMarkdownRelativeUrls } from "$lib/utils/markdown";
   import { getErrorMessage, toastErrorMessage } from "$lib/api/utils/error";
   import {
@@ -33,7 +33,7 @@
   const readmeQuery = createIconPackReadmeQuery(() => item.repo);
 
   const install = createInstallIconPackFromRegistry();
-  const uninstall = createUninstallIconPackMutation();
+  const uninstall = createUninstallIconPack();
   const update = createUpdateIconPack();
 
   async function onInstall() {

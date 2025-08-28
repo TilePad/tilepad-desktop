@@ -5,7 +5,7 @@ import type { IconPackId } from "../types/icons";
 import { uninstallIconPack } from "./icons.requests";
 import { invalidateIconPacksQuery } from "./icons.mutators";
 
-export function createUninstallIconPackMutation() {
+export function createUninstallIconPack() {
   const queryClient = getQueryClientContext();
 
   return createMutation(() => ({
