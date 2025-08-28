@@ -11,13 +11,17 @@
   import Button from "$lib/components/input/Button.svelte";
   import SolarShopBoldDuotone from "~icons/solar/shop-bold-duotone";
   import SolarBoxBoldDuotone from "~icons/solar/box-bold-duotone";
-  import PluginCard from "$lib/components/plugins/PluginCard.svelte";
-  import { getLatestPluginVersions } from "$lib/api/plugins_registry";
+  import {
+    createPluginRegistryQuery,
+    getLatestPluginVersions,
+  } from "$lib/api/plugins_registry";
   import SkeletonList from "$lib/components/skeleton/SkeletonList.svelte";
   import { getSettingsContext } from "$lib/components/SettingsProvider.svelte";
   import ManualImportPlugin from "$lib/components/plugins/ManualImportPlugin.svelte";
   import { serverContext } from "$lib/contexts/server.context";
-  import { getPluginAssetPath } from "$lib/api/utils/url";
+  import type { PluginRegistryEntry } from "$lib/api/types/plugins_registry";
+  import PluginsRegistryItem from "$lib/components/plugins_registry/PluginsRegistryItem.svelte";
+  import PluginRegistryViewer from "$lib/components/plugins_registry/PluginRegistryViewer.svelte";
 
   const i18n = i18nContext.get();
 
@@ -26,7 +30,26 @@
 
   const currentServerContext = serverContext.get();
 
+  const pluginRegistryQuery = createPluginRegistryQuery();
   const pluginsQuery = createPluginsQuery();
+
+  let active: PluginRegistryEntry | undefined = $state(undefined);
+  let search = $state("");
+
+  const filteredRegistry = $derived(
+    filterIconPacks(pluginRegistryQuery.data ?? [], search),
+  );
+
+  function filterIconPacks(packs: PluginRegistryEntry[], query: string) {
+    query = query.toLowerCase();
+
+    if (query.length < 1) return packs;
+
+    return packs.filter((entry) => {
+      const name = entry.name.toLowerCase();
+      return name === query || name.includes(query);
+    });
+  }
 
   const checkUpdatesMutation = createMutation(() => ({
     mutationFn: async ({ plugins }: { plugins: PluginWithState[] }) => {
@@ -59,7 +82,7 @@
 </script>
 
 <div class="layout">
-  {#if pluginsQuery.isLoading}
+  {#if pluginRegistryQuery.isLoading || pluginsQuery.isLoading}
     <SkeletonList style="margin: 1rem" />
   {:else if pluginsQuery.isError}
     <Aside severity="error" style="margin: 1rem">
@@ -67,19 +90,27 @@
         values: { error: getErrorMessage(pluginsQuery.error) },
       })}
     </Aside>
-  {:else if pluginsQuery.isSuccess}
+  {:else if pluginRegistryQuery.isSuccess && pluginsQuery.isSuccess}
     <div class="header">
       <div class="nav">
-        <a class="tab tab--active" href="/plugins">
+        <a class="tab" href="/plugins">
           <SolarBoxBoldDuotone />
 
           {i18n.f("installed")}
         </a>
-        <a class="tab" href="/plugins/community">
+        <a class="tab tab--active" href="/plugins/community">
           <SolarShopBoldDuotone />
+
           {i18n.f("community_plugins")}
         </a>
       </div>
+
+      <input
+        bind:value={search}
+        class="search"
+        type="text"
+        placeholder={i18n.f("search_placeholder")}
+      />
 
       <div class="actions">
         <Button
@@ -97,45 +128,39 @@
     </div>
 
     <div class="plugins-wrapper">
-      <div class="plugins">
-        {#each pluginsQuery.data as plugin (plugin.manifest.plugin.id)}
-          {#if !plugin.manifest.plugin.internal || import.meta.env.DEV}
-            {@const latestManifest = checkUpdatesMutation.data?.find(
-              (entry) =>
-                entry.manifest.plugin.id === plugin.manifest.plugin.id &&
-                // Ignore if version already matches
-                entry.manifest.plugin.version !==
-                  plugin.manifest.plugin.version,
-            )}
-            {@const manifest = plugin.manifest.plugin}
-
-            <PluginCard
-              id={manifest.id}
-              icon={manifest.icon
-                ? getPluginAssetPath(
-                    currentServerContext.serverURL,
-                    manifest.id,
-                    manifest.icon,
-                  )
-                : null}
-              name={manifest.name}
-              description={manifest.description}
-              version={manifest.version}
-              internal={manifest.internal ?? false}
-              authors={manifest.authors}
-              state={plugin.state}
-              latestVersion={latestManifest
-                ? {
-                    version: latestManifest.manifest.plugin.version,
-                    remotePlugin: latestManifest.remotePlugin,
-                  }
-                : undefined}
-              developerMode={settings.developer_mode}
-            />
-          {/if}
+      <div class="plugins-list">
+        {#each filteredRegistry as item (item.id)}
+          <PluginsRegistryItem
+            name={item.name}
+            authors={item.authors}
+            description={item.description}
+            repo={item.repo}
+            onClick={() => {
+              if (active !== undefined && active.id === item.id) {
+                active = undefined;
+              } else {
+                active = item;
+              }
+            }}
+            installed={pluginsQuery.data.find(
+              (plugin) => plugin.manifest.plugin.id === item.id,
+            ) !== undefined}
+            selected={active !== undefined && active.id === item.id}
+          />
         {:else}
-          {i18n.f("plugins_none")}
+          {i18n.f("community_plugins_none")}
         {/each}
+      </div>
+
+      <div class="viewer">
+        {#if active}
+          <PluginRegistryViewer
+            item={active}
+            installed={pluginsQuery.data.find(
+              (plugin) => plugin.manifest.plugin.id === active!.id,
+            )?.manifest}
+          />
+        {/if}
       </div>
     </div>
   {/if}
@@ -157,21 +182,47 @@
     justify-content: space-between;
   }
 
-  .plugins-wrapper {
+  .viewer {
+    height: 100%;
+    overflow: auto;
+    flex: auto;
+  }
+
+  .search {
+    padding: 0.5rem;
+    background-color: #1f1d22;
+    border: 1px solid #666;
+    color: #fff;
+    border-radius: 0.25rem;
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    flex: auto;
+  }
+
+  .plugins-list {
+    display: flex;
+    gap: 0.5rem;
+    flex-direction: column;
     flex: auto;
     overflow: auto;
   }
 
-  .plugins {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(
-      auto-fit,
-      minmax(min(400px, max(200px, 100%)), 1fr)
-    );
-    gap: var(--tp-space-4);
-    padding: var(--tp-space-4);
-    padding-top: 0;
+  .plugins-wrapper {
+    display: flex;
+    flex-flow: row;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .plugins-list {
+    display: flex;
+    gap: 0.5rem;
+    flex-direction: column;
+    flex: auto;
+    overflow: auto;
+    max-width: 24rem;
+    padding: 0 1rem;
   }
 
   .actions {
