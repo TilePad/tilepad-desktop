@@ -126,8 +126,8 @@
         </div>
       </div>
 
-      {#if installed}
-        <div class="actions">
+      <div class="actions">
+        {#if installed}
           {#if semverCompare(manifest.plugin.version, installed.plugin.version) === 1}
             <Button
               onclick={() => handleUpdate(manifest, item)}
@@ -144,12 +144,12 @@
             loading={uninstall.isPending}
             disabled={update.isPending}>{i18n.f("uninstall")}</Button
           >
-        </div>
-      {:else}
-        <Button loading={install.isPending} onclick={onInstall}>
-          {install.isPending ? i18n.f("installing") : i18n.f("install")}
-        </Button>
-      {/if}
+        {:else}
+          <Button loading={install.isPending} onclick={onInstall}>
+            {install.isPending ? i18n.f("installing") : i18n.f("install")}
+          </Button>
+        {/if}
+      </div>
     {/if}
   </div>
 
