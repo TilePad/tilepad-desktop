@@ -6,7 +6,6 @@
   import AppToaster from "$lib/components/AppToaster.svelte";
   import { QueryClientProvider } from "@tanstack/svelte-query";
   import { serverContext } from "$lib/contexts/server.context";
-  import { createI18n, i18nContext } from "$lib/i18n/i18n.svelte";
   import SettingsLoader from "$lib/components/SettingsLoader.svelte";
   import I18nProvider from "$lib/components/i18n/I18nProvider.svelte";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
@@ -19,9 +18,6 @@
   const { children: layoutChildren, data }: LayoutProps = $props();
   const port = $derived(data.port);
 
-  const i18n = createI18n();
-  i18nContext.set(i18n);
-
   serverContext.set({
     get serverURL() {
       return `http://127.0.0.1:${port}/`;
@@ -31,11 +27,11 @@
 
 <RootLayout>
   <Tooltip.Provider>
-    <QueryClientProvider client={queryClient}>
-      <SettingsLoader>
-        {#snippet children({ settings })}
-          <SettingsProvider {settings}>
-            <I18nProvider locale={settings.language}>
+    <I18nProvider>
+      <QueryClientProvider client={queryClient}>
+        <SettingsLoader>
+          {#snippet children({ settings })}
+            <SettingsProvider {settings}>
               <div class="layout">
                 <Header />
 
@@ -48,13 +44,13 @@
 
               <AppToaster />
               <UpdateNotification />
-            </I18nProvider>
-          </SettingsProvider>
-        {/snippet}
-      </SettingsLoader>
+            </SettingsProvider>
+          {/snippet}
+        </SettingsLoader>
 
-      <SvelteQueryDevtools buttonPosition="bottom-left" position="bottom" />
-    </QueryClientProvider>
+        <SvelteQueryDevtools buttonPosition="bottom-left" position="bottom" />
+      </QueryClientProvider>
+    </I18nProvider>
   </Tooltip.Provider>
 </RootLayout>
 
