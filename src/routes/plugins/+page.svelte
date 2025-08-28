@@ -16,11 +16,15 @@
   import { getSettingsContext } from "$lib/components/SettingsProvider.svelte";
   import ManualImportPlugin from "$lib/components/plugins/ManualImportPlugin.svelte";
   import PluginsRegistryDialog from "$lib/components/plugins_registry/PluginsRegistryDialog.svelte";
+  import { serverContext } from "$lib/contexts/server.context";
+  import { getPluginAssetPath } from "$lib/api/utils/url";
 
   const i18n = i18nContext.get();
 
   const settingsContext = getSettingsContext();
   const settings = $derived.by(settingsContext.settings);
+
+  const currentServerContext = serverContext.get();
 
   const pluginsQuery = createPluginsQuery();
 
@@ -100,6 +104,13 @@
 
             <PluginCard
               id={manifest.id}
+              icon={manifest.icon
+                ? getPluginAssetPath(
+                    currentServerContext.serverURL,
+                    manifest.id,
+                    manifest.icon,
+                  )
+                : null}
               name={manifest.name}
               description={manifest.description}
               version={manifest.version}

@@ -16,6 +16,7 @@
   name="Default"
   args={{
     id: "00000000-0000-0000-0000-000000000000",
+    icon: null,
     name: "Example Plugin",
     description: "Example plugin description for example plugin",
     version: "1.0.0",
@@ -29,6 +30,8 @@
   name="New Version"
   args={{
     id: "00000000-0000-0000-0000-000000000000",
+    icon: null,
+
     name: "Example Plugin",
     description: "Example plugin description for example plugin",
     version: "1.0.0",
@@ -52,6 +55,8 @@
   name="Unavailable"
   args={{
     id: "00000000-0000-0000-0000-000000000000",
+    icon: null,
+
     name: "Example Plugin",
     description: "Example plugin description for example plugin",
     version: "1.0.0",
@@ -66,6 +71,8 @@
   name="Developer Mode"
   args={{
     id: "00000000-0000-0000-0000-000000000000",
+    icon: null,
+
     name: "Example Plugin",
     description: "Example plugin description for example plugin",
     version: "1.0.0",
@@ -80,6 +87,8 @@
   name="Internal"
   args={{
     id: "00000000-0000-0000-0000-000000000000",
+    icon: null,
+
     name: "Example Plugin",
     description: "Example plugin description for example plugin",
     version: "1.0.0",

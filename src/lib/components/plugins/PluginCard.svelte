@@ -11,9 +11,11 @@
   import { createUninstallPlugin } from "$lib/api/plugins/plugins.mutations";
 
   import Button from "../input/Button.svelte";
+  import { onMount } from "svelte";
 
   type Props = {
     id: PluginId;
+    icon: string | null;
     name: string;
     description: string | null;
     version: string;
@@ -29,12 +31,13 @@
 
   const {
     id,
+    icon,
     name,
     description,
     version,
     internal,
     authors,
-    state,
+    state: taskState,
     latestVersion,
     developerMode,
   }: Props = $props();
@@ -80,77 +83,161 @@
       error: toastErrorMessage(i18n.f("plugin_update_error")),
     });
   }
+
+  let bgColor: string = $state(
+    "radial-gradient(circle at 50% 50%, rgba(200,200,255,0.2), rgba(200,200,255,0.1))",
+  );
+  let imgEl: HTMLImageElement | undefined = $state();
+
+  $effect(() => {
+    const currentImg = imgEl;
+
+    if (!currentImg) {
+      return;
+    }
+
+    if (currentImg.complete) {
+      extractColor(currentImg);
+    } else {
+      currentImg.onload = () => extractColor(currentImg);
+    }
+  });
+
+  /**
+   * Handles extracting a color to use for the background color
+   * from the provided icon image. This calculates and sets the
+   * background to an average of the colors in the image
+   *
+   * @param imgEl Icon image element
+   */
+  function extractColor(imgEl: HTMLImageElement) {
+    const canvas = document.createElement("canvas");
+    canvas.width = imgEl.naturalWidth;
+    canvas.height = imgEl.naturalHeight;
+
+    const ctx = canvas.getContext("2d");
+    if (ctx === null) return;
+
+    ctx.drawImage(imgEl, 0, 0);
+
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+
+    let r = 0;
+    let g = 0;
+    let b = 0;
+    let count = 0;
+
+    for (let i = 0; i < data.length; i += 4) {
+      const alpha = data[i + 3];
+      if (alpha > 0) {
+        // ignore fully transparent pixels
+        r += data[i];
+        g += data[i + 1];
+        b += data[i + 2];
+        count++;
+      }
+    }
+
+    r = Math.round(r / count);
+    g = Math.round(g / count);
+    b = Math.round(b / count);
+
+    bgColor = `radial-gradient(circle at 50% 50%, rgba(${r}, ${g}, ${b}, 0.2), rgba(${r}, ${g}, ${b}, 0.1))`;
+  }
 </script>
 
 <div class="card">
-  <div class="head">
-    <div class="head__text">
-      <span class="version">
-        {version}
+  <div class="left">
+    <div class="head">
+      <div class="head__text">
+        <span class="version">
+          {version}
 
-        {#if latestVersion}
-          <span class="version__new">
-            New: {latestVersion.version}
-          </span>
+          {#if latestVersion}
+            <span class="version__new">
+              New: {latestVersion.version}
+            </span>
+          {/if}
+        </span>
+
+        {#if developerMode && !internal}
+          <span class="state">{taskState}</span>
         {/if}
-      </span>
+      </div>
+    </div>
 
-      {#if developerMode && !internal}
-        <span class="state">{state}</span>
+    <h2 class="name">
+      {name}
+    </h2>
+
+    {#if description}
+      <p class="description">
+        {description}
+      </p>
+    {/if}
+
+    {#if authors.length > 0}
+      <span class="authors">
+        By {authors.join(", ")}
+      </span>
+    {/if}
+
+    <div class="actions">
+      {#if developerMode}
+        <Button
+          variant="secondary"
+          title={i18n.f("Reload")}
+          size="small"
+          onclick={handleReload}
+        >
+          <SolarRefreshLinear />
+        </Button>
+      {/if}
+
+      {#if latestVersion}
+        <Button
+          variant="secondary"
+          size="small"
+          onclick={handleUpdate}
+          loading={update.isPending}
+          disabled={uninstall.isPending}
+        >
+          {i18n.f("update")}
+        </Button>
+      {/if}
+
+      {#if !internal}
+        <Button
+          variant="secondary"
+          size="small"
+          onclick={handleUninstall}
+          loading={uninstall.isPending}
+          disabled={update.isPending}
+        >
+          {i18n.f("uninstall")}
+        </Button>
       {/if}
     </div>
   </div>
 
-  <h2 class="name">
-    {name}
-  </h2>
-
-  {#if description}
-    <p class="description">
-      {description}
-    </p>
-  {/if}
-
-  {#if authors.length > 0}
-    <span class="authors">
-      By {authors.join(", ")}
-    </span>
-  {/if}
-
-  <div class="actions">
-    {#if developerMode}
-      <Button
-        variant="secondary"
-        title={i18n.f("Reload")}
-        size="small"
-        onclick={handleReload}
-      >
-        <SolarRefreshLinear />
-      </Button>
-    {/if}
-
-    {#if latestVersion}
-      <Button
-        variant="secondary"
-        size="small"
-        onclick={handleUpdate}
-        loading={update.isPending}
-        disabled={uninstall.isPending}
-      >
-        {i18n.f("update")}
-      </Button>
-    {/if}
-
-    {#if !internal}
-      <Button
-        variant="secondary"
-        size="small"
-        onclick={handleUninstall}
-        loading={uninstall.isPending}
-        disabled={update.isPending}
-      >
-        {i18n.f("uninstall")}
-      </Button>
+  <div class="right" style:background={bgColor}>
+    {#if icon}
+      <img
+        class="icon"
+        bind:this={imgEl}
+        src={icon}
+        alt="{name} Plugin Icon"
+        crossorigin="anonymous"
+      />
+    {:else}
+      <img
+        class="icon"
+        bind:this={imgEl}
+        src="/missing-icon.png"
+        alt="{name} Plugin Icon"
+        crossorigin="anonymous"
+      />
     {/if}
   </div>
 </div>
@@ -158,14 +245,38 @@
 <style>
   .card {
     display: flex;
-    flex-flow: column;
+    flex-flow: row;
     gap: var(--tp-space-2);
     align-items: flex-start;
 
-    padding: var(--tp-space-3);
     border-radius: var(--tp-radius-md);
     background-color: var(--tp-bg-secondary);
     border: 1px solid var(--tp-border-secondary);
+  }
+
+  .icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+  }
+
+  .left {
+    display: flex;
+    flex-flow: column;
+    gap: var(--tp-space-2);
+    align-items: flex-start;
+    flex: auto;
+    padding: var(--tp-space-3);
+  }
+
+  .right {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    aspect-ratio: 1/1;
+    border-top-right-radius: var(--tp-radius-md);
+    border-bottom-right-radius: var(--tp-radius-md);
   }
 
   .head {
