@@ -1,6 +1,6 @@
 [package]
 name = "tilepad-desktop"
-version = "0.0.3"
+version = "0.1.0"
 description = "Tilepad desktop app"
 authors = ["Jacobtread"]
 edition = "2024"
