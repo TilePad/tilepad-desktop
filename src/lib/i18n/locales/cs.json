@@ -177,5 +177,8 @@
   "fingerprint": "Otisk veřejného klíče",
   "server_port": "Port serveru",
   "server_port_description": "Port, ze kterého poběží interní server, musí být pro správný chod aplikace jedinečný. Změna se použije po restartu TilePad",
-  "check_for_updates": "Zkontrolovat aktualizace"
+  "check_for_updates": "Zkontrolovat aktualizace",
+  "icon_packs_updating": "Aktualizuji balíček ikon...",
+  "icon_packs_updated": "Balíček ikon aktualizován",
+  "icon_packs_update_error": "Nepodařilo se aktualizovat balíček ikon"
 }

@@ -177,5 +177,8 @@
   "fingerprint": "Huella de la clave pública",
   "server_port": "Puerto del servidor",
   "server_port_description": "Puerto desde el que se ejecutará el servidor interno; debe ser único para que la aplicación funcione correctamente. Se aplicará después de reiniciar TilePad",
-  "check_for_updates": "Buscar actualizaciones"
+  "check_for_updates": "Buscar actualizaciones",
+  "icon_packs_updating": "Actualizando paquete de iconos...",
+  "icon_packs_updated": "Paquete de iconos actualizado",
+  "icon_packs_update_error": "No se pudo actualizar el paquete de iconos"
 }

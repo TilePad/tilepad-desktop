@@ -4,10 +4,12 @@
 
   import { toast } from "svelte-sonner";
   import { i18nContext } from "$lib/i18n/i18n.svelte";
+  import { compare as semverCompare } from "semver-ts";
   import { createUninstallIconPackMutation } from "$lib/api/icons";
   import { replaceMarkdownRelativeUrls } from "$lib/utils/markdown";
   import { getErrorMessage, toastErrorMessage } from "$lib/api/utils/error";
   import {
+    createUpdateIconPack,
     createIconPackReadmeQuery,
     createIconPackManifestQuery,
     createInstallIconPackFromRegistry,
@@ -31,7 +33,8 @@
   const readmeQuery = createIconPackReadmeQuery(() => item.repo);
 
   const install = createInstallIconPackFromRegistry();
-  const uninstallMutation = createUninstallIconPackMutation();
+  const uninstall = createUninstallIconPackMutation();
+  const update = createUpdateIconPack();
 
   async function onInstall() {
     const manifest = manifestQuery.data;
@@ -54,7 +57,7 @@
   }
 
   function handleUninstall() {
-    const uninstallPromise = uninstallMutation.mutateAsync({
+    const uninstallPromise = uninstall.mutateAsync({
       packId: item.id,
     });
 
@@ -62,6 +65,21 @@
       loading: i18n.f("icon_packs_uninstalling"),
       success: i18n.f("icon_packs_uninstalled"),
       error: toastErrorMessage(i18n.f("icon_packs_uninstall_error")),
+    });
+  }
+
+  async function handleUpdate(version: string, remotePack: IconRegistryEntry) {
+    const updatePromise = update.mutateAsync({
+      repo: remotePack.repo,
+      version,
+      packId: remotePack.id,
+      fileName: remotePack.fileName,
+    });
+
+    toast.promise(updatePromise, {
+      loading: i18n.f("icon_packs_updating"),
+      success: i18n.f("icon_packs_updated"),
+      error: toastErrorMessage(i18n.f("icon_packs_update_error")),
     });
   }
 </script>
@@ -96,6 +114,16 @@
 
       <div class="actions">
         {#if installed !== undefined}
+          {#if semverCompare(manifest.version, installed.icons.version) === 1}
+            <Button
+              onclick={() => handleUpdate(manifest.version, item)}
+              loading={update.isPending}
+              disabled={uninstall.isPaused}
+            >
+              {i18n.f("update")}
+            </Button>
+          {/if}
+
           <Button variant="error" onclick={handleUninstall}
             >{i18n.f("uninstall")}</Button
           >

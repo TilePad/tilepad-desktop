@@ -177,5 +177,8 @@
   "fingerprint": "Fingerprint",
   "server_port": "Server Port",
   "server_port_description": "Port the internal server will run from, this must be unique for the app to run properly. Will be applied after a restart of TilePad",
-  "check_for_updates": "Check for updates"
+  "check_for_updates": "Check for updates",
+  "icon_packs_updating": "Updating icon pack...",
+  "icon_packs_updated": "Updated icon pack",
+  "icon_packs_update_error": "Failed to update icon pack"
 }

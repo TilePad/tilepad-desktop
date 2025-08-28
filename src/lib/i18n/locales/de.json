@@ -177,5 +177,8 @@
   "fingerprint": "Fingerprint des öffentlichen Schlüssels",
   "server_port": "Server-Port",
   "server_port_description": "Port, von dem der interne Server ausgeführt wird. Dieser muss eindeutig sein, damit die App ordnungsgemäß funktioniert. Wird nach einem Neustart von TilePad angewendet",
-  "check_for_updates": "Nach Updates suchen"
+  "check_for_updates": "Nach Updates suchen",
+  "icon_packs_updating": "Icon-Paket wird aktualisiert...",
+  "icon_packs_updated": "Icon-Paket aktualisiert",
+  "icon_packs_update_error": "Fehler beim Aktualisieren des Icon-Pakets"
 }
