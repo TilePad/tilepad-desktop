@@ -9,6 +9,7 @@
   import { createUpdatePlugin } from "$lib/api/plugins_registry";
   import { reloadPlugin } from "$lib/api/plugins/plugins.requests";
   import { createUninstallPlugin } from "$lib/api/plugins/plugins.mutations";
+  import missingLogo from "$lib/assets/missing-icon.png";
 
   import Button from "../input/Button.svelte";
   import { onMount } from "svelte";
@@ -234,7 +235,7 @@
       <img
         class="icon"
         bind:this={imgEl}
-        src="/missing-icon.png"
+        src={missingLogo}
         alt="{name} Plugin Icon"
         crossorigin="anonymous"
       />
@@ -252,6 +253,8 @@
     border-radius: var(--tp-radius-md);
     background-color: var(--tp-bg-secondary);
     border: 1px solid var(--tp-border-secondary);
+    width: 100%;
+    overflow: hidden;
   }
 
   .icon {
@@ -267,16 +270,18 @@
     align-items: flex-start;
     flex: auto;
     padding: var(--tp-space-3);
+    overflow: hidden;
   }
 
   .right {
+    align-self: center;
+    margin: 1rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100%;
+    height: 150px;
     aspect-ratio: 1/1;
-    border-top-right-radius: var(--tp-radius-md);
-    border-bottom-right-radius: var(--tp-radius-md);
+    border-radius: var(--tp-radius-md);
   }
 
   .head {
@@ -285,8 +290,8 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--tp-space-2);
-
     width: 100%;
+    overflow: hidden;
   }
 
   .head__text {
@@ -313,13 +318,22 @@
 
   .description {
     color: var(--tp-text-secondary);
+    line-height: var(--tp-leading-normal);
     font-size: var(--tp-text-xs);
     max-width: 100%;
+    max-height: calc((var(--tp-text-xs) * 2) * var(--tp-leading-normal));
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .name {
     font-size: var(--tp-text-lg);
     line-height: var(--tp-leading-tight);
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-height: calc((var(--tp-text-lg) * 2) * var(--tp-leading-tight));
   }
 
   .actions {
