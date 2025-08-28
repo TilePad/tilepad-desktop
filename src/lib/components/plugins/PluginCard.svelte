@@ -4,15 +4,14 @@
 
   import { toast } from "svelte-sonner";
   import { i18nContext } from "$lib/i18n/i18n.svelte";
+  import missingLogo from "$lib/assets/missing-icon.png";
   import { toastErrorMessage } from "$lib/api/utils/error";
   import SolarRefreshLinear from "~icons/solar/refresh-linear";
   import { createUpdatePlugin } from "$lib/api/plugins_registry";
   import { reloadPlugin } from "$lib/api/plugins/plugins.requests";
   import { createUninstallPlugin } from "$lib/api/plugins/plugins.mutations";
-  import missingLogo from "$lib/assets/missing-icon.png";
 
   import Button from "../input/Button.svelte";
-  import { onMount } from "svelte";
 
   type Props = {
     id: PluginId;
@@ -321,7 +320,7 @@
     line-height: var(--tp-leading-normal);
     font-size: var(--tp-text-xs);
     max-width: 100%;
-    max-height: calc((var(--tp-text-xs) * 2) * var(--tp-leading-normal));
+    height: calc((var(--tp-text-xs) * 2) * var(--tp-leading-normal));
     overflow: hidden;
     text-overflow: ellipsis;
   }
