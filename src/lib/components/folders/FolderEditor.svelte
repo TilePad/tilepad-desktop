@@ -57,7 +57,7 @@
 <div class="layout">
   {#if tilesQuery.isLoading}
     <div class="content">
-      <SkeletonList />
+      <SkeletonList style="margin-top: 1rem" />
     </div>
   {:else if tilesQuery.isError}
     <div class="content">
