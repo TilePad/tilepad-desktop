@@ -9,6 +9,7 @@
   import SettingsIcon from "~icons/solar/settings-bold";
   import {
     updateFolderRows,
+    updateFolderColumns,
     createSetFolderConfigMutation,
   } from "$lib/api/folders";
 
@@ -50,7 +51,7 @@
 
   function onChangeColumns(columns: number) {
     // Update the data on the UI ahead of time
-    updateFolderRows(queryClient, folder.profile_id, folder.id, columns);
+    updateFolderColumns(queryClient, folder.profile_id, folder.id, columns);
 
     debounceUpdateFolder({ rows: folder.config.rows, columns });
   }
