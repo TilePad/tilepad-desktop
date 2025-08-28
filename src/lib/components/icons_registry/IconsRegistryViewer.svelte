@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { IconPackManifest } from "$lib/api/types/icons";
   import type { IconRegistryEntry } from "$lib/api/types/icons_registry";
 
   import { toast } from "svelte-sonner";
@@ -19,7 +20,7 @@
 
   type Props = {
     item: IconRegistryEntry;
-    installed: boolean;
+    installed?: IconPackManifest;
   };
 
   const { item, installed }: Props = $props();
@@ -76,16 +77,34 @@
         })}
       </Aside>
     {:else if manifestQuery.isSuccess}
-      <h2>{item.name}</h2>
-      <p>{item.description}</p>
+      {@const manifest = manifestQuery.data}
+      <div class="head">
+        <div>
+          <h2>{item.name}</h2>
+          <p>{item.description}</p>
+          <span>
+            {i18n.f("version")}: {manifest.version}
 
-      {#if installed}
-        <Button onclick={handleUninstall}>{i18n.f("uninstall")}</Button>
-      {:else}
-        <Button disabled={install.isPending} onclick={onInstall}>
-          {i18n.f("install")}
-        </Button>
-      {/if}
+            {#if installed}
+              <span class="installed-version">
+                ({i18n.f("installed")}: {installed.icons.version})
+              </span>
+            {/if}
+          </span>
+        </div>
+      </div>
+
+      <div class="actions">
+        {#if installed !== undefined}
+          <Button variant="error" onclick={handleUninstall}
+            >{i18n.f("uninstall")}</Button
+          >
+        {:else}
+          <Button disabled={install.isPending} onclick={onInstall}>
+            {i18n.f("install")}
+          </Button>
+        {/if}
+      </div>
     {/if}
   </div>
 
@@ -114,6 +133,15 @@
     height: 100%;
   }
 
+  .head {
+    display: flex;
+    flex-flow: row;
+    gap: var(--tp-space-2);
+    align-items: flex-start;
+    justify-content: space-between;
+    align-items: center;
+  }
+
   .readme {
     flex: auto;
     overflow: hidden;
@@ -123,8 +151,17 @@
     display: flex;
     flex-flow: column;
     width: 100%;
-    background-color: #322e38;
+    background-color: var(--tp-bg-secondary);
     padding: 1rem;
     gap: 0.5rem;
+  }
+
+  .actions {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .installed-version {
+    color: #999;
   }
 </style>

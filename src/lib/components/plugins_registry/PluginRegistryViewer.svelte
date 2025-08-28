@@ -139,6 +139,7 @@
           {/if}
 
           <Button
+            variant="error"
             onclick={handleUninstall}
             loading={uninstall.isPending}
             disabled={update.isPending}>{i18n.f("uninstall")}</Button

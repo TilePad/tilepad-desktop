@@ -4,13 +4,13 @@
   import { toast } from "svelte-sonner";
   import Aside from "$lib/components/Aside.svelte";
   import { i18nContext } from "$lib/i18n/i18n.svelte";
+  import SolarBoxBoldDuotone from "~icons/solar/box-bold-duotone";
   import SolarShopBoldDuotone from "~icons/solar/shop-bold-duotone";
   import IconPackCard from "$lib/components/icons/IconPackCard.svelte";
   import SkeletonList from "$lib/components/skeleton/SkeletonList.svelte";
   import { uninstallIconPack, createIconPacksQuery } from "$lib/api/icons";
   import { getErrorMessage, toastErrorMessage } from "$lib/api/utils/error";
   import ManualImportIconPack from "$lib/components/icons/ManualImportIconPack.svelte";
-  import IconsRegistryDialog from "$lib/components/icons_registry/IconsRegistryDialog.svelte";
 
   const i18n = i18nContext.get();
 
@@ -38,13 +38,19 @@
     </Aside>
   {:else if iconPacksQuery.isSuccess}
     <div class="header">
+      <div class="nav">
+        <a class="tab tab--active" href="/icons">
+          <SolarBoxBoldDuotone />
+
+          {i18n.f("installed")}
+        </a>
+        <a class="tab" href="/icons/community">
+          <SolarShopBoldDuotone />
+          {i18n.f("community_icon_packs")}
+        </a>
+      </div>
+
       <div class="actions">
-        <IconsRegistryDialog
-          buttonLabel={{
-            text: i18n.f("community_icon_packs"),
-            icon: SolarShopBoldDuotone,
-          }}
-        />
         <ManualImportIconPack />
       </div>
     </div>
@@ -78,6 +84,9 @@
 
   .header {
     padding: var(--tp-space-4);
+    display: flex;
+    gap: var(--tp-space-4);
+    justify-content: space-between;
   }
 
   .plugins-wrapper {
@@ -100,5 +109,33 @@
   .actions {
     display: flex;
     gap: var(--tp-space-3);
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .tab {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--tp-space-2);
+    justify-content: center;
+    font-size: var(--tp-text-base);
+    font-weight: var(--tp-font-weight-medium);
+    text-decoration: none;
+    color: var(--tp-text-primary);
+    border-bottom: 2px solid transparent;
+    height: var(--tp-btn-height-md);
+    padding: 0 var(--tp-btn-padding-x-md);
+    border-radius: var(--tp-radius-md);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .tab--active {
+    background: var(--tp-bg-tertiary);
+    border-bottom: 2px solid var(--tp-text-primary);
   }
 </style>
