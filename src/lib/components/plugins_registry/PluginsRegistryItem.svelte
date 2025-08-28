@@ -43,7 +43,6 @@
     display: flex;
     flex-flow: column;
     gap: 0.25rem;
-    background-color: #28252e;
     color: #fff;
     border: none;
     width: 100%;
@@ -51,7 +50,11 @@
     padding: 0.5rem;
     cursor: pointer;
     font-size: 0.9rem;
-    border-radius: 0.25rem;
+
+    border-radius: var(--tp-radius-md);
+    background-color: var(--tp-bg-secondary);
+    border: 1px solid var(--tp-border-secondary);
+    overflow: hidden;
   }
 
   .item--selected {

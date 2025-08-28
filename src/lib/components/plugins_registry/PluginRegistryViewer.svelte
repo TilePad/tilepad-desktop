@@ -6,8 +6,8 @@
   import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { compare as semverCompare } from "semver-ts";
   import { createUninstallPlugin } from "$lib/api/plugins";
-  import { replaceMarkdownRelativeUrls } from "$lib/utils/markdown";
   import { getErrorMessage, toastErrorMessage } from "$lib/api/utils/error";
+  import { resolveUrl, replaceMarkdownRelativeUrls } from "$lib/utils/markdown";
   import {
     createUpdatePlugin,
     createPluginReadmeQuery,
@@ -18,6 +18,7 @@
   import Aside from "../Aside.svelte";
   import Button from "../input/Button.svelte";
   import Markdown from "../markdown/Markdown.svelte";
+  import PluginIcon from "../plugins/PluginIcon.svelte";
   import SkeletonList from "../skeleton/SkeletonList.svelte";
 
   type Props = {
@@ -94,23 +95,42 @@
         })}
       </Aside>
     {:else if manifestQuery.isSuccess}
-      <h2>{manifestQuery.data.plugin.name}</h2>
-      <p>{manifestQuery.data.plugin.description}</p>
-      <span>
-        {i18n.f("version")}: {manifestQuery.data.plugin.version}
+      {@const manifest = manifestQuery.data}
 
-        {#if installed}
-          <span class="installed-version">
-            ({i18n.f("installed")}: {installed.plugin.version})
+      <div class="head">
+        <div>
+          <h2>{manifest.plugin.name}</h2>
+          <p>{manifest.plugin.description}</p>
+          <span>
+            {i18n.f("version")}: {manifest.plugin.version}
+
+            {#if installed}
+              <span class="installed-version">
+                ({i18n.f("installed")}: {installed.plugin.version})
+              </span>
+            {/if}
           </span>
-        {/if}
-      </span>
+        </div>
+
+        <div>
+          <PluginIcon
+            icon={manifest.plugin.icon
+              ? resolveUrl(
+                  `https://raw.githubusercontent.com/${item.repo}/HEAD/.tilepadPlugin/`,
+                  manifest.plugin.icon,
+                )
+              : null}
+            name={manifest.plugin.name}
+            height={100}
+          />
+        </div>
+      </div>
 
       {#if installed}
         <div class="actions">
-          {#if semverCompare(manifestQuery.data.plugin.version, installed.plugin.version) === 1}
+          {#if semverCompare(manifest.plugin.version, installed.plugin.version) === 1}
             <Button
-              onclick={() => handleUpdate(manifestQuery.data, item)}
+              onclick={() => handleUpdate(manifest, item)}
               loading={update.isPending}
               disabled={uninstall.isPaused}
             >
@@ -157,6 +177,15 @@
     height: 100%;
   }
 
+  .head {
+    display: flex;
+    flex-flow: row;
+    gap: var(--tp-space-2);
+    align-items: flex-start;
+    justify-content: space-between;
+    align-items: center;
+  }
+
   .readme {
     flex: auto;
     overflow: hidden;
@@ -166,7 +195,7 @@
     display: flex;
     flex-flow: column;
     width: 100%;
-    background-color: #322e38;
+    background-color: var(--tp-bg-secondary);
     padding: 1rem;
     gap: 0.5rem;
   }

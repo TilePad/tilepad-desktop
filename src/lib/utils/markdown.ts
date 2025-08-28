@@ -41,6 +41,6 @@ function isAbsoluteUrl(url: string): boolean {
   );
 }
 
-function resolveUrl(base: string, relative: string): string {
+export function resolveUrl(base: string, relative: string): string {
   return base + relative.replace(/^\.?\/+/, "");
 }

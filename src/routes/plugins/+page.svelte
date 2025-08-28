@@ -8,16 +8,16 @@
   import { createPluginsQuery } from "$lib/api/plugins";
   import { getErrorMessage } from "$lib/api/utils/error";
   import { createMutation } from "@tanstack/svelte-query";
+  import { getPluginAssetPath } from "$lib/api/utils/url";
   import Button from "$lib/components/input/Button.svelte";
-  import SolarShopBoldDuotone from "~icons/solar/shop-bold-duotone";
+  import { serverContext } from "$lib/contexts/server.context";
   import SolarBoxBoldDuotone from "~icons/solar/box-bold-duotone";
+  import SolarShopBoldDuotone from "~icons/solar/shop-bold-duotone";
   import PluginCard from "$lib/components/plugins/PluginCard.svelte";
   import { getLatestPluginVersions } from "$lib/api/plugins_registry";
   import SkeletonList from "$lib/components/skeleton/SkeletonList.svelte";
   import { getSettingsContext } from "$lib/components/SettingsProvider.svelte";
   import ManualImportPlugin from "$lib/components/plugins/ManualImportPlugin.svelte";
-  import { serverContext } from "$lib/contexts/server.context";
-  import { getPluginAssetPath } from "$lib/api/utils/url";
 
   const i18n = i18nContext.get();
 

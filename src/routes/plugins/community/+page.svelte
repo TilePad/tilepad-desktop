@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { PluginWithState } from "$lib/api/types/plugin";
+  import type { PluginRegistryEntry } from "$lib/api/types/plugins_registry";
 
   import { toast } from "svelte-sonner";
   import Aside from "$lib/components/Aside.svelte";
@@ -9,26 +10,18 @@
   import { getErrorMessage } from "$lib/api/utils/error";
   import { createMutation } from "@tanstack/svelte-query";
   import Button from "$lib/components/input/Button.svelte";
-  import SolarShopBoldDuotone from "~icons/solar/shop-bold-duotone";
   import SolarBoxBoldDuotone from "~icons/solar/box-bold-duotone";
-  import {
-    createPluginRegistryQuery,
-    getLatestPluginVersions,
-  } from "$lib/api/plugins_registry";
+  import SolarShopBoldDuotone from "~icons/solar/shop-bold-duotone";
   import SkeletonList from "$lib/components/skeleton/SkeletonList.svelte";
-  import { getSettingsContext } from "$lib/components/SettingsProvider.svelte";
   import ManualImportPlugin from "$lib/components/plugins/ManualImportPlugin.svelte";
-  import { serverContext } from "$lib/contexts/server.context";
-  import type { PluginRegistryEntry } from "$lib/api/types/plugins_registry";
   import PluginsRegistryItem from "$lib/components/plugins_registry/PluginsRegistryItem.svelte";
   import PluginRegistryViewer from "$lib/components/plugins_registry/PluginRegistryViewer.svelte";
+  import {
+    getLatestPluginVersions,
+    createPluginRegistryQuery,
+  } from "$lib/api/plugins_registry";
 
   const i18n = i18nContext.get();
-
-  const settingsContext = getSettingsContext();
-  const settings = $derived.by(settingsContext.settings);
-
-  const currentServerContext = serverContext.get();
 
   const pluginRegistryQuery = createPluginRegistryQuery();
   const pluginsQuery = createPluginsQuery();
@@ -206,23 +199,28 @@
     flex-direction: column;
     flex: auto;
     overflow: auto;
+    height: 100%;
   }
 
   .plugins-wrapper {
-    display: flex;
-    flex-flow: row;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 24rem 1fr;
     height: 100%;
     overflow: hidden;
   }
 
   .plugins-list {
-    display: flex;
+    display: block;
     gap: 0.5rem;
-    flex-direction: column;
-    flex: auto;
     overflow: auto;
-    max-width: 24rem;
+    width: 100%;
     padding: 0 1rem;
+    height: 100%;
+  }
+
+  .plugins-list:global(> .item) {
+    margin-bottom: 1rem;
   }
 
   .actions {

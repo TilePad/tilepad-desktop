@@ -25,20 +25,27 @@
 </script>
 
 {#key source}
-  <div class="markdown-body">
-    {#await markdownPromise then rendered}
-      <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-      {@html DOMPurify.sanitize(rendered)}
-    {/await}
+  <div class="markdown-container">
+    <div class="markdown-body">
+      {#await markdownPromise then rendered}
+        <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+        {@html DOMPurify.sanitize(rendered)}
+      {/await}
+    </div>
   </div>
 {/key}
 
 <style>
   .markdown-body {
     width: 100%;
-    height: 100%;
     padding: 1rem;
     padding-bottom: 10rem;
+    max-width: 1012px;
+  }
+
+  .markdown-container {
+    width: 100%;
+    height: 100%;
     overflow: auto;
   }
 </style>
