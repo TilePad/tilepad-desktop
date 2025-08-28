@@ -37,6 +37,28 @@
 </script>
 
 <div class="layout">
+  <div class="header">
+    <div class="nav">
+      <a class="tab" href="/plugins">
+        <SolarBoxBoldDuotone />
+
+        {i18n.f("installed")}
+      </a>
+      <a class="tab tab--active" href="/plugins/community">
+        <SolarShopBoldDuotone />
+
+        {i18n.f("community_plugins")}
+      </a>
+    </div>
+
+    <input
+      bind:value={search}
+      class="search"
+      type="text"
+      placeholder={i18n.f("search_placeholder")}
+    />
+  </div>
+
   {#if pluginRegistryQuery.isLoading || pluginsQuery.isLoading}
     <SkeletonList style="margin: 1rem" />
   {:else if pluginsQuery.isError}
@@ -45,29 +67,13 @@
         values: { error: getErrorMessage(pluginsQuery.error) },
       })}
     </Aside>
+  {:else if pluginRegistryQuery.isError}
+    <Aside severity="error" style="margin: 1rem">
+      {i18n.f("community_plugins_error", {
+        values: { error: getErrorMessage(pluginRegistryQuery.error) },
+      })}
+    </Aside>
   {:else if pluginRegistryQuery.isSuccess && pluginsQuery.isSuccess}
-    <div class="header">
-      <div class="nav">
-        <a class="tab" href="/plugins">
-          <SolarBoxBoldDuotone />
-
-          {i18n.f("installed")}
-        </a>
-        <a class="tab tab--active" href="/plugins/community">
-          <SolarShopBoldDuotone />
-
-          {i18n.f("community_plugins")}
-        </a>
-      </div>
-
-      <input
-        bind:value={search}
-        class="search"
-        type="text"
-        placeholder={i18n.f("search_placeholder")}
-      />
-    </div>
-
     <div class="plugins-wrapper">
       <div class="plugins-list">
         {#each filteredRegistry as item (item.id)}

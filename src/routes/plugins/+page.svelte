@@ -59,6 +59,37 @@
 </script>
 
 <div class="layout">
+  <div class="header">
+    <div class="nav">
+      <a class="tab tab--active" href="/plugins">
+        <SolarBoxBoldDuotone />
+
+        {i18n.f("installed")}
+      </a>
+      <a class="tab" href="/plugins/community">
+        <SolarShopBoldDuotone />
+        {i18n.f("community_plugins")}
+      </a>
+    </div>
+
+    <div class="actions">
+      <Button
+        disabled={!pluginsQuery.data}
+        variant="secondary"
+        onclick={() => {
+          if (!pluginsQuery.data) return;
+
+          checkUpdatesMutation.mutate({ plugins: pluginsQuery.data });
+        }}
+        loading={checkUpdatesMutation.isPending}
+      >
+        {i18n.f("check_for_updates")}
+      </Button>
+
+      <ManualImportPlugin />
+    </div>
+  </div>
+
   {#if pluginsQuery.isLoading}
     <SkeletonList style="margin: 1rem" />
   {:else if pluginsQuery.isError}
@@ -68,34 +99,6 @@
       })}
     </Aside>
   {:else if pluginsQuery.isSuccess}
-    <div class="header">
-      <div class="nav">
-        <a class="tab tab--active" href="/plugins">
-          <SolarBoxBoldDuotone />
-
-          {i18n.f("installed")}
-        </a>
-        <a class="tab" href="/plugins/community">
-          <SolarShopBoldDuotone />
-          {i18n.f("community_plugins")}
-        </a>
-      </div>
-
-      <div class="actions">
-        <Button
-          variant="secondary"
-          onclick={() => {
-            checkUpdatesMutation.mutate({ plugins: pluginsQuery.data });
-          }}
-          loading={checkUpdatesMutation.isPending}
-        >
-          {i18n.f("check_for_updates")}
-        </Button>
-
-        <ManualImportPlugin />
-      </div>
-    </div>
-
     <div class="plugins-wrapper">
       <div class="plugins">
         {#each pluginsQuery.data as plugin (plugin.manifest.plugin.id)}

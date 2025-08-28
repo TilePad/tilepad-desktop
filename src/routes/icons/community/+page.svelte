@@ -58,12 +58,18 @@
     />
   </div>
 
-  {#if iconPacksQuery.isLoading}
+  {#if iconPacksQuery.isLoading || iconRegistryQuery.isLoading}
     <SkeletonList style="margin: 1rem" />
   {:else if iconPacksQuery.isError}
     <Aside severity="error" style="margin: 1rem">
       {i18n.f("icon_packs_installed_error", {
         values: { error: getErrorMessage(iconPacksQuery.error) },
+      })}
+    </Aside>
+  {:else if iconRegistryQuery.isError}
+    <Aside severity="error" style="margin: 1rem">
+      {i18n.f("community_icons_error", {
+        values: { error: getErrorMessage(iconRegistryQuery.error) },
       })}
     </Aside>
   {:else if iconPacksQuery.isSuccess}
@@ -94,12 +100,14 @@
 
       <div class="viewer">
         {#if active}
-          <IconsRegistryViewer
-            item={active}
-            installed={iconPacksQuery.data.find(
-              (plugin) => plugin.manifest.icons.id === active!.id,
-            )?.manifest}
-          />
+          {#key active}
+            <IconsRegistryViewer
+              item={active}
+              installed={iconPacksQuery.data.find(
+                (plugin) => plugin.manifest.icons.id === active!.id,
+              )?.manifest}
+            />
+          {/key}
         {/if}
       </div>
     </div>

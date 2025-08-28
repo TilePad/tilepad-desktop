@@ -28,6 +28,24 @@
 </script>
 
 <div class="layout">
+  <div class="header">
+    <div class="nav">
+      <a class="tab tab--active" href="/icons">
+        <SolarBoxBoldDuotone />
+
+        {i18n.f("installed")}
+      </a>
+      <a class="tab" href="/icons/community">
+        <SolarShopBoldDuotone />
+        {i18n.f("community_icon_packs")}
+      </a>
+    </div>
+
+    <div class="actions">
+      <ManualImportIconPack />
+    </div>
+  </div>
+
   {#if iconPacksQuery.isLoading}
     <SkeletonList style="margin: 1rem" />
   {:else if iconPacksQuery.isError}
@@ -37,24 +55,6 @@
       })}
     </Aside>
   {:else if iconPacksQuery.isSuccess}
-    <div class="header">
-      <div class="nav">
-        <a class="tab tab--active" href="/icons">
-          <SolarBoxBoldDuotone />
-
-          {i18n.f("installed")}
-        </a>
-        <a class="tab" href="/icons/community">
-          <SolarShopBoldDuotone />
-          {i18n.f("community_icon_packs")}
-        </a>
-      </div>
-
-      <div class="actions">
-        <ManualImportIconPack />
-      </div>
-    </div>
-
     <div class="plugins-wrapper">
       <div class="plugins">
         {#each iconPacksQuery.data as pack, index (index)}
