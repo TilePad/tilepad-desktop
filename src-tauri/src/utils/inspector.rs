@@ -2,6 +2,8 @@ use std::borrow::Cow;
 
 use tokio::join;
 
+/// Injects the property inspector styles and scripts into the head tag of the
+/// provided `input` HTML
 pub async fn inject_property_inspector_current(input: &str) -> String {
     let (inspector_script, inspector_styles) =
         join!(get_inspector_script(), get_inspector_styles());
@@ -9,6 +11,8 @@ pub async fn inject_property_inspector_current(input: &str) -> String {
     inject_property_inspector(input, &inspector_script, &inspector_styles)
 }
 
+/// Injects the property inspector script and styles into the head tag of the
+/// provided HTML `value`
 fn inject_property_inspector(
     value: &str,
     inspector_script: &str,

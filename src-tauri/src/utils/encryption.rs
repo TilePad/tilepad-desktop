@@ -9,6 +9,8 @@ pub struct ServerKeyPair {
     pub public_key: PublicKey,
 }
 
+/// Sets up the server private key, loads an existing key if one is present at `path`
+/// otherwise will generate the save a new one
 pub async fn setup_private_key(path: &Path) -> std::io::Result<StaticSecret> {
     // Try read existing private key
     if let Some(private_key) = read_private_key(path).await? {
@@ -21,6 +23,7 @@ pub async fn setup_private_key(path: &Path) -> std::io::Result<StaticSecret> {
     Ok(private_key)
 }
 
+/// Write `private_key` to a file at `path`
 async fn write_private_key(path: &Path, private_key: &StaticSecret) -> std::io::Result<()> {
     let key_bytes = private_key.as_bytes();
 
@@ -35,6 +38,7 @@ async fn write_private_key(path: &Path, private_key: &StaticSecret) -> std::io::
     Ok(())
 }
 
+/// Read a private key from `path`
 async fn read_private_key(path: &Path) -> std::io::Result<Option<StaticSecret>> {
     if !path.exists() {
         return Ok(None);

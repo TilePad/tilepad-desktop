@@ -11,7 +11,7 @@ use serde::{Serialize, de::DeserializeOwned};
 use thiserror::Error;
 use tokio::sync::mpsc;
 
-/// Abstraction for easily implementing a JSON protocol
+/// Abstraction for easily implementing a MSGPACK protocol
 /// on top of a websocket connection, manages the underlying
 /// reading and writing within a self contained future
 ///

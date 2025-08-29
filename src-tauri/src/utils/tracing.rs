@@ -10,6 +10,9 @@ use tracing_subscriber::{
     util::SubscriberInitExt,
 };
 
+/// Create and setup the logging subscriber for the main app
+///
+/// Persists logs within the `logs_path` directory
 pub fn setup_main_subscriber(logs_path: PathBuf) -> anyhow::Result<WorkerGuard> {
     // Initialize rolling file for persisted logs
     let file_appender = BasicRollingFileAppender::new(
@@ -88,6 +91,9 @@ pub type PluginSubscriber = fmt::Subscriber<
     tracing_appender::non_blocking::NonBlocking,
 >;
 
+/// Create a logging subscriber for use within individual plugins
+///
+/// Persists logs within the `logs_path` directory
 pub fn create_plugin_logger(logs_path: PathBuf) -> anyhow::Result<(PluginSubscriber, WorkerGuard)> {
     // Initialize rolling file for persisted logs
     let file_appender = BasicRollingFileAppender::new(

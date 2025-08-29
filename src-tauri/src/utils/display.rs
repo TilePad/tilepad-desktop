@@ -1,13 +1,16 @@
 use std::borrow::Cow;
-
 use tokio::join;
 
+/// Injects the display styles and scripts into the head tag of the
+/// provided `input` HTML
 pub async fn inject_display_current(input: &str) -> String {
     let (display_script, display_styles) = join!(get_display_script(), get_display_styles());
 
     inject_display(input, &display_script, &display_styles)
 }
 
+/// Injects the display script and styles into the head tag of the
+/// provided HTML `value`
 fn inject_display(value: &str, display_script: &str, display_styles: &str) -> String {
     value.replace(
         "<head>",
