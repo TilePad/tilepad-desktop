@@ -13,10 +13,18 @@ import tanstackQuery from "@tanstack/eslint-plugin-query";
 import svelteConfig from "./svelte.config.js";
 
 const gitignorePath = fileURLToPath(new URL("./.gitignore", import.meta.url));
+const displayGitignorePath = fileURLToPath(
+  new URL("./display/.gitignore", import.meta.url),
+);
+const inspectorGitignorePath = fileURLToPath(
+  new URL("./inspector/.gitignore", import.meta.url),
+);
 
 export default ts.config(
   // Ignored files
   includeIgnoreFile(gitignorePath),
+  includeIgnoreFile(displayGitignorePath),
+  includeIgnoreFile(inspectorGitignorePath),
   { ignores: ["src-tauri/src/script/**/*", "script/**/*"] },
   // JS
   js.configs.recommended,

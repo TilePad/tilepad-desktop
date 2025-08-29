@@ -29,6 +29,7 @@ export const passiveEventArg = (() => {
     window.addEventListener("testpassive", arg, arg);
     // @ts-expect-error Testing passive
     window.remove("testpassive", arg, arg);
+    // eslint-disable-next-line unused-imports/no-unused-vars
   } catch (_e) {
     /* */
   }

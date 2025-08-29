@@ -10,3 +10,6 @@ bun.lockb
 /src-tauri/
 
 THIRD_PARTY_LICENSES.md
+
+/display/dist/
+/inspector/dist/

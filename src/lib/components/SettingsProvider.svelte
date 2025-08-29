@@ -14,6 +14,7 @@
 
 <script lang="ts">
   import type { SettingsConfig } from "$lib/api/types/settings";
+
   import { watch } from "runed";
   import { i18nContext } from "$lib/i18n/i18n.svelte";
 
