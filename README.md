@@ -1,12 +1,12 @@
-<img src="./assets/tilepad-logo.svg" width="256px" height="auto" > 
+<img src="./assets/tilepad-logo.svg" width="256px" height="auto" >
 
-> ⚠️ WIP: TilePad is currently under active development. 
+> ⚠️ WIP: TilePad is currently under active development.
 
 ![License](https://img.shields.io/github/license/tilepad/tilepad-desktop?style=for-the-badge)
 
 ## 🚀 What is TilePad?
 
-**TilePad** is a macropad software inspired by devices like the [Elgato Stream Deck](https://www.elgato.com/us/en/s/welcome-to-stream-deck) but using Android touchscreen mobile devices instead of requiring dedicated hardware. 
+**TilePad** is a macropad software inspired by devices like the [Elgato Stream Deck](https://www.elgato.com/us/en/s/welcome-to-stream-deck) but using Android touchscreen mobile devices instead of requiring dedicated hardware.
 
 Written with [Svelte](https://svelte.dev/) & [Typescript](https://www.typescriptlang.org/) on the frontend using [Tauri v2](https://tauri.app/) and [Rust](https://www.rust-lang.org/) on the backend
 
@@ -34,13 +34,13 @@ There is a community plugins registry available where you can directly download 
 
 ## 🎨 Icon Packs
 
-You can install collections of icons called icon packs to style your various tiles with icons. 
+You can install collections of icons called icon packs to style your various tiles with icons.
 
 ![alt text](assets/image-6.png)
 
 ## 📦 Community Icon Packs Registry
 
-There is a community icon packs registry available where you can directly download icon packs from GitHub. You can also manually side-load your own icon pack bundles. 
+There is a community icon packs registry available where you can directly download icon packs from GitHub. You can also manually side-load your own icon pack bundles.
 
 The community icon packs registry has a large number of automatically generated packs from [Tilepad Iconify Icon Packs](https://github.com/TilePad/tilepad-iconify-icon-packs) which contains all the icon packs present on [Iconify](https://icon-sets.iconify.design/)
 
@@ -54,11 +54,11 @@ Although Tilepad is primarily designed for local use, it implements measures to 
 
 The following content is **securely transmitted** using **Diffie-Hellman key exchange over Curve25519**, with **XChaCha20-Poly1305** encryption over WebSocket:
 
-- Device approval and connection processes  
-- Triggering tile actions  
-- Communication between **Inspector ↔ Device ↔ Plugin**  
-- Communication between **Display ↔ Device ↔ Plugin**  
-- Loading of tiles  
+- Device approval and connection processes
+- Triggering tile actions
+- Communication between **Inspector ↔ Device ↔ Plugin**
+- Communication between **Display ↔ Device ↔ Plugin**
+- Loading of tiles
 
 ### 📄 Plain Text Content
 
@@ -67,9 +67,9 @@ The following content is **transmitted in plain text**:
 - Icon pack icons
 - Fonts
 - Plugin assets
-  - This includes iframes, displays, inspectors, and other plugin resources  
-  - **Note:** Plugin-to-device communication is **not** included here and is transmitted securely  
-- Plugin ↔ Inspector communication (local-only via loopback; does not leave the device)  
+  - This includes iframes, displays, inspectors, and other plugin resources
+  - **Note:** Plugin-to-device communication is **not** included here and is transmitted securely
+- Plugin ↔ Inspector communication (local-only via loopback; does not leave the device)
 
 Due to current technical limitations, the above assets cannot be served over an encrypted socket:
 

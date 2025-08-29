@@ -1,71 +1,68 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <style>
-        .row {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
 
-        .row .tile-input {
-            flex: auto;
-        }
+      .row .tile-input {
+        flex: auto;
+      }
     </style>
-</head>
+  </head>
 
-<body>
-
+  <body>
     <div class="tile-item">
-        <label class="tile-label" for="path">Folder Path</label>
-        <div class="row">
-            <input type="text" class="tile-input" name="path" id="path">
-            <button class="tile-button" id="pickFolderBtn">+</button>
-        </div>
-        <p class="tile-description">Path to the folder</p>
+      <label class="tile-label" for="path">Folder Path</label>
+      <div class="row">
+        <input type="text" class="tile-input" name="path" id="path" />
+        <button class="tile-button" id="pickFolderBtn">+</button>
+      </div>
+      <p class="tile-description">Path to the folder</p>
     </div>
+  </body>
 
-</body>
-
-<script>
+  <script>
     const pathInput = document.getElementById("path");
     const pickFolderBtn = document.getElementById("pickFolderBtn");
 
     // Request the current properties
-    tilepad.tile.getProperties()
-        // Handle properties received
-        .then((properties) => {
-            pathInput.value = properties.path ?? '';
-        })
+    tilepad.tile
+      .getProperties()
+      // Handle properties received
+      .then((properties) => {
+        pathInput.value = properties.path ?? "";
+      });
 
     // Handle the folder path changing
     pathInput.onchange = (event) => {
-        const value = event.target.value;
-        tilepad.tile.setProperty("path", value);
+      const value = event.target.value;
+      tilepad.tile.setProperty("path", value);
     };
 
     // Handle the pick folder button being used
     pickFolderBtn.onclick = () => {
-        // Request the picking of a folder from the plugin 
-        tilepad.plugin.send({
-            type: "PICK_FOLDER"
-        })
+      // Request the picking of a folder from the plugin
+      tilepad.plugin.send({
+        type: "PICK_FOLDER",
+      });
     };
 
     // Handle messages from plugin
     tilepad.plugin.onMessage((data) => {
-        switch (data.type) {
-            case "PICKED_FOLDER": {
-                tilepad.tile.setProperty("path", data.path);
-                pathInput.value = data.path;
-                break;
-            }
+      switch (data.type) {
+        case "PICKED_FOLDER": {
+          tilepad.tile.setProperty("path", data.path);
+          pathInput.value = data.path;
+          break;
         }
+      }
     });
-</script>
-
+  </script>
 </html>

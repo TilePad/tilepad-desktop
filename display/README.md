@@ -1,4 +1,4 @@
-<img src="../assets/tilepad-logo.svg" width="128px" height="auto" > 
+<img src="../assets/tilepad-logo.svg" width="128px" height="auto" >
 
 # Display
 

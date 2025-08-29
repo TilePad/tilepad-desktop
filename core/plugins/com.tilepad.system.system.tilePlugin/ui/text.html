@@ -1,75 +1,71 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <style>
-        .tile-input {
-            width: 100%;
-            resize: none;
-            overflow-y: hidden;
-        }
+      .tile-input {
+        width: 100%;
+        resize: none;
+        overflow-y: hidden;
+      }
     </style>
-</head>
+  </head>
 
-<body>
-
+  <body>
     <div class="tile-item">
-        <label class="tile-label" for="text">Text</label>
-        <textarea rows="1" class="tile-input" name="text" id="text"></textarea>
-        <p class="tile-description">Text to type out</p>
+      <label class="tile-label" for="text">Text</label>
+      <textarea rows="1" class="tile-input" name="text" id="text"></textarea>
+      <p class="tile-description">Text to type out</p>
     </div>
+  </body>
 
-</body>
-
-<script>
+  <script>
     const text = document.getElementById("text");
-    text.setAttribute('disabled', 'true')
+    text.setAttribute("disabled", "true");
 
     updateTextHeight();
 
     function updateTextHeight() {
-        text.style.height = "auto";
-        text.style.height = text.scrollHeight + "px";
+      text.style.height = "auto";
+      text.style.height = text.scrollHeight + "px";
     }
 
     // Request the current properties
-    tilepad.tile.getProperties()
-        // Handle properties received
-        .then((properties) => {
-            text.removeAttribute('disabled');
-            text.value = properties.text ?? '';
-            updateTextHeight();
-        })
+    tilepad.tile
+      .getProperties()
+      // Handle properties received
+      .then((properties) => {
+        text.removeAttribute("disabled");
+        text.value = properties.text ?? "";
+        updateTextHeight();
+      });
 
     text.oninput = (event) => {
-        const value = event.target.value;
-        onChange(value);
-        updateTextHeight();
+      const value = event.target.value;
+      onChange(value);
+      updateTextHeight();
     };
 
     const onChange = debounce((value) => {
-        tilepad.tile.setProperty("text", value);
-    }, 300)
+      tilepad.tile.setProperty("text", value);
+    }, 300);
 
     function debounce(fn, delay) {
-        let timeoutId;
+      let timeoutId;
 
-        return function (...args) {
-            // Clear the previous timeout
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-            }
+      return function (...args) {
+        // Clear the previous timeout
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
 
-            // Set a new timeout with the specified delay
-            timeoutId = setTimeout(() => {
-                fn.apply(this, args);
-            }, delay);
-        };
+        // Set a new timeout with the specified delay
+        timeoutId = setTimeout(() => {
+          fn.apply(this, args);
+        }, delay);
+      };
     }
-
-</script>
-
+  </script>
 </html>

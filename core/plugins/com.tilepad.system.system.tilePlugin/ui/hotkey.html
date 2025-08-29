@@ -1,162 +1,162 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-
-<body>
-
+  <body>
     <div class="tile-item">
-        <button id="recordBtn" class="tile-button">Record</button>
-        <p class="tile-description">Press record then press the keys that the hotkey should trigger</p>
+      <button id="recordBtn" class="tile-button">Record</button>
+      <p class="tile-description">
+        Press record then press the keys that the hotkey should trigger
+      </p>
     </div>
+  </body>
 
-</body>
-
-<script>
+  <script>
     const recordBtn = document.getElementById("recordBtn");
-    const modifierKeys = ['Control', 'Shift', 'Alt', 'Meta']
+    const modifierKeys = ["Control", "Shift", "Alt", "Meta"];
 
     let recording = false;
     let currentKeys = [];
 
     function addKey(code, display) {
-        if (currentKeys.find((key) => key.code === code) !== undefined) return;
-        currentKeys.push({ code, display })
+      if (currentKeys.find((key) => key.code === code) !== undefined) return;
+      currentKeys.push({ code, display });
     }
 
     function removeKey(code) {
-        currentKeys = currentKeys.filter((key) => key.code === code);
+      currentKeys = currentKeys.filter((key) => key.code === code);
     }
 
     // Request the current properties
-    tilepad.tile.getProperties()
-        // Handle properties received
-        .then((properties) => {
-            const keys = properties.keys;
-            if (!keys) return;
+    tilepad.tile
+      .getProperties()
+      // Handle properties received
+      .then((properties) => {
+        const keys = properties.keys;
+        if (!keys) return;
 
-            for (const modifier of keys.modifiers) {
-                addKey(modifier.code, modifier.display)
-            }
+        for (const modifier of keys.modifiers) {
+          addKey(modifier.code, modifier.display);
+        }
 
-            for (const key of keys.keys) {
-                addKey(key.code, key.display)
-            }
+        for (const key of keys.keys) {
+          addKey(key.code, key.display);
+        }
 
-            onUpdateLabel()
-        })
+        onUpdateLabel();
+      });
 
     recordBtn.onclick = () => {
-        recording = !recording;
-        if (recording) {
-            onBeginRecording()
-        } else {
-            onEndRecording();
-        }
-    }
-
+      recording = !recording;
+      if (recording) {
+        onBeginRecording();
+      } else {
+        onEndRecording();
+      }
+    };
 
     function onKeyDown(event) {
-        const { keyCode, key } = event;
+      const { keyCode, key } = event;
 
-        event.preventDefault();
+      event.preventDefault();
 
-        addKey(keyCode, key);
-        onUpdateLabel()
+      addKey(keyCode, key);
+      onUpdateLabel();
 
-        // End when a non modifier key is pressed
-        if (!modifierKeys.includes(key)) {
-            onEndRecording()
-        }
+      // End when a non modifier key is pressed
+      if (!modifierKeys.includes(key)) {
+        onEndRecording();
+      }
     }
 
     function onUpdateLabel() {
-        if (recording) {
-            if (currentKeys.length > 0) {
-                const label = getDisplayLabel(currentKeys);
-                recordBtn.textContent = `Current Hotkey: ${label}`;
-            } else {
-                recordBtn.textContent = "Recording... press your key combination"
-            }
+      if (recording) {
+        if (currentKeys.length > 0) {
+          const label = getDisplayLabel(currentKeys);
+          recordBtn.textContent = `Current Hotkey: ${label}`;
         } else {
-            if (currentKeys.length > 0) {
-                const label = getDisplayLabel(currentKeys);
-                recordBtn.textContent = `Hotkey: ${label}`;
-            } else {
-                recordBtn.textContent = "Record";
-            }
+          recordBtn.textContent = "Recording... press your key combination";
         }
+      } else {
+        if (currentKeys.length > 0) {
+          const label = getDisplayLabel(currentKeys);
+          recordBtn.textContent = `Hotkey: ${label}`;
+        } else {
+          recordBtn.textContent = "Record";
+        }
+      }
     }
 
     function onKeyUp(event) {
-        const { keyCode } = event;
-        removeKey(keyCode)
+      const { keyCode } = event;
+      removeKey(keyCode);
 
-        onUpdateLabel()
+      onUpdateLabel();
     }
 
-
     function onBeginRecording() {
-        window.addEventListener("keydown", onKeyDown)
-        window.addEventListener('keyup', onKeyUp);
+      window.addEventListener("keydown", onKeyDown);
+      window.addEventListener("keyup", onKeyUp);
 
-        currentKeys = [];
-        onUpdateLabel()
+      currentKeys = [];
+      onUpdateLabel();
     }
 
     function onEndRecording() {
-        window.removeEventListener("keydown", onKeyDown)
-        window.removeEventListener('keyup', onKeyUp);
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
 
-        if (currentKeys.size < 1) {
-            recording = false;
-            onChangeKeys([]);
-            onUpdateLabel();
-            return;
-        }
-
-        onChangeKeys(currentKeys);
+      if (currentKeys.size < 1) {
+        recording = false;
+        onChangeKeys([]);
         onUpdateLabel();
+        return;
+      }
 
-        currentKeys = [];
+      onChangeKeys(currentKeys);
+      onUpdateLabel();
+
+      currentKeys = [];
     }
 
     function getDisplayLabel(keys) {
-        const { modifiers, others } = getKeys(keys);
-        return [...modifiers.map((key) => key.display), ...others.map((key) => key.display)].join(' + ');
+      const { modifiers, others } = getKeys(keys);
+      return [
+        ...modifiers.map((key) => key.display),
+        ...others.map((key) => key.display),
+      ].join(" + ");
     }
 
     function getKeys(keys) {
-        const modifiers = [];
-        const others = [];
+      const modifiers = [];
+      const others = [];
 
-        for (const key of keys) {
-            if (modifierKeys.includes(key.display)) {
-                modifiers.push(key)
-            } else {
-                others.push(key)
-            }
+      for (const key of keys) {
+        if (modifierKeys.includes(key.display)) {
+          modifiers.push(key);
+        } else {
+          others.push(key);
         }
+      }
 
-        return { modifiers, others }
+      return { modifiers, others };
     }
 
     function onChangeKeys(keys) {
-        const { modifiers, others } = getKeys(keys);
+      const { modifiers, others } = getKeys(keys);
 
-        if (modifiers.length < 1 || others.length < 1) {
-            tilepad.tile.setProperty("keys", null);
-            return;
-        }
+      if (modifiers.length < 1 || others.length < 1) {
+        tilepad.tile.setProperty("keys", null);
+        return;
+      }
 
-        tilepad.tile.setProperty("keys", {
-            modifiers,
-            keys: others,
-        });
+      tilepad.tile.setProperty("keys", {
+        modifiers,
+        keys: others,
+      });
     }
-</script>
-
+  </script>
 </html>

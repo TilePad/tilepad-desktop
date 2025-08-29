@@ -8,3 +8,5 @@ bun.lockb
 # Miscellaneous
 /static/
 /src-tauri/
+
+THIRD_PARTY_LICENSES.md

@@ -273,16 +273,16 @@
 }
 
 :where(
-    [data-sonner-toast][data-y-position="top"][data-swiping="true"]
-  )::before {
+  [data-sonner-toast][data-y-position="top"][data-swiping="true"]
+)::before {
   /* y 50% needed to distribute height additional height evenly */
   bottom: 50%;
   transform: scaleY(3) translateY(50%);
 }
 
 :where(
-    [data-sonner-toast][data-y-position="bottom"][data-swiping="true"]
-  )::before {
+  [data-sonner-toast][data-y-position="bottom"][data-swiping="true"]
+)::before {
   /* y -50% needed to distribute height additional height evenly */
   top: 50%;
   transform: scaleY(3) translateY(-50%);

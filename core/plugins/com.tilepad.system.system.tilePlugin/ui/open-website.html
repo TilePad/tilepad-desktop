@@ -1,37 +1,36 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-
-<body>
-
+  <body>
     <div class="tile-item">
-        <label class="tile-label" for="website">Website URL</label>
-        <input type="url" class="tile-input" name="website" id="website">
-        <p class="tile-description">URL of the website that will open when the tile is clicked</p>
+      <label class="tile-label" for="website">Website URL</label>
+      <input type="url" class="tile-input" name="website" id="website" />
+      <p class="tile-description">
+        URL of the website that will open when the tile is clicked
+      </p>
     </div>
+  </body>
 
-</body>
-
-<script>
+  <script>
     const website = document.getElementById("website");
-    website.setAttribute('disabled', 'true')
+    website.setAttribute("disabled", "true");
 
     // Request the current properties
-    tilepad.tile.getProperties()
-        // Handle properties received
-        .then((properties) => {
-            website.removeAttribute('disabled');
-            website.value = properties.url ?? '';
-        })
+    tilepad.tile
+      .getProperties()
+      // Handle properties received
+      .then((properties) => {
+        website.removeAttribute("disabled");
+        website.value = properties.url ?? "";
+      });
 
     website.onchange = (event) => {
-        const value = event.target.value;
-        tilepad.tile.setProperty("url", value);
+      const value = event.target.value;
+      tilepad.tile.setProperty("url", value);
     };
-</script>
-
+  </script>
 </html>
