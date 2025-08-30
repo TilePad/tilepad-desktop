@@ -1,4 +1,4 @@
-<script module>
+<script module lang="ts">
   const currentProfileKey = "currentProfileId";
 
   const profileStore = new Context<ProfileContext>("profileStore");

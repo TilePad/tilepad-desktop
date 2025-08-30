@@ -1,4 +1,4 @@
-<script module>
+<script module lang="ts">
   const currentFolderKey = "currentFolderId";
   const folderStore = new Context<FolderContext>("folderStore");
 
