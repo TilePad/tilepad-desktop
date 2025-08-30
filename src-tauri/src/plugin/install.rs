@@ -162,11 +162,12 @@ pub async fn install_plugin_requirements(
         .await
         .context("downloading node runtime")?;
 
-    let exe_path = output_path.join("node.exe");
-
     #[cfg(unix)]
-    crate::utils::file::make_file_executable(&exe_path)
-        .context("failed to make node runtime executable")?;
+    {
+        let exe_path = output_path.join("node.exe");
+        crate::utils::file::make_file_executable(&exe_path)
+            .context("failed to make node runtime executable")?;
+    }
 
     Ok(())
 }
