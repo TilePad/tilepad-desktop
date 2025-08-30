@@ -62,7 +62,7 @@ async_zip = { version = "=0.0.18", features = ["full", "tokio"] }
 
 # Tracing / logging
 tracing = { version = "=0.1.41", features = ["log"] }
-tracing-subscriber = { version = "=0.3.19", features = ["env-filter", "json"] }
+tracing-subscriber = { version = "=0.3.20", features = ["env-filter", "json"] }
 tracing-appender = "=0.2.3"
 
 # Rolling files for logging efficiently
