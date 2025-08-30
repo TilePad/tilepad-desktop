@@ -197,6 +197,14 @@ where
     // Starting the exe
     task_state.on_change_state(PluginTaskState::Starting);
 
+    // On unix platforms the file must be made executable
+    #[cfg(unix)]
+    if let Err(error) = crate::utils::file::make_file_executable(&exe_path) {
+        tracing::error!(?error, "failed to make plugin executable");
+        task_state.on_change_state(PluginTaskState::Error);
+        return state;
+    }
+
     let mut cmd = Command::new(exe_path);
 
     // Windows creation flag to prevent showing windows for the process

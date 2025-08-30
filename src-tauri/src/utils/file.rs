@@ -68,3 +68,14 @@ pub async fn copy_dir_all(src: &Path, dst: &Path) -> anyhow::Result<()> {
 
     Ok(())
 }
+
+/// On unix systems the file must first be made executable
+#[cfg(unix)]
+pub fn make_file_executable(path: &Path) -> std::io::Result<()> {
+    use std::os::unix::fs::PermissionsExt;
+
+    let metadata = std::fs::metadata(path)?;
+    let mut perm = metadata.permissions();
+    perm.set_mode(0o755); // rwxr-xr-x
+    std::fs::set_permissions(path, perm)
+}

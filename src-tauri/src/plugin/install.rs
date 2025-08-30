@@ -11,7 +11,10 @@ use tokio::{
     io::BufReader,
 };
 
-use crate::utils::zip::{create_zip_reader, extract_zip};
+use crate::utils::{
+    file::make_file_executable,
+    zip::{create_zip_reader, extract_zip},
+};
 
 use super::node::{download_node, get_node_versions};
 
@@ -158,9 +161,13 @@ pub async fn install_plugin_requirements(
 
     let os = OperatingSystem::default();
     let arch = Arch::default();
-    download_node(&client, output_path, matching.version, os, arch)
+    download_node(&client, &output_path, matching.version, os, arch)
         .await
         .context("downloading node runtime")?;
+
+    let exe_path = output_path.join("node.exe");
+
+    make_file_executable(&exe_path).context("failed to make node runtime executable")?;
 
     Ok(())
 }
