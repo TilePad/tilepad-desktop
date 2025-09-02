@@ -28,10 +28,10 @@ async fn write_private_key(path: &Path, private_key: &StaticSecret) -> std::io::
     let key_bytes = private_key.as_bytes();
 
     // Create parent path if missing
-    if let Some(parent) = path.parent() {
-        if !parent.exists() {
-            tokio::fs::create_dir_all(parent).await?;
-        }
+    if let Some(parent) = path.parent()
+        && !parent.exists()
+    {
+        tokio::fs::create_dir_all(parent).await?;
     }
 
     tokio::fs::write(path, key_bytes).await?;

@@ -103,11 +103,11 @@ impl DeviceSession {
         spawn(async move {
             if let Err(cause) = ws_future.await {
                 // Handle device connection lost as just a warning
-                if let Some(cause_io) = try_cast_error::<std::io::Error>(&cause) {
-                    if cause_io.kind() == ErrorKind::ConnectionReset {
-                        tracing::warn!(?cause_io, "plugin connection closed");
-                        return;
-                    }
+                if let Some(cause_io) = try_cast_error::<std::io::Error>(&cause)
+                    && cause_io.kind() == ErrorKind::ConnectionReset
+                {
+                    tracing::warn!(?cause_io, "plugin connection closed");
+                    return;
                 }
 
                 error!(?cause, "error running device websocket future");

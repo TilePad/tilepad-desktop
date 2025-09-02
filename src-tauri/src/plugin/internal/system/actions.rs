@@ -148,11 +148,11 @@ pub async fn handle(
                 system.refresh_processes(ProcessesToUpdate::All, true);
 
                 for process in system.processes().values() {
-                    if let Some(exe_path) = process.exe() {
-                        if exe_path == path {
-                            tracing::debug!(?process, ?exe_path, "stopping program at path");
-                            let _ = process.kill();
-                        }
+                    if let Some(exe_path) = process.exe()
+                        && exe_path == path
+                    {
+                        tracing::debug!(?process, ?exe_path, "stopping program at path");
+                        let _ = process.kill();
                     }
                 }
 
