@@ -8,19 +8,23 @@ import {
   installPluginBuffer,
 } from "../plugins/plugins.requests";
 
-export function createInstallPluginFromRegistry() {
-  return createMutation(() => ({
-    mutationFn: async ({
-      repo,
-      version,
-    }: {
-      repo: string;
-      version: string;
-    }) => {
-      const bundle = await getPluginBundle(repo, version);
-      await installPluginBuffer(bundle);
-    },
-  }));
+export function createInstallPluginFromRegistry(pluginId: () => string) {
+  return createMutation(() => {
+    const id = pluginId();
+    return {
+      mutationKey: ["install-plugin", id],
+      mutationFn: async ({
+        repo,
+        version,
+      }: {
+        repo: string;
+        version: string;
+      }) => {
+        const bundle = await getPluginBundle(repo, version);
+        await installPluginBuffer(bundle);
+      },
+    };
+  });
 }
 
 export function createUpdatePlugin() {

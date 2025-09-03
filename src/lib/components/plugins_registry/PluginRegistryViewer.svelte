@@ -33,7 +33,7 @@
   const manifestQuery = createPluginManifestQuery(() => item.repo);
   const readmeQuery = createPluginReadmeQuery(() => item.repo);
 
-  const install = createInstallPluginFromRegistry();
+  const install = createInstallPluginFromRegistry(() => item.id);
   const uninstall = createUninstallPlugin();
   const update = createUpdatePlugin();
 

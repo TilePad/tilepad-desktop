@@ -101,12 +101,14 @@
 
       <div class="viewer">
         {#if active}
-          <PluginRegistryViewer
-            item={active}
-            installed={pluginsQuery.data.find(
-              (plugin) => plugin.manifest.plugin.id === active!.id,
-            )?.manifest}
-          />
+          {#key active.id}
+            <PluginRegistryViewer
+              item={active}
+              installed={pluginsQuery.data.find(
+                (plugin) => plugin.manifest.plugin.id === active!.id,
+              )?.manifest}
+            />
+          {/key}
         {/if}
       </div>
     </div>
