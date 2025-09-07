@@ -36,7 +36,10 @@
       "../core/": "core/",
       "../THIRD_PARTY_LICENSES.md": "THIRD_PARTY_LICENSES.md"
     },
-    "createUpdaterArtifacts": true
+    "createUpdaterArtifacts": true,
+    "macOS": {
+        "signingIdentity": "-"
+    }
   },
   "plugins": {
     "deep-link": {
