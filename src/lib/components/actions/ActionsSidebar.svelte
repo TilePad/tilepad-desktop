@@ -1,14 +1,18 @@
 <script lang="ts">
   import type { PluginId } from "$lib/api/types/plugin";
 
+  import { fade } from "svelte/transition";
   import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { getErrorMessage } from "$lib/api/utils/error";
   import { persistedState } from "$lib/utils/localStorage.svelte";
   import SolarAltArrowLeftOutline from "~icons/solar/alt-arrow-left-outline";
   import SolarAltArrowRightOutline from "~icons/solar/alt-arrow-right-outline";
+  import SolarTrashBinTrashBoldDuotone from "~icons/solar/trash-bin-trash-bold-duotone";
 
   import Aside from "../Aside.svelte";
+  import Button from "../input/Button.svelte";
   import SkeletonList from "../skeleton/SkeletonList.svelte";
+  import { getDraggingContext } from "../tiles/TileDraggingProvider.svelte";
   import ActionsSidebarCategory, {
     type ActionCategoryData,
   } from "./ActionCategory.svelte";
@@ -27,6 +31,20 @@
   const { actions, actionsError, actionsLoading }: Props = $props();
 
   const i18n = i18nContext.get();
+  const { draggingState, dropZoneTarget } = getDraggingContext();
+
+  // Existing tile is currently held over the sidebar preparing to delete
+  const isDroppingTileDelete = $derived.by(() => {
+    const dragging = draggingState();
+    const dropZone = dropZoneTarget();
+
+    return (
+      dropZone &&
+      dropZone.type === "sidebar" &&
+      dragging &&
+      dragging.data.type === "tile"
+    );
+  });
 
   const actionSidebarState = persistedState<ActionSidebarState>(
     "actionSidebarState",
@@ -89,7 +107,11 @@
   }
 </script>
 
-<div class="sidebar" class:sidebar--expanded={sidebarExpanded}>
+<div
+  class="sidebar"
+  class:sidebar--expanded={sidebarExpanded}
+  data-drop-zone="sidebar"
+>
   <button class="sidebar-expand" onclick={onToggleExpanded}>
     {#if sidebarExpanded}
       <SolarAltArrowRightOutline />
@@ -134,9 +156,30 @@
       {/each}
     {/if}
   </div>
+
+  {#if isDroppingTileDelete}
+    <div class="drop-delete" transition:fade={{ duration: 100 }}>
+      <Button transparent variant="default" size="icon">
+        <SolarTrashBinTrashBoldDuotone width={64} height={64} />
+      </Button>
+    </div>
+  {/if}
 </div>
 
 <style>
+  .drop-delete {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #33333390;
+  }
+
   .sidebar {
     position: relative;
     flex-shrink: 0;

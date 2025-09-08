@@ -17,7 +17,11 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof TileGrid>)}
-  <TileDraggingProvider onMoveTile={() => {}} onPlaceTile={() => {}}>
+  <TileDraggingProvider
+    onMoveTile={() => {}}
+    onPlaceTile={() => {}}
+    onDeleteTile={() => {}}
+  >
     <div style="width: 900px; height: 900px">
       <TileGrid {...args} onClickTile={() => {}} />
     </div>

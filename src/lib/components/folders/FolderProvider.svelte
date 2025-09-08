@@ -42,10 +42,10 @@
   } from "../profiles/ProfilesProvider.svelte";
 
   type Props = {
-    content?: Snippet<[{ folder: FolderModel }]> | undefined;
+    children?: Snippet;
   };
 
-  const { content }: Props = $props();
+  const { children }: Props = $props();
 
   const i18n = i18nContext.get();
 
@@ -157,5 +157,5 @@
     })}
   </Aside>
 {:else if (createFolder.isIdle || createFolder.isSuccess) && foldersQuery.isSuccess && folderQuery.isSuccess && folder}
-  {@render content?.({ folder })}
+  {@render children?.()}
 {/if}

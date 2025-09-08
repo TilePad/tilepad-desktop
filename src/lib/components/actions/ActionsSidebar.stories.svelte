@@ -16,7 +16,11 @@
 </script>
 
 {#snippet template(args: ComponentProps<typeof ActionsSidebar>)}
-  <TileDraggingProvider onMoveTile={() => {}} onPlaceTile={() => {}}>
+  <TileDraggingProvider
+    onMoveTile={() => {}}
+    onPlaceTile={() => {}}
+    onDeleteTile={() => {}}
+  >
     <ActionsSidebar {...args} />
   </TileDraggingProvider>
 {/snippet}

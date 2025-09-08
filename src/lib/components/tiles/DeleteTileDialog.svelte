@@ -16,15 +16,21 @@
   type Props = DialogProps & {
     tile: TileModel;
     onClose: VoidFunction;
+
+    /**
+     * Whether the dialog is automatically opened as soon as its mounted as opposed
+     * to showing the button to open it
+     */
+    alwaysOpen?: boolean;
   };
 
-  let { tile, onClose }: Props = $props();
+  let { tile, onClose, alwaysOpen }: Props = $props();
+
+  let open = $state(alwaysOpen ?? false);
 
   const i18n = i18nContext.get();
 
   const deleteTile = createDeleteTileMutation();
-
-  let open = $state(false);
 
   function onDelete() {
     if (!tile) return;
@@ -45,11 +51,20 @@
   }
 </script>
 
-<Dialog bind:open>
+<Dialog
+  bind:open
+  onOpenChange={(value) => {
+    if (!value) {
+      onClose();
+    }
+  }}
+>
   {#snippet button({ props })}
-    <Button transparent variant="error" size="icon" {...props}>
-      <SolarTrashBinTrashBoldDuotone width={24} height={24} />
-    </Button>
+    {#if !alwaysOpen}
+      <Button transparent variant="error" size="icon" {...props}>
+        <SolarTrashBinTrashBoldDuotone width={24} height={24} />
+      </Button>
+    {/if}
   {/snippet}
 
   {#snippet title()}

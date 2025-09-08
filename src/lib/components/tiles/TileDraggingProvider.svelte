@@ -29,7 +29,8 @@
         type: "filledTile";
         row: number;
         column: number;
-      };
+      }
+    | { type: "sidebar" };
 
   type TileDraggingContext = {
     draggingState(): DraggingState | null;
@@ -54,6 +55,7 @@
 
   type Props = {
     onMoveTile: (tileId: TileId, row: number, column: number) => void;
+    onDeleteTile: (tileId: TileId) => void;
     onPlaceTile: (
       pluginId: PluginId,
       actionId: ActionId,
@@ -64,7 +66,7 @@
     children?: Snippet;
   };
 
-  const { onMoveTile, onPlaceTile, children }: Props = $props();
+  const { onMoveTile, onDeleteTile, onPlaceTile, children }: Props = $props();
 
   let dropZoneTarget: DropZoneTarget | null = $state(null);
   let draggingState: DraggingState | null = $state(null);
@@ -155,6 +157,13 @@
 
     // Extract drop zone state
     const dropZone = dropZoneElement.getAttribute("data-drop-zone");
+    if (dropZone === "sidebar") {
+      dropZoneTarget = {
+        type: dropZone,
+      };
+      return;
+    }
+
     const rowRaw = dropZoneElement.getAttribute("data-row");
     const columnRaw = dropZoneElement.getAttribute("data-column");
     if (dropZone === null || rowRaw === null || columnRaw === null) {
@@ -182,15 +191,26 @@
   function handlePointerUp() {
     if (draggingState === null) return;
 
-    if (dropZoneTarget !== null && dropZoneTarget.type === "emptyTile") {
-      const { row, column } = dropZoneTarget;
+    if (dropZoneTarget !== null) {
+      // Dragging in actions and moving existing tiles
+      if (dropZoneTarget.type === "emptyTile") {
+        const { row, column } = dropZoneTarget;
 
-      if (draggingState.data.type === "tile") {
+        if (draggingState.data.type === "tile") {
+          const { data } = draggingState;
+          onMoveTile(data.tileId, row, column);
+        } else if (draggingState.data.type === "action") {
+          const { data } = draggingState;
+          onPlaceTile(data.pluginId, data.actionId, row, column);
+        }
+      }
+      // Dragged existing tile to sidebar (Removing)
+      else if (
+        dropZoneTarget.type === "sidebar" &&
+        draggingState.data.type === "tile"
+      ) {
         const { data } = draggingState;
-        onMoveTile(data.tileId, row, column);
-      } else if (draggingState.data.type === "action") {
-        const { data } = draggingState;
-        onPlaceTile(data.pluginId, data.actionId, row, column);
+        onDeleteTile(data.tileId);
       }
     }
 
