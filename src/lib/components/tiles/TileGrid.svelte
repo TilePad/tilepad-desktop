@@ -34,7 +34,7 @@
     const left = (containerWidth - spannedWidth) / 2;
 
     return {
-      tileSize,
+      tileSize: Math.max(tileSize, 0),
       width: spannedWidth,
       height: spannedHeight,
       left,
