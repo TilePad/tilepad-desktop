@@ -135,6 +135,7 @@
 <style>
   .grid {
     position: relative;
+    overflow: hidden;
   }
 
   .container {
