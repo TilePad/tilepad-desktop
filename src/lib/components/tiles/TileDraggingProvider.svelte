@@ -17,6 +17,8 @@
     initialY: number;
     // Data
     data: DraggingData;
+    // Whether the shift key was held
+    shiftKey: boolean;
   };
 
   type DropZoneTarget =
@@ -55,7 +57,7 @@
 
   type Props = {
     onMoveTile: (tileId: TileId, row: number, column: number) => void;
-    onDeleteTile: (tileId: TileId) => void;
+    onDeleteTile: (tileId: TileId, shiftKey: boolean) => void;
     onPlaceTile: (
       pluginId: PluginId,
       actionId: ActionId,
@@ -100,6 +102,7 @@
       initialX: event.clientX - previewRect.left,
       initialY: event.clientY - previewRect.top,
       data,
+      shiftKey: event.shiftKey,
     };
 
     // Setup initial preview styles
@@ -210,7 +213,7 @@
         draggingState.data.type === "tile"
       ) {
         const { data } = draggingState;
-        onDeleteTile(data.tileId);
+        onDeleteTile(data.tileId, draggingState.shiftKey);
       }
     }
 

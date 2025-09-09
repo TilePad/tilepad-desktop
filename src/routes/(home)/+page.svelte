@@ -36,6 +36,7 @@
   import {
     createTilesQuery,
     createCreateTileMutation,
+    createDeleteTileMutation,
     createUpdateTilePositionMutation,
   } from "$lib/api/tiles";
 
@@ -63,6 +64,7 @@
   const tiles = $derived(tilesQuery.data ?? []);
 
   const createTile = createCreateTileMutation();
+  const deleteTileMutation = createDeleteTileMutation();
   const updateTilePosition = createUpdateTilePositionMutation();
 
   const currentServerContext = serverContext.get();
@@ -190,8 +192,21 @@
   onPlaceTile={(pluginId, actionId, row, column) => {
     onPlaceTile(currentFolder.id, pluginId, actionId, row, column);
   }}
-  onDeleteTile={(tileId) => {
-    deleteTileId = tileId;
+  onDeleteTile={(tileId, shiftKey) => {
+    if (shiftKey) {
+      const deletePromise = deleteTileMutation.mutateAsync({
+        tileId,
+        folderId: currentFolder.id,
+      });
+
+      toast.promise(deletePromise, {
+        loading: i18n.f("tile_deleting"),
+        success: i18n.f("tile_deleted"),
+        error: toastErrorMessage(i18n.f("tile_delete_error")),
+      });
+    } else {
+      deleteTileId = tileId;
+    }
   }}
 >
   <div class="layout">
