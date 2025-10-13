@@ -33,6 +33,8 @@
     "tilepad",
     "getrandom",
     "macropad",
-    "Jacobtread"
+    "Jacobtread",
+    "unplugin",
+    "iconify"
   ]
 }
