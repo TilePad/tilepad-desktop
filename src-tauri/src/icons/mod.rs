@@ -79,7 +79,7 @@ impl Icons {
 
         let pack_ids: Vec<IconPackId> = packs
             .iter()
-            .map(|pack| (pack.manifest.icons.id.clone()))
+            .map(|pack| pack.manifest.icons.id.clone())
             .collect();
 
         tracing::debug!(?pack_ids, "loaded icon packs");
