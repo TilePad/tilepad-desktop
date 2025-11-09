@@ -72,8 +72,8 @@
     "typescript": "5.8.3",
     "typescript-eslint": "8.46.1",
     "unplugin-icons": "22.4.2",
-    "vite": "7.1.9",
-    "vitest": "^3.2.4"
+    "vite": "7.2.2",
+    "vitest": "4.0.8"
   },
   "overrides": {
     "@sveltejs/kit": {
