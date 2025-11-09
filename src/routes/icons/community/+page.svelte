@@ -17,8 +17,13 @@
   const iconRegistryQuery = createIconPackRegistryQuery();
   const iconPacksQuery = createIconPacksQuery();
 
-  let active: IconRegistryEntry | undefined = $state(undefined);
   let search = $state("");
+  let activeId: string | null = $state(null);
+
+  const active = $derived.by(() => {
+    if (!activeId || !iconRegistryQuery.data) return undefined;
+    return iconRegistryQuery.data.find((plugin) => plugin.id === activeId);
+  });
 
   const filteredRegistry = $derived(
     filterIconPacks(iconRegistryQuery.data ?? [], search),
@@ -73,8 +78,11 @@
       })}
     </Aside>
   {:else if iconPacksQuery.isSuccess}
-    <div class="plugins-wrapper">
-      <div class="plugins-list">
+    <div
+      class="plugins-wrapper"
+      class:plugins-wrapper--split={activeId !== null}
+    >
+      <div class="plugins-list" class:plugins-list--split={activeId !== null}>
         {#each filteredRegistry as item (item.id)}
           <IconsRegistryItem
             name={item.name}
@@ -83,9 +91,9 @@
             repo={item.repo}
             onClick={() => {
               if (active !== undefined && active.id === item.id) {
-                active = undefined;
+                activeId = null;
               } else {
-                active = item;
+                activeId = item.id;
               }
             }}
             installed={iconPacksQuery.data.find(
@@ -98,18 +106,18 @@
         {/each}
       </div>
 
-      <div class="viewer">
-        {#if active}
-          {#key active}
+      {#if active}
+        {#key active}
+          <div class="viewer">
             <IconsRegistryViewer
               item={active}
               installed={iconPacksQuery.data.find(
                 (plugin) => plugin.manifest.icons.id === active!.id,
               )?.manifest}
             />
-          {/key}
-        {/if}
-      </div>
+          </div>
+        {/key}
+      {/if}
     </div>
   {/if}
 </div>
@@ -130,12 +138,6 @@
     justify-content: space-between;
   }
 
-  .viewer {
-    height: 100%;
-    overflow: auto;
-    flex: auto;
-  }
-
   .search {
     padding: 0.5rem;
     background-color: #1f1d22;
@@ -146,36 +148,6 @@
     display: flex;
     gap: 0.5rem;
     flex: auto;
-  }
-
-  .plugins-list {
-    display: flex;
-    gap: 0.5rem;
-    flex-direction: column;
-    flex: auto;
-    overflow: auto;
-    height: 100%;
-  }
-
-  .plugins-wrapper {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 24rem 1fr;
-    height: 100%;
-    overflow: hidden;
-  }
-
-  .plugins-list {
-    display: block;
-    gap: 0.5rem;
-    overflow: auto;
-    width: 100%;
-    padding: 0 1rem;
-    height: 100%;
-  }
-
-  .plugins-list:global(> .item) {
-    margin-bottom: 1rem;
   }
 
   .nav {
@@ -206,5 +178,50 @@
   .tab--active {
     background: var(--tp-bg-tertiary);
     border-bottom: 2px solid var(--tp-text-primary);
+  }
+
+  .plugins-list {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(400px, max(200px, 100%)), 1fr)
+    );
+    gap: var(--tp-space-4);
+    padding: var(--tp-space-4);
+    padding-top: 0;
+  }
+
+  .plugins-wrapper {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+  }
+
+  .plugins-wrapper--split {
+    display: grid;
+    grid-template-columns: 24rem 1fr;
+    overflow: hidden;
+  }
+
+  .plugins-list--split {
+    flex: auto;
+    display: block;
+    gap: 0.5rem;
+    overflow: auto;
+    width: 100%;
+    padding: 0 1rem;
+    height: 100%;
+  }
+
+  .plugins-list--split:global(> .item) {
+    margin-bottom: 1rem;
+  }
+
+  .viewer {
+    height: 100%;
+    overflow: auto;
+    flex: auto;
   }
 </style>
