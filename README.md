@@ -1,7 +1,5 @@
 <img src="./assets/tilepad-logo.svg" width="256px" height="auto" >
 
-> ⚠️ WIP: TilePad is currently under active development.
-
 ![License](https://img.shields.io/github/license/tilepad/tilepad-desktop?style=for-the-badge)
 
 ## 🚀 What is TilePad?
