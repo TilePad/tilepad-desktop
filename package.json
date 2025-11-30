@@ -44,7 +44,7 @@
     "runed": "0.35.0",
     "semver-ts": "1.0.3",
     "svelte-awesome-color-picker": "4.0.2",
-    "svelte-sonner": "1.0.5"
+    "svelte-sonner": "1.0.6"
   },
   "devDependencies": {
     "@eslint/compat": "^1.4.0",
