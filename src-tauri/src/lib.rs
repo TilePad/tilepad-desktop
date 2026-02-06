@@ -8,7 +8,6 @@ use fonts::Fonts;
 use icons::Icons;
 use plugin::Plugins;
 use server::{ServerPort, create_http_socket};
-use std::path::PathBuf;
 use tauri::{
     App, AppHandle, Manager, RunEvent,
     async_runtime::{block_on, spawn},
@@ -357,7 +356,7 @@ fn on_deep_link(plugins: &Arc<Plugins>, event: OpenUrlEvent) {
 /// because tauri does not automatically update these files unless you
 /// touch some source code in the main project and cause a re-build
 #[cfg(debug_assertions)]
-fn debug_core_resources_path() -> PathBuf {
+fn debug_core_resources_path() -> std::path::PathBuf {
     let manifest_dir = std::env::var("CARGO_MANIFEST_DIR")
         .expect("CARGO_MANIFEST_DIR environment variable missing");
 
