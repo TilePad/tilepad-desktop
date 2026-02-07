@@ -14,7 +14,7 @@ export function debounce<T extends (...args: any[]) => any>(
 ) {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
-  return function (...args: Parameters<T>) {
+  return function (this: any, ...args: Parameters<T>) {
     // Clear the previous timeout
     if (timeoutId) {
       clearTimeout(timeoutId);
