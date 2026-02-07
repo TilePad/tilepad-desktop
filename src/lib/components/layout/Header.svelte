@@ -1,13 +1,13 @@
 <script lang="ts">
+  import { resolve } from "$app/paths";
   import { i18nContext } from "$lib/i18n/i18n.svelte";
   import tilepadLogo from "$lib/assets/tilepad-logo.svg";
+  import NavButton from "$lib/components/layout/NavButton.svelte";
   import SolarDevicesBoldDuotone from "~icons/solar/devices-bold-duotone";
   import SolarSettingsBoldDuotone from "~icons/solar/settings-bold-duotone";
   import SolarPlugCircleBoldDuotone from "~icons/solar/plug-circle-bold-duotone";
   import SolarGalleryWideBoldDuotone from "~icons/solar/gallery-wide-bold-duotone";
   import SolarLayersMinimalisticBoldDuotone from "~icons/solar/layers-minimalistic-bold-duotone";
-
-  import NavButton from "./NavButton.svelte";
 
   const i18n = i18nContext.get();
 </script>
@@ -17,27 +17,27 @@
   <nav class="nav">
     <NavButton
       icon={SolarLayersMinimalisticBoldDuotone}
-      href="/"
+      href={resolve("/")}
       title={i18n.f("profiles")}
     />
     <NavButton
       icon={SolarDevicesBoldDuotone}
-      href="/devices"
+      href={resolve("/devices")}
       title={i18n.f("devices")}
     />
     <NavButton
       icon={SolarPlugCircleBoldDuotone}
-      href="/plugins"
+      href={resolve("/plugins")}
       title={i18n.f("plugins")}
     />
     <NavButton
       icon={SolarGalleryWideBoldDuotone}
-      href="/icons"
+      href={resolve("/icons")}
       title={i18n.f("icon_packs")}
     />
     <NavButton
       icon={SolarSettingsBoldDuotone}
-      href="/settings"
+      href={resolve("/settings")}
       title={i18n.f("settings")}
     />
   </nav>

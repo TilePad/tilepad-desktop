@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { IconPack } from "$lib/api/types/icons";
 
+  import { resolve } from "$app/paths";
   import { toast } from "svelte-sonner";
   import Aside from "$lib/components/Aside.svelte";
   import { i18nContext } from "$lib/i18n/i18n.svelte";
@@ -53,12 +54,12 @@
 <div class="layout">
   <div class="header">
     <div class="nav">
-      <a class="tab tab--active" href="/icons">
+      <a class="tab tab--active" href={resolve("/icons")}>
         <SolarBoxBoldDuotone />
 
         {i18n.f("installed")}
       </a>
-      <a class="tab" href="/icons/community">
+      <a class="tab" href={resolve("/icons/community")}>
         <SolarShopBoldDuotone />
         {i18n.f("community_icon_packs")}
       </a>

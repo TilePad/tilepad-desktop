@@ -114,7 +114,7 @@ export default ts.config(
         {
           order: "asc",
           type: "line-length",
-          newlinesBetween: "always",
+          newlinesBetween: 1,
           internalPattern: ["^~/.*"],
         },
       ],

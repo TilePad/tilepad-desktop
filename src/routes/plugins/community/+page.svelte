@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { PluginRegistryEntry } from "$lib/api/types/plugins_registry";
 
+  import { resolve } from "$app/paths";
   import Aside from "$lib/components/Aside.svelte";
   import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { createPluginsQuery } from "$lib/api/plugins";
@@ -44,12 +45,12 @@
 <div class="layout">
   <div class="header">
     <div class="nav">
-      <a class="tab" href="/plugins">
+      <a class="tab" href={resolve("/plugins")}>
         <SolarBoxBoldDuotone />
 
         {i18n.f("installed")}
       </a>
-      <a class="tab tab--active" href="/plugins/community">
+      <a class="tab tab--active" href={resolve("/plugins/community")}>
         <SolarShopBoldDuotone />
 
         {i18n.f("community_plugins")}

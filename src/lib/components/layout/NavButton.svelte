@@ -1,12 +1,13 @@
 <script lang="ts">
   import type { Snippet, Component } from "svelte";
+  import type { ResolvedPathname } from "$app/types";
   import type { SvelteHTMLElements } from "svelte/elements";
 
   import { page } from "$app/state";
 
   type Props = {
     icon: Component<SvelteHTMLElements["svg"]>;
-    href: string;
+    href: ResolvedPathname;
     title: string;
 
     end?: Snippet;
@@ -14,6 +15,8 @@
 
   const { icon: Icon, href, title }: Props = $props();
 </script>
+
+<!-- eslint-disable svelte/no-navigation-without-resolve -->
 
 <a
   {href}

@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { IconRegistryEntry } from "$lib/api/types/icons_registry";
 
+  import { resolve } from "$app/paths";
   import Aside from "$lib/components/Aside.svelte";
   import { i18nContext } from "$lib/i18n/i18n.svelte";
   import { createIconPacksQuery } from "$lib/api/icons";
@@ -44,12 +45,12 @@
 <div class="layout">
   <div class="header">
     <div class="nav">
-      <a class="tab" href="/icons">
+      <a class="tab" href={resolve("/icons")}>
         <SolarBoxBoldDuotone />
 
         {i18n.f("installed")}
       </a>
-      <a class="tab tab--active" href="/icons/community">
+      <a class="tab tab--active" href={resolve("/icons/community")}>
         <SolarShopBoldDuotone />
         {i18n.f("community_icon_packs")}
       </a>

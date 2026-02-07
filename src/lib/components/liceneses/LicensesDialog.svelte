@@ -16,9 +16,8 @@
 
   const i18n = i18nContext.get();
 
-  const licenseMarkdownPromise = import(
-    "../../../../THIRD_PARTY_LICENSES.md?raw"
-  );
+  const licenseMarkdownPromise =
+    import("../../../../THIRD_PARTY_LICENSES.md?raw");
 </script>
 
 <Dialog {...restProps}>
