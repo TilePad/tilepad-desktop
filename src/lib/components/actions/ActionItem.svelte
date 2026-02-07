@@ -19,7 +19,7 @@
   const { pluginId, actionId, label, icon }: Props = $props();
   const { onStartDragging } = getDraggingContext();
 
-  let button: HTMLDivElement | undefined = $state();
+  let button: HTMLButtonElement | undefined = $state();
 
   function onPointerDown(event: PointerEvent) {
     if (!button) return;
@@ -35,7 +35,7 @@
   }
 </script>
 
-<div class="action" bind:this={button} onpointerdown={onPointerDown}>
+<button class="action" bind:this={button} onpointerdown={onPointerDown}>
   {#if icon}
     <img class="icon" src={icon} alt="Action Icon" />
   {/if}
@@ -43,7 +43,7 @@
   <div class="action__text">
     <span class="label">{label}</span>
   </div>
-</div>
+</button>
 
 <style>
   .action {
@@ -59,6 +59,9 @@
     padding-left: 1rem;
     background-color: #28262c;
     cursor: grab;
+
+    color: white;
+    border: none;
   }
 
   .icon {

@@ -42,8 +42,12 @@
     plugin_id: action?.plugin_id ?? "",
   });
 
+  // State here is managed in a backwards way to ensure updates don't cause flickering
+  // while maintaining the most recent changes
+  // svelte-ignore state_referenced_locally
   let lastOptionsUpdate: TileIconOptions = $state(config.icon_options);
-  let iconOptions = $state(config.icon_options);
+  // svelte-ignore state_referenced_locally
+  let iconOptions: TileIconOptions = $state(config.icon_options);
 
   const onClickIconPackIcon = (icon: ITileIcon) => {
     updateTileIcon.mutate({

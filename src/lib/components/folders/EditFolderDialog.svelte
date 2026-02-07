@@ -25,7 +25,7 @@
   const setFolderNameMutation = createSetFolderNameMutation();
 
   let open = $state(false);
-  let name = $state(folder.name);
+  let name = $state("");
 
   function onSave(event: Event) {
     event.preventDefault();

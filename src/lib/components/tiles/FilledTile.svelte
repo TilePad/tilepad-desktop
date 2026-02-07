@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { TileId, TileModel, TilePosition } from "$lib/api/types/tiles";
 
-  import { watch, useDebounce } from "runed";
+  import { useDebounce } from "runed";
   import { type ResizeEventDetail } from "$lib/utils/resizable";
   import { createUpdateTilePositionMutation } from "$lib/api/tiles/tiles.mutations";
   import {
@@ -45,18 +45,10 @@
   const updateTilePosition = createUpdateTilePositionMutation();
 
   /** Current persisted position of the tile */
-  let tilePosition: TilePosition = $state(tile.position);
+  let tilePosition: TilePosition = $derived(tile.position);
 
   /** Currently position of the tile (Affected by states such as dragging) */
-  let currentPosition: TilePosition = $state(tile.position);
-
-  watch(
-    () => tile.position,
-    (newPosition) => {
-      tilePosition = newPosition;
-      currentPosition = newPosition;
-    },
-  );
+  let currentPosition: TilePosition = $derived(tile.position);
 
   let touchTimeout: number | undefined;
   let button: HTMLButtonElement | undefined = $state();

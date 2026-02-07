@@ -31,8 +31,11 @@
   const fonts = $derived(fontsQuery.data ?? []);
   const updateTileLabel = createUpdateTileLabelMutation();
 
-  // Last persisted update
+  // State here is managed in a backwards way to ensure updates don't cause flickering
+  // while maintaining the most recent changes
+  // svelte-ignore state_referenced_locally
   let lastUpdate: TileLabel = $state(config.label);
+  // svelte-ignore state_referenced_locally
   let label = $state(config.label);
 
   const updateLabelDebounced = useDebounce((label: TileLabel) => {

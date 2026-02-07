@@ -26,7 +26,7 @@
 
   let { tile, onClose, alwaysOpen }: Props = $props();
 
-  let open = $state(alwaysOpen ?? false);
+  let open = $derived(alwaysOpen ?? false);
 
   const i18n = i18nContext.get();
 

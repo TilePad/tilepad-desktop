@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { ProfileModel } from "$lib/api/types/profiles";
 
-  import { watch } from "runed";
   import { toast } from "svelte-sonner";
   import { setProfileName } from "$lib/api/profiles";
   import { i18nContext } from "$lib/i18n/i18n.svelte";
@@ -22,7 +21,7 @@
   const i18n = i18nContext.get();
 
   let open = $state(false);
-  let name = $state(profile.name);
+  let name = $derived(profile.name);
 
   async function onSave(event: Event) {
     event.preventDefault();
@@ -42,13 +41,6 @@
   function reset() {
     name = "";
   }
-
-  watch(
-    () => profile,
-    (profile) => {
-      name = profile.name;
-    },
-  );
 </script>
 
 <Dialog bind:open>
