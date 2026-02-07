@@ -51,7 +51,7 @@
   }
 
   function reset() {
-    name = "";
+    name = folder.name;
   }
 
   watch(

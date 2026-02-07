@@ -39,7 +39,7 @@
   }
 
   function reset() {
-    name = "";
+    name = profile.name;
   }
 </script>
 
