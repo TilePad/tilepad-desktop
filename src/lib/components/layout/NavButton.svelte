@@ -22,7 +22,7 @@
   {href}
   class="button"
   class:button--selected={href === "/"
-    ? page.route.id === href
+    ? page.route.id === "/(home)"
     : page.route.id?.startsWith(href)}
 >
   <Icon class="icon" />
