@@ -11,7 +11,7 @@
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import SettingsProvider from "$lib/components/SettingsProvider.svelte";
   import DeviceRequests from "$lib/components/devices/DeviceRequests.svelte";
-  import UpdateNotification from "$lib/components/UpdateNotification.svelte";
+  import UpdateNotification from "$lib/components/update/UpdateNotification.svelte";
 
   import type { LayoutProps } from "./$types";
 
