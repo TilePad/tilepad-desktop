@@ -35,6 +35,9 @@
     "macropad",
     "Jacobtread",
     "unplugin",
-    "iconify"
+    "iconify",
+    "castlenine",
+    "qrcode",
+    "messageformat"
   ]
 }
