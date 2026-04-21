@@ -52,16 +52,18 @@ jobs:
         # webkitgtk 4.0 is for Tauri v1 - webkitgtk 4.1 is for Tauri v2.
         # You can remove the one that doesn't apply to your app to speed up the workflow a bit.
 
+      - uses: pnpm/action-setup@v6
+
       - name: install frontend dependencies
-        run: npm install
+        run: pnpm install
 
       # These deps have some platform specific components which causes CI to fail due to
       # the package-lock.json having different locked platform specific installs
       - name: install problematic dependencies
-        run: npm install --save-dev @tauri-apps/cli rollup
+        run: pnpm install --save-dev @tauri-apps/cli rollup
 
       - name: generate THIRD_PARTY_LICENSES.md
-        run: npm run make:licenses
+        run: pnpm run make:licenses
 
       - uses: tauri-apps/tauri-action@v0
         env:

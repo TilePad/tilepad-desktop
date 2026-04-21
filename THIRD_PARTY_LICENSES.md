@@ -2,25 +2,11 @@
 This page lists the licenses of third party dependencies used by this project
 
 ## Licenses
-- MIT
-- Apache-2.0
-- OFL-1.1
-- CC-BY-4.0
-- (MIT OR CC0-1.0)
-- Apache-2.0 OR MIT
-- MIT OR Apache-2.0
-- 0BSD
-- Unknown
-- BSD-2-Clause
-- ISC
-- BSD-3-Clause
-- Python-2.0
-- (MPL-2.0 OR Apache-2.0)
-- CC0-1.0
-- BlueOak-1.0.0
-- MIT-0
 - 0BSD OR Apache-2.0 OR MIT
+- Apache-2.0 OR MIT
 - MIT OR Unlicense
+- BSD-3-Clause
+- MIT
 - ISC AND (Apache-2.0 OR ISC)
 - ISC AND (Apache-2.0 OR ISC) AND OpenSSL
 - BSD-3-Clause AND MIT
@@ -28,14 +14,17 @@ This page lists the licenses of third party dependencies used by this project
 - Apache-2.0 OR MIT OR Zlib
 - BSL-1.0
 - MPL-2.0
+- Unknown
 - Apache-2.0 AND MIT
 - Apache-2.0 OR CC0-1.0 OR MIT-0
 - (Apache-2.0 OR MIT) AND BSD-3-Clause
 - Apache-2.0 OR BSD-1-Clause OR MIT
 - Zlib
+- Apache-2.0
 - Apache-2.0 OR ISC OR MIT
 - Unicode-3.0
 - bzip2-1.0.6
+- ISC
 - Apache-2.0 OR Apache-2.0 WITH LLVM-exception OR MIT
 - MIT AND BSD-3-Clause
 - Apache-2.0 OR BSD-3-Clause OR MIT
@@ -43,6 +32,7 @@ This page lists the licenses of third party dependencies used by this project
 - Apache-2.0 AND ISC
 - Apache-2.0 OR BSL-1.0
 - Apache-2.0 WITH LLVM-exception
+- CC0-1.0
 - (MIT OR Apache-2.0) AND Unicode-3.0
 - Apache-2.0 OR BSL-1.0 OR MIT
 - CDLA-Permissive-2.0
@@ -50,956 +40,14 @@ This page lists the licenses of third party dependencies used by this project
 
 ---
 
-## MIT
+## 0BSD OR Apache-2.0 OR MIT
 
-- [@castlenine/svelte-qrcode]() - 2.3.0
-- [svelte]() - 5.49.2
-- [@types/json-schema]() - 7.0.15
-- [eslint]() - 9.39.2
-- [@eslint/js]() - 9.39.2
-- [@iconify/types]() - 2.0.0
-- [@iconify/types]() - 2.0.0
-- [@storybook/addon-svelte-csf]() - 5.0.10
-- [@storybook/csf]() - 0.1.13
-- [@storybook/svelte]() - 10.2.7
-- [storybook]() - 10.2.7
-- [svelte]() - 5.49.2
-- [ts-dedent]() - 2.2.0
-- [@sveltejs/vite-plugin-svelte]() - 6.2.4
-- [dedent]() - 1.7.1
-- [es-toolkit]() - 1.44.0
-- [esrap]() - 1.4.9
-- [@jridgewell/sourcemap-codec]() - 1.5.5
-- [magic-string]() - 0.30.21
-- [@jridgewell/sourcemap-codec]() - 1.5.5
-- [storybook]() - 10.2.7
-- [svelte-ast-print]() - 0.4.2
-- [esrap]() - 1.2.2
-- [@jridgewell/sourcemap-codec]() - 1.5.5
-- [@types/estree]() - 1.0.8
-- [svelte]() - 5.49.2
-- [zimmerframe]() - 1.1.2
-- [svelte]() - 5.49.2
-- [vite]() - 7.3.1
-- [zimmerframe]() - 1.1.4
-- [@storybook/sveltekit]() - 10.2.7
-- [@storybook/builder-vite]() - 10.2.7
-- [@storybook/csf-plugin]() - 10.2.7
-- [esbuild]() - 0.27.3
-- [rollup]() - 4.57.1
-- [storybook]() - 10.2.7
-- [unplugin]() - 2.3.11
-- [vite]() - 7.3.1
-- [storybook]() - 10.2.7
-- [ts-dedent]() - 2.2.0
-- [vite]() - 7.3.1
-- [@storybook/svelte-vite]() - 10.2.7
-- [@storybook/builder-vite]() - 10.2.7
-- [@storybook/svelte]() - 10.2.7
-- [@sveltejs/vite-plugin-svelte]() - 6.2.4
-- [magic-string]() - 0.30.21
-- [storybook]() - 10.2.7
-- [svelte]() - 5.49.2
-- [svelte2tsx]() - 0.7.47
-- [dedent-js]() - 1.0.1
-- [scule]() - 1.3.0
-- [svelte]() - 5.49.2
-- [vite]() - 7.3.1
-- [@storybook/svelte]() - 10.2.7
-- [storybook]() - 10.2.7
-- [svelte]() - 5.49.2
-- [vite]() - 7.3.1
-- [@sveltejs/adapter-static]() - 3.0.10
-- [@sveltejs/kit]() - 2.50.2
-- [@sveltejs/kit]() - 2.50.2
-- [@standard-schema/spec]() - 1.1.0
-- [@sveltejs/acorn-typescript]() - 1.0.8
-- [acorn]() - 8.15.0
-- [@sveltejs/vite-plugin-svelte]() - 6.2.4
-- [@types/cookie]() - 0.6.0
-- [acorn]() - 8.15.0
-- [cookie]() - 0.7.2
-- [devalue]() - 5.6.2
-- [esm-env]() - 1.2.2
-- [kleur]() - 4.1.5
-- [magic-string]() - 0.30.21
-- [mrmime]() - 2.0.1
-- [sade]() - 1.8.1
-- [mri]() - 1.2.0
-- [set-cookie-parser]() - 3.0.1
-- [sirv]() - 3.0.2
-- [@polka/url]() - 1.0.0-next.29
-- [mrmime]() - 2.0.1
-- [totalist]() - 3.0.1
-- [svelte]() - 5.49.2
-- [vite]() - 7.3.1
-- [@sveltejs/vite-plugin-svelte]() - 6.2.4
-- [@sveltejs/vite-plugin-svelte-inspector]() - 5.0.2
-- [@sveltejs/vite-plugin-svelte]() - 6.2.4
-- [obug]() - 2.1.1
-- [svelte]() - 5.49.2
-- [vite]() - 7.3.1
-- [deepmerge]() - 4.3.1
-- [magic-string]() - 0.30.21
-- [obug]() - 2.1.1
-- [svelte]() - 5.49.2
-- [vite]() - 7.3.1
-- [vitefu]() - 1.1.1
-- [vite]() - 7.3.1
-- [@tanstack/eslint-plugin-query]() - 5.91.4
-- [@typescript-eslint/utils]() - 8.54.0
-- [@eslint-community/eslint-utils]() - 4.9.1
-- [@typescript-eslint/scope-manager]() - 8.54.0
-- [@typescript-eslint/types]() - 8.54.0
-- [@typescript-eslint/visitor-keys]() - 8.54.0
-- [@typescript-eslint/types]() - 8.54.0
-- [@typescript-eslint/typescript-estree]() - 8.54.0
-- [eslint]() - 9.39.2
-- [eslint]() - 9.39.2
-- [@tanstack/svelte-query-devtools]() - 6.0.4
-- [@tanstack/query-devtools]() - 5.93.0
-- [@tanstack/svelte-query]() - 6.0.18
-- [esm-env]() - 1.2.2
-- [svelte]() - 5.49.2
-- [@tanstack/svelte-query]() - 6.0.18
-- [@tanstack/query-core]() - 5.90.20
-- [svelte]() - 5.49.2
-- [bits-ui]() - 2.15.5
-- [@floating-ui/core]() - 1.7.4
-- [@floating-ui/utils]() - 0.2.10
-- [@floating-ui/dom]() - 1.7.5
-- [@floating-ui/core]() - 1.7.4
-- [@floating-ui/utils]() - 0.2.10
-- [esm-env]() - 1.2.2
-- [runed]() - 0.35.1
-- [@sveltejs/kit]() - 2.50.2
-- [dequal]() - 2.0.3
-- [esm-env]() - 1.2.2
-- [lz-string]() - 1.5.0
-- [svelte]() - 5.49.2
-- [clsx]() - 2.1.1
-- [runed]() - 0.35.1
-- [@sveltejs/kit]() - 2.50.2
-- [dequal]() - 2.0.3
-- [esm-env]() - 1.2.2
-- [lz-string]() - 1.5.0
-- [svelte]() - 5.49.2
-- [style-to-object]() - 1.0.14
-- [inline-style-parser]() - 0.2.7
-- [svelte]() - 5.49.2
-- [svelte]() - 5.49.2
-- [tabbable]() - 6.4.0
-- [eslint-config-prettier]() - 10.1.8
-- [eslint]() - 9.39.2
-- [eslint-plugin-perfectionist]() - 5.5.0
-- [@typescript-eslint/utils]() - 8.54.0
-- [eslint]() - 9.39.2
-- [natural-orderby]() - 5.0.0
-- [eslint-plugin-storybook]() - 10.2.7
-- [@typescript-eslint/utils]() - 8.54.0
-- [eslint]() - 9.39.2
-- [storybook]() - 10.2.7
-- [eslint-plugin-svelte]() - 3.14.0
-- [@eslint-community/eslint-utils]() - 4.9.1
-- [eslint]() - 9.39.2
-- [@jridgewell/sourcemap-codec]() - 1.5.5
-- [eslint]() - 9.39.2
-- [globals]() - 16.5.0
-- [known-css-properties]() - 0.37.0
-- [postcss-load-config]() - 3.1.4
-- [lilconfig]() - 2.1.0
-- [postcss]() - 8.5.6
-- [postcss-safe-parser]() - 7.0.1
-- [postcss]() - 8.5.6
-- [postcss]() - 8.5.6
-- [nanoid]() - 3.3.11
-- [svelte-eslint-parser]() - 1.4.1
-- [postcss-scss]() - 4.0.9
-- [postcss]() - 8.5.6
-- [postcss-selector-parser]() - 7.1.1
-- [cssesc]() - 3.0.0
-- [util-deprecate]() - 1.0.2
-- [postcss]() - 8.5.6
-- [svelte]() - 5.49.2
-- [svelte]() - 5.49.2
-- [eslint-plugin-unused-imports]() - 4.3.0
-- [@typescript-eslint/eslint-plugin]() - 8.54.0
-- [@eslint-community/regexpp]() - 4.12.2
-- [@typescript-eslint/parser]() - 8.54.0
-- [@typescript-eslint/scope-manager]() - 8.54.0
-- [@typescript-eslint/type-utils]() - 8.54.0
-- [@typescript-eslint/types]() - 8.54.0
-- [@typescript-eslint/typescript-estree]() - 8.54.0
-- [@typescript-eslint/utils]() - 8.54.0
-- [debug]() - 4.4.3
-- [eslint]() - 9.39.2
-- [ts-api-utils]() - 2.4.0
-- [@typescript-eslint/utils]() - 8.54.0
-- [@typescript-eslint/visitor-keys]() - 8.54.0
-- [@typescript-eslint/types]() - 8.54.0
-- [eslint]() - 9.39.2
-- [ignore]() - 7.0.5
-- [natural-compare]() - 1.4.0
-- [ts-api-utils]() - 2.4.0
-- [eslint]() - 9.39.2
-- [eslint]() - 9.39.2
-- [@eslint-community/eslint-utils]() - 4.9.1
-- [@eslint-community/regexpp]() - 4.12.2
-- [debug]() - 4.4.3
-- [brace-expansion]() - 1.1.12
-- [balanced-match]() - 1.0.2
-- [concat-map]() - 0.0.1
-- [@types/json-schema]() - 7.0.15
-- [@types/json-schema]() - 7.0.15
-- [@eslint/eslintrc]() - 3.3.3
-- [ajv]() - 6.12.6
-- [debug]() - 4.4.3
-- [globals]() - 14.0.0
-- [ignore]() - 5.3.2
-- [import-fresh]() - 3.3.1
-- [parent-module]() - 1.0.1
-- [callsites]() - 3.1.0
-- [resolve-from]() - 4.0.0
-- [js-yaml]() - 4.1.1
-- [brace-expansion]() - 1.1.12
-- [balanced-match]() - 1.0.2
-- [concat-map]() - 0.0.1
-- [strip-json-comments]() - 3.1.1
-- [@eslint/js]() - 9.39.2
-- [@types/json-schema]() - 7.0.15
-- [levn]() - 0.4.1
-- [prelude-ls]() - 1.2.1
-- [type-check]() - 0.4.0
-- [@types/estree]() - 1.0.8
-- [ajv]() - 6.12.6
-- [fast-deep-equal]() - 3.1.3
-- [fast-json-stable-stringify]() - 2.1.0
-- [json-schema-traverse]() - 0.4.1
-- [punycode]() - 2.3.1
-- [chalk]() - 4.1.2
-- [ansi-styles]() - 4.3.0
-- [color-convert]() - 2.0.1
-- [color-name]() - 1.1.4
-- [supports-color]() - 7.2.0
-- [has-flag]() - 4.0.0
-- [cross-spawn]() - 7.0.6
-- [path-key]() - 3.1.1
-- [shebang-command]() - 2.0.0
-- [shebang-regex]() - 3.0.0
-- [debug]() - 4.4.3
-- [ms]() - 2.1.3
-- [escape-string-regexp]() - 4.0.0
-- [acorn-jsx]() - 5.3.2
-- [acorn]() - 8.15.0
-- [acorn]() - 8.15.0
-- [fast-deep-equal]() - 3.1.3
-- [file-entry-cache]() - 8.0.0
-- [flat-cache]() - 4.0.1
-- [keyv]() - 4.5.4
-- [json-buffer]() - 3.0.1
-- [find-up]() - 5.0.0
-- [locate-path]() - 6.0.0
-- [p-locate]() - 5.0.0
-- [p-limit]() - 3.1.0
-- [yocto-queue]() - 0.1.0
-- [path-exists]() - 4.0.0
-- [is-glob]() - 4.0.3
-- [ignore]() - 5.3.2
-- [imurmurhash]() - 0.1.4
-- [is-glob]() - 4.0.3
-- [is-extglob]() - 2.1.1
-- [json-stable-stringify-without-jsonify]() - 1.0.1
-- [lodash.merge]() - 4.6.2
-- [brace-expansion]() - 1.1.12
-- [balanced-match]() - 1.0.2
-- [concat-map]() - 0.0.1
-- [natural-compare]() - 1.4.0
-- [optionator]() - 0.9.4
-- [deep-is]() - 0.1.4
-- [fast-levenshtein]() - 2.0.6
-- [levn]() - 0.4.1
-- [prelude-ls]() - 1.2.1
-- [type-check]() - 0.4.0
-- [prelude-ls]() - 1.2.1
-- [word-wrap]() - 1.2.5
-- [@formatjs/ecma402-abstract]() - 3.1.1
-- [@formatjs/fast-memoize]() - 3.1.0
-- [@formatjs/intl-localematcher]() - 0.8.1
-- [@formatjs/fast-memoize]() - 3.1.0
-- [decimal.js]() - 10.6.0
-- [@formatjs/fast-memoize]() - 3.1.0
-- [@formatjs/icu-messageformat-parser]() - 3.5.1
-- [@formatjs/ecma402-abstract]() - 3.1.1
-- [@formatjs/icu-skeleton-parser]() - 2.1.1
-- [@formatjs/ecma402-abstract]() - 3.1.1
-- [isomorphic-dompurify]() - 2.35.0
-- [@types/trusted-types]() - 2.0.7
-- [jsdom]() - 27.4.0
-- [@acemir/cssom]() - 0.9.31
-- [@asamuzakjp/dom-selector]() - 6.7.8
-- [@asamuzakjp/nwsapi]() - 2.3.9
-- [bidi-js]() - 1.0.3
-- [require-from-string]() - 2.0.2
-- [css-tree]() - 3.1.0
-- [is-potential-custom-element-name]() - 1.0.1
-- [@exodus/bytes]() - 1.11.0
-- [cssstyle]() - 5.3.7
-- [@asamuzakjp/css-color]() - 4.1.2
-- [@csstools/css-calc]() - 3.0.0
-- [@csstools/css-parser-algorithms]() - 4.0.0
-- [@csstools/css-tokenizer]() - 4.0.0
-- [@csstools/css-color-parser]() - 4.0.1
-- [@csstools/css-calc]() - 3.0.0
-- [@csstools/css-parser-algorithms]() - 4.0.0
-- [@csstools/css-tokenizer]() - 4.0.0
-- [@csstools/css-parser-algorithms]() - 4.0.0
-- [@csstools/css-tokenizer]() - 4.0.0
-- [@csstools/css-tokenizer]() - 4.0.0
-- [css-tree]() - 3.1.0
-- [data-urls]() - 6.0.1
-- [whatwg-mimetype]() - 5.0.0
-- [whatwg-url]() - 15.1.0
-- [decimal.js]() - 10.6.0
-- [html-encoding-sniffer]() - 6.0.0
-- [@exodus/bytes]() - 1.11.0
-- [http-proxy-agent]() - 7.0.2
-- [agent-base]() - 7.1.4
-- [debug]() - 4.4.3
-- [https-proxy-agent]() - 7.0.6
-- [agent-base]() - 7.1.4
-- [debug]() - 4.4.3
-- [is-potential-custom-element-name]() - 1.0.1
-- [parse5]() - 8.0.0
-- [xmlchars]() - 2.2.0
-- [symbol-tree]() - 3.2.4
-- [tldts]() - 7.0.22
-- [tldts-core]() - 7.0.22
-- [w3c-xmlserializer]() - 5.0.0
-- [whatwg-mimetype]() - 4.0.0
-- [whatwg-url]() - 15.1.0
-- [tr46]() - 6.0.0
-- [punycode]() - 2.3.1
-- [ws]() - 8.19.0
-- [marked]() - 17.0.1
-- [prettier-plugin-svelte]() - 3.4.1
-- [prettier]() - 3.8.1
-- [svelte]() - 5.49.2
-- [prettier]() - 3.8.1
-- [runed]() - 0.37.1
-- [@sveltejs/kit]() - 2.50.2
-- [dequal]() - 2.0.3
-- [esm-env]() - 1.2.2
-- [lz-string]() - 1.5.0
-- [svelte]() - 5.49.2
-- [storybook]() - 10.2.7
-- [@storybook/global]() - 5.0.0
-- [@storybook/icons]() - 2.0.1
-- [react-dom]() - 19.2.4
-- [react]() - 19.2.4
-- [scheduler]() - 0.27.0
-- [react]() - 19.2.4
-- [@testing-library/jest-dom]() - 6.9.1
-- [@adobe/css-tools]() - 4.4.4
-- [dequal]() - 2.0.3
-- [css.escape]() - 1.5.1
-- [dom-accessibility-api]() - 0.6.3
-- [redent]() - 3.0.0
-- [indent-string]() - 4.0.0
-- [strip-indent]() - 3.0.0
-- [min-indent]() - 1.0.1
-- [@testing-library/user-event]() - 14.6.1
-- [@testing-library/dom]() - 10.4.1
-- [@babel/code-frame]() - 7.29.0
-- [@babel/helper-validator-identifier]() - 7.28.5
-- [js-tokens]() - 4.0.0
-- [@babel/runtime]() - 7.28.6
-- [@types/aria-query]() - 5.0.4
-- [dom-accessibility-api]() - 0.5.16
-- [lz-string]() - 1.5.0
-- [pretty-format]() - 27.5.1
-- [ansi-regex]() - 5.0.1
-- [ansi-styles]() - 5.2.0
-- [react-is]() - 17.0.2
-- [@vitest/expect]() - 3.2.4
-- [@types/chai]() - 5.2.3
-- [@types/deep-eql]() - 4.0.2
-- [assertion-error]() - 2.0.1
-- [@vitest/spy]() - 3.2.4
-- [@vitest/utils]() - 3.2.4
-- [@vitest/pretty-format]() - 3.2.4
-- [tinyrainbow]() - 2.0.0
-- [loupe]() - 3.2.1
-- [tinyrainbow]() - 2.0.0
-- [chai]() - 5.3.3
-- [assertion-error]() - 2.0.1
-- [check-error]() - 2.1.3
-- [deep-eql]() - 5.0.2
-- [loupe]() - 3.2.1
-- [pathval]() - 2.0.1
-- [tinyrainbow]() - 2.0.0
-- [@vitest/spy]() - 3.2.4
-- [tinyspy]() - 4.0.4
-- [esbuild]() - 0.27.3
-- [@esbuild/aix-ppc64]() - 0.27.3
-- [@esbuild/android-arm]() - 0.27.3
-- [@esbuild/android-arm64]() - 0.27.3
-- [@esbuild/android-x64]() - 0.27.3
-- [@esbuild/darwin-arm64]() - 0.27.3
-- [@esbuild/darwin-x64]() - 0.27.3
-- [@esbuild/freebsd-arm64]() - 0.27.3
-- [@esbuild/freebsd-x64]() - 0.27.3
-- [@esbuild/linux-arm]() - 0.27.3
-- [@esbuild/linux-arm64]() - 0.27.3
-- [@esbuild/linux-ia32]() - 0.27.3
-- [@esbuild/linux-loong64]() - 0.27.3
-- [@esbuild/linux-mips64el]() - 0.27.3
-- [@esbuild/linux-ppc64]() - 0.27.3
-- [@esbuild/linux-riscv64]() - 0.27.3
-- [@esbuild/linux-s390x]() - 0.27.3
-- [@esbuild/linux-x64]() - 0.27.3
-- [@esbuild/netbsd-arm64]() - 0.27.3
-- [@esbuild/netbsd-x64]() - 0.27.3
-- [@esbuild/openbsd-arm64]() - 0.27.3
-- [@esbuild/openbsd-x64]() - 0.27.3
-- [@esbuild/openharmony-arm64]() - 0.27.3
-- [@esbuild/sunos-x64]() - 0.27.3
-- [@esbuild/win32-arm64]() - 0.27.3
-- [@esbuild/win32-ia32]() - 0.27.3
-- [@esbuild/win32-x64]() - 0.27.3
-- [open]() - 10.2.0
-- [default-browser]() - 5.5.0
-- [bundle-name]() - 4.1.0
-- [run-applescript]() - 7.1.0
-- [default-browser-id]() - 5.0.1
-- [define-lazy-prop]() - 3.0.0
-- [is-inside-container]() - 1.0.0
-- [is-docker]() - 3.0.0
-- [wsl-utils]() - 0.1.0
-- [is-wsl]() - 3.1.0
-- [is-inside-container]() - 1.0.0
-- [prettier]() - 3.8.1
-- [recast]() - 0.23.11
-- [ast-types]() - 0.16.1
-- [tiny-invariant]() - 1.3.3
-- [use-sync-external-store]() - 1.6.0
-- [react]() - 19.2.4
-- [ws]() - 8.19.0
-- [svelte-awesome-color-picker]() - 4.1.1
-- [colord]() - 2.9.3
-- [svelte-awesome-slider]() - 2.0.0
-- [svelte]() - 5.49.2
-- [svelte]() - 5.49.2
-- [svelte-check]() - 4.3.6
-- [@jridgewell/trace-mapping]() - 0.3.31
-- [@jridgewell/resolve-uri]() - 3.1.2
-- [@jridgewell/sourcemap-codec]() - 1.5.5
-- [chokidar]() - 4.0.3
-- [readdirp]() - 4.1.2
-- [fdir]() - 6.5.0
-- [picomatch]() - 4.0.3
-- [sade]() - 1.8.1
-- [svelte]() - 5.49.2
-- [svelte-sonner]() - 1.0.7
-- [runed]() - 0.28.0
-- [esm-env]() - 1.2.2
-- [svelte]() - 5.49.2
-- [svelte]() - 5.49.2
-- [svelte]() - 5.49.2
-- [@jridgewell/remapping]() - 2.3.5
-- [@jridgewell/gen-mapping]() - 0.3.13
-- [@jridgewell/sourcemap-codec]() - 1.5.5
-- [@jridgewell/trace-mapping]() - 0.3.31
-- [@jridgewell/trace-mapping]() - 0.3.31
-- [@jridgewell/sourcemap-codec]() - 1.5.5
-- [@sveltejs/acorn-typescript]() - 1.0.8
-- [@types/estree]() - 1.0.8
-- [acorn]() - 8.15.0
-- [clsx]() - 2.1.1
-- [devalue]() - 5.6.2
-- [esm-env]() - 1.2.2
-- [esrap]() - 2.2.2
-- [@jridgewell/sourcemap-codec]() - 1.5.5
-- [is-reference]() - 3.0.3
-- [@types/estree]() - 1.0.8
-- [locate-character]() - 3.0.0
-- [magic-string]() - 0.30.21
-- [zimmerframe]() - 1.1.4
-- [tilepad-display]() - 1.0.0
-- [esbuild]() - 0.25.8
-- [@esbuild/aix-ppc64]() - 0.25.8
-- [@esbuild/android-arm]() - 0.25.8
-- [@esbuild/android-arm64]() - 0.25.8
-- [@esbuild/android-x64]() - 0.25.8
-- [@esbuild/darwin-arm64]() - 0.25.8
-- [@esbuild/darwin-x64]() - 0.25.8
-- [@esbuild/freebsd-arm64]() - 0.25.8
-- [@esbuild/freebsd-x64]() - 0.25.8
-- [@esbuild/linux-arm]() - 0.25.8
-- [@esbuild/linux-arm64]() - 0.25.8
-- [@esbuild/linux-ia32]() - 0.25.8
-- [@esbuild/linux-loong64]() - 0.25.8
-- [@esbuild/linux-mips64el]() - 0.25.8
-- [@esbuild/linux-ppc64]() - 0.25.8
-- [@esbuild/linux-riscv64]() - 0.25.8
-- [@esbuild/linux-s390x]() - 0.25.8
-- [@esbuild/linux-x64]() - 0.25.8
-- [@esbuild/netbsd-arm64]() - 0.25.8
-- [@esbuild/netbsd-x64]() - 0.25.8
-- [@esbuild/openbsd-arm64]() - 0.25.8
-- [@esbuild/openbsd-x64]() - 0.25.8
-- [@esbuild/openharmony-arm64]() - 0.25.8
-- [@esbuild/sunos-x64]() - 0.25.8
-- [@esbuild/win32-arm64]() - 0.25.8
-- [@esbuild/win32-ia32]() - 0.25.8
-- [@esbuild/win32-x64]() - 0.25.8
-- [tilepad-inspector]() - 1.0.0
-- [esbuild]() - 0.25.8
-- [@esbuild/aix-ppc64]() - 0.25.8
-- [@esbuild/android-arm]() - 0.25.8
-- [@esbuild/android-arm64]() - 0.25.8
-- [@esbuild/android-x64]() - 0.25.8
-- [@esbuild/darwin-arm64]() - 0.25.8
-- [@esbuild/darwin-x64]() - 0.25.8
-- [@esbuild/freebsd-arm64]() - 0.25.8
-- [@esbuild/freebsd-x64]() - 0.25.8
-- [@esbuild/linux-arm]() - 0.25.8
-- [@esbuild/linux-arm64]() - 0.25.8
-- [@esbuild/linux-ia32]() - 0.25.8
-- [@esbuild/linux-loong64]() - 0.25.8
-- [@esbuild/linux-mips64el]() - 0.25.8
-- [@esbuild/linux-ppc64]() - 0.25.8
-- [@esbuild/linux-riscv64]() - 0.25.8
-- [@esbuild/linux-s390x]() - 0.25.8
-- [@esbuild/linux-x64]() - 0.25.8
-- [@esbuild/netbsd-arm64]() - 0.25.8
-- [@esbuild/netbsd-x64]() - 0.25.8
-- [@esbuild/openbsd-arm64]() - 0.25.8
-- [@esbuild/openbsd-x64]() - 0.25.8
-- [@esbuild/openharmony-arm64]() - 0.25.8
-- [@esbuild/sunos-x64]() - 0.25.8
-- [@esbuild/win32-arm64]() - 0.25.8
-- [@esbuild/win32-ia32]() - 0.25.8
-- [@esbuild/win32-x64]() - 0.25.8
-- [typescript-eslint]() - 8.54.0
-- [@typescript-eslint/eslint-plugin]() - 8.54.0
-- [@typescript-eslint/parser]() - 8.54.0
-- [@typescript-eslint/scope-manager]() - 8.54.0
-- [@typescript-eslint/types]() - 8.54.0
-- [@typescript-eslint/typescript-estree]() - 8.54.0
-- [@typescript-eslint/visitor-keys]() - 8.54.0
-- [debug]() - 4.4.3
-- [eslint]() - 9.39.2
-- [@typescript-eslint/typescript-estree]() - 8.54.0
-- [@typescript-eslint/project-service]() - 8.54.0
-- [@typescript-eslint/tsconfig-utils]() - 8.54.0
-- [@typescript-eslint/types]() - 8.54.0
-- [debug]() - 4.4.3
-- [@typescript-eslint/tsconfig-utils]() - 8.54.0
-- [@typescript-eslint/types]() - 8.54.0
-- [@typescript-eslint/visitor-keys]() - 8.54.0
-- [debug]() - 4.4.3
-- [brace-expansion]() - 2.0.2
-- [balanced-match]() - 1.0.2
-- [tinyglobby]() - 0.2.15
-- [ts-api-utils]() - 2.4.0
-- [@typescript-eslint/utils]() - 8.54.0
-- [eslint]() - 9.39.2
-- [unplugin-icons]() - 23.0.1
-- [@antfu/install-pkg]() - 1.1.0
-- [package-manager-detector]() - 1.6.0
-- [tinyexec]() - 1.0.2
-- [@iconify/utils]() - 3.1.0
-- [@antfu/install-pkg]() - 1.1.0
-- [@iconify/types]() - 2.0.0
-- [mlly]() - 1.8.0
-- [acorn]() - 8.15.0
-- [pathe]() - 2.0.3
-- [pkg-types]() - 1.3.1
-- [confbox]() - 0.1.8
-- [mlly]() - 1.8.0
-- [pathe]() - 2.0.3
-- [ufo]() - 1.6.3
-- [local-pkg]() - 1.1.2
-- [mlly]() - 1.8.0
-- [pkg-types]() - 2.3.0
-- [confbox]() - 0.2.2
-- [exsolve]() - 1.0.8
-- [pathe]() - 2.0.3
-- [quansync]() - 0.2.11
-- [obug]() - 2.1.1
-- [svelte]() - 5.49.2
-- [unplugin]() - 2.3.11
-- [@jridgewell/remapping]() - 2.3.5
-- [acorn]() - 8.15.0
-- [picomatch]() - 4.0.3
-- [webpack-virtual-modules]() - 0.6.2
-- [vite]() - 7.3.1
-- [esbuild]() - 0.27.3
-- [fdir]() - 6.5.0
-- [fsevents]() - 2.3.3
-- [picomatch]() - 4.0.3
-- [postcss]() - 8.5.6
-- [rollup]() - 4.57.1
-- [@rollup/rollup-android-arm-eabi]() - 4.57.1
-- [@rollup/rollup-android-arm64]() - 4.57.1
-- [@rollup/rollup-darwin-arm64]() - 4.57.1
-- [@rollup/rollup-darwin-x64]() - 4.57.1
-- [@rollup/rollup-freebsd-arm64]() - 4.57.1
-- [@rollup/rollup-freebsd-x64]() - 4.57.1
-- [@rollup/rollup-linux-arm-gnueabihf]() - 4.57.1
-- [@rollup/rollup-linux-arm-musleabihf]() - 4.57.1
-- [@rollup/rollup-linux-arm64-gnu]() - 4.57.1
-- [@rollup/rollup-linux-arm64-musl]() - 4.57.1
-- [@rollup/rollup-linux-loong64-gnu]() - 4.57.1
-- [@rollup/rollup-linux-loong64-musl]() - 4.57.1
-- [@rollup/rollup-linux-ppc64-gnu]() - 4.57.1
-- [@rollup/rollup-linux-ppc64-musl]() - 4.57.1
-- [@rollup/rollup-linux-riscv64-gnu]() - 4.57.1
-- [@rollup/rollup-linux-riscv64-musl]() - 4.57.1
-- [@rollup/rollup-linux-s390x-gnu]() - 4.57.1
-- [@rollup/rollup-linux-x64-gnu]() - 4.57.1
-- [@rollup/rollup-linux-x64-musl]() - 4.57.1
-- [@rollup/rollup-openbsd-x64]() - 4.57.1
-- [@rollup/rollup-openharmony-arm64]() - 4.57.1
-- [@rollup/rollup-win32-arm64-msvc]() - 4.57.1
-- [@rollup/rollup-win32-ia32-msvc]() - 4.57.1
-- [@rollup/rollup-win32-x64-gnu]() - 4.57.1
-- [@rollup/rollup-win32-x64-msvc]() - 4.57.1
-- [@types/estree]() - 1.0.8
-- [fsevents]() - 2.3.3
-- [tinyglobby]() - 0.2.15
-- [fdir]() - 6.5.0
-- [picomatch]() - 4.0.3
-- [vitest]() - 4.0.18
-- [@vitest/expect]() - 4.0.18
-- [@standard-schema/spec]() - 1.1.0
-- [@types/chai]() - 5.2.3
-- [@vitest/spy]() - 4.0.18
-- [@vitest/utils]() - 4.0.18
-- [chai]() - 6.2.2
-- [tinyrainbow]() - 3.0.3
-- [@vitest/mocker]() - 4.0.18
-- [@vitest/spy]() - 4.0.18
-- [estree-walker]() - 3.0.3
-- [@types/estree]() - 1.0.8
-- [magic-string]() - 0.30.21
-- [vite]() - 7.3.1
-- [@vitest/pretty-format]() - 4.0.18
-- [tinyrainbow]() - 3.0.3
-- [@vitest/runner]() - 4.0.18
-- [@vitest/utils]() - 4.0.18
-- [@vitest/pretty-format]() - 4.0.18
-- [tinyrainbow]() - 3.0.3
-- [tinyrainbow]() - 3.0.3
-- [pathe]() - 2.0.3
-- [@vitest/snapshot]() - 4.0.18
-- [@vitest/pretty-format]() - 4.0.18
-- [tinyrainbow]() - 3.0.3
-- [magic-string]() - 0.30.21
-- [pathe]() - 2.0.3
-- [@vitest/spy]() - 4.0.18
-- [@vitest/utils]() - 4.0.18
-- [@vitest/pretty-format]() - 4.0.18
-- [tinyrainbow]() - 3.0.3
-- [es-module-lexer]() - 1.7.0
-- [jsdom]() - 27.4.0
-- [magic-string]() - 0.30.21
-- [obug]() - 2.1.1
-- [pathe]() - 2.0.3
-- [picomatch]() - 4.0.3
-- [std-env]() - 3.10.0
-- [tinybench]() - 2.9.0
-- [tinyexec]() - 1.0.2
-- [tinyglobby]() - 0.2.15
-- [tinyrainbow]() - 3.0.3
-- [vite]() - 7.3.1
-- [why-is-node-running]() - 2.3.0
-- [stackback]() - 0.0.2
-- [async_zip](https://github.com/Majored/rs-async-zip) - 0.0.18
-- [atk](https://github.com/gtk-rs/gtk3-rs) - 0.18.2
-- [atk-sys](https://github.com/gtk-rs/gtk3-rs) - 0.18.2
-- [atoi](https://github.com/pacman82/atoi-rs) - 2.0.0
-- [auto-launch](https://github.com/zzzgydi/auto-launch.git) - 0.5.0
-- [axum](https://github.com/tokio-rs/axum) - 0.8.8
-- [axum-core](https://github.com/tokio-rs/axum) - 0.5.5
-- [bincode](https://github.com/servo/bincode) - 1.3.3
-- [block2](https://github.com/madsmtm/objc2) - 0.5.1
-- [block2](https://github.com/madsmtm/objc2) - 0.6.1
-- [bytes](https://github.com/tokio-rs/bytes) - 1.10.1
-- [cairo-rs](https://github.com/gtk-rs/gtk-rs-core) - 0.18.5
-- [cairo-sys-rs](https://github.com/gtk-rs/gtk-rs-core) - 0.18.2
-- [card-validate](https://github.com/valeriansaliou/rs-card-validate.git) - 2.4.0
-- [cargo_metadata](https://github.com/oli-obk/cargo_metadata) - 0.19.2
-- [castaway](https://github.com/sagebind/castaway) - 0.2.4
-- [cfb](https://github.com/mdsteele/rust-cfb) - 0.7.3
-- [cfg_aliases](https://github.com/katharostech/cfg_aliases) - 0.2.1
-- [combine](https://github.com/Marwes/combine) - 4.6.7
-- [compact_str](https://github.com/ParkMyCar/compact_str) - 0.8.1
-- [convert_case](https://github.com/rutrum/convert-case) - 0.4.0
-- [core_maths](https://github.com/robertbastian/core_maths) - 0.1.1
-- [crunchy](https://github.com/eira-fransham/crunchy) - 0.2.4
-- [darling](https://github.com/TedDriggs/darling) - 0.20.11
-- [darling_core](https://github.com/TedDriggs/darling) - 0.20.11
-- [darling_macro](https://github.com/TedDriggs/darling) - 0.20.11
-- [data-encoding](https://github.com/ia0/data-encoding) - 2.9.0
-- [deflate64](https://github.com/anatawa12/deflate64-rs) - 0.1.9
-- [derive_more](https://github.com/JelteF/derive_more) - 0.99.20
-- [dispatch](http://github.com/SSheldon/rust-dispatch) - 0.2.0
-- [dotenvy](https://github.com/allan2/dotenvy) - 0.15.7
-- [embed-resource](https://github.com/nabijaczleweli/rust-embed-resource) - 3.0.5
-- [endi](https://github.com/zeenix/endi) - 1.1.0
-- [enigo](https://github.com/enigo-rs/enigo) - 0.6.1
-- [fontconfig-parser](https://github.com/Riey/fontconfig-parser) - 0.5.8
-- [fontdb](https://github.com/RazrFalcon/fontdb) - 0.23.0
-- [fs_extra](https://github.com/webdesus/fs_extra) - 1.3.0
-- [gdk](https://github.com/gtk-rs/gtk3-rs) - 0.18.2
-- [gdk-pixbuf](https://github.com/gtk-rs/gtk-rs-core) - 0.18.5
-- [gdk-pixbuf-sys](https://github.com/gtk-rs/gtk-rs-core) - 0.18.0
-- [gdk-sys](https://github.com/gtk-rs/gtk3-rs) - 0.18.2
-- [gdkwayland-sys](https://github.com/gtk-rs/gtk3-rs) - 0.18.2
-- [gdkx11](https://github.com/gtk-rs/gtk3-rs) - 0.18.2
-- [gdkx11-sys](https://github.com/gtk-rs/gtk3-rs) - 0.18.2
-- [generic-array](https://github.com/fizyk20/generic-array.git) - 0.14.7
-- [getset](https://github.com/jbaublitz/getset) - 0.1.6
-- [gio](https://github.com/gtk-rs/gtk-rs-core) - 0.18.4
-- [gio-sys](https://github.com/gtk-rs/gtk-rs-core) - 0.18.1
-- [glib](https://github.com/gtk-rs/gtk-rs-core) - 0.18.5
-- [glib-macros](https://github.com/gtk-rs/gtk-rs-core) - 0.18.5
-- [glib-sys](https://github.com/gtk-rs/gtk-rs-core) - 0.18.1
-- [gobject-sys](https://github.com/gtk-rs/gtk-rs-core) - 0.18.0
-- [gtk](https://github.com/gtk-rs/gtk3-rs) - 0.18.2
-- [gtk-sys](https://github.com/gtk-rs/gtk3-rs) - 0.18.2
-- [gtk3-macros](https://github.com/gtk-rs/gtk3-rs) - 0.18.2
-- [h2](https://github.com/hyperium/h2) - 0.4.12
-- [http-body](https://github.com/hyperium/http-body) - 1.0.1
-- [http-body-util](https://github.com/hyperium/http-body) - 0.1.3
-- [hyper](https://github.com/hyperium/hyper) - 1.7.0
-- [hyper-util](https://github.com/hyperium/hyper-util) - 0.1.16
-- [ico](https://github.com/mdsteele/rust-ico) - 0.5.0
-- [infer](https://github.com/bojand/infer) - 0.19.0
-- [is-docker](https://github.com/TheLarkInn/is-docker) - 0.2.0
-- [is-wsl](https://github.com/TheLarkInn/is-wsl) - 0.4.0
-- [javascriptcore-rs](https://github.com/tauri-apps/javascriptcore-rs) - 1.1.2
-- [javascriptcore-rs-sys](https://github.com/tauri-apps/javascriptcore-rs) - 1.1.1
-- [kuchikiki](https://github.com/brave/kuchikiki) - 0.8.8-speedreader
-- [libm](https://github.com/rust-lang/compiler-builtins) - 0.2.15
-- [libredox](https://gitlab.redox-os.org/redox-os/libredox.git) - 0.1.9
-- [libsqlite3-sys](https://github.com/rusqlite/rusqlite) - 0.30.1
-- [matchers](https://github.com/hawkw/matchers) - 0.2.0
-- [matches](https://github.com/SimonSapin/rust-std-candidates) - 0.1.10
-- [memoffset](https://github.com/Gilnaa/memoffset) - 0.9.1
-- [mime_guess](https://github.com/abonander/mime_guess) - 2.0.5
-- [minisign-verify](https://github.com/jedisct1/rust-minisign-verify) - 0.2.4
-- [mio](https://github.com/tokio-rs/mio) - 1.0.4
-- [new_debug_unreachable](https://github.com/mbrubeck/rust-debug-unreachable) - 1.0.6
-- [nix](https://github.com/nix-rust/nix) - 0.30.1
-- [nom](https://github.com/Geal/nom) - 7.1.3
-- [nom](https://github.com/rust-bakery/nom) - 8.0.0
-- [nu-ansi-term](https://github.com/nushell/nu-ansi-term) - 0.50.1
-- [objc-sys](https://github.com/madsmtm/objc2) - 0.3.5
-- [objc2](https://github.com/madsmtm/objc2) - 0.5.2
-- [objc2](https://github.com/madsmtm/objc2) - 0.6.2
-- [objc2-encode](https://github.com/madsmtm/objc2) - 4.1.0
-- [objc2-foundation](https://github.com/madsmtm/objc2) - 0.2.2
-- [objc2-foundation](https://github.com/madsmtm/objc2) - 0.3.1
-- [objc2-metal](https://github.com/madsmtm/objc2) - 0.2.2
-- [objc2-quartz-core](https://github.com/madsmtm/objc2) - 0.2.2
-- [open](https://github.com/Byron/open-rs) - 5.3.2
-- [ordered-multimap](https://github.com/sgodwincs/ordered-multimap-rs) - 0.7.3
-- [pango](https://github.com/gtk-rs/gtk-rs-core) - 0.18.3
-- [pango-sys](https://github.com/gtk-rs/gtk-rs-core) - 0.18.0
-- [phf](https://github.com/sfackler/rust-phf) - 0.8.0
-- [phf](https://github.com/sfackler/rust-phf) - 0.10.1
-- [phf](https://github.com/rust-phf/rust-phf) - 0.11.3
-- [phf_codegen](https://github.com/sfackler/rust-phf) - 0.8.0
-- [phf_codegen](https://github.com/rust-phf/rust-phf) - 0.11.3
-- [phf_generator](https://github.com/sfackler/rust-phf) - 0.8.0
-- [phf_generator](https://github.com/sfackler/rust-phf) - 0.10.0
-- [phf_generator](https://github.com/rust-phf/rust-phf) - 0.11.3
-- [phf_macros](https://github.com/sfackler/rust-phf) - 0.10.0
-- [phf_macros](https://github.com/rust-phf/rust-phf) - 0.11.3
-- [phf_shared](https://github.com/sfackler/rust-phf) - 0.8.0
-- [phf_shared](https://github.com/sfackler/rust-phf) - 0.10.0
-- [phf_shared](https://github.com/rust-phf/rust-phf) - 0.11.3
-- [plist](https://github.com/ebarnard/rust-plist/) - 1.7.4
-- [precomputed-hash](https://github.com/emilio/precomputed-hash) - 0.1.1
-- [quick-xml](https://github.com/tafia/quick-xml) - 0.37.5
-- [quick-xml](https://github.com/tafia/quick-xml) - 0.38.3
-- [redox_syscall](https://gitlab.redox-os.org/redox-os/syscall) - 0.5.17
-- [redox_users](https://gitlab.redox-os.org/redox-os/users) - 0.4.6
-- [redox_users](https://gitlab.redox-os.org/redox-os/users) - 0.5.2
-- [regex-cache](https://github.com/1aim/rust-regex-cache) - 0.2.1
-- [rfd](https://github.com/PolyMeilex/rfd) - 0.17.2
-- [rmp](https://github.com/3Hren/msgpack-rust) - 0.8.14
-- [rmp-serde](https://github.com/3Hren/msgpack-rust) - 1.3.1
-- [rust-ini](https://github.com/zonyitoo/rust-ini) - 0.21.1
-- [sanitize-filename](https://github.com/kardeiz/sanitize-filename) - 0.6.0
-- [schannel](https://github.com/steffengy/schannel-rs) - 0.1.27
-- [schemars](https://github.com/GREsau/schemars) - 0.8.22
-- [schemars](https://github.com/GREsau/schemars) - 0.9.0
-- [schemars](https://github.com/GREsau/schemars) - 1.0.4
-- [schemars_derive](https://github.com/GREsau/schemars) - 0.8.22
-- [schemars_derive](https://github.com/GREsau/schemars) - 1.0.4
-- [sharded-slab](https://github.com/hawkw/sharded-slab) - 0.1.7
-- [simd-adler32](https://github.com/mcountryman/simd-adler32) - 0.3.7
-- [slab](https://github.com/tokio-rs/slab) - 0.4.11
-- [soup3](https://gitlab.gnome.org/World/Rust/soup3-rs) - 0.5.0
-- [soup3-sys](https://gitlab.gnome.org/World/Rust/soup3-rs) - 0.5.0
-- [spin](https://github.com/mvdnes/spin-rs.git) - 0.9.8
-- [strsim](https://github.com/rapidfuzz/strsim-rs) - 0.11.1
-- [strum](https://github.com/Peternator7/strum) - 0.26.3
-- [strum](https://github.com/Peternator7/strum) - 0.27.2
-- [strum_macros](https://github.com/Peternator7/strum) - 0.26.4
-- [strum_macros](https://github.com/Peternator7/strum) - 0.27.2
-- [synstructure](https://github.com/mystor/synstructure) - 0.13.2
-- [sysinfo](https://github.com/GuillaumeGomez/sysinfo) - 0.38.0
-- [tauri-winres](https://github.com/tauri-apps/winres) - 0.3.3
-- [tiff](https://github.com/image-rs/image-tiff) - 0.9.1
-- [tilepad-desktop](https://github.com/TilePad/tilepad-desktop) - 0.1.3
-- [tilepad-manifest](https://github.com/tilepad/tilepad-manifest) - 0.9.0
-- [tokio](https://github.com/tokio-rs/tokio) - 1.49.0
-- [tokio-macros](https://github.com/tokio-rs/tokio) - 2.6.0
-- [tokio-stream](https://github.com/tokio-rs/tokio) - 0.1.17
-- [tokio-tungstenite](https://github.com/snapview/tokio-tungstenite) - 0.28.0
-- [tokio-util](https://github.com/tokio-rs/tokio) - 0.7.18
-- [tower](https://github.com/tower-rs/tower) - 0.5.2
-- [tower-http](https://github.com/tower-rs/tower-http) - 0.6.8
-- [tower-layer](https://github.com/tower-rs/tower) - 0.3.3
-- [tower-service](https://github.com/tower-rs/tower) - 0.3.3
-- [tracing](https://github.com/tokio-rs/tracing) - 0.1.44
-- [tracing-appender](https://github.com/tokio-rs/tracing) - 0.2.4
-- [tracing-attributes](https://github.com/tokio-rs/tracing) - 0.1.31
-- [tracing-core](https://github.com/tokio-rs/tracing) - 0.1.36
-- [tracing-log](https://github.com/tokio-rs/tracing) - 0.2.0
-- [tracing-serde](https://github.com/tokio-rs/tracing) - 0.2.0
-- [tracing-subscriber](https://github.com/tokio-rs/tracing) - 0.3.22
-- [trim-in-place](https://github.com/magiclen/trim-in-place) - 0.1.7
-- [try-lock](https://github.com/seanmonstar/try-lock) - 0.2.5
-- [uds_windows](https://github.com/haraldh/rust_uds_windows) - 1.1.0
-- [urlpattern](https://github.com/denoland/rust-urlpattern) - 0.3.0
-- [valuable](https://github.com/tokio-rs/valuable) - 0.1.1
-- [version-compare](https://gitlab.com/timvisee/version-compare) - 0.2.0
-- [vswhom](https://github.com/nabijaczleweli/vswhom.rs) - 0.1.0
-- [vswhom-sys](https://github.com/nabijaczleweli/vswhom-sys.rs) - 0.1.3
-- [want](https://github.com/seanmonstar/want) - 0.3.1
-- [webkit2gtk](https://github.com/tauri-apps/webkit2gtk-rs) - 2.0.2
-- [webkit2gtk-sys](https://github.com/tauri-apps/webkit2gtk-rs) - 2.0.2
-- [webview2-com](https://github.com/wravery/webview2-rs) - 0.38.0
-- [webview2-com-macros](https://github.com/wravery/webview2-rs) - 0.8.0
-- [webview2-com-sys](https://github.com/wravery/webview2-rs) - 0.38.0
-- [winnow](https://github.com/winnow-rs/winnow) - 0.5.40
-- [winnow](https://github.com/winnow-rs/winnow) - 0.7.13
-- [winreg](https://github.com/gentoo90/winreg-rs) - 0.10.1
-- [winreg](https://github.com/gentoo90/winreg-rs) - 0.55.0
-- [x11](https://github.com/AltF02/x11-rs.git) - 2.21.0
-- [x11-dl](https://github.com/AltF02/x11-rs.git) - 2.21.0
-- [xkbcommon](https://github.com/rust-x-bindings/xkbcommon-rs) - 0.9.0
-- [zbus](https://github.com/dbus2/zbus/) - 5.10.0
-- [zbus_macros](https://github.com/dbus2/zbus/) - 5.10.0
-- [zbus_names](https://github.com/dbus2/zbus/) - 4.2.0
-- [zip](https://github.com/zip-rs/zip2.git) - 4.5.0
-- [zmij](https://github.com/dtolnay/zmij) - 1.0.19
-- [zstd](https://github.com/gyscos/zstd-rs) - 0.13.3
-- [zvariant](https://github.com/dbus2/zbus/) - 5.7.0
-- [zvariant_derive](https://github.com/dbus2/zbus/) - 5.7.0
-- [zvariant_utils](https://github.com/dbus2/zbus/) - 3.2.1
-
----
-
-## Apache-2.0
-
-- [@eslint/compat]() - 2.0.2
-- [@eslint/core]() - 1.1.0
-- [typescript]() - 5.9.3
-- [typescript]() - 5.9.3
-- [typescript]() - 5.9.3
-- [typescript]() - 5.9.3
-- [typescript]() - 5.9.3
-- [@internationalized/date]() - 3.11.0
-- [@swc/helpers]() - 0.5.18
-- [eslint-visitor-keys]() - 3.4.3
-- [eslint-visitor-keys]() - 4.2.1
-- [typescript]() - 5.9.3
-- [eslint-visitor-keys]() - 4.2.1
-- [typescript]() - 5.9.3
-- [typescript]() - 5.9.3
-- [@eslint/config-array]() - 0.21.1
-- [@eslint/object-schema]() - 2.1.7
-- [@eslint/config-helpers]() - 0.4.2
-- [@eslint/core]() - 0.17.0
-- [@eslint/core]() - 0.17.0
-- [@eslint/plugin-kit]() - 0.4.1
-- [@eslint/core]() - 0.17.0
-- [@humanfs/node]() - 0.16.7
-- [@humanfs/core]() - 0.19.1
-- [@humanwhocodes/retry]() - 0.4.3
-- [@humanwhocodes/module-importer]() - 1.0.1
-- [@humanwhocodes/retry]() - 0.4.3
-- [eslint-visitor-keys]() - 4.2.1
-- [eslint-visitor-keys]() - 4.2.1
-- [xml-name-validator]() - 5.0.0
-- [xml-name-validator]() - 5.0.0
-- [aria-query]() - 5.3.0
-- [aria-query]() - 5.3.0
-- [typescript]() - 5.9.3
-- [aria-query]() - 5.3.2
-- [axobject-query]() - 4.1.0
-- [typescript]() - 5.9.3
-- [typescript]() - 5.9.3
-- [typescript]() - 5.9.3
-- [typescript]() - 5.9.3
-- [typescript]() - 5.9.3
-- [typescript]() - 5.9.3
-- [expect-type]() - 1.3.0
-- [gethostname](https://codeberg.org/swsnr/gethostname.rs.git) - 1.0.2
-- [miette](https://github.com/zkat/miette) - 7.6.0
-- [miette-derive](https://github.com/zkat/miette) - 7.6.0
-- [node-semver](https://github.com/felipesere/node-semver-rs) - 2.2.0
-- [phonenumber](https://github.com/whisperfish/rust-phonenumber) - 0.3.7+8.13.52
-- [sync_wrapper](https://github.com/Actyx/sync_wrapper) - 1.0.2
-- [tao](https://github.com/tauri-apps/tao) - 0.34.5
-
----
-
-## OFL-1.1
-
-- [@fontsource/roboto]() - 5.2.9
-
----
-
-## CC-BY-4.0
-
-- [@iconify-json/solar]() - 1.2.5
-- [@iconify-json/twemoji]() - 1.2.5
-
----
-
-## (MIT OR CC0-1.0)
-
-- [type-fest]() - 2.19.0
-- [type-fest]() - 2.19.0
+- [adler2](https://github.com/oyvindln/adler2) - 2.0.1
 
 ---
 
 ## Apache-2.0 OR MIT
 
-- [@tauri-apps/api]() - 2.10.1
-- [@tauri-apps/cli]() - 2.10.0
-- [@tauri-apps/cli-darwin-arm64]() - 2.10.0
-- [@tauri-apps/cli-darwin-x64]() - 2.10.0
-- [@tauri-apps/cli-linux-arm-gnueabihf]() - 2.10.0
-- [@tauri-apps/cli-linux-arm64-gnu]() - 2.10.0
-- [@tauri-apps/cli-linux-arm64-musl]() - 2.10.0
-- [@tauri-apps/cli-linux-riscv64-gnu]() - 2.10.0
-- [@tauri-apps/cli-linux-x64-gnu]() - 2.10.0
-- [@tauri-apps/cli-linux-x64-musl]() - 2.10.0
-- [@tauri-apps/cli-win32-arm64-msvc]() - 2.10.0
-- [@tauri-apps/cli-win32-ia32-msvc]() - 2.10.0
-- [@tauri-apps/cli-win32-x64-msvc]() - 2.10.0
-- [@tauri-apps/api]() - 2.10.1
-- [@tauri-apps/api]() - 2.10.1
-- [@tauri-apps/api]() - 2.10.1
-- [@tauri-apps/api]() - 2.10.1
 - [aead](https://github.com/RustCrypto/traits) - 0.5.2
 - [allocator-api2](https://github.com/zakarumych/allocator-api2) - 0.2.21
 - [android_system_properties](https://github.com/nical/android_system_properties) - 0.1.5
@@ -1445,94 +493,20 @@ This page lists the licenses of third party dependencies used by this project
 
 ---
 
-## MIT OR Apache-2.0
+## MIT OR Unlicense
 
-- [@tauri-apps/plugin-autostart]() - 2.5.1
-- [@tauri-apps/plugin-deep-link]() - 2.4.7
-- [@tauri-apps/plugin-opener]() - 2.5.3
-- [@tauri-apps/plugin-updater]() - 2.10.0
-
----
-
-## 0BSD
-
-- [tslib]() - 2.8.1
-- [tslib]() - 2.8.1
-- [tslib]() - 2.8.1
-- [tslib]() - 2.8.1
-- [tslib]() - 2.8.1
-- [tslib]() - 2.8.1
-- [tslib]() - 2.8.1
-- [tslib]() - 2.8.1
-- [tslib]() - 2.8.1
-
----
-
-## Unknown
-
-- [svelte-toolbelt]() - 0.10.6
-- [dlopen2](https://github.com/OpenByteDev/dlopen2) - 0.8.0
-- [dlopen2_derive](https://github.com/OpenByteDev/dlopen2) - 0.4.1
-
----
-
-## BSD-2-Clause
-
-- [esutils]() - 2.0.3
-- [eslint-scope]() - 8.4.0
-- [espree]() - 10.4.0
-- [espree]() - 10.4.0
-- [uri-js]() - 4.4.1
-- [eslint-scope]() - 8.4.0
-- [esrecurse]() - 4.3.0
-- [estraverse]() - 5.3.0
-- [estraverse]() - 5.3.0
-- [espree]() - 10.4.0
-- [estraverse]() - 5.3.0
-- [esutils]() - 2.0.3
-- [entities]() - 6.0.1
-- [webidl-conversions]() - 8.0.1
-- [webidl-conversions]() - 8.0.1
-- [esprima]() - 4.0.1
-
----
-
-## ISC
-
-- [yaml]() - 1.10.2
-- [picocolors]() - 1.1.1
-- [semver]() - 7.7.4
-- [minimatch]() - 3.1.2
-- [minimatch]() - 3.1.2
-- [which]() - 2.0.2
-- [isexe]() - 2.0.0
-- [flatted]() - 3.3.3
-- [glob-parent]() - 6.0.2
-- [minimatch]() - 3.1.2
-- [saxes]() - 6.0.0
-- [semver-ts]() - 1.0.3
-- [picocolors]() - 1.1.1
-- [picocolors]() - 1.1.1
-- [picocolors]() - 1.1.1
-- [semver]() - 7.7.4
-- [picocolors]() - 1.1.1
-- [minimatch]() - 9.0.5
-- [semver]() - 7.7.4
-- [siginfo]() - 2.0.0
-- [libloading](https://github.com/nagisa/rust_libloading/) - 0.7.4
-- [rustls-webpki](https://github.com/rustls/webpki) - 0.103.4
-- [untrusted](https://github.com/briansmith/untrusted) - 0.9.0
+- [aho-corasick](https://github.com/BurntSushi/aho-corasick) - 1.1.3
+- [byteorder](https://github.com/BurntSushi/byteorder) - 1.5.0
+- [byteorder-lite](https://github.com/image-rs/byteorder-lite) - 0.1.0
+- [memchr](https://github.com/BurntSushi/memchr) - 2.7.5
+- [same-file](https://github.com/BurntSushi/same-file) - 1.0.6
+- [walkdir](https://github.com/BurntSushi/walkdir) - 2.5.0
+- [winapi-util](https://github.com/BurntSushi/winapi-util) - 0.1.10
 
 ---
 
 ## BSD-3-Clause
 
-- [source-map-js]() - 1.2.1
-- [esquery]() - 1.7.0
-- [intl-messageformat]() - 11.1.2
-- [source-map-js]() - 1.2.1
-- [tough-cookie]() - 6.0.0
-- [source-map]() - 0.6.1
 - [alloc-no-stdlib](https://github.com/dropbox/rust-alloc-no-stdlib) - 2.0.4
 - [alloc-stdlib](https://github.com/dropbox/rust-alloc-no-stdlib) - 0.2.2
 - [curve25519-dalek](https://github.com/dalek-cryptography/curve25519-dalek/tree/main/curve25519-dalek) - 4.1.3
@@ -1543,55 +517,196 @@ This page lists the licenses of third party dependencies used by this project
 
 ---
 
-## Python-2.0
+## MIT
 
-- [argparse]() - 2.0.1
-
----
-
-## (MPL-2.0 OR Apache-2.0)
-
-- [dompurify]() - 3.3.1
-
----
-
-## CC0-1.0
-
-- [mdn-data]() - 2.12.2
-- [tiny-keccak]() - 2.0.2
-
----
-
-## BlueOak-1.0.0
-
-- [lru-cache]() - 11.2.5
-- [lru-cache]() - 11.2.5
-- [lru-cache]() - 11.2.5
-
----
-
-## MIT-0
-
-- [@csstools/color-helpers]() - 6.0.1
-- [@csstools/css-syntax-patches-for-csstree]() - 1.0.26
-
----
-
-## 0BSD OR Apache-2.0 OR MIT
-
-- [adler2](https://github.com/oyvindln/adler2) - 2.0.1
-
----
-
-## MIT OR Unlicense
-
-- [aho-corasick](https://github.com/BurntSushi/aho-corasick) - 1.1.3
-- [byteorder](https://github.com/BurntSushi/byteorder) - 1.5.0
-- [byteorder-lite](https://github.com/image-rs/byteorder-lite) - 0.1.0
-- [memchr](https://github.com/BurntSushi/memchr) - 2.7.5
-- [same-file](https://github.com/BurntSushi/same-file) - 1.0.6
-- [walkdir](https://github.com/BurntSushi/walkdir) - 2.5.0
-- [winapi-util](https://github.com/BurntSushi/winapi-util) - 0.1.10
+- [async_zip](https://github.com/Majored/rs-async-zip) - 0.0.18
+- [atk](https://github.com/gtk-rs/gtk3-rs) - 0.18.2
+- [atk-sys](https://github.com/gtk-rs/gtk3-rs) - 0.18.2
+- [atoi](https://github.com/pacman82/atoi-rs) - 2.0.0
+- [auto-launch](https://github.com/zzzgydi/auto-launch.git) - 0.5.0
+- [axum](https://github.com/tokio-rs/axum) - 0.8.8
+- [axum-core](https://github.com/tokio-rs/axum) - 0.5.5
+- [bincode](https://github.com/servo/bincode) - 1.3.3
+- [block2](https://github.com/madsmtm/objc2) - 0.5.1
+- [block2](https://github.com/madsmtm/objc2) - 0.6.1
+- [bytes](https://github.com/tokio-rs/bytes) - 1.10.1
+- [cairo-rs](https://github.com/gtk-rs/gtk-rs-core) - 0.18.5
+- [cairo-sys-rs](https://github.com/gtk-rs/gtk-rs-core) - 0.18.2
+- [card-validate](https://github.com/valeriansaliou/rs-card-validate.git) - 2.4.0
+- [cargo_metadata](https://github.com/oli-obk/cargo_metadata) - 0.19.2
+- [castaway](https://github.com/sagebind/castaway) - 0.2.4
+- [cfb](https://github.com/mdsteele/rust-cfb) - 0.7.3
+- [cfg_aliases](https://github.com/katharostech/cfg_aliases) - 0.2.1
+- [combine](https://github.com/Marwes/combine) - 4.6.7
+- [compact_str](https://github.com/ParkMyCar/compact_str) - 0.8.1
+- [convert_case](https://github.com/rutrum/convert-case) - 0.4.0
+- [core_maths](https://github.com/robertbastian/core_maths) - 0.1.1
+- [crunchy](https://github.com/eira-fransham/crunchy) - 0.2.4
+- [darling](https://github.com/TedDriggs/darling) - 0.20.11
+- [darling_core](https://github.com/TedDriggs/darling) - 0.20.11
+- [darling_macro](https://github.com/TedDriggs/darling) - 0.20.11
+- [data-encoding](https://github.com/ia0/data-encoding) - 2.9.0
+- [deflate64](https://github.com/anatawa12/deflate64-rs) - 0.1.9
+- [derive_more](https://github.com/JelteF/derive_more) - 0.99.20
+- [dispatch](http://github.com/SSheldon/rust-dispatch) - 0.2.0
+- [dotenvy](https://github.com/allan2/dotenvy) - 0.15.7
+- [embed-resource](https://github.com/nabijaczleweli/rust-embed-resource) - 3.0.5
+- [endi](https://github.com/zeenix/endi) - 1.1.0
+- [enigo](https://github.com/enigo-rs/enigo) - 0.6.1
+- [fontconfig-parser](https://github.com/Riey/fontconfig-parser) - 0.5.8
+- [fontdb](https://github.com/RazrFalcon/fontdb) - 0.23.0
+- [fs_extra](https://github.com/webdesus/fs_extra) - 1.3.0
+- [gdk](https://github.com/gtk-rs/gtk3-rs) - 0.18.2
+- [gdk-pixbuf](https://github.com/gtk-rs/gtk-rs-core) - 0.18.5
+- [gdk-pixbuf-sys](https://github.com/gtk-rs/gtk-rs-core) - 0.18.0
+- [gdk-sys](https://github.com/gtk-rs/gtk3-rs) - 0.18.2
+- [gdkwayland-sys](https://github.com/gtk-rs/gtk3-rs) - 0.18.2
+- [gdkx11](https://github.com/gtk-rs/gtk3-rs) - 0.18.2
+- [gdkx11-sys](https://github.com/gtk-rs/gtk3-rs) - 0.18.2
+- [generic-array](https://github.com/fizyk20/generic-array.git) - 0.14.7
+- [getset](https://github.com/jbaublitz/getset) - 0.1.6
+- [gio](https://github.com/gtk-rs/gtk-rs-core) - 0.18.4
+- [gio-sys](https://github.com/gtk-rs/gtk-rs-core) - 0.18.1
+- [glib](https://github.com/gtk-rs/gtk-rs-core) - 0.18.5
+- [glib-macros](https://github.com/gtk-rs/gtk-rs-core) - 0.18.5
+- [glib-sys](https://github.com/gtk-rs/gtk-rs-core) - 0.18.1
+- [gobject-sys](https://github.com/gtk-rs/gtk-rs-core) - 0.18.0
+- [gtk](https://github.com/gtk-rs/gtk3-rs) - 0.18.2
+- [gtk-sys](https://github.com/gtk-rs/gtk3-rs) - 0.18.2
+- [gtk3-macros](https://github.com/gtk-rs/gtk3-rs) - 0.18.2
+- [h2](https://github.com/hyperium/h2) - 0.4.12
+- [http-body](https://github.com/hyperium/http-body) - 1.0.1
+- [http-body-util](https://github.com/hyperium/http-body) - 0.1.3
+- [hyper](https://github.com/hyperium/hyper) - 1.7.0
+- [hyper-util](https://github.com/hyperium/hyper-util) - 0.1.16
+- [ico](https://github.com/mdsteele/rust-ico) - 0.5.0
+- [infer](https://github.com/bojand/infer) - 0.19.0
+- [is-docker](https://github.com/TheLarkInn/is-docker) - 0.2.0
+- [is-wsl](https://github.com/TheLarkInn/is-wsl) - 0.4.0
+- [javascriptcore-rs](https://github.com/tauri-apps/javascriptcore-rs) - 1.1.2
+- [javascriptcore-rs-sys](https://github.com/tauri-apps/javascriptcore-rs) - 1.1.1
+- [kuchikiki](https://github.com/brave/kuchikiki) - 0.8.8-speedreader
+- [libm](https://github.com/rust-lang/compiler-builtins) - 0.2.15
+- [libredox](https://gitlab.redox-os.org/redox-os/libredox.git) - 0.1.9
+- [libsqlite3-sys](https://github.com/rusqlite/rusqlite) - 0.30.1
+- [matchers](https://github.com/hawkw/matchers) - 0.2.0
+- [matches](https://github.com/SimonSapin/rust-std-candidates) - 0.1.10
+- [memoffset](https://github.com/Gilnaa/memoffset) - 0.9.1
+- [mime_guess](https://github.com/abonander/mime_guess) - 2.0.5
+- [minisign-verify](https://github.com/jedisct1/rust-minisign-verify) - 0.2.4
+- [mio](https://github.com/tokio-rs/mio) - 1.0.4
+- [new_debug_unreachable](https://github.com/mbrubeck/rust-debug-unreachable) - 1.0.6
+- [nix](https://github.com/nix-rust/nix) - 0.30.1
+- [nom](https://github.com/Geal/nom) - 7.1.3
+- [nom](https://github.com/rust-bakery/nom) - 8.0.0
+- [nu-ansi-term](https://github.com/nushell/nu-ansi-term) - 0.50.1
+- [objc-sys](https://github.com/madsmtm/objc2) - 0.3.5
+- [objc2](https://github.com/madsmtm/objc2) - 0.5.2
+- [objc2](https://github.com/madsmtm/objc2) - 0.6.2
+- [objc2-encode](https://github.com/madsmtm/objc2) - 4.1.0
+- [objc2-foundation](https://github.com/madsmtm/objc2) - 0.2.2
+- [objc2-foundation](https://github.com/madsmtm/objc2) - 0.3.1
+- [objc2-metal](https://github.com/madsmtm/objc2) - 0.2.2
+- [objc2-quartz-core](https://github.com/madsmtm/objc2) - 0.2.2
+- [open](https://github.com/Byron/open-rs) - 5.3.2
+- [ordered-multimap](https://github.com/sgodwincs/ordered-multimap-rs) - 0.7.3
+- [pango](https://github.com/gtk-rs/gtk-rs-core) - 0.18.3
+- [pango-sys](https://github.com/gtk-rs/gtk-rs-core) - 0.18.0
+- [phf](https://github.com/sfackler/rust-phf) - 0.8.0
+- [phf](https://github.com/sfackler/rust-phf) - 0.10.1
+- [phf](https://github.com/rust-phf/rust-phf) - 0.11.3
+- [phf_codegen](https://github.com/sfackler/rust-phf) - 0.8.0
+- [phf_codegen](https://github.com/rust-phf/rust-phf) - 0.11.3
+- [phf_generator](https://github.com/sfackler/rust-phf) - 0.8.0
+- [phf_generator](https://github.com/sfackler/rust-phf) - 0.10.0
+- [phf_generator](https://github.com/rust-phf/rust-phf) - 0.11.3
+- [phf_macros](https://github.com/sfackler/rust-phf) - 0.10.0
+- [phf_macros](https://github.com/rust-phf/rust-phf) - 0.11.3
+- [phf_shared](https://github.com/sfackler/rust-phf) - 0.8.0
+- [phf_shared](https://github.com/sfackler/rust-phf) - 0.10.0
+- [phf_shared](https://github.com/rust-phf/rust-phf) - 0.11.3
+- [plist](https://github.com/ebarnard/rust-plist/) - 1.7.4
+- [precomputed-hash](https://github.com/emilio/precomputed-hash) - 0.1.1
+- [quick-xml](https://github.com/tafia/quick-xml) - 0.37.5
+- [quick-xml](https://github.com/tafia/quick-xml) - 0.38.3
+- [redox_syscall](https://gitlab.redox-os.org/redox-os/syscall) - 0.5.17
+- [redox_users](https://gitlab.redox-os.org/redox-os/users) - 0.4.6
+- [redox_users](https://gitlab.redox-os.org/redox-os/users) - 0.5.2
+- [regex-cache](https://github.com/1aim/rust-regex-cache) - 0.2.1
+- [rfd](https://github.com/PolyMeilex/rfd) - 0.17.2
+- [rmp](https://github.com/3Hren/msgpack-rust) - 0.8.14
+- [rmp-serde](https://github.com/3Hren/msgpack-rust) - 1.3.1
+- [rust-ini](https://github.com/zonyitoo/rust-ini) - 0.21.1
+- [sanitize-filename](https://github.com/kardeiz/sanitize-filename) - 0.6.0
+- [schannel](https://github.com/steffengy/schannel-rs) - 0.1.27
+- [schemars](https://github.com/GREsau/schemars) - 0.8.22
+- [schemars](https://github.com/GREsau/schemars) - 0.9.0
+- [schemars](https://github.com/GREsau/schemars) - 1.0.4
+- [schemars_derive](https://github.com/GREsau/schemars) - 0.8.22
+- [schemars_derive](https://github.com/GREsau/schemars) - 1.0.4
+- [sharded-slab](https://github.com/hawkw/sharded-slab) - 0.1.7
+- [simd-adler32](https://github.com/mcountryman/simd-adler32) - 0.3.7
+- [slab](https://github.com/tokio-rs/slab) - 0.4.11
+- [soup3](https://gitlab.gnome.org/World/Rust/soup3-rs) - 0.5.0
+- [soup3-sys](https://gitlab.gnome.org/World/Rust/soup3-rs) - 0.5.0
+- [spin](https://github.com/mvdnes/spin-rs.git) - 0.9.8
+- [strsim](https://github.com/rapidfuzz/strsim-rs) - 0.11.1
+- [strum](https://github.com/Peternator7/strum) - 0.26.3
+- [strum](https://github.com/Peternator7/strum) - 0.27.2
+- [strum_macros](https://github.com/Peternator7/strum) - 0.26.4
+- [strum_macros](https://github.com/Peternator7/strum) - 0.27.2
+- [synstructure](https://github.com/mystor/synstructure) - 0.13.2
+- [sysinfo](https://github.com/GuillaumeGomez/sysinfo) - 0.38.0
+- [tauri-winres](https://github.com/tauri-apps/winres) - 0.3.3
+- [tiff](https://github.com/image-rs/image-tiff) - 0.9.1
+- [tilepad-desktop](https://github.com/TilePad/tilepad-desktop) - 0.1.3
+- [tilepad-manifest](https://github.com/tilepad/tilepad-manifest) - 0.9.0
+- [tokio](https://github.com/tokio-rs/tokio) - 1.49.0
+- [tokio-macros](https://github.com/tokio-rs/tokio) - 2.6.0
+- [tokio-stream](https://github.com/tokio-rs/tokio) - 0.1.17
+- [tokio-tungstenite](https://github.com/snapview/tokio-tungstenite) - 0.28.0
+- [tokio-util](https://github.com/tokio-rs/tokio) - 0.7.18
+- [tower](https://github.com/tower-rs/tower) - 0.5.2
+- [tower-http](https://github.com/tower-rs/tower-http) - 0.6.8
+- [tower-layer](https://github.com/tower-rs/tower) - 0.3.3
+- [tower-service](https://github.com/tower-rs/tower) - 0.3.3
+- [tracing](https://github.com/tokio-rs/tracing) - 0.1.44
+- [tracing-appender](https://github.com/tokio-rs/tracing) - 0.2.4
+- [tracing-attributes](https://github.com/tokio-rs/tracing) - 0.1.31
+- [tracing-core](https://github.com/tokio-rs/tracing) - 0.1.36
+- [tracing-log](https://github.com/tokio-rs/tracing) - 0.2.0
+- [tracing-serde](https://github.com/tokio-rs/tracing) - 0.2.0
+- [tracing-subscriber](https://github.com/tokio-rs/tracing) - 0.3.22
+- [trim-in-place](https://github.com/magiclen/trim-in-place) - 0.1.7
+- [try-lock](https://github.com/seanmonstar/try-lock) - 0.2.5
+- [uds_windows](https://github.com/haraldh/rust_uds_windows) - 1.1.0
+- [urlpattern](https://github.com/denoland/rust-urlpattern) - 0.3.0
+- [valuable](https://github.com/tokio-rs/valuable) - 0.1.1
+- [version-compare](https://gitlab.com/timvisee/version-compare) - 0.2.0
+- [vswhom](https://github.com/nabijaczleweli/vswhom.rs) - 0.1.0
+- [vswhom-sys](https://github.com/nabijaczleweli/vswhom-sys.rs) - 0.1.3
+- [want](https://github.com/seanmonstar/want) - 0.3.1
+- [webkit2gtk](https://github.com/tauri-apps/webkit2gtk-rs) - 2.0.2
+- [webkit2gtk-sys](https://github.com/tauri-apps/webkit2gtk-rs) - 2.0.2
+- [webview2-com](https://github.com/wravery/webview2-rs) - 0.38.0
+- [webview2-com-macros](https://github.com/wravery/webview2-rs) - 0.8.0
+- [webview2-com-sys](https://github.com/wravery/webview2-rs) - 0.38.0
+- [winnow](https://github.com/winnow-rs/winnow) - 0.5.40
+- [winnow](https://github.com/winnow-rs/winnow) - 0.7.13
+- [winreg](https://github.com/gentoo90/winreg-rs) - 0.10.1
+- [winreg](https://github.com/gentoo90/winreg-rs) - 0.55.0
+- [x11](https://github.com/AltF02/x11-rs.git) - 2.21.0
+- [x11-dl](https://github.com/AltF02/x11-rs.git) - 2.21.0
+- [xkbcommon](https://github.com/rust-x-bindings/xkbcommon-rs) - 0.9.0
+- [zbus](https://github.com/dbus2/zbus/) - 5.10.0
+- [zbus_macros](https://github.com/dbus2/zbus/) - 5.10.0
+- [zbus_names](https://github.com/dbus2/zbus/) - 4.2.0
+- [zip](https://github.com/zip-rs/zip2.git) - 4.5.0
+- [zmij](https://github.com/dtolnay/zmij) - 1.0.19
+- [zstd](https://github.com/gyscos/zstd-rs) - 0.13.3
+- [zvariant](https://github.com/dbus2/zbus/) - 5.7.0
+- [zvariant_derive](https://github.com/dbus2/zbus/) - 5.7.0
+- [zvariant_utils](https://github.com/dbus2/zbus/) - 3.2.1
 
 ---
 
@@ -1664,6 +779,13 @@ This page lists the licenses of third party dependencies used by this project
 
 ---
 
+## Unknown
+
+- [dlopen2](https://github.com/OpenByteDev/dlopen2) - 0.8.0
+- [dlopen2_derive](https://github.com/OpenByteDev/dlopen2) - 0.4.1
+
+---
+
 ## Apache-2.0 AND MIT
 
 - [dpi](https://github.com/rust-windowing/winit) - 0.1.2
@@ -1692,6 +814,18 @@ This page lists the licenses of third party dependencies used by this project
 
 - [foldhash](https://github.com/orlp/foldhash) - 0.1.5
 - [slotmap](https://github.com/orlp/slotmap) - 1.0.7
+
+---
+
+## Apache-2.0
+
+- [gethostname](https://codeberg.org/swsnr/gethostname.rs.git) - 1.0.2
+- [miette](https://github.com/zkat/miette) - 7.6.0
+- [miette-derive](https://github.com/zkat/miette) - 7.6.0
+- [node-semver](https://github.com/felipesere/node-semver-rs) - 2.2.0
+- [phonenumber](https://github.com/whisperfish/rust-phonenumber) - 0.3.7+8.13.52
+- [sync_wrapper](https://github.com/Actyx/sync_wrapper) - 1.0.2
+- [tao](https://github.com/tauri-apps/tao) - 0.34.5
 
 ---
 
@@ -1729,6 +863,14 @@ This page lists the licenses of third party dependencies used by this project
 ## bzip2-1.0.6
 
 - [libbz2-rs-sys](https://github.com/trifectatechfoundation/libbzip2-rs) - 0.2.2
+
+---
+
+## ISC
+
+- [libloading](https://github.com/nagisa/rust_libloading/) - 0.7.4
+- [rustls-webpki](https://github.com/rustls/webpki) - 0.103.4
+- [untrusted](https://github.com/briansmith/untrusted) - 0.9.0
 
 ---
 
@@ -1778,6 +920,12 @@ This page lists the licenses of third party dependencies used by this project
 ## Apache-2.0 WITH LLVM-exception
 
 - [target-lexicon](https://github.com/bytecodealliance/target-lexicon) - 0.12.16
+
+---
+
+## CC0-1.0
+
+- [tiny-keccak]() - 2.0.2
 
 ---
 

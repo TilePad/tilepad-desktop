@@ -14,9 +14,9 @@
     "moduleResolution": "bundler",
     "module": "esnext",
     "noEmit": true,
-    "target": "esnext",
+    "target": "esnext"
   },
-  "include": ["./src/**/*.ts"],
+  "include": ["./src/**/*.ts"]
   // Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias
   // except $lib which is handled by https://svelte.dev/docs/kit/configuration#files
   //

@@ -1,4 +1,3 @@
-import js from "@eslint/js";
 import globals from "globals";
 import ts from "typescript-eslint";
 import { fileURLToPath } from "node:url";
@@ -26,8 +25,6 @@ export default ts.config(
   includeIgnoreFile(displayGitignorePath),
   includeIgnoreFile(inspectorGitignorePath),
   { ignores: ["src-tauri/src/script/**/*", "script/**/*"] },
-  // JS
-  js.configs.recommended,
   // TS
   ...ts.configs.recommended,
   // Svelte

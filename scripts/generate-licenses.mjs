@@ -47,7 +47,7 @@ function createLicenseMarkdown(jsonData) {
 }
 
 async function getNpmLicenses() {
-  const { stdout } = await execAsync("npm ls --all --json --long", {
+  const { stdout } = await execAsync("pnpm ls --json --long", {
     maxBuffer: 1024 * 1024 * 10, // 10MB buffer
   });
   const data = JSON.parse(stdout);
