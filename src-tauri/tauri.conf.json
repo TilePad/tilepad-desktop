@@ -1,59 +1,59 @@
 {
-  "$schema": "https://schema.tauri.app/config/2",
-  "mainBinaryName": "tilepad-desktop",
-  "productName": "Tilepad",
-  "version": "0.1.3",
-  "identifier": "com.jacobtread.tilepad.desktop",
-  "build": {
-    "beforeDevCommand": "npm run dev",
-    "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "npm run build",
-    "frontendDist": "../build"
-  },
-  "app": {
-    "windows": [
-      {
-        "title": "Tilepad",
-        "width": 1050,
-        "height": 700
-      }
-    ],
-    "security": {
-      "csp": null
-    }
-  },
-  "bundle": {
-    "active": true,
-    "targets": "all",
-    "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
-    ],
-    "resources": {
-      "../core/": "core/",
-      "../THIRD_PARTY_LICENSES.md": "THIRD_PARTY_LICENSES.md"
+    "$schema": "https://schema.tauri.app/config/2",
+    "mainBinaryName": "tilepad-desktop",
+    "productName": "Tilepad",
+    "version": "0.1.4",
+    "identifier": "com.jacobtread.tilepad.desktop",
+    "build": {
+        "beforeDevCommand": "npm run dev",
+        "devUrl": "http://localhost:1420",
+        "beforeBuildCommand": "npm run build",
+        "frontendDist": "../build"
     },
-    "createUpdaterArtifacts": true,
-    "macOS": {
-        "signingIdentity": "-"
-    }
-  },
-  "plugins": {
-    "deep-link": {
-      "desktop": {
-        "schemes": [
-          "tilepad"
-        ]
-      }
+    "app": {
+        "windows": [
+            {
+                "title": "Tilepad",
+                "width": 1050,
+                "height": 700
+            }
+        ],
+        "security": {
+            "csp": null
+        }
     },
-    "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEU2NjdGNTE3REIzMTA5OTMKUldTVENUSGJGL1ZuNWk5TmtDUUFBMU0vVlRjQTl1aCtxWXFIanhPaTgwYlhCRThsRzNpQlpuKzcK",
-      "endpoints": [
-        "https://github.com/TilePad/tilepad-desktop/releases/latest/download/latest.json"
-      ]
+    "bundle": {
+        "active": true,
+        "targets": "all",
+        "icon": [
+            "icons/32x32.png",
+            "icons/128x128.png",
+            "icons/128x128@2x.png",
+            "icons/icon.icns",
+            "icons/icon.ico"
+        ],
+        "resources": {
+            "../core/": "core/",
+            "../THIRD_PARTY_LICENSES.md": "THIRD_PARTY_LICENSES.md"
+        },
+        "createUpdaterArtifacts": true,
+        "macOS": {
+            "signingIdentity": "-"
+        }
+    },
+    "plugins": {
+        "deep-link": {
+            "desktop": {
+                "schemes": [
+                    "tilepad"
+                ]
+            }
+        },
+        "updater": {
+            "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEU2NjdGNTE3REIzMTA5OTMKUldTVENUSGJGL1ZuNWk5TmtDUUFBMU0vVlRjQTl1aCtxWXFIanhPaTgwYlhCRThsRzNpQlpuKzcK",
+            "endpoints": [
+                "https://github.com/TilePad/tilepad-desktop/releases/latest/download/latest.json"
+            ]
+        }
     }
-  }
 }
