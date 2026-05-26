@@ -2,6 +2,7 @@ use super::device::DeviceId;
 use super::folder::FolderId;
 use crate::database::{DbErr, DbPool, DbResult, JsonObject};
 use serde::{Deserialize, Serialize};
+use sqlx::AssertSqlSafe;
 use sqlx::prelude::FromRow;
 use tilepad_manifest::icons::IconPackId;
 use tilepad_manifest::plugin::{ActionId, PluginId};
@@ -388,7 +389,11 @@ impl TileModel {
             "#
         );
 
-        let mut query = sqlx::query_as(&query)
+        // This query is safe, the dynamic portion of this query consists of only "?,"
+        // repeated the amount of times needed for each fo the device ids
+        let query = AssertSqlSafe(query);
+
+        let mut query = sqlx::query_as(query)
             // Bind the plugin ID
             .bind(plugin_id.as_str());
 
