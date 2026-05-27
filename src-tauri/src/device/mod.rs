@@ -116,8 +116,8 @@ impl Devices {
     pub fn get_connected_device_ids(&self) -> Vec<DeviceId> {
         self.sessions
             .read()
-            .iter()
-            .filter_map(|(_, session_ref)| {
+            .values()
+            .filter_map(|session_ref| {
                 let device_id = session_ref.get_device_id()?;
                 Some(device_id)
             })

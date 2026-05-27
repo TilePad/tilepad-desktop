@@ -361,8 +361,8 @@ impl Plugins {
         let sessions: Vec<(PluginId, PluginSessionRef)> = {
             self.sessions
                 .read()
-                .iter()
-                .filter_map(|(_, value)| {
+                .values()
+                .filter_map(|value| {
                     let plugin_id = value.get_plugin_id()?;
                     Some((plugin_id, value.clone()))
                 })
@@ -554,7 +554,7 @@ impl Plugins {
     }
 
     #[tracing::instrument(
-        name = "start_plugin_task", 
+        name = "start_plugin_task",
         skip(self, manifest),
         fields(
             manifest.plugin_id = ?manifest.plugin.id,
