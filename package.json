@@ -1,93 +1,90 @@
 {
-  "name": "tilepad-desktop",
-  "version": "0.1.4",
-  "description": "",
-  "type": "module",
-  "scripts": {
-    "dev": "vite dev",
-    "build": "pnpm run prebuild && vite build",
-    "prebuild": "pnpm run build:inspector && pnpm run build:display",
-    "preview": "vite preview",
-    "prepare": "svelte-kit sync || echo ''",
-    "build:inspector": "pnpm run --filter=tilepad-inspector build ",
-    "build:display": "pnpm run --filter=tilepad-display build ",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "tauri": "tauri",
-    "format": "prettier --write .",
-    "lint": "prettier --check . && eslint .",
-    "lint:fix": "eslint src --fix",
-    "make:licenses": "node scripts/generate-licenses.mjs",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
-    "test:unit": "vitest"
-  },
-  "license": "MIT",
-  "dependencies": {
-    "@castlenine/svelte-qrcode": "2.3.0",
-    "@fontsource/roboto": "^5.2.9",
-    "@tanstack/svelte-query": "6.0.18",
-    "@tanstack/svelte-query-devtools": "6.0.4",
-    "@tauri-apps/api": "2.11.0",
-    "@tauri-apps/plugin-autostart": "2.5.1",
-    "@tauri-apps/plugin-deep-link": "2.4.9",
-    "@tauri-apps/plugin-opener": "2.5.4",
-    "@tauri-apps/plugin-updater": "2.10.1",
-    "bits-ui": "2.15.5",
-    "intl-messageformat": "^11.1.2",
-    "isomorphic-dompurify": "2.35.0",
-    "marked": "17.0.1",
-    "runed": "0.37.1",
-    "semver-ts": "1.0.3",
-    "svelte-awesome-color-picker": "4.1.1",
-    "svelte-sonner": "1.0.7"
-  },
-  "devDependencies": {
-    "@eslint/compat": "^2.0.5",
-    "@iconify-json/solar": "1.2.5",
-    "@iconify-json/twemoji": "1.2.5",
-    "@storybook/addon-svelte-csf": "^5.1.2",
-    "@storybook/sveltekit": "^10.3.5",
-    "@sveltejs/adapter-static": "3.0.10",
-    "@sveltejs/kit": "2.57.1",
-    "@sveltejs/vite-plugin-svelte": "7.0.0",
-    "@tanstack/eslint-plugin-query": "5.99.2",
-    "@tauri-apps/cli": "2.10.0",
-    "eslint": "10.2.1",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-perfectionist": "5.9.0",
-    "eslint-plugin-storybook": "^10.3.5",
-    "eslint-plugin-svelte": "3.17.0",
-    "eslint-plugin-unused-imports": "4.4.1",
-    "globals": "^17.5.0",
-    "prettier": "3.8.3",
-    "prettier-plugin-svelte": "3.5.1",
-    "storybook": "^10.3.5",
-    "svelte": "5.55.4",
-    "svelte-check": "4.4.6",
-    "typescript": "5.9.3",
-    "typescript-eslint": "8.54.0",
-    "unplugin-icons": "23.0.1",
-    "vite": "8.0.9",
-    "vitest": "4.1.4"
-  },
-  "overrides": {
-    "@sveltejs/kit": {
-      "cookie": "^0.7.0"
+    "name": "tilepad-desktop",
+    "version": "0.1.4",
+    "description": "",
+    "type": "module",
+    "scripts": {
+        "dev": "vite dev",
+        "build": "pnpm run prebuild && vite build",
+        "prebuild": "pnpm run build:inspector && pnpm run build:display",
+        "preview": "vite preview",
+        "prepare": "svelte-kit sync || echo ''",
+        "build:inspector": "pnpm run --filter=tilepad-inspector build ",
+        "build:display": "pnpm run --filter=tilepad-display build ",
+        "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+        "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+        "tauri": "tauri",
+        "format": "prettier --write .",
+        "lint": "prettier --check . && eslint .",
+        "lint:fix": "eslint src --fix",
+        "make:licenses": "node scripts/generate-licenses.mjs",
+        "storybook": "storybook dev -p 6006",
+        "build-storybook": "storybook build",
+        "test:unit": "vitest"
     },
-    "@sveltejs/vite-plugin-svelte@": {
-      "vite": "^8.0.9"
-    }
-  },
-  "npm": {
+    "license": "MIT",
+    "dependencies": {
+        "@castlenine/svelte-qrcode": "2.3.0",
+        "@fontsource/roboto": "^5.2.10",
+        "@tanstack/svelte-query": "6.1.34",
+        "@tanstack/svelte-query-devtools": "6.1.34",
+        "@tauri-apps/api": "2.11.0",
+        "@tauri-apps/plugin-autostart": "2.5.1",
+        "@tauri-apps/plugin-deep-link": "2.4.9",
+        "@tauri-apps/plugin-opener": "2.5.4",
+        "@tauri-apps/plugin-updater": "2.10.1",
+        "bits-ui": "2.18.1",
+        "intl-messageformat": "^11.2.8",
+        "isomorphic-dompurify": "3.16.0",
+        "marked": "18.0.5",
+        "runed": "0.37.1",
+        "semver-ts": "1.0.3",
+        "svelte-awesome-color-picker": "4.1.3",
+        "svelte-sonner": "1.1.1"
+    },
+    "devDependencies": {
+        "@eslint/compat": "^2.1.0",
+        "@iconify-json/solar": "1.2.5",
+        "@iconify-json/twemoji": "1.2.5",
+        "@storybook/addon-svelte-csf": "^5.1.2",
+        "@storybook/sveltekit": "^10.4.2",
+        "@sveltejs/adapter-static": "3.0.10",
+        "@sveltejs/kit": "2.63.1",
+        "@sveltejs/vite-plugin-svelte": "7.1.2",
+        "@tanstack/eslint-plugin-query": "5.101.0",
+        "@tauri-apps/cli": "2.10.0",
+        "eslint": "10.4.1",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-perfectionist": "5.9.0",
+        "eslint-plugin-storybook": "^10.4.2",
+        "eslint-plugin-svelte": "3.19.0",
+        "eslint-plugin-unused-imports": "4.4.1",
+        "globals": "^17.6.0",
+        "prettier": "3.8.3",
+        "prettier-plugin-svelte": "4.1.0",
+        "storybook": "^10.4.2",
+        "svelte": "5.56.3",
+        "svelte-check": "4.6.0",
+        "typescript": "5.9.3",
+        "typescript-eslint": "8.61.0",
+        "unplugin-icons": "23.0.1",
+        "vite": "8.0.16",
+        "vitest": "4.1.4"
+    },
     "overrides": {
-      "cookie": "^0.7.0"
+        "@sveltejs/kit": {
+            "cookie": "^0.7.0"
+        }
+    },
+    "npm": {
+        "overrides": {
+            "cookie": "^0.7.0"
+        }
+    },
+    "packageManager": "pnpm@10.33.0",
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "esbuild"
+        ]
     }
-  },
-  "packageManager": "pnpm@10.33.0",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
-  }
 }
