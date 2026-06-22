@@ -1,15 +1,15 @@
 {
-  "name": "tilepad-inspector",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "build": "node esbuild.mjs",
-    "types": "tsc"
-  },
-  "author": "Jacobtread",
-  "license": "MIT",
-  "description": "",
-  "devDependencies": {
-    "esbuild": "0.27.3"
-  }
+    "name": "tilepad-inspector",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "build": "node esbuild.mjs",
+        "types": "tsc"
+    },
+    "author": "Jacobtread",
+    "license": "MIT",
+    "description": "",
+    "devDependencies": {
+        "esbuild": "0.28.1"
+    }
 }
