@@ -79,3 +79,5 @@ Because of these constraints, plugin assets must be loaded in plain text. Howeve
 ## Linux notes
 
 To build on linux you must follow the [Enigo Runtime Dependencies](https://github.com/enigo-rs/enigo?tab=readme-ov-file#runtime-dependencies) instructions for your distribution (They are "Runtime Dependencies" but are also required while building otherwise linking will fail)
+
+Crashing on startup? Try setting `__NV_DISABLE_EXPLICIT_SYNC=1` before launching
