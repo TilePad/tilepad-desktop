@@ -128,7 +128,11 @@
     });
   }
 
-  function onSetProperties(ctx: InspectorContext, properties: object) {
+  function onSetProperties(
+    ctx: InspectorContext,
+    properties: object,
+    partial: boolean,
+  ) {
     updateMutex.runExclusive(async () => {
       const currentTile = await getTile(ctx.tile_id);
 
@@ -140,7 +144,7 @@
       await updateTileProperties.mutateAsync({
         tileId: ctx.tile_id,
         properties,
-        partial: true,
+        partial,
       });
     });
   }
@@ -230,7 +234,7 @@
       }
 
       case "SET_PROPERTIES": {
-        onSetProperties(ctx, event.properties);
+        onSetProperties(ctx, event.properties, event.partial);
         break;
       }
 

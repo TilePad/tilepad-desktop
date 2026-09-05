@@ -6,11 +6,7 @@ type EventCallback = (...args: any[]) => void;
  * Event emitting and subscribing
  */
 export class EventEmitter {
-  private events: Record<string, EventCallback[]>;
-
-  constructor() {
-    this.events = {};
-  }
+  private events: Record<string, EventCallback[]> = {};
 
   // Subscribe to an event
   on<T extends EventCallback>(event: string, callback: T) {
@@ -24,6 +20,15 @@ export class EventEmitter {
   off<T extends EventCallback>(event: string, callback: T) {
     if (!this.events[event]) return;
     this.events[event] = this.events[event].filter((cb) => cb !== callback);
+  }
+
+  // Subscribe to an event returning a dispose function to remove the subscription
+  subscribe<T extends EventCallback>(event: string, callback: T) {
+    this.on(event, callback);
+
+    return () => {
+      this.off(event, callback);
+    };
   }
 
   // Emit an event

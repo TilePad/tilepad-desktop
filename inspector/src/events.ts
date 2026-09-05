@@ -3,32 +3,38 @@ import { EventEmitter } from "./eventEmitter";
 class Inspector extends EventEmitter {
   constructor() {
     super();
+    window.addEventListener("message", this.onWindowMessage.bind(this));
+  }
 
-    window.addEventListener("message", (event) => {
-      const data = event.data;
-      const type = data.type;
+  /**
+   * Handle messages from the window
+   *
+   * @param event
+   */
+  private onWindowMessage(event: MessageEvent) {
+    const data = event.data;
+    const type = data.type;
 
-      // Handled when properties are received
-      if (type === "PROPERTIES") {
-        this.emit("properties", data.properties);
-      }
-      // Handled when plugin properties are received
-      else if (type === "PLUGIN_PROPERTIES") {
-        this.emit("plugin_properties", data.properties);
-      }
-      // Handled when the tile is received
-      else if (type === "TILE") {
-        this.emit("tile", data.tile);
-      }
-      // Handled when a message comes in from the plugin
-      else if (type === "PLUGIN_MESSAGE") {
-        this.emit("plugin_message", data.message);
-      }
-      // Used by the inspector to force a refresh for new state
-      else if (type === "REFRESH") {
-        window.location.reload();
-      }
-    });
+    // Handled when properties are received
+    if (type === "PROPERTIES") {
+      this.emit("properties", data.properties);
+    }
+    // Handled when plugin properties are received
+    else if (type === "PLUGIN_PROPERTIES") {
+      this.emit("plugin_properties", data.properties);
+    }
+    // Handled when the tile is received
+    else if (type === "TILE") {
+      this.emit("tile", data.tile);
+    }
+    // Handled when a message comes in from the plugin
+    else if (type === "PLUGIN_MESSAGE") {
+      this.emit("plugin_message", data.message);
+    }
+    // Used by the inspector to force a refresh for new state
+    else if (type === "REFRESH") {
+      window.location.reload();
+    }
   }
 
   /**
@@ -36,7 +42,7 @@ class Inspector extends EventEmitter {
    *
    * @param msg The message to send
    */
-  send(msg: unknown) {
+  send(msg: unknown): void {
     window.parent.postMessage(msg, "*");
   }
 }

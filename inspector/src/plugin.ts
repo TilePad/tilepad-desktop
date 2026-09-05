@@ -1,12 +1,19 @@
-import { debounce } from "./utils";
 import { inspector } from "./events";
+import { asyncEventCallback } from "./utils";
+import { DebouncedPropertyUpdater } from "./debouncePropertyUpdater";
 
-const plugin = {
-  /**
-   * Send a message to the plugin
-   *
-   * @param message The message to send
-   */
+function setProperties(properties: unknown, partial: boolean = true) {
+  inspector.send({
+    type: "SET_PLUGIN_PROPERTIES",
+    properties,
+    partial,
+  });
+}
+
+const debouncedUpdater = new DebouncedPropertyUpdater(setProperties, 100, 1500);
+const setProperty = debouncedUpdater.setProperty.bind(debouncedUpdater);
+
+const plugin: PluginApi = {
   send(message: unknown) {
     inspector.send({
       type: "SEND_TO_PLUGIN",
@@ -14,56 +21,24 @@ const plugin = {
     });
   },
 
-  /**
-   * Subscribes to messages sent to the inspector via the
-   * associated plugin for the action
-   *
-   * The returned function can be used to remove the subscription
-   *
-   * @param callback The callback to invoke when a message is received
-   * @returns Function that will remove the listener when called
-   */
   onMessage(callback: (message: unknown) => void) {
-    inspector.on("plugin_message", callback);
-    return () => {
-      inspector.off("plugin_message", callback);
-    };
+    return inspector.subscribe("plugin_message", callback);
   },
 
   requestProperties() {
-    inspector.send({
-      type: "GET_PLUGIN_PROPERTIES",
-    });
+    inspector.send({ type: "GET_PLUGIN_PROPERTIES" });
   },
 
-  onProperties(callback: (properties: unknown) => void) {
-    inspector.on("plugin_properties", callback);
-    return () => {
-      inspector.off("plugin_properties", callback);
-    };
+  onProperties(callback: (properties: unknown) => void): DisposeFunction {
+    return inspector.subscribe("plugin_properties", callback);
   },
 
   getProperties(): Promise<unknown> {
-    return new Promise((resolve) => {
-      const dispose = plugin.onProperties((properties) => {
-        resolve(properties);
-        dispose();
-      });
-      plugin.requestProperties();
-    });
+    return asyncEventCallback(plugin.onProperties, plugin.requestProperties);
   },
 
-  setProperty: debounce((name: string, value: unknown) => {
-    plugin.setProperties({ [name]: value }, true);
-  }, 100),
-
-  setProperties(properties: unknown, partial: boolean = true) {
-    inspector.send({
-      type: "SET_PLUGIN_PROPERTIES",
-      properties,
-      partial,
-    });
-  },
+  setProperty,
+  setProperties,
 };
 
 export default plugin;
