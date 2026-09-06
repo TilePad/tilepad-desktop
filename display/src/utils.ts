@@ -1,28 +1,21 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 /**
- * Helper to debounce calls to a function to ensure that
- * a delay has elapsed between calls
+ * Subscribes to an event handler, triggers the event, waits for the result, then disposes
+ * the event handler and resolves the value
  *
- * @param fn The function to call
- * @param delay The delay to wait before calling (Reset if called before the delay has elapsed)
- * @returns The debounced function
+ * @param onEvent Event handler to subscribe to with our async callback
+ * @param trigger The trigger to initiate the event (i.e fetch data that will run the handler)
+ * @returns The promise for the result value
  */
-export function debounce<T extends (...args: any[]) => any>(
-  fn: T,
-  delay: number,
-) {
-  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+export function asyncEventCallback<T>(
+  onEvent: (callback: (value: T) => void) => DisposeFunction,
+  trigger: () => void,
+): Promise<T> {
+  return new Promise((resolve) => {
+    const dispose = onEvent((value) => {
+      resolve(value);
+      dispose();
+    });
 
-  return function (this: any, ...args: Parameters<T>) {
-    // Clear the previous timeout
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-
-    // Set a new timeout with the specified delay
-    timeoutId = setTimeout(() => {
-      fn.apply(this, args);
-    }, delay);
-  };
+    trigger();
+  });
 }
