@@ -110,6 +110,8 @@
               </span>
             {/if}
           </span>
+
+          <p class="authors">{item.authors.join(", ")}</p>
         </div>
 
         <div>
@@ -208,5 +210,10 @@
 
   .installed-version {
     color: #999;
+  }
+
+  .authors {
+    font-size: 0.8rem;
+    color: #888;
   }
 </style>

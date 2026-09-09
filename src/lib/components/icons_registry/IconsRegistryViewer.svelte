@@ -100,6 +100,7 @@
         <div>
           <h2>{item.name}</h2>
           <p>{item.description}</p>
+
           <span>
             {i18n.f("version")}: {manifest.version}
 
@@ -109,6 +110,7 @@
               </span>
             {/if}
           </span>
+          <p class="authors">{item.authors.join(", ")}</p>
         </div>
       </div>
 
@@ -191,5 +193,10 @@
 
   .installed-version {
     color: #999;
+  }
+
+  .authors {
+    font-size: 0.8rem;
+    color: #888;
   }
 </style>
